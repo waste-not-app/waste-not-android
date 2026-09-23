@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>WasteNot · Design system & screen library</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="design-system.css">
+<script src="design-system.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Lewati navigasi</a>
+<aside class="sidebar">
+  <a class="wordmark" href="#overview">WasteNot<span class="brand-dot" aria-hidden="true"></span></a>
+  <p class="side-caption">Product design / Android</p>
+  <nav aria-label="Bagian dokumentasi">
+    <a href="#overview"><span>01</span>Arah desain</a>
+    <a href="#foundations"><span>02</span>Fondasi visual</a>
+    <a href="#components"><span>03</span>Komponen</a>
+    <a href="#screens"><span>04</span>Semua layar</a>
+    <a href="#prototype"><span>05</span>Coba alur</a>
+    <a href="#handoff"><span>06</span>Handoff Android</a>
+  </nav>
+  <div class="side-bottom"><label for="theme">Tema dokumentasi</label><select id="theme"><option value="light">Terang</option><option value="dark">Gelap</option><option value="system">Ikuti sistem</option></select><p>v1.1 / 23 Sep 2026<br>Rancangan, belum aplikasi produksi.</p><a href="DESIGN.md">Baca DESIGN.md</a></div>
+</aside>
+<main id="main">
+<section id="overview" class="overview">
+ <div class="topline"><span>WasteNot / UI system</span><span>Kotlin + Jetpack Compose</span></div>
+ <div class="cover">
+  <div class="cover-copy"><p class="eyebrow">Catatan kebiasaan 3R</p><h1>Lebih sadar,<br>mulai dari<br><span>satu catatan.</span></h1><p class="lede">Ruang sederhana untuk mencatat sampah, memahami cara memilah, dan melihat kebiasaanmu tumbuh.</p><a class="btn primary" href="#prototype">Coba alur pencatatan</a><p class="small muted">Prototype lokal. Seluruh angka dan aktivitas adalah data simulasi.</p><div class="cover-facts"><div><strong>20</strong><span>layar & panel</span></div><div><strong>34</strong><span>komponen</span></div><div><strong>2</strong><span>tema visual</span></div></div></div>
+  <div class="cover-visual"><div class="spec-label"><span>Beranda / S04</span><span>Data simulasi</span></div><div id="cover-phone" class="phone cover-phone"></div><div class="cover-note">Satu angka utama. Satu langkah berikutnya.</div></div>
+ </div>
+ <div class="principles"><div><span class="index">A</span><h3>Praktis untuk dicatat</h3><p>Form ringkas, satuan selalu terlihat, satu aksi utama di setiap layar.</p></div><div><span class="index">B</span><h3>Jelas untuk dipahami</h3><p>Berat, jumlah benda, dan aktivitas Reduce ditampilkan terpisah.</p></div><div><span class="index">C</span><h3>Nyaman untuk diulang</h3><p>Progres memberi dorongan tanpa menghakimi pilihan pengguna.</p></div></div>
+</section>
+<section id="foundations" class="doc-section">
+ <header class="section-head"><div><p class="eyebrow">02 / Fondasi visual</p><h2>Segar, dengan tujuan.</h2></div><p>Hijau pinus memandu aksi. Lime menandai progres. Tipografi sans menjaga angka dan input mudah dibaca.</p></header>
+ <div id="swatches" class="swatches"></div>
+ <div class="material-board" aria-label="Material permukaan">
+  <div class="material-sample material-solid"><strong>Solid / ruang baca</strong><p>Input dan daftar tetap tenang agar isi mudah dipahami.</p></div>
+  <div class="material-sample material-gradient"><strong>Gradasi / fokus utama</strong><p>Pinus berlapis untuk ringkasan. Lime untuk progres kebiasaan.</p></div>
+  <div class="material-stage"><div class="material-sample material-glass"><strong>Glass / navigasi</strong><p>Tint, pantulan tepi, dan blur lembut pada dock mengambang.</p></div></div>
+ </div>
+ <div class="type-board"><div class="font-intro"><p class="eyebrow">Satu keluarga font</p><h3>Plus<br>Jakarta Sans</h3><p>400 · 500 · 600 · 700 · 800</p><p class="muted">Font lokal, berlisensi SIL OFL. Tidak memerlukan koneksi internet.</p><a href="assets/fonts/OFL-PlusJakartaSans.txt">Lihat lisensi font</a></div><div class="type-samples"><div><span>Display / 48 · 800</span><strong class="type-display">650 <small>g</small></strong></div><div><span>Headline / 28 · 700</span><strong class="type-heading">Kebiasaan hari ini</strong></div><div><span>Body / 16 · 400</span><p>Catat yang kamu tangani. Pahami perubahan kecil dari hari ke hari.</p></div><div><span>Label / 14 · 700</span><b>Catat aktivitas</b></div></div></div>
+ <div class="foundation-bottom"><div><h3>Ritme jarak</h3><div class="spacing-samples" id="spacing-samples"></div><p class="small muted">Basis 4. Padding layar 20. Jarak antarseksi 24.</p></div><div><h3>Bentuk berdasarkan fungsi</h3><div class="radius-samples"><div style="border-radius:8px">8<br><small>Badge</small></div><div style="border-radius:12px">12<br><small>Kontrol</small></div><div style="border-radius:24px">24<br><small>Ringkasan</small></div></div></div></div>
+</section>
+<section id="components" class="doc-section">
+ <header class="section-head"><div><p class="eyebrow">03 / Library komponen</p><h2>Bahasa yang konsisten.</h2></div><p>34 komponen, dipetakan ke Material 3. Contoh dapat dicoba; tombol navigasi membuka layar terkait pada prototype.</p></header>
+ <div id="component-grid" class="component-grid"></div>
+</section>
+<section id="screens" class="doc-section">
+ <header class="section-head"><div><p class="eyebrow">04 / Screen library</p><h2>Dari masuk sampai refleksi.</h2></div><p>Galeri adalah pratinjau statis. Pilih “Coba layar” untuk membuka versi interaktif. Panel opsional ditandai jelas.</p></header>
+ <div class="gallery-tools"><label for="screen-filter">Tampilkan kelompok</label><select id="screen-filter"><option value="all">Seluruh 20 layar</option><option value="access">Akses akun</option><option value="tracking">Pencatatan</option><option value="insight">Panduan & statistik</option><option value="profile">Profil & pengaturan</option><option value="optional">Opsi & state</option></select><span id="screen-count" class="muted small"></span></div>
+ <div id="screen-gallery" class="screen-gallery"></div>
+</section>
+<section id="prototype" class="doc-section">
+ <header class="section-head"><div><p class="eyebrow">05 / Prototype interaktif</p><h2>Coba satu kebiasaan baru.</h2></div><p>Tambah, ubah, hapus, dan lihat angka berubah. Simulasi tersimpan di memori halaman ini dan kembali ke awal saat dimuat ulang.</p></header>
+ <div class="prototype-layout"><div class="prototype-controls"><label for="screen-select">Pilih layar</label><select id="screen-select"></select><label for="state-select">Keadaan layar data</label><select id="state-select"><option value="content">Konten</option><option value="loading">Loading</option><option value="empty">Kosong</option><option value="error">Gagal memuat</option><option value="offline">Offline</option></select><p id="live-description" class="muted"></p><hr><h3>Alur yang bisa dicoba</h3><ol class="flow-list"><li>Buka Beranda, pilih Catat aktivitas.</li><li>Pilih metode, kategori, dan satuan.</li><li>Simpan lalu periksa riwayat dan statistik.</li><li>Buka detail untuk ubah atau hapus.</li></ol><button class="btn secondary" data-action="reset-demo">Reset data simulasi</button><p class="small muted">Tanggal acuan: 21 Sep 2026, Asia/Jakarta. Gunakan data dan credential contoh saja.</p><div class="notice">Autentikasi, notifikasi, lokasi, dan respons server adalah simulasi. Foto hanya dipratinjau di perangkat.</div></div><div class="live-stage"><div class="spec-label"><span id="live-label">S04 / Beranda</span><span>Data simulasi</span></div><div id="live-phone" class="phone live-phone" tabindex="-1"></div><div class="dialog-tools"><span class="small muted">Uji dialog:</span><button data-dialog="delete">Hapus</button><button data-dialog="logout">Keluar</button><button data-dialog="discard">Buang draf</button><button data-dialog="conflict">Konflik</button></div></div></div>
+</section>
+<section id="handoff" class="doc-section handoff">
+ <div><p class="eyebrow">06 / Handoff</p><h2>Siap diterjemahkan<br>ke Compose.</h2><p>Token menjadi theme. Komponen menjadi bahasa bersama. Data dan perilaku tetap mengikuti spesifikasi produk.</p></div><div class="doc-links"><a href="DESIGN.md"><strong>DESIGN.md</strong><span>Token, styling, font, aksesibilitas</span></a><a href="SCREEN_SPEC.md"><strong>SCREEN_SPEC.md</strong><span>Field, aksi, state setiap layar</span></a><a href="PRD.md"><strong>PRD.md</strong><span>Scope dan aturan produk</span></a><a href="ARCHITECTURE.md"><strong>ARCHITECTURE.md</strong><span>State, navigasi, data, infrastruktur</span></a><a href="API.md"><strong>API.md</strong><span>Kontrak Android dan backend</span></a><a href="QA.md"><strong>QA.md</strong><span>Pemeriksaan paket mockup</span></a></div>
+</section>
+<footer>WasteNot / Design system 1.1 <span>Rancangan produk · 23 September 2026</span></footer>
+</main>
+<dialog id="app-dialog" aria-labelledby="dialog-title"><div id="dialog-body"></div></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

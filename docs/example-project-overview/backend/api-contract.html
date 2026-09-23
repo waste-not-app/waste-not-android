@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titip.in — API Contract</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:      #F5F2EC;
+    --cream-dark: #EDE9DF;
+    --warm-white: #FAFAF8;
+    --charcoal:   #1A1A18;
+    --c60: rgba(26,26,24,0.6);
+    --c30: rgba(26,26,24,0.3);
+    --c10: rgba(26,26,24,0.07);
+    --sage:       #8FAF8A;
+    --sage-pale:  #E8F0E7;
+    --terra:      #C8714A;
+    --terra-pale: #F5E4DB;
+    --gold:       #C4A862;
+    --gold-pale:  #F0E8D4;
+    --blue:       #4A7FC8;
+    --blue-pale:  #DBE8F5;
+    --purple:     #8A6FC8;
+    --purple-pale:#EBE8F5;
+    --red:        #C84A4A;
+    --red-pale:   #F5DBDB;
+
+    --font-d: 'Fraunces', serif;
+    --font-b: 'DM Sans', sans-serif;
+    --font-m: 'DM Mono', monospace;
+    --shadow: 0 2px 12px rgba(26,26,24,0.07);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--cream);
+    font-family: var(--font-b);
+    color: var(--charcoal);
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR NAV ── */
+  .sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--charcoal);
+    padding: 32px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-brand {
+    padding: 0 24px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 16px;
+  }
+
+  .brand-name {
+    font-family: var(--font-d);
+    font-size: 22px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--cream);
+  }
+
+  .brand-sub {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.3);
+    margin-top: 2px;
+  }
+
+  .nav-section {
+    padding: 0 16px;
+    margin-bottom: 8px;
+  }
+
+  .nav-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.25);
+    padding: 0 8px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+    margin-bottom: 2px;
+  }
+
+  .nav-item:hover { background: rgba(245,242,236,0.06); }
+  .nav-item.active { background: rgba(245,242,236,0.1); }
+
+  .nav-method {
+    font-size: 8px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: var(--font-m);
+    min-width: 36px;
+    text-align: center;
+  }
+
+  .m-get    { background: rgba(143,175,138,0.25); color: var(--sage); }
+  .m-post   { background: rgba(200,113,74,0.25);  color: #e0855a; }
+  .m-put    { background: rgba(196,168,98,0.25);  color: var(--gold); }
+  .m-delete { background: rgba(200,74,74,0.25);   color: #e06060; }
+
+  .nav-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(245,242,236,0.7);
+  }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    padding: 48px 52px 80px;
+    max-width: 900px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    margin-bottom: 52px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--c10);
+  }
+
+  .page-title {
+    font-family: var(--font-d);
+    font-size: 40px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+  }
+
+  .page-sub {
+    font-size: 13px;
+    color: var(--c60);
+    margin-bottom: 20px;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .pill-version  { background: var(--charcoal); color: var(--cream); }
+  .pill-base     { background: var(--blue-pale); color: var(--blue); font-family: var(--font-m); }
+  .pill-auth     { background: var(--purple-pale); color: var(--purple); }
+  .pill-format   { background: var(--sage-pale); color: var(--sage); }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 60px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1.5px solid var(--c10);
+  }
+
+  .section-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .icon-auth     { background: var(--purple-pale); }
+  .icon-jastip   { background: var(--sage-pale); }
+  .icon-preloved { background: var(--terra-pale); }
+  .icon-user     { background: var(--blue-pale); }
+  .icon-request  { background: var(--gold-pale); }
+  .icon-upload   { background: var(--cream-dark); }
+
+  .section-title {
+    font-family: var(--font-d);
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--charcoal);
+  }
+
+  /* ── ENDPOINT CARD ── */
+  .endpoint-card {
+    background: var(--warm-white);
+    border-radius: 18px;
+    border: 1px solid rgba(26,26,24,0.06);
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .endpoint-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .method-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 7px;
+    font-family: var(--font-m);
+    min-width: 56px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .badge-get    { background: var(--sage-pale);   color: var(--sage); }
+  .badge-post   { background: var(--terra-pale);  color: var(--terra); }
+  .badge-put    { background: var(--gold-pale);   color: var(--gold); }
+  .badge-delete { background: var(--red-pale);    color: var(--red); }
+
+  .endpoint-path {
+    font-family: var(--font-m);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--charcoal);
+    flex: 1;
+  }
+
+  .endpoint-desc {
+    font-size: 12px;
+    color: var(--c60);
+    margin-left: auto;
+  }
+
+  .auth-required {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--purple-pale);
+    color: var(--purple);
+    flex-shrink: 0;
+  }
+
+  .endpoint-body {
+    border-top: 1px solid var(--c10);
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .endpoint-body.single { grid-template-columns: 1fr; }
+
+  .body-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--c30);
+    margin-bottom: 10px;
+  }
+
+  /* Code block */
+  .code-block {
+    background: var(--charcoal);
+    border-radius: 12px;
+    padding: 16px;
+    font-family: var(--font-m);
+    font-size: 11.5px;
+    line-height: 1.8;
+    color: rgba(245,242,236,0.85);
+    overflow-x: auto;
+  }
+
+  .code-key    { color: #8FA8C8; }
+  .code-string { color: #A8C88F; }
+  .code-number { color: #C8A862; }
+  .code-bool   { color: #C88F8F; }
+  .code-null   { color: rgba(245,242,236,0.3); }
+  .code-type   { color: rgba(245,242,236,0.4); font-style: italic; }
+  .code-comment{ color: rgba(245,242,236,0.25); }
+
+  /* Params table */
+  .params-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .params-table th {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--c30);
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--c10);
+  }
+
+  .params-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--c10);
+    vertical-align: top;
+  }
+
+  .params-table tr:last-child td { border-bottom: none; }
+
+  .param-name {
+    font-family: var(--font-m);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--blue);
+  }
+
+  .param-type {
+    font-family: var(--font-m);
+    font-size: 10px;
+    color: var(--c60);
+  }
+
+  .param-required {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--terra);
+    background: var(--terra-pale);
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+
+  .param-optional {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--c30);
+    background: var(--c10);
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+
+  .param-desc {
+    font-size: 11px;
+    color: var(--c60);
+    line-height: 1.5;
+  }
+
+  /* ── GLOBAL RESPONSE ── */
+  .info-card {
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+
+  .info-base { background: var(--blue-pale); border: 1.5px solid rgba(74,127,200,0.15); }
+  .info-warn { background: var(--gold-pale); border: 1.5px solid rgba(196,168,98,0.2); }
+  .info-err  { background: var(--red-pale);  border: 1.5px solid rgba(200,74,74,0.15); }
+
+  .info-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .error-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .error-item {
+    background: white;
+    border-radius: 10px;
+    padding: 12px;
+  }
+
+  .error-code {
+    font-family: var(--font-m);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--red);
+    margin-bottom: 4px;
+  }
+
+  .error-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+  }
+
+  .error-desc {
+    font-size: 10px;
+    color: var(--c60);
+    line-height: 1.5;
+  }
+
+  /* ── DATA MODELS ── */
+  .model-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .model-card {
+    background: var(--warm-white);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid var(--c10);
+    box-shadow: var(--shadow);
+  }
+
+  .model-title {
+    font-family: var(--font-m);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--c10);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .model-badge {
+    font-size: 9px;
+    font-weight: 700;
+    background: var(--sage-pale);
+    color: var(--sage);
+    padding: 2px 7px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { padding: 24px 20px; }
+    .endpoint-body { grid-template-columns: 1fr; }
+    .model-grid { grid-template-columns: 1fr; }
+    .error-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">Titip.in</div>
+    <div class="brand-sub">API Contract v1.0</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <a href="#overview" class="nav-item active">
+      <span class="nav-label">📋 Global Info</span>
+    </a>
+    <a href="#models" class="nav-item">
+      <span class="nav-label">🧩 Data Models</span>
+    </a>
+    <a href="#errors" class="nav-item">
+      <span class="nav-label">⚠️ Error Codes</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Auth</div>
+    <a href="#auth" class="nav-item">
+      <span class="nav-method m-post">POST</span>
+      <span class="nav-label">/auth/register</span>
+    </a>
+    <a href="#auth" class="nav-item">
+      <span class="nav-method m-post">POST</span>
+      <span class="nav-label">/auth/login</span>
+    </a>
+    <a href="#auth" class="nav-item">
+      <span class="nav-method m-post">POST</span>
+      <span class="nav-label">/auth/refresh</span>
+    </a>
+    <a href="#auth" class="nav-item">
+      <span class="nav-method m-post">POST</span>
+      <span class="nav-label">/auth/logout</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Jastip</div>
+    <a href="#jastip" class="nav-item">
+      <span class="nav-method m-get">GET</span>
+      <span class="nav-label">/jastip</span>
+    </a>
+    <a href="#jastip" class="nav-item">
+      <span class="nav-method m-get">GET</span>
+      <span class="nav-label">/jastip/{id}</span>
+    </a>
+    <a href="#jastip" class="nav-item">
+      <span class="nav-method m-post">POST</span>
+      <span class="nav-label">/jastip</span>
+    </a>
+    <a href="#jastip" class="nav-item">
+      <span class="nav-method m-put">PUT</span>
+      <span class="nav-label">/jastip/{id}</span>
+    </a>
+    <a href="#jastip" class="nav-item">
+      <span class="nav-method m-delete">DEL</span>
+      <span class="nav-label">/jastip/{id}</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Preloved</div>
+    <a href="#preloved" class="nav-item">
+      <span class="nav-method m-get">GET</span>
+      <span class="nav-label">/preloved</span>
+    </a>
+    <a href="#preloved" class="nav-item">
+      <span class="nav-method m-get">GET</span>
+      <span class="nav-label">/preloved/{id}</span>
+    </a>
+    <a href="#preloved" class="nav-item">
+      <span class="nav-method m-post">POST</span>
+      <span class="nav-label">/preloved</span>
+    </a>
+    <a href="#preloved" class="nav-item">
+      <span class="nav-method m-put">PUT</span>
+      <span class="nav-label">/preloved/{id}</span>
+    </a>
+    <a href="#preloved" class="nav-item">
+      <span class="nav-method m-delete">DEL</span>
+      <span class="nav-label">/preloved/{id}</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Request Jastip</div>
+    <a href="#request" class="nav-item">
+      <span class="nav-method m-get">GET</span>
+      <span class="nav-label">/requests</span>
+    </a>
+    <a href="#request" class="nav-item">
+      <span class="nav-method m-post">POST</span>
+      <span class="nav-label">/requests</span>
+    </a>
+    <a href="#request" class="nav-item">
+      <span class="nav-method m-put">PUT</span>
+      <span class="nav-label">/requests/{id}</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">User & Upload</div>
+    <a href="#user" class="nav-item">
+      <span class="nav-method m-get">GET</span>
+      <span class="nav-label">/users/me</span>
+    </a>
+    <a href="#user" class="nav-item">
+      <span class="nav-method m-put">PUT</span>
+      <span class="nav-label">/users/me</span>
+    </a>
+    <a href="#upload" class="nav-item">
+      <span class="nav-method m-post">POST</span>
+      <span class="nav-label">/upload/image</span>
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="page-header" id="overview">
+    <div class="page-title">API Contract</div>
+    <div class="page-sub">Titip.in · REST API · Dokumen referensi untuk Android & Backend team</div>
+    <div class="meta-row">
+      <span class="meta-pill pill-version">v1.0.0</span>
+      <span class="meta-pill pill-base">Base URL: https://api.titip.in/v1</span>
+      <span class="meta-pill pill-auth">JWT Bearer Auth</span>
+      <span class="meta-pill pill-format">JSON · UTF-8</span>
+    </div>
+  </div>
+
+  <!-- ── GLOBAL RESPONSE FORMAT ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Global Response Format</div>
+    </div>
+
+    <div class="info-card info-base">
+      <div class="info-title">📦 Semua response pakai wrapper yang sama</div>
+      <div class="code-block">
+<span class="code-comment">// SUCCESS</span>
+{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: { <span class="code-comment">/* object atau array */</span> },
+  <span class="code-key">"message"</span>: <span class="code-string">"OK"</span>
+}
+
+<span class="code-comment">// ERROR</span>
+{
+  <span class="code-key">"success"</span>: <span class="code-bool">false</span>,
+  <span class="code-key">"error"</span>: {
+    <span class="code-key">"code"</span>: <span class="code-string">"UNAUTHORIZED"</span>,
+    <span class="code-key">"message"</span>: <span class="code-string">"Token expired or invalid"</span>
+  }
+}
+
+<span class="code-comment">// LIST dengan pagination</span>
+{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: [ <span class="code-comment">/* array items */</span> ],
+  <span class="code-key">"meta"</span>: {
+    <span class="code-key">"page"</span>: <span class="code-number">1</span>,
+    <span class="code-key">"limit"</span>: <span class="code-number">20</span>,
+    <span class="code-key">"total"</span>: <span class="code-number">87</span>,
+    <span class="code-key">"hasNext"</span>: <span class="code-bool">true</span>
+  }
+}</div>
+    </div>
+
+    <div class="info-card info-warn">
+      <div class="info-title">🔐 Auth Header</div>
+      <div class="code-block">Authorization: Bearer &lt;access_token&gt;</div>
+    </div>
+  </div>
+
+  <!-- ── ERROR CODES ── -->
+  <div class="section" id="errors">
+    <div class="section-header">
+      <div class="section-title">Error Codes</div>
+    </div>
+    <div class="error-grid">
+      <div class="error-item">
+        <div class="error-code">400</div>
+        <div class="error-name">BAD_REQUEST</div>
+        <div class="error-desc">Request body / param tidak valid atau ada field yang missing</div>
+      </div>
+      <div class="error-item">
+        <div class="error-code">401</div>
+        <div class="error-name">UNAUTHORIZED</div>
+        <div class="error-desc">Token tidak ada, expired, atau invalid</div>
+      </div>
+      <div class="error-item">
+        <div class="error-code">403</div>
+        <div class="error-name">FORBIDDEN</div>
+        <div class="error-desc">User tidak punya akses ke resource ini (bukan miliknya)</div>
+      </div>
+      <div class="error-item">
+        <div class="error-code">404</div>
+        <div class="error-name">NOT_FOUND</div>
+        <div class="error-desc">Resource yang diminta tidak ditemukan di database</div>
+      </div>
+      <div class="error-item">
+        <div class="error-code">409</div>
+        <div class="error-name">CONFLICT</div>
+        <div class="error-desc">Data sudah ada, misal email sudah terdaftar</div>
+      </div>
+      <div class="error-item">
+        <div class="error-code">429</div>
+        <div class="error-name">RATE_LIMITED</div>
+        <div class="error-desc">Terlalu banyak request dalam waktu singkat</div>
+      </div>
+      <div class="error-item">
+        <div class="error-code">500</div>
+        <div class="error-name">SERVER_ERROR</div>
+        <div class="error-desc">Internal server error, perlu dicek di log backend</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DATA MODELS ── -->
+  <div class="section" id="models">
+    <div class="section-header">
+      <div class="section-title">Data Models</div>
+    </div>
+    <div class="model-grid">
+
+      <div class="model-card">
+        <div class="model-title">UserSummary <span class="model-badge">reusable</span></div>
+        <div class="code-block" style="font-size:11px;">
+{
+  <span class="code-key">"id"</span>: <span class="code-string">"uuid"</span>,
+  <span class="code-key">"name"</span>: <span class="code-string">"Rizky Pratama"</span>,
+  <span class="code-key">"avatarUrl"</span>: <span class="code-string">"https://..."</span>,
+  <span class="code-key">"waNumber"</span>: <span class="code-string">"628123456789"</span>,
+  <span class="code-key">"rating"</span>: <span class="code-number">4.9</span>,
+  <span class="code-key">"totalJastip"</span>: <span class="code-number">23</span>
+}</div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-title">JastipListing <span class="model-badge">core</span></div>
+        <div class="code-block" style="font-size:11px;">
+{
+  <span class="code-key">"id"</span>: <span class="code-string">"uuid"</span>,
+  <span class="code-key">"user"</span>: <span class="code-type">UserSummary</span>,
+  <span class="code-key">"fromLocation"</span>: <span class="code-string">"Giant Dinoyo"</span>,
+  <span class="code-key">"toLocation"</span>: <span class="code-string">"Kampus UB"</span>,
+  <span class="code-key">"deadline"</span>: <span class="code-string">"2025-03-10T15:00:00Z"</span>,
+  <span class="code-key">"latitude"</span>: <span class="code-number">-7.9666</span>,
+  <span class="code-key">"longitude"</span>: <span class="code-number">112.6326</span>,
+  <span class="code-key">"distanceKm"</span>: <span class="code-number">1.2</span>,
+  <span class="code-key">"notes"</span>: <span class="code-string">"Bisa groceries & snack"</span>,
+  <span class="code-key">"status"</span>: <span class="code-string">"ACTIVE"</span>,
+  <span class="code-key">"createdAt"</span>: <span class="code-string">"2025-03-10T10:00:00Z"</span>
+}</div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-title">PrelovedItem <span class="model-badge">core</span></div>
+        <div class="code-block" style="font-size:11px;">
+{
+  <span class="code-key">"id"</span>: <span class="code-string">"uuid"</span>,
+  <span class="code-key">"user"</span>: <span class="code-type">UserSummary</span>,
+  <span class="code-key">"title"</span>: <span class="code-string">"Nike Air Max 90"</span>,
+  <span class="code-key">"description"</span>: <span class="code-string">"Jarang dipakai..."</span>,
+  <span class="code-key">"price"</span>: <span class="code-number">350000</span>,
+  <span class="code-key">"condition"</span>: <span class="code-string">"GOOD"</span>,
+  <span class="code-key">"category"</span>: <span class="code-string">"FASHION"</span>,
+  <span class="code-key">"images"</span>: [<span class="code-string">"https://s3.../img.jpg"</span>],
+  <span class="code-key">"isSold"</span>: <span class="code-bool">false</span>,
+  <span class="code-key">"createdAt"</span>: <span class="code-string">"2025-03-10T10:00:00Z"</span>
+}</div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-title">JastipRequest <span class="model-badge">core</span></div>
+        <div class="code-block" style="font-size:11px;">
+{
+  <span class="code-key">"id"</span>: <span class="code-string">"uuid"</span>,
+  <span class="code-key">"user"</span>: <span class="code-type">UserSummary</span>,
+  <span class="code-key">"fromLocation"</span>: <span class="code-string">"Alfamart Soekarno Hatta"</span>,
+  <span class="code-key">"toLocation"</span>: <span class="code-string">"Kos Dieng"</span>,
+  <span class="code-key">"notes"</span>: <span class="code-string">"Butuh indomie & telur"</span>,
+  <span class="code-key">"status"</span>: <span class="code-string">"OPEN"</span>,
+  <span class="code-key">"takenBy"</span>: <span class="code-null">null</span>,
+  <span class="code-key">"createdAt"</span>: <span class="code-string">"2025-03-10T10:00:00Z"</span>
+}</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       AUTH
+  ══════════════════════════ -->
+  <div class="section" id="auth">
+    <div class="section-header">
+      <div class="section-icon icon-auth">🔐</div>
+      <div class="section-title">Auth</div>
+    </div>
+
+    <!-- Register -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-post">POST</span>
+        <span class="endpoint-path">/auth/register</span>
+        <span class="endpoint-desc">Daftar akun baru</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Request Body</div>
+          <div class="code-block">{
+  <span class="code-key">"name"</span>: <span class="code-string">"Rizky Pratama"</span>,       <span class="code-comment">// required</span>
+  <span class="code-key">"email"</span>: <span class="code-string">"rizky@ub.ac.id"</span>,     <span class="code-comment">// required</span>
+  <span class="code-key">"password"</span>: <span class="code-string">"min8chars"</span>,       <span class="code-comment">// required, min 8</span>
+  <span class="code-key">"waNumber"</span>: <span class="code-string">"628123456789"</span>     <span class="code-comment">// required, format intl</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-section-title">Response 201</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: {
+    <span class="code-key">"accessToken"</span>: <span class="code-string">"eyJ..."</span>,
+    <span class="code-key">"refreshToken"</span>: <span class="code-string">"eyJ..."</span>,
+    <span class="code-key">"user"</span>: <span class="code-type">UserSummary</span>
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-post">POST</span>
+        <span class="endpoint-path">/auth/login</span>
+        <span class="endpoint-desc">Login dengan email & password</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Request Body</div>
+          <div class="code-block">{
+  <span class="code-key">"email"</span>: <span class="code-string">"rizky@ub.ac.id"</span>,
+  <span class="code-key">"password"</span>: <span class="code-string">"password123"</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: {
+    <span class="code-key">"accessToken"</span>: <span class="code-string">"eyJ..."</span>,  <span class="code-comment">// expires 15m</span>
+    <span class="code-key">"refreshToken"</span>: <span class="code-string">"eyJ..."</span>, <span class="code-comment">// expires 30d</span>
+    <span class="code-key">"user"</span>: <span class="code-type">UserSummary</span>
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Refresh -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-post">POST</span>
+        <span class="endpoint-path">/auth/refresh</span>
+        <span class="endpoint-desc">Refresh access token yang expired</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Request Body</div>
+          <div class="code-block">{
+  <span class="code-key">"refreshToken"</span>: <span class="code-string">"eyJ..."</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: {
+    <span class="code-key">"accessToken"</span>: <span class="code-string">"eyJ..."</span>
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════
+       JASTIP
+  ══════════════════════════ -->
+  <div class="section" id="jastip">
+    <div class="section-header">
+      <div class="section-icon icon-jastip">📦</div>
+      <div class="section-title">Jastip</div>
+    </div>
+
+    <!-- GET /jastip -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-get">GET</span>
+        <span class="endpoint-path">/jastip</span>
+        <span class="endpoint-desc">List jastip aktif, sort by distance</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Query Params</div>
+          <table class="params-table">
+            <tr><th>Param</th><th>Type</th><th>Wajib</th><th>Keterangan</th></tr>
+            <tr>
+              <td><span class="param-name">lat</span></td>
+              <td><span class="param-type">Double</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">Latitude user untuk sort by distance</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">lng</span></td>
+              <td><span class="param-type">Double</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">Longitude user</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">radius</span></td>
+              <td><span class="param-type">Int</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">Radius filter dalam km, default: 10</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">page</span></td>
+              <td><span class="param-type">Int</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">Halaman, default: 1</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">limit</span></td>
+              <td><span class="param-type">Int</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">Jumlah per halaman, default: 20</td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: [<span class="code-type">JastipListing</span>, ...],
+  <span class="code-key">"meta"</span>: {
+    <span class="code-key">"page"</span>: <span class="code-number">1</span>,
+    <span class="code-key">"limit"</span>: <span class="code-number">20</span>,
+    <span class="code-key">"total"</span>: <span class="code-number">24</span>,
+    <span class="code-key">"hasNext"</span>: <span class="code-bool">false</span>
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GET /jastip/{id} -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-get">GET</span>
+        <span class="endpoint-path">/jastip/{id}</span>
+        <span class="endpoint-desc">Detail satu jastip</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: <span class="code-type">JastipListing</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST /jastip -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-post">POST</span>
+        <span class="endpoint-path">/jastip</span>
+        <span class="endpoint-desc">Buat jastip baru</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Request Body</div>
+          <div class="code-block">{
+  <span class="code-key">"fromLocation"</span>: <span class="code-string">"Giant Dinoyo"</span>,   <span class="code-comment">// required</span>
+  <span class="code-key">"toLocation"</span>: <span class="code-string">"Kampus UB"</span>,        <span class="code-comment">// required</span>
+  <span class="code-key">"deadline"</span>: <span class="code-string">"2025-03-10T15:00:00Z"</span>, <span class="code-comment">// required</span>
+  <span class="code-key">"latitude"</span>: <span class="code-number">-7.9666</span>,              <span class="code-comment">// required</span>
+  <span class="code-key">"longitude"</span>: <span class="code-number">112.6326</span>,            <span class="code-comment">// required</span>
+  <span class="code-key">"notes"</span>: <span class="code-string">"Bisa groceries & snack"</span>  <span class="code-comment">// optional</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-section-title">Response 201</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: <span class="code-type">JastipListing</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PUT /jastip/{id} -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-put">PUT</span>
+        <span class="endpoint-path">/jastip/{id}</span>
+        <span class="endpoint-desc">Update jastip milik sendiri</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Request Body (semua optional)</div>
+          <div class="code-block">{
+  <span class="code-key">"fromLocation"</span>: <span class="code-string">"..."</span>,
+  <span class="code-key">"toLocation"</span>: <span class="code-string">"..."</span>,
+  <span class="code-key">"deadline"</span>: <span class="code-string">"..."</span>,
+  <span class="code-key">"notes"</span>: <span class="code-string">"..."</span>,
+  <span class="code-key">"status"</span>: <span class="code-string">"CLOSED"</span>  <span class="code-comment">// ACTIVE | CLOSED</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: <span class="code-type">JastipListing</span>  <span class="code-comment">// updated</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE /jastip/{id} -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-delete">DELETE</span>
+        <span class="endpoint-path">/jastip/{id}</span>
+        <span class="endpoint-desc">Hapus jastip milik sendiri</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"message"</span>: <span class="code-string">"Jastip deleted"</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════
+       PRELOVED
+  ══════════════════════════ -->
+  <div class="section" id="preloved">
+    <div class="section-header">
+      <div class="section-icon icon-preloved">🛍️</div>
+      <div class="section-title">Preloved</div>
+    </div>
+
+    <!-- GET /preloved -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-get">GET</span>
+        <span class="endpoint-path">/preloved</span>
+        <span class="endpoint-desc">List barang preloved</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Query Params</div>
+          <table class="params-table">
+            <tr><th>Param</th><th>Type</th><th>Wajib</th><th>Keterangan</th></tr>
+            <tr>
+              <td><span class="param-name">category</span></td>
+              <td><span class="param-type">String</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">FASHION, GADGET, BOOK, OTHER</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">condition</span></td>
+              <td><span class="param-type">String</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">NEW, GOOD, FAIR</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">minPrice</span></td>
+              <td><span class="param-type">Long</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">Filter harga minimum (IDR)</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">maxPrice</span></td>
+              <td><span class="param-type">Long</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">Filter harga maksimum (IDR)</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">search</span></td>
+              <td><span class="param-type">String</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">Keyword search title/desc</td>
+            </tr>
+            <tr>
+              <td><span class="param-name">page</span></td>
+              <td><span class="param-type">Int</span></td>
+              <td><span class="param-optional">optional</span></td>
+              <td class="param-desc">Default: 1</td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: [<span class="code-type">PrelovedItem</span>, ...],
+  <span class="code-key">"meta"</span>: {
+    <span class="code-key">"page"</span>: <span class="code-number">1</span>,
+    <span class="code-key">"total"</span>: <span class="code-number">89</span>,
+    <span class="code-key">"hasNext"</span>: <span class="code-bool">true</span>
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST /preloved -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-post">POST</span>
+        <span class="endpoint-path">/preloved</span>
+        <span class="endpoint-desc">Post barang preloved baru</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Request Body</div>
+          <div class="code-block">{
+  <span class="code-key">"title"</span>: <span class="code-string">"Nike Air Max 90"</span>,   <span class="code-comment">// required</span>
+  <span class="code-key">"description"</span>: <span class="code-string">"Jarang dipakai"</span>,  <span class="code-comment">// optional</span>
+  <span class="code-key">"price"</span>: <span class="code-number">350000</span>,                  <span class="code-comment">// required, IDR</span>
+  <span class="code-key">"condition"</span>: <span class="code-string">"GOOD"</span>,             <span class="code-comment">// required</span>
+  <span class="code-key">"category"</span>: <span class="code-string">"FASHION"</span>,           <span class="code-comment">// required</span>
+  <span class="code-key">"images"</span>: [<span class="code-string">"s3-key-1"</span>, <span class="code-string">"s3-key-2"</span>]  <span class="code-comment">// required, min 1</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-section-title">Response 201</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: <span class="code-type">PrelovedItem</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PUT /preloved/{id} -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-put">PUT</span>
+        <span class="endpoint-path">/preloved/{id}</span>
+        <span class="endpoint-desc">Update / tandai terjual</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Request Body (semua optional)</div>
+          <div class="code-block">{
+  <span class="code-key">"title"</span>: <span class="code-string">"..."</span>,
+  <span class="code-key">"description"</span>: <span class="code-string">"..."</span>,
+  <span class="code-key">"price"</span>: <span class="code-number">300000</span>,
+  <span class="code-key">"condition"</span>: <span class="code-string">"FAIR"</span>,
+  <span class="code-key">"isSold"</span>: <span class="code-bool">true</span>  <span class="code-comment">// tandai terjual</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: <span class="code-type">PrelovedItem</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════
+       REQUEST JASTIP
+  ══════════════════════════ -->
+  <div class="section" id="request">
+    <div class="section-header">
+      <div class="section-icon icon-request">📍</div>
+      <div class="section-title">Request Jastip</div>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-get">GET</span>
+        <span class="endpoint-path">/requests</span>
+        <span class="endpoint-desc">List semua request jastip terbuka</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: [<span class="code-type">JastipRequest</span>, ...]
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-post">POST</span>
+        <span class="endpoint-path">/requests</span>
+        <span class="endpoint-desc">Buat request jastip baru</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Request Body</div>
+          <div class="code-block">{
+  <span class="code-key">"fromLocation"</span>: <span class="code-string">"Alfamart Soekarno Hatta"</span>,
+  <span class="code-key">"toLocation"</span>: <span class="code-string">"Kos Dieng"</span>,
+  <span class="code-key">"notes"</span>: <span class="code-string">"Butuh indomie & telur"</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-section-title">Response 201</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: <span class="code-type">JastipRequest</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-put">PUT</span>
+        <span class="endpoint-path">/requests/{id}/take</span>
+        <span class="endpoint-desc">Ambil request jastip orang lain</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: {
+    <span class="code-key">"request"</span>: <span class="code-type">JastipRequest</span>,  <span class="code-comment">// status: TAKEN</span>
+    <span class="code-key">"takenBy"</span>: <span class="code-type">UserSummary</span>
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════
+       USER & UPLOAD
+  ══════════════════════════ -->
+  <div class="section" id="user">
+    <div class="section-header">
+      <div class="section-icon icon-user">👤</div>
+      <div class="section-title">User & Upload</div>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-get">GET</span>
+        <span class="endpoint-path">/users/me</span>
+        <span class="endpoint-desc">Get profil user yang sedang login</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: {
+    <span class="code-key">"id"</span>: <span class="code-string">"uuid"</span>,
+    <span class="code-key">"name"</span>: <span class="code-string">"Rizky Pratama"</span>,
+    <span class="code-key">"email"</span>: <span class="code-string">"rizky@ub.ac.id"</span>,
+    <span class="code-key">"waNumber"</span>: <span class="code-string">"628123456789"</span>,
+    <span class="code-key">"avatarUrl"</span>: <span class="code-string">"https://..."</span>,
+    <span class="code-key">"rating"</span>: <span class="code-number">4.9</span>,
+    <span class="code-key">"totalJastip"</span>: <span class="code-number">23</span>,
+    <span class="code-key">"totalPreloved"</span>: <span class="code-number">5</span>,
+    <span class="code-key">"createdAt"</span>: <span class="code-string">"2025-01-01T00:00:00Z"</span>
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-put">PUT</span>
+        <span class="endpoint-path">/users/me</span>
+        <span class="endpoint-desc">Update profil sendiri</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Request Body (semua optional)</div>
+          <div class="code-block">{
+  <span class="code-key">"name"</span>: <span class="code-string">"Rizky Updated"</span>,
+  <span class="code-key">"waNumber"</span>: <span class="code-string">"628198765432"</span>,
+  <span class="code-key">"avatarUrl"</span>: <span class="code-string">"s3-key-avatar"</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: <span class="code-type">UserSummary</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="section" id="upload">
+    <div class="section-header">
+      <div class="section-icon icon-upload">🖼️</div>
+      <div class="section-title">Upload</div>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method-badge badge-post">POST</span>
+        <span class="endpoint-path">/upload/image</span>
+        <span class="endpoint-desc">Upload gambar ke S3, return URL</span>
+        <span class="auth-required">🔐 Auth</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-section-title">Request</div>
+          <div class="code-block"><span class="code-comment">// Content-Type: multipart/form-data</span>
+{
+  <span class="code-key">"file"</span>: <span class="code-type">File</span>,           <span class="code-comment">// required, max 5MB</span>
+  <span class="code-key">"type"</span>: <span class="code-string">"preloved"</span>   <span class="code-comment">// preloved | avatar</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-section-title">Response 200</div>
+          <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: {
+    <span class="code-key">"key"</span>: <span class="code-string">"preloved/uuid.jpg"</span>,  <span class="code-comment">// S3 key, simpan ini</span>
+    <span class="code-key">"url"</span>: <span class="code-string">"https://s3.../..."</span>   <span class="code-comment">// URL publik</span>
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+</body>
+</html>

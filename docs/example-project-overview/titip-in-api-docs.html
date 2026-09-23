@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titip.in — API Docs</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:       #F5F2EC;
+    --warm-white:  #FAFAF7;
+    --charcoal:    #1A1A18;
+    --charcoal-60: rgba(26,26,24,0.6);
+    --charcoal-10: rgba(26,26,24,0.08);
+    --sage:        #8FAF8A;
+    --sage-pale:   #EEF4ED;
+    --terra:       #C8714A;
+    --terra-pale:  #F8EDE8;
+    --gold:        #C4A862;
+    --gold-pale:   #FAF4E6;
+    --blue:        #5B82A6;
+    --blue-pale:   #EAF0F6;
+    --purple:      #8B6FAF;
+    --purple-pale: #F0ECF8;
+    --red:         #C85A5A;
+    --red-pale:    #F8ECEC;
+    --shadow:      0 2px 12px rgba(26,26,24,0.06);
+    --font-d:      'DM Serif Display', serif;
+    --font-s:      'DM Sans', sans-serif;
+    --font-m:      'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-s);
+    background: var(--cream);
+    color: var(--charcoal);
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--charcoal);
+    padding: 32px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .sidebar-logo {
+    padding: 0 24px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 16px;
+  }
+
+  .logo-title {
+    font-family: var(--font-d);
+    font-size: 22px;
+    font-style: italic;
+    color: var(--cream);
+    letter-spacing: -0.3px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: rgba(245,242,236,0.4);
+    font-family: var(--font-m);
+    margin-top: 2px;
+  }
+
+  .nav-section {
+    padding: 8px 24px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.3);
+    margin-top: 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 24px;
+    font-size: 13px;
+    color: rgba(245,242,236,0.65);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  .nav-item:hover {
+    color: var(--cream);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .nav-item.active {
+    color: var(--cream);
+    border-left-color: var(--sage);
+    background: rgba(143,175,138,0.1);
+  }
+
+  .nav-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-auth    { background: var(--purple); }
+  .dot-jastip  { background: var(--sage); }
+  .dot-preloved{ background: var(--terra); }
+  .dot-request { background: var(--gold); }
+  .dot-wanted  { background: var(--blue); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 20px 24px 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .version-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(143,175,138,0.2);
+    border: 1px solid rgba(143,175,138,0.3);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: var(--font-m);
+    color: var(--sage);
+  }
+
+  .base-url {
+    font-size: 10px;
+    font-family: var(--font-m);
+    color: rgba(245,242,236,0.3);
+    margin-top: 8px;
+    word-break: break-all;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    padding: 52px 56px 100px;
+    max-width: 860px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    margin-bottom: 56px;
+    padding-bottom: 36px;
+    border-bottom: 1.5px solid var(--charcoal-10);
+  }
+
+  .page-tag {
+    display: inline-block;
+    font-family: var(--font-m);
+    font-size: 11px;
+    color: var(--terra);
+    background: var(--terra-pale);
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+
+  .page-title {
+    font-family: var(--font-d);
+    font-size: 44px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--charcoal);
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  .page-sub {
+    font-size: 14px;
+    color: var(--charcoal-60);
+    line-height: 1.6;
+    max-width: 520px;
+    margin-bottom: 20px;
+  }
+
+  .meta-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-m);
+  }
+
+  .pill-dark    { background: var(--charcoal); color: var(--cream); }
+  .pill-sage    { background: var(--sage-pale); color: var(--sage); }
+  .pill-purple  { background: var(--purple-pale); color: var(--purple); }
+  .pill-gold    { background: var(--gold-pale); color: var(--gold); }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 64px;
+    scroll-margin-top: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1.5px solid var(--charcoal-10);
+  }
+
+  .section-icon {
+    width: 38px; height: 38px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  .icon-auth     { background: var(--purple-pale); }
+  .icon-jastip   { background: var(--sage-pale); }
+  .icon-preloved { background: var(--terra-pale); }
+  .icon-request  { background: var(--gold-pale); }
+  .icon-wanted   { background: var(--blue-pale); }
+  .icon-model    { background: var(--charcoal-10); }
+
+  .section-title {
+    font-family: var(--font-d);
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--charcoal);
+  }
+
+  /* ── ENDPOINT CARD ── */
+  .endpoint-card {
+    background: var(--warm-white);
+    border-radius: 18px;
+    border: 1px solid var(--charcoal-10);
+    margin-bottom: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .endpoint-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    flex-wrap: wrap;
+  }
+
+  .method {
+    font-family: var(--font-m);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    min-width: 52px;
+    text-align: center;
+  }
+
+  .m-get    { background: rgba(143,175,138,0.2); color: #5A8F54; }
+  .m-post   { background: rgba(200,113,74,0.2);  color: var(--terra); }
+  .m-put    { background: rgba(196,168,98,0.2);  color: #A08020; }
+  .m-delete { background: rgba(200,90,90,0.2);   color: var(--red); }
+
+  .endpoint-path {
+    font-family: var(--font-m);
+    font-size: 14px;
+    color: var(--charcoal);
+    font-weight: 500;
+  }
+
+  .endpoint-desc {
+    font-size: 12px;
+    color: var(--charcoal-60);
+    margin-left: auto;
+  }
+
+  .badge-auth {
+    font-size: 10px;
+    font-family: var(--font-m);
+    background: var(--purple-pale);
+    color: var(--purple);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .badge-public {
+    font-size: 10px;
+    font-family: var(--font-m);
+    background: var(--sage-pale);
+    color: var(--sage);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .endpoint-body {
+    border-top: 1px solid var(--charcoal-10);
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .endpoint-body.single {
+    grid-template-columns: 1fr;
+  }
+
+  .body-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--charcoal-60);
+    margin-bottom: 10px;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #1E1E1C;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: var(--font-m);
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-x: auto;
+    color: #D4D0C8;
+  }
+
+  .ck  { color: #9ECBFF; } /* key */
+  .cs  { color: #9ADCA8; } /* string */
+  .cn  { color: #FFD580; } /* number */
+  .cb  { color: #FF9F6A; } /* bool */
+  .ct  { color: #C9A9FF; } /* type */
+  .cc  { color: #6A7A6A; font-style: italic; } /* comment */
+  .cg  { color: #7EC8A0; } /* green label */
+
+  /* ── NOTES ── */
+  .note {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin-top: 10px;
+  }
+
+  .note-info  { background: var(--blue-pale);   color: var(--blue); }
+  .note-warn  { background: var(--gold-pale);   color: #906010; }
+  .note-error { background: var(--red-pale);    color: var(--red); }
+  .note-ok    { background: var(--sage-pale);   color: #3A6A35; }
+
+  /* ── ERROR TABLE ── */
+  .error-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin-top: 8px;
+  }
+
+  .error-table th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--charcoal-60);
+    padding: 8px 12px;
+    border-bottom: 1.5px solid var(--charcoal-10);
+  }
+
+  .error-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--charcoal-10);
+    vertical-align: top;
+  }
+
+  .error-table tr:last-child td { border-bottom: none; }
+
+  .code-pill {
+    font-family: var(--font-m);
+    font-size: 11px;
+    background: var(--charcoal-10);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .http-pill {
+    font-family: var(--font-m);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .http-200 { background: rgba(143,175,138,0.2); color: #5A8F54; }
+  .http-201 { background: rgba(143,175,138,0.2); color: #5A8F54; }
+  .http-400 { background: rgba(196,168,98,0.2);  color: #A08020; }
+  .http-401 { background: rgba(139,111,175,0.2); color: var(--purple); }
+  .http-403 { background: rgba(200,113,74,0.2);  color: var(--terra); }
+  .http-404 { background: rgba(200,90,90,0.2);   color: var(--red); }
+  .http-409 { background: rgba(200,90,90,0.2);   color: var(--red); }
+  .http-500 { background: rgba(26,26,24,0.1);    color: var(--charcoal); }
+
+  /* ── MODEL GRID ── */
+  .model-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .model-card {
+    background: var(--warm-white);
+    border: 1px solid var(--charcoal-10);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .model-name {
+    font-family: var(--font-m);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .model-badge {
+    font-size: 10px;
+    background: var(--charcoal-10);
+    color: var(--charcoal-60);
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+
+  /* ── STATUS OVERVIEW ── */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .status-card {
+    background: var(--warm-white);
+    border: 1px solid var(--charcoal-10);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .status-label {
+    font-size: 11px;
+    color: var(--charcoal-60);
+    margin-bottom: 4px;
+  }
+
+  .status-value {
+    font-family: var(--font-d);
+    font-size: 28px;
+    color: var(--charcoal);
+    line-height: 1;
+  }
+
+  .status-value.green { color: var(--sage); }
+
+  .divider {
+    height: 1.5px;
+    background: var(--charcoal-10);
+    margin: 48px 0;
+    border: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-title">Titip.in</div>
+    <div class="logo-sub">API Documentation</div>
+  </div>
+
+  <div class="nav-section">Overview</div>
+  <a href="#overview" class="nav-item active">
+    <div class="nav-dot" style="background:var(--cream);opacity:0.4"></div>
+    Getting Started
+  </a>
+  <a href="#models" class="nav-item">
+    <div class="nav-dot" style="background:var(--cream);opacity:0.4"></div>
+    Data Models
+  </a>
+  <a href="#errors" class="nav-item">
+    <div class="nav-dot" style="background:var(--cream);opacity:0.4"></div>
+    Error Codes
+  </a>
+
+  <div class="nav-section">Endpoints</div>
+  <a href="#auth" class="nav-item">
+    <div class="nav-dot dot-auth"></div>
+    Auth
+  </a>
+  <a href="#jastip" class="nav-item">
+    <div class="nav-dot dot-jastip"></div>
+    Jastip
+  </a>
+  <a href="#preloved" class="nav-item">
+    <div class="nav-dot dot-preloved"></div>
+    Preloved
+  </a>
+  <a href="#requests" class="nav-item">
+    <div class="nav-dot dot-request"></div>
+    Requests
+  </a>
+  <a href="#wanted" class="nav-item">
+    <div class="nav-dot dot-wanted"></div>
+    Wanted
+  </a>
+
+  <div class="sidebar-footer">
+    <div class="version-pill">
+      <span>●</span> v1.0.0 MVP
+    </div>
+    <div class="base-url">localhost:8080<br>10.0.2.2:8080 (emulator)</div>
+  </div>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header" id="overview">
+    <div class="page-tag">Backend · Ktor + PostgreSQL</div>
+    <div class="page-title">Titip.in API</div>
+    <div class="page-sub">Dokumentasi lengkap semua endpoint yang tersedia. Semua response dibungkus dengan format <code style="font-family:var(--font-m);font-size:12px">ApiResponse</code> yang konsisten.</div>
+    <div class="meta-pills">
+      <span class="pill pill-dark">REST API</span>
+      <span class="pill pill-sage">JSON</span>
+      <span class="pill pill-purple">JWT Auth</span>
+      <span class="pill pill-gold">MVP Complete ✓</span>
+    </div>
+  </div>
+
+  <!-- STATUS OVERVIEW -->
+  <div class="status-grid">
+    <div class="status-card">
+      <div class="status-label">Total Endpoints</div>
+      <div class="status-value green">15</div>
+    </div>
+    <div class="status-card">
+      <div class="status-label">Auth Required</div>
+      <div class="status-value">10</div>
+    </div>
+    <div class="status-card">
+      <div class="status-label">Public</div>
+      <div class="status-value">5</div>
+    </div>
+  </div>
+
+  <!-- GLOBAL RESPONSE FORMAT -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-model">📦</div>
+      <div class="section-title">Global Response Format</div>
+    </div>
+
+    <div class="endpoint-card">
+      <div class="endpoint-body" style="grid-template-columns:1fr 1fr">
+        <div>
+          <div class="body-label">✅ Success</div>
+          <div class="code-block">{
+  <span class="ck">"success"</span>: <span class="cb">true</span>,
+  <span class="ck">"message"</span>: <span class="cs">"OK"</span>,
+  <span class="ck">"data"</span>: <span class="ct">T</span>,       <span class="cc">// object atau array</span>
+  <span class="ck">"error"</span>: <span class="cb">null</span>,
+  <span class="ck">"meta"</span>: <span class="cb">null</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-label">❌ Error</div>
+          <div class="code-block">{
+  <span class="ck">"success"</span>: <span class="cb">false</span>,
+  <span class="ck">"message"</span>: <span class="cb">null</span>,
+  <span class="ck">"data"</span>: <span class="cb">null</span>,
+  <span class="ck">"error"</span>: {
+    <span class="ck">"code"</span>: <span class="cs">"NOT_FOUND"</span>,
+    <span class="ck">"message"</span>: <span class="cs">"..."</span>
+  },
+  <span class="ck">"meta"</span>: <span class="cb">null</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note note-info">
+      💡 Selalu cek field <code style="font-family:var(--font-m)">"success"</code> dulu sebelum parse <code style="font-family:var(--font-m)">"data"</code>. Header <code style="font-family:var(--font-m)">Authorization: Bearer &lt;token&gt;</code> wajib untuk endpoint protected.
+    </div>
+  </div>
+
+  <!-- DATA MODELS -->
+  <div class="section" id="models">
+    <div class="section-header">
+      <div class="section-icon icon-model">🗂</div>
+      <div class="section-title">Data Models</div>
+    </div>
+
+    <div class="model-grid">
+
+      <div class="model-card">
+        <div class="model-name">UserSummary <span class="model-badge">reusable</span></div>
+        <div class="code-block" style="font-size:11.5px">{
+  <span class="ck">"name"</span>:      <span class="ct">String</span>,
+  <span class="ck">"waNumber"</span>:  <span class="ct">String</span>,  <span class="cc">// "628xxx"</span>
+  <span class="ck">"avatarUrl"</span>: <span class="ct">String?</span>
+}</div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-name">JastipDto <span class="model-badge">core</span></div>
+        <div class="code-block" style="font-size:11.5px">{
+  <span class="ck">"id"</span>:           <span class="ct">String</span>,   <span class="cc">// UUID</span>
+  <span class="ck">"userId"</span>:       <span class="ct">String</span>,
+  <span class="ck">"user"</span>:         <span class="ct">UserSummary</span>,
+  <span class="ck">"fromLocation"</span>: <span class="ct">String</span>,
+  <span class="ck">"toLocation"</span>:   <span class="ct">String</span>,
+  <span class="ck">"deadline"</span>:     <span class="ct">String</span>,   <span class="cc">// ISO datetime</span>
+  <span class="ck">"latitude"</span>:     <span class="ct">Double</span>,
+  <span class="ck">"longitude"</span>:    <span class="ct">Double</span>,
+  <span class="ck">"notes"</span>:        <span class="ct">String?</span>,
+  <span class="ck">"status"</span>:       <span class="cs">"ACTIVE"</span> | <span class="cs">"CLOSED"</span>,
+  <span class="ck">"createdAt"</span>:    <span class="ct">String</span>
+}</div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-name">PrelovedDto <span class="model-badge">core</span></div>
+        <div class="code-block" style="font-size:11.5px">{
+  <span class="ck">"id"</span>:          <span class="ct">String</span>,
+  <span class="ck">"userId"</span>:      <span class="ct">String</span>,
+  <span class="ck">"user"</span>:        <span class="ct">UserSummary</span>,
+  <span class="ck">"title"</span>:       <span class="ct">String</span>,
+  <span class="ck">"description"</span>: <span class="ct">String?</span>,
+  <span class="ck">"price"</span>:       <span class="ct">Double</span>,    <span class="cc">// IDR</span>
+  <span class="ck">"category"</span>:    <span class="ct">String</span>,
+  <span class="ck">"condition"</span>:   <span class="cs">"NEW"</span>|<span class="cs">"LIKE_NEW"</span>|<span class="cs">"GOOD"</span>|<span class="cs">"FAIR"</span>,
+  <span class="ck">"imageUrl"</span>:    <span class="ct">String?</span>,
+  <span class="ck">"status"</span>:      <span class="cs">"AVAILABLE"</span>|<span class="cs">"SOLD"</span>|<span class="cs">"RESERVED"</span>,
+  <span class="ck">"createdAt"</span>:   <span class="ct">String</span>
+}</div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-name">RequestDto <span class="model-badge">core</span></div>
+        <div class="code-block" style="font-size:11.5px">{
+  <span class="ck">"id"</span>:           <span class="ct">String</span>,
+  <span class="ck">"userId"</span>:       <span class="ct">String</span>,
+  <span class="ck">"user"</span>:         <span class="ct">UserSummary</span>,
+  <span class="ck">"fromLocation"</span>: <span class="ct">String</span>,
+  <span class="ck">"toLocation"</span>:   <span class="ct">String</span>,
+  <span class="ck">"notes"</span>:        <span class="ct">String?</span>,
+  <span class="ck">"status"</span>:       <span class="cs">"OPEN"</span>|<span class="cs">"TAKEN"</span>|<span class="cs">"CLOSED"</span>,
+  <span class="ck">"createdAt"</span>:    <span class="ct">String</span>
+}</div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-name">WantedDto <span class="model-badge">core</span></div>
+        <div class="code-block" style="font-size:11.5px">{
+  <span class="ck">"id"</span>:          <span class="ct">String</span>,
+  <span class="ck">"userId"</span>:      <span class="ct">String</span>,
+  <span class="ck">"user"</span>:        <span class="ct">UserSummary</span>,
+  <span class="ck">"title"</span>:       <span class="ct">String</span>,
+  <span class="ck">"description"</span>: <span class="ct">String?</span>,
+  <span class="ck">"maxPrice"</span>:    <span class="ct">Double?</span>,   <span class="cc">// IDR, optional</span>
+  <span class="ck">"category"</span>:    <span class="ct">String?</span>,
+  <span class="ck">"status"</span>:      <span class="cs">"OPEN"</span>|<span class="cs">"FOUND"</span>|<span class="cs">"CLOSED"</span>,
+  <span class="ck">"createdAt"</span>:   <span class="ct">String</span>
+}</div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-name">UserDto <span class="model-badge">auth</span></div>
+        <div class="code-block" style="font-size:11.5px">{
+  <span class="ck">"id"</span>:         <span class="ct">String</span>,
+  <span class="ck">"name"</span>:       <span class="ct">String</span>,
+  <span class="ck">"email"</span>:      <span class="ct">String</span>,
+  <span class="ck">"waNumber"</span>:   <span class="ct">String</span>,
+  <span class="ck">"avatarUrl"</span>:  <span class="ct">String?</span>,
+  <span class="ck">"createdAt"</span>:  <span class="ct">String</span>
+}</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ERROR CODES -->
+  <div class="section" id="errors">
+    <div class="section-header">
+      <div class="section-icon icon-model">⚠️</div>
+      <div class="section-title">Error Codes</div>
+    </div>
+    <div class="endpoint-card">
+      <div class="endpoint-body single">
+        <table class="error-table">
+          <tr>
+            <th>Code</th>
+            <th>HTTP</th>
+            <th>Keterangan</th>
+          </tr>
+          <tr><td><span class="code-pill">BAD_REQUEST</span></td><td><span class="http-pill http-400">400</span></td><td>Request body tidak valid / field kosong</td></tr>
+          <tr><td><span class="code-pill">UNAUTHORIZED</span></td><td><span class="http-pill http-401">401</span></td><td>Token tidak ada atau tidak valid</td></tr>
+          <tr><td><span class="code-pill">FORBIDDEN</span></td><td><span class="http-pill http-403">403</span></td><td>Aksi tidak diizinkan (misal: take request sendiri)</td></tr>
+          <tr><td><span class="code-pill">NOT_FOUND</span></td><td><span class="http-pill http-404">404</span></td><td>Resource tidak ditemukan</td></tr>
+          <tr><td><span class="code-pill">CONFLICT</span></td><td><span class="http-pill http-409">409</span></td><td>Sudah diambil orang lain</td></tr>
+          <tr><td><span class="code-pill">EMAIL_ALREADY_EXISTS</span></td><td><span class="http-pill http-409">409</span></td><td>Email sudah terdaftar</td></tr>
+          <tr><td><span class="code-pill">INVALID_CREDENTIALS</span></td><td><span class="http-pill http-401">401</span></td><td>Email/password salah</td></tr>
+          <tr><td><span class="code-pill">INSUFFICIENT_PERMISSION</span></td><td><span class="http-pill http-403">403</span></td><td>Bukan pemilik resource</td></tr>
+          <tr><td><span class="code-pill">ITEM_NOT_AVAILABLE</span></td><td><span class="http-pill http-409">409</span></td><td>Item sudah tidak tersedia</td></tr>
+          <tr><td><span class="code-pill">SERVER_ERROR</span></td><td><span class="http-pill http-500">500</span></td><td>Kesalahan internal server</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══ AUTH ══ -->
+  <div class="section" id="auth">
+    <div class="section-header">
+      <div class="section-icon icon-auth">🔐</div>
+      <div class="section-title">Auth</div>
+    </div>
+
+    <!-- POST /auth/register -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-post">POST</span>
+        <span class="endpoint-path">/auth/register</span>
+        <span class="badge-public">public</span>
+        <span class="endpoint-desc">Daftar akun baru</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-label">Request Body</div>
+          <div class="code-block">{
+  <span class="ck">"name"</span>:     <span class="cs">"Okta Pratama"</span>,     <span class="cc">// required</span>
+  <span class="ck">"email"</span>:    <span class="cs">"okta@mail.com"</span>,    <span class="cc">// required, unique</span>
+  <span class="ck">"password"</span>: <span class="cs">"password123"</span>,    <span class="cc">// required</span>
+  <span class="ck">"waNumber"</span>: <span class="cs">"628123456789"</span>    <span class="cc">// required, format intl</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-label">Response 201</div>
+          <div class="code-block">{
+  <span class="ck">"accessToken"</span>: <span class="cs">"eyJ..."</span>,  <span class="cc">// JWT 24 jam</span>
+  <span class="ck">"user"</span>: <span class="ct">UserDto</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST /auth/login -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-post">POST</span>
+        <span class="endpoint-path">/auth/login</span>
+        <span class="badge-public">public</span>
+        <span class="endpoint-desc">Login, dapat token</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-label">Request Body</div>
+          <div class="code-block">{
+  <span class="ck">"email"</span>:    <span class="cs">"okta@mail.com"</span>,
+  <span class="ck">"password"</span>: <span class="cs">"password123"</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block">{
+  <span class="ck">"accessToken"</span>: <span class="cs">"eyJ..."</span>,
+  <span class="ck">"user"</span>: <span class="ct">UserDto</span>
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GET /auth/me -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-get">GET</span>
+        <span class="endpoint-path">/auth/me</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Profil user dari token</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block"><span class="ct">UserDto</span>  <span class="cc">// data user yang sedang login</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ JASTIP ══ -->
+  <div class="section" id="jastip">
+    <div class="section-header">
+      <div class="section-icon icon-jastip">📦</div>
+      <div class="section-title">Jastip</div>
+    </div>
+
+    <div class="note note-ok" style="margin-bottom:20px">
+      📋 Tab <strong>"Tersedia"</strong> — listing dari provider yang menawarkan jasa jastip. <code style="font-family:var(--font-m)">GET /jastip</code> hanya return status <strong>ACTIVE</strong>.
+    </div>
+
+    <!-- GET /jastip -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-get">GET</span>
+        <span class="endpoint-path">/jastip</span>
+        <span class="badge-public">public</span>
+        <span class="endpoint-desc">List semua jastip aktif</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block">[<span class="ct">JastipDto</span>, ...]  <span class="cc">// hanya status ACTIVE</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GET /jastip/{id} -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-get">GET</span>
+        <span class="endpoint-path">/jastip/{id}</span>
+        <span class="badge-public">public</span>
+        <span class="endpoint-desc">Detail satu jastip</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block"><span class="ct">JastipDto</span>  <span class="cc">// 404 kalau tidak ditemukan</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST /jastip -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-post">POST</span>
+        <span class="endpoint-path">/jastip</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Buka jastip baru</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-label">Request Body</div>
+          <div class="code-block">{
+  <span class="ck">"fromLocation"</span>: <span class="cs">"Giant Dinoyo"</span>,   <span class="cc">// required</span>
+  <span class="ck">"toLocation"</span>:   <span class="cs">"Kos Soekarno"</span>,  <span class="cc">// required</span>
+  <span class="ck">"deadline"</span>:     <span class="cs">"2026-03-15T15:00:00"</span>, <span class="cc">// required</span>
+  <span class="ck">"latitude"</span>:     <span class="cn">-7.9666</span>,        <span class="cc">// required</span>
+  <span class="ck">"longitude"</span>:    <span class="cn">112.6326</span>,       <span class="cc">// required</span>
+  <span class="ck">"notes"</span>:        <span class="cs">"Bisa groceries"</span> <span class="cc">// optional</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-label">Response 201</div>
+          <div class="code-block"><span class="ct">JastipDto</span>  <span class="cc">// include user object</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PUT /jastip/{id} -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-put">PUT</span>
+        <span class="endpoint-path">/jastip/{id}</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Update status (owner only)</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-label">Request Body</div>
+          <div class="code-block">{
+  <span class="ck">"status"</span>: <span class="cs">"CLOSED"</span>  <span class="cc">// ACTIVE | CLOSED</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block"><span class="ct">JastipDto</span>  <span class="cc">// 403 kalau bukan owner</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE /jastip/{id} -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-delete">DELETE</span>
+        <span class="endpoint-path">/jastip/{id}</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Hapus jastip (owner only)</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block">{ <span class="ck">"message"</span>: <span class="cs">"Jastip berhasil dihapus"</span> }  <span class="cc">// 403 kalau bukan owner</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PRELOVED ══ -->
+  <div class="section" id="preloved">
+    <div class="section-header">
+      <div class="section-icon icon-preloved">🛍️</div>
+      <div class="section-title">Preloved</div>
+    </div>
+
+    <div class="note note-ok" style="margin-bottom:20px">
+      📋 Tab <strong>"Dijual"</strong> — barang preloved yang dijual. <code style="font-family:var(--font-m)">GET /preloved</code> hanya return status <strong>AVAILABLE</strong>.
+    </div>
+
+    <!-- GET /preloved -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-get">GET</span>
+        <span class="endpoint-path">/preloved</span>
+        <span class="badge-public">public</span>
+        <span class="endpoint-desc">List semua barang tersedia</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block">[<span class="ct">PrelovedDto</span>, ...]  <span class="cc">// hanya status AVAILABLE</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GET /preloved/{id} -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-get">GET</span>
+        <span class="endpoint-path">/preloved/{id}</span>
+        <span class="badge-public">public</span>
+        <span class="endpoint-desc">Detail satu item</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block"><span class="ct">PrelovedDto</span>  <span class="cc">// 404 kalau tidak ditemukan</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST /preloved -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-post">POST</span>
+        <span class="endpoint-path">/preloved</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Post barang baru</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-label">Request Body</div>
+          <div class="code-block">{
+  <span class="ck">"title"</span>:       <span class="cs">"Nike Air Max 90"</span>,  <span class="cc">// required</span>
+  <span class="ck">"description"</span>: <span class="cs">"Jarang dipakai"</span>,   <span class="cc">// optional</span>
+  <span class="ck">"price"</span>:       <span class="cn">350000</span>,             <span class="cc">// required, IDR</span>
+  <span class="ck">"category"</span>:    <span class="cs">"FASHION"</span>,          <span class="cc">// required</span>
+  <span class="ck">"condition"</span>:   <span class="cs">"GOOD"</span>,             <span class="cc">// required</span>
+  <span class="ck">"imageUrl"</span>:    <span class="cs">"https://..."</span>       <span class="cc">// optional</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-label">Response 201 + Enums</div>
+          <div class="code-block"><span class="ct">PrelovedDto</span>
+
+<span class="cc">// condition:</span>
+<span class="cs">"NEW"</span> | <span class="cs">"LIKE_NEW"</span> | <span class="cs">"GOOD"</span> | <span class="cs">"FAIR"</span>
+
+<span class="cc">// status default: AVAILABLE</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PUT /preloved/{id} -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-put">PUT</span>
+        <span class="endpoint-path">/preloved/{id}</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Update status (owner only)</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-label">Request Body</div>
+          <div class="code-block">{
+  <span class="ck">"status"</span>: <span class="cs">"SOLD"</span>
+  <span class="cc">// AVAILABLE | SOLD | RESERVED</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block"><span class="ct">PrelovedDto</span>  <span class="cc">// updated</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE /preloved/{id} -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-delete">DELETE</span>
+        <span class="endpoint-path">/preloved/{id}</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Hapus item (owner only)</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block">{ <span class="ck">"message"</span>: <span class="cs">"Preloved berhasil dihapus"</span> }</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ REQUESTS ══ -->
+  <div class="section" id="requests">
+    <div class="section-header">
+      <div class="section-icon icon-request">📍</div>
+      <div class="section-title">Requests</div>
+    </div>
+
+    <div class="note note-ok" style="margin-bottom:20px">
+      📋 Tab <strong>"Cari Jastip"</strong> — user yang <em>butuh</em> dititipin bisa posting request. Provider lain bisa "ambil" request tersebut. <code style="font-family:var(--font-m)">GET /requests</code> hanya return status <strong>OPEN</strong>.
+    </div>
+
+    <!-- GET /requests -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-get">GET</span>
+        <span class="endpoint-path">/requests</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">List semua request terbuka</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block">[<span class="ct">RequestDto</span>, ...]  <span class="cc">// hanya status OPEN</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST /requests -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-post">POST</span>
+        <span class="endpoint-path">/requests</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Buat request jastip baru</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-label">Request Body</div>
+          <div class="code-block">{
+  <span class="ck">"fromLocation"</span>: <span class="cs">"Alfamart Soekarno"</span>,  <span class="cc">// required</span>
+  <span class="ck">"toLocation"</span>:   <span class="cs">"Kos Dieng Indah"</span>,   <span class="cc">// required</span>
+  <span class="ck">"notes"</span>:        <span class="cs">"Indomie 3 bungkus"</span>  <span class="cc">// optional</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-label">Response 201</div>
+          <div class="code-block"><span class="ct">RequestDto</span>  <span class="cc">// status: OPEN</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PUT /requests/{id}/take -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-put">PUT</span>
+        <span class="endpoint-path">/requests/{id}/take</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Ambil request (provider)</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-label">Request Body</div>
+          <div class="code-block"><span class="cc">// tidak perlu body</span></div>
+        </div>
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block">{
+  <span class="ck">"request"</span>: <span class="ct">RequestDto</span>,   <span class="cc">// status: TAKEN</span>
+  <span class="ck">"takenBy"</span>: <span class="ct">UserSummary</span>  <span class="cc">// provider yg ambil</span>
+}</div>
+        </div>
+      </div>
+      <div style="padding: 0 20px 16px">
+        <div class="note note-warn">
+          ⚠️ <strong>403</strong> kalau mencoba mengambil request milik sendiri. <strong>409</strong> kalau request sudah diambil orang lain.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ WANTED ══ -->
+  <div class="section" id="wanted">
+    <div class="section-header">
+      <div class="section-icon icon-wanted">🔍</div>
+      <div class="section-title">Wanted</div>
+    </div>
+
+    <div class="note note-ok" style="margin-bottom:20px">
+      📋 Tab <strong>"Barang Dicari"</strong> — user yang <em>mencari</em> barang preloved bisa posting wanted. Seller yang punya barang bisa "fulfill" request tersebut. <code style="font-family:var(--font-m)">GET /wanted</code> hanya return status <strong>OPEN</strong>.
+    </div>
+
+    <!-- GET /wanted -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-get">GET</span>
+        <span class="endpoint-path">/wanted</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">List semua pencarian terbuka</span>
+      </div>
+      <div class="endpoint-body single">
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block">[<span class="ct">WantedDto</span>, ...]  <span class="cc">// hanya status OPEN</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST /wanted -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-post">POST</span>
+        <span class="endpoint-path">/wanted</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Post pencarian barang baru</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-label">Request Body</div>
+          <div class="code-block">{
+  <span class="ck">"title"</span>:       <span class="cs">"Laptop second 3 juta"</span>, <span class="cc">// required</span>
+  <span class="ck">"description"</span>: <span class="cs">"RAM min 8GB"</span>,         <span class="cc">// optional</span>
+  <span class="ck">"maxPrice"</span>:    <span class="cn">3000000</span>,               <span class="cc">// optional, IDR</span>
+  <span class="ck">"category"</span>:    <span class="cs">"GADGET"</span>               <span class="cc">// optional</span>
+}</div>
+        </div>
+        <div>
+          <div class="body-label">Response 201</div>
+          <div class="code-block"><span class="ct">WantedDto</span>  <span class="cc">// status: OPEN</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PUT /wanted/{id}/fulfill -->
+    <div class="endpoint-card">
+      <div class="endpoint-head">
+        <span class="method m-put">PUT</span>
+        <span class="endpoint-path">/wanted/{id}/fulfill</span>
+        <span class="badge-auth">🔐 Auth</span>
+        <span class="endpoint-desc">Tawarkan barang ke pencari</span>
+      </div>
+      <div class="endpoint-body">
+        <div>
+          <div class="body-label">Request Body</div>
+          <div class="code-block"><span class="cc">// tidak perlu body</span></div>
+        </div>
+        <div>
+          <div class="body-label">Response 200</div>
+          <div class="code-block">{
+  <span class="ck">"wantedItem"</span>: <span class="ct">WantedDto</span>,    <span class="cc">// status: FOUND</span>
+  <span class="ck">"foundBy"</span>:    <span class="ct">UserSummary</span>  <span class="cc">// seller yg offer</span>
+}</div>
+        </div>
+      </div>
+      <div style="padding: 0 20px 16px">
+        <div class="note note-warn">
+          ⚠️ <strong>403</strong> kalau mencoba fulfill wanted milik sendiri. <strong>409</strong> kalau wanted sudah dipenuhi orang lain.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // Highlight active nav on scroll
+  const sections = document.querySelectorAll('.section, .page-header');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(n => n.classList.remove('active'));
+        const target = document.querySelector(`.nav-item[href="#${entry.target.id}"]`);
+        if (target) target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('[id]').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

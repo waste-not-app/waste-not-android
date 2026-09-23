@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titip.in — System Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:      #F5F2EC;
+    --cream-dark: #EDE9DF;
+    --warm-white: #FAFAF8;
+    --charcoal:   #1A1A18;
+    --c60:        rgba(26,26,24,0.6);
+    --c30:        rgba(26,26,24,0.3);
+    --c10:        rgba(26,26,24,0.08);
+    --sage:       #8FAF8A;
+    --sage-pale:  #E8F0E7;
+    --terra:      #C8714A;
+    --terra-pale: #F5E4DB;
+    --gold:       #C4A862;
+    --gold-pale:  #F0E8D4;
+    --blue:       #4A7FC8;
+    --blue-pale:  #DBE8F5;
+    --purple:     #8A6FC8;
+    --purple-pale:#EBE8F5;
+
+    --font-d: 'Fraunces', serif;
+    --font-b: 'DM Sans', sans-serif;
+    --font-m: 'DM Mono', monospace;
+    --r-sm: 8px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px;
+    --shadow: 0 4px 20px rgba(26,26,24,0.08), 0 1px 4px rgba(26,26,24,0.04);
+    --shadow-lg: 0 12px 40px rgba(26,26,24,0.12);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--cream);
+    font-family: var(--font-b);
+    color: var(--charcoal);
+    min-height: 100vh;
+    padding: 48px;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--c10);
+  }
+
+  .header-left .app-name {
+    font-family: var(--font-d);
+    font-size: 38px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--charcoal);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .header-left .doc-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--c60);
+  }
+
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .stack-badge {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .badge {
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-kotlin { background: var(--purple-pale); color: var(--purple); }
+  .badge-ktor   { background: var(--blue-pale);   color: var(--blue);   }
+  .badge-pg     { background: var(--sage-pale);   color: var(--sage);   }
+  .badge-aws    { background: var(--gold-pale);   color: var(--gold);   }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    color: var(--c60);
+    font-weight: 500;
+  }
+
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+  }
+
+  /* ── MAIN DIAGRAM ── */
+  .arch-diagram {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  /* ── LAYER LABELS ── */
+  .layer-label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    padding-right: 16px;
+    gap: 4px;
+  }
+
+  .layer-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--c60);
+    text-align: right;
+  }
+
+  .layer-sub {
+    font-size: 10px;
+    color: var(--c30);
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  /* ── LAYER CONTENT ── */
+  .layer-content {
+    background: var(--warm-white);
+    border-radius: var(--r-xl);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(26,26,24,0.05);
+  }
+
+  /* CLIENT LAYER */
+  .client-layer {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .client-card {
+    flex: 1;
+    border-radius: var(--r-lg);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .client-android {
+    background: var(--purple-pale);
+    border: 1.5px solid rgba(138,111,200,0.2);
+  }
+
+  .client-dev {
+    background: var(--cream-dark);
+    border: 1.5px solid rgba(26,26,24,0.08);
+  }
+
+  .card-icon { font-size: 22px; margin-bottom: 2px; }
+
+  .card-title {
+    font-family: var(--font-d);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--charcoal);
+  }
+
+  .card-sub {
+    font-size: 11px;
+    color: var(--c60);
+    line-height: 1.5;
+  }
+
+  .tech-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 4px;
+  }
+
+  .tech-pill {
+    background: white;
+    border: 1px solid rgba(26,26,24,0.1);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--charcoal);
+    font-family: var(--font-m);
+  }
+
+  /* ARROW ROW */
+  .arrow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0;
+    gap: 32px;
+    grid-column: 2;
+  }
+
+  .arrow-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .arrow-line {
+    width: 2px;
+    height: 28px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .arrow-up   { background: linear-gradient(to top, transparent, var(--blue)); }
+  .arrow-down { background: linear-gradient(to bottom, transparent, var(--terra)); }
+  .arrow-both {
+    background: linear-gradient(to bottom, var(--blue), var(--terra));
+  }
+
+  .arrow-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--c30);
+    white-space: nowrap;
+  }
+
+  .arrow-tag {
+    background: var(--blue-pale);
+    color: var(--blue);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 9px;
+    font-weight: 700;
+    font-family: var(--font-m);
+  }
+
+  /* BACKEND LAYER */
+  .backend-layer {
+    display: flex;
+    gap: 16px;
+  }
+
+  .backend-main {
+    flex: 2;
+    background: var(--charcoal);
+    border-radius: var(--r-lg);
+    padding: 20px;
+    color: var(--cream);
+  }
+
+  .backend-main-title {
+    font-family: var(--font-d);
+    font-size: 18px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--cream);
+    margin-bottom: 4px;
+  }
+
+  .backend-main-sub {
+    font-size: 10px;
+    color: rgba(245,242,236,0.4);
+    margin-bottom: 16px;
+    font-family: var(--font-m);
+  }
+
+  .module-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .module-card {
+    background: rgba(245,242,236,0.06);
+    border: 1px solid rgba(245,242,236,0.08);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .module-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .module-routes {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .route-item {
+    font-size: 9px;
+    color: rgba(245,242,236,0.4);
+    font-family: var(--font-m);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .method {
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: var(--font-m);
+  }
+
+  .get    { background: rgba(143,175,138,0.3); color: var(--sage); }
+  .post   { background: rgba(200,113,74,0.3);  color: var(--terracotta, #C8714A); }
+  .put    { background: rgba(196,168,98,0.3);  color: var(--gold); }
+  .delete { background: rgba(200,74,74,0.3);   color: #c84a4a; }
+
+  .backend-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .side-card {
+    border-radius: var(--r-md);
+    padding: 14px;
+    flex: 1;
+  }
+
+  .side-auth    { background: var(--blue-pale); border: 1.5px solid rgba(74,127,200,0.2); }
+  .side-storage { background: var(--gold-pale); border: 1.5px solid rgba(196,168,98,0.2); }
+  .side-notif   { background: var(--terra-pale); border: 1.5px solid rgba(200,113,74,0.2); }
+
+  .side-card-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .side-card-sub {
+    font-size: 10px;
+    color: var(--c60);
+    line-height: 1.5;
+    font-family: var(--font-m);
+  }
+
+  /* DATA LAYER */
+  .data-layer {
+    display: flex;
+    gap: 16px;
+  }
+
+  .data-card {
+    flex: 1;
+    border-radius: var(--r-lg);
+    padding: 18px;
+  }
+
+  .data-pg {
+    background: var(--sage-pale);
+    border: 1.5px solid rgba(143,175,138,0.25);
+    flex: 2;
+  }
+
+  .data-s3 {
+    background: var(--gold-pale);
+    border: 1.5px solid rgba(196,168,98,0.25);
+  }
+
+  .data-cache {
+    background: var(--blue-pale);
+    border: 1.5px solid rgba(74,127,200,0.2);
+  }
+
+  .data-title {
+    font-family: var(--font-d);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin-bottom: 2px;
+  }
+
+  .data-sub {
+    font-size: 10px;
+    color: var(--c60);
+    margin-bottom: 12px;
+    font-family: var(--font-m);
+  }
+
+  .table-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .table-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: var(--c60);
+  }
+
+  .table-name {
+    font-family: var(--font-m);
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--charcoal);
+    background: rgba(255,255,255,0.7);
+    padding: 2px 8px;
+    border-radius: 5px;
+  }
+
+  /* ── INFRA / AWS SECTION ── */
+  .infra-section {
+    background: var(--charcoal);
+    border-radius: var(--r-xl);
+    padding: 28px 32px;
+    margin-bottom: 40px;
+    color: var(--cream);
+  }
+
+  .infra-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .infra-title {
+    font-family: var(--font-d);
+    font-size: 22px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--cream);
+  }
+
+  .infra-badge {
+    background: var(--gold);
+    color: white;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .infra-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+
+  .infra-card {
+    background: rgba(245,242,236,0.05);
+    border: 1px solid rgba(245,242,236,0.08);
+    border-radius: var(--r-md);
+    padding: 16px;
+  }
+
+  .infra-icon { font-size: 20px; margin-bottom: 8px; }
+
+  .infra-service {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 2px;
+  }
+
+  .infra-aws-name {
+    font-size: 10px;
+    color: var(--gold);
+    font-family: var(--font-m);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .infra-desc {
+    font-size: 10px;
+    color: rgba(245,242,236,0.45);
+    line-height: 1.6;
+  }
+
+  .infra-spec {
+    margin-top: 8px;
+    font-size: 9px;
+    font-family: var(--font-m);
+    color: rgba(245,242,236,0.3);
+    line-height: 1.7;
+  }
+
+  /* ── TEAM & PHASES ── */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .section-card {
+    background: var(--warm-white);
+    border-radius: var(--r-xl);
+    padding: 28px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(26,26,24,0.05);
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--c30);
+    margin-bottom: 20px;
+  }
+
+  /* Team */
+  .team-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .team-card {
+    border-radius: var(--r-md);
+    padding: 16px;
+  }
+
+  .team-card-1 { background: var(--purple-pale); border: 1.5px solid rgba(138,111,200,0.15); }
+  .team-card-2 { background: var(--blue-pale);   border: 1.5px solid rgba(74,127,200,0.15);  }
+
+  .team-role {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--c60);
+    margin-bottom: 6px;
+  }
+
+  .team-name {
+    font-family: var(--font-d);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin-bottom: 10px;
+  }
+
+  .team-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .team-task {
+    font-size: 10px;
+    color: var(--c60);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.4;
+  }
+
+  .task-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-purple { background: var(--purple); }
+  .dot-blue   { background: var(--blue); }
+
+  .shared-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--c60);
+    margin: 14px 0 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .shared-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .shared-pill {
+    background: var(--cream-dark);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--c60);
+  }
+
+  /* Phases */
+  .phase-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .phase-item {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 20px;
+    position: relative;
+  }
+
+  .phase-item:last-child { padding-bottom: 0; }
+
+  .phase-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: 0;
+    width: 2px;
+    background: var(--c10);
+  }
+
+  .phase-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .phase-1 { background: var(--terra-pale); color: var(--terra); }
+  .phase-2 { background: var(--sage-pale);  color: var(--sage);  }
+  .phase-3 { background: var(--blue-pale);  color: var(--blue);  }
+  .phase-4 { background: var(--gold-pale);  color: var(--gold);  }
+
+  .phase-content { flex: 1; }
+
+  .phase-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: 2px;
+  }
+
+  .phase-period {
+    font-size: 10px;
+    color: var(--c30);
+    font-family: var(--font-m);
+    margin-bottom: 6px;
+  }
+
+  .phase-tasks {
+    font-size: 11px;
+    color: var(--c60);
+    line-height: 1.7;
+  }
+
+  /* ── API CONTRACT SECTION ── */
+  .api-section {
+    background: var(--warm-white);
+    border-radius: var(--r-xl);
+    padding: 28px 32px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(26,26,24,0.05);
+    margin-bottom: 40px;
+  }
+
+  .api-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--c30);
+    margin-bottom: 20px;
+  }
+
+  .api-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .api-group {
+    border-radius: var(--r-md);
+    padding: 16px;
+    background: var(--cream);
+    border: 1px solid var(--cream-dark);
+  }
+
+  .api-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .endpoint {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 6px;
+    font-size: 10px;
+    font-family: var(--font-m);
+    color: var(--c60);
+  }
+
+  @media (max-width: 1100px) {
+    .infra-grid { grid-template-columns: 1fr 1fr; }
+    .api-grid   { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 800px) {
+    body { padding: 24px 16px; }
+    .arch-diagram { grid-template-columns: 100px 1fr; }
+    .bottom-grid  { grid-template-columns: 1fr; }
+    .team-grid    { grid-template-columns: 1fr; }
+    .infra-grid   { grid-template-columns: 1fr 1fr; }
+    .api-grid     { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="header-left">
+    <div class="app-name">Titip.in</div>
+    <div class="doc-title">System Architecture · v1.0</div>
+  </div>
+  <div class="header-right">
+    <div class="stack-badge">
+      <span class="badge badge-kotlin">Kotlin · Jetpack Compose</span>
+      <span class="badge badge-ktor">Ktor · Kotlin</span>
+      <span class="badge badge-pg">PostgreSQL</span>
+      <span class="badge badge-aws">AWS EC2 · RDS · S3</span>
+    </div>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple-pale);border:1.5px solid var(--purple);"></div>Android Client</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--charcoal);"></div>Ktor Backend</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--sage-pale);border:1.5px solid var(--sage);"></div>PostgreSQL / RDS</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gold-pale);border:1.5px solid var(--gold);"></div>AWS S3</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--blue-pale);border:1.5px solid var(--blue);"></div>Auth / Cache / Notif</div>
+  <div class="legend-item">
+    <div style="width:32px;height:2px;background:linear-gradient(to right,var(--blue),var(--terra));border-radius:2px;"></div>
+    REST / HTTPS
+  </div>
+</div>
+
+<!-- ARCHITECTURE DIAGRAM -->
+<div class="arch-diagram">
+
+  <!-- Layer 1: Client -->
+  <div class="layer-label">
+    <div class="layer-name">Client</div>
+    <div class="layer-sub">Android App<br>Jetpack Compose</div>
+  </div>
+  <div class="layer-content client-layer">
+
+    <div class="client-card client-android">
+      <div class="card-icon">📱</div>
+      <div class="card-title">Android App</div>
+      <div class="card-sub">Jetpack Compose UI · MVVM + Clean Architecture · Kotlin Coroutines</div>
+      <div class="tech-pills">
+        <span class="tech-pill">Compose</span>
+        <span class="tech-pill">Retrofit</span>
+        <span class="tech-pill">Hilt</span>
+        <span class="tech-pill">Room</span>
+        <span class="tech-pill">DataStore</span>
+        <span class="tech-pill">Coil</span>
+        <span class="tech-pill">Maps SDK</span>
+        <span class="tech-pill">FCM</span>
+      </div>
+    </div>
+
+    <div class="client-card client-dev">
+      <div class="card-icon">🛠️</div>
+      <div class="card-title">Dev Tools</div>
+      <div class="card-sub">Tools untuk development & testing selama masa development berdua</div>
+      <div class="tech-pills">
+        <span class="tech-pill">Postman</span>
+        <span class="tech-pill">Android Studio</span>
+        <span class="tech-pill">IntelliJ IDEA</span>
+        <span class="tech-pill">Git / GitHub</span>
+        <span class="tech-pill">Swagger UI</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Arrow: Client → Backend -->
+  <div></div>
+  <div class="arrow-row">
+    <div class="arrow-group">
+      <div class="arrow-label">Request</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="arrow-line arrow-down" style="height:20px;"></div>
+        <span class="arrow-tag">HTTPS · REST · JSON</span>
+        <div class="arrow-line arrow-up" style="height:20px;"></div>
+      </div>
+      <div class="arrow-label">Response</div>
+    </div>
+    <div class="arrow-group">
+      <div class="arrow-label">Auth Token</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="arrow-line arrow-down" style="height:20px;"></div>
+        <span class="arrow-tag">JWT Bearer</span>
+        <div class="arrow-line arrow-up" style="height:20px;"></div>
+      </div>
+      <div class="arrow-label">Refresh</div>
+    </div>
+    <div class="arrow-group">
+      <div class="arrow-label">Push Notification</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="arrow-line arrow-up" style="height:20px;"></div>
+        <span class="arrow-tag">FCM</span>
+        <div style="width:2px;height:20px;background:transparent;"></div>
+      </div>
+      <div class="arrow-label">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- Layer 2: Backend -->
+  <div class="layer-label">
+    <div class="layer-name">Backend</div>
+    <div class="layer-sub">Ktor Server<br>AWS EC2</div>
+  </div>
+  <div class="layer-content backend-layer">
+
+    <div class="backend-main">
+      <div class="backend-main-title">Ktor Backend</div>
+      <div class="backend-main-sub">EC2 · Kotlin · Exposed ORM · Coroutines</div>
+
+      <div class="module-grid">
+
+        <div class="module-card">
+          <div class="module-name">🔐 Auth Module</div>
+          <div class="module-routes">
+            <div class="route-item"><span class="method post">POST</span>/auth/register</div>
+            <div class="route-item"><span class="method post">POST</span>/auth/login</div>
+            <div class="route-item"><span class="method post">POST</span>/auth/refresh</div>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">📦 Jastip Module</div>
+          <div class="module-routes">
+            <div class="route-item"><span class="method get">GET</span>/jastip?lat=&lng=</div>
+            <div class="route-item"><span class="method post">POST</span>/jastip</div>
+            <div class="route-item"><span class="method get">GET</span>/jastip/{id}</div>
+            <div class="route-item"><span class="method put">PUT</span>/jastip/{id}</div>
+            <div class="route-item"><span class="method delete">DEL</span>/jastip/{id}</div>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">🛍️ Preloved Module</div>
+          <div class="module-routes">
+            <div class="route-item"><span class="method get">GET</span>/preloved</div>
+            <div class="route-item"><span class="method post">POST</span>/preloved</div>
+            <div class="route-item"><span class="method get">GET</span>/preloved/{id}</div>
+            <div class="route-item"><span class="method put">PUT</span>/preloved/{id}</div>
+            <div class="route-item"><span class="method delete">DEL</span>/preloved/{id}</div>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">👤 User Module</div>
+          <div class="module-routes">
+            <div class="route-item"><span class="method get">GET</span>/users/me</div>
+            <div class="route-item"><span class="method put">PUT</span>/users/me</div>
+            <div class="route-item"><span class="method get">GET</span>/users/{id}</div>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">📍 Request Module</div>
+          <div class="module-routes">
+            <div class="route-item"><span class="method get">GET</span>/requests</div>
+            <div class="route-item"><span class="method post">POST</span>/requests</div>
+            <div class="route-item"><span class="method put">PUT</span>/requests/{id}</div>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">🖼️ Upload Module</div>
+          <div class="module-routes">
+            <div class="route-item"><span class="method post">POST</span>/upload/image</div>
+            <div class="route-item"><span class="method delete">DEL</span>/upload/{key}</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="backend-side">
+      <div class="side-card side-auth">
+        <div class="side-card-title">🔑 Auth & Security</div>
+        <div class="side-card-sub">
+          JWT Access Token (15m)<br>
+          Refresh Token (30d)<br>
+          BCrypt password hash<br>
+          Rate limiting per IP
+        </div>
+      </div>
+      <div class="side-card side-storage">
+        <div class="side-card-title">🗂️ S3 Image Storage</div>
+        <div class="side-card-sub">
+          Preloved item photos<br>
+          User avatar uploads<br>
+          Presigned URL upload<br>
+          CloudFront CDN (later)
+        </div>
+      </div>
+      <div class="side-card side-notif">
+        <div class="side-card-title">🔔 Push Notification</div>
+        <div class="side-card-sub">
+          FCM via Firebase Admin SDK<br>
+          Jastip baru di area user<br>
+          Pesan WA redirect event
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Arrow: Backend → Data -->
+  <div></div>
+  <div class="arrow-row">
+    <div class="arrow-group">
+      <div class="arrow-label">SQL Queries</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="arrow-line arrow-down" style="height:20px;"></div>
+        <span class="arrow-tag">Kotlin Exposed ORM</span>
+        <div class="arrow-line arrow-up" style="height:20px;"></div>
+      </div>
+      <div class="arrow-label">Result Sets</div>
+    </div>
+    <div class="arrow-group">
+      <div class="arrow-label">S3 Put/Get</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="arrow-line arrow-down" style="height:20px;"></div>
+        <span class="arrow-tag">AWS SDK</span>
+        <div class="arrow-line arrow-up" style="height:20px;"></div>
+      </div>
+      <div class="arrow-label">URL / Binary</div>
+    </div>
+  </div>
+
+  <!-- Layer 3: Data -->
+  <div class="layer-label">
+    <div class="layer-name">Data</div>
+    <div class="layer-sub">AWS RDS<br>S3 · Redis</div>
+  </div>
+  <div class="layer-content data-layer">
+
+    <div class="data-card data-pg">
+      <div class="data-title">PostgreSQL</div>
+      <div class="data-sub">AWS RDS · db.t3.micro (MVP)</div>
+      <div class="table-list">
+        <div class="table-item"><span class="table-name">users</span> id, name, email, phone, avatar_url, wa_number</div>
+        <div class="table-item"><span class="table-name">jastip_listings</span> id, user_id, from_loc, to_loc, deadline, status, lat, lng</div>
+        <div class="table-item"><span class="table-name">jastip_requests</span> id, user_id, from_loc, to_loc, notes, status</div>
+        <div class="table-item"><span class="table-name">preloved_items</span> id, user_id, title, price, condition, category, images[]</div>
+        <div class="table-item"><span class="table-name">categories</span> id, name, icon, type (jastip/preloved)</div>
+      </div>
+    </div>
+
+    <div class="data-card data-s3">
+      <div class="data-title">S3 Bucket</div>
+      <div class="data-sub">ap-southeast-1</div>
+      <div class="table-list">
+        <div class="table-item"><span class="table-name">avatars/</span> user photos</div>
+        <div class="table-item"><span class="table-name">preloved/</span> item images</div>
+        <div class="table-item"><span class="table-name">thumbnails/</span> resized</div>
+      </div>
+    </div>
+
+    <div class="data-card data-cache">
+      <div class="data-title">Redis</div>
+      <div class="data-sub">ElastiCache (Phase 2)</div>
+      <div class="table-list">
+        <div class="table-item"><span class="table-name">sessions</span> JWT blacklist</div>
+        <div class="table-item"><span class="table-name">geo-cache</span> nearby jastip</div>
+        <div class="table-item"><span class="table-name">rate-limit</span> per IP/user</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- AWS INFRA -->
+<div class="infra-section">
+  <div class="infra-header">
+    <div class="infra-title">AWS Infrastructure</div>
+    <div class="infra-badge">ap-southeast-1 · Singapore</div>
+  </div>
+  <div class="infra-grid">
+
+    <div class="infra-card">
+      <div class="infra-icon">🖥️</div>
+      <div class="infra-service">App Server</div>
+      <div class="infra-aws-name">EC2 · t3.small</div>
+      <div class="infra-desc">Deploy Ktor sebagai JAR via Docker. Nginx sebagai reverse proxy + SSL termination.</div>
+      <div class="infra-spec">
+        OS: Ubuntu 22.04 LTS<br>
+        RAM: 2GB · vCPU: 2<br>
+        Port: 80 (HTTP) / 443 (HTTPS)<br>
+        Internal: 8080 (Ktor)
+      </div>
+    </div>
+
+    <div class="infra-card">
+      <div class="infra-icon">🗄️</div>
+      <div class="infra-service">Database</div>
+      <div class="infra-aws-name">RDS PostgreSQL · db.t3.micro</div>
+      <div class="infra-desc">Managed PostgreSQL. Auto backup harian. Private subnet, hanya bisa diakses dari EC2.</div>
+      <div class="infra-spec">
+        Engine: PostgreSQL 15<br>
+        Storage: 20GB gp3 (awal)<br>
+        Multi-AZ: No (MVP)<br>
+        Backup: 7 hari retention
+      </div>
+    </div>
+
+    <div class="infra-card">
+      <div class="infra-icon">🪣</div>
+      <div class="infra-service">Object Storage</div>
+      <div class="infra-aws-name">S3 Bucket</div>
+      <div class="infra-desc">Simpan semua gambar preloved & avatar user. Akses via presigned URL dari backend.</div>
+      <div class="infra-spec">
+        Region: ap-southeast-1<br>
+        Access: Private bucket<br>
+        Upload: Presigned URL<br>
+        Max size: 5MB/image
+      </div>
+    </div>
+
+    <div class="infra-card">
+      <div class="infra-icon">🌐</div>
+      <div class="infra-service">Networking & SSL</div>
+      <div class="infra-aws-name">VPC · Security Groups · ACM</div>
+      <div class="infra-desc">VPC private subnet untuk RDS. Security Group buka port 443 saja ke publik. SSL via Let's Encrypt / ACM.</div>
+      <div class="infra-spec">
+        Domain: titip.in (rencana)<br>
+        SSL: Let's Encrypt (awal)<br>
+        SG: 443 public, 5432 internal<br>
+        Elastic IP: 1 (EC2)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- API CONTRACT -->
+<div class="api-section">
+  <div class="api-section-label">API Contract — Response Format</div>
+  <div class="api-grid">
+
+    <div class="api-group">
+      <div class="api-group-title">📦 Jastip Listing Object</div>
+      <div class="endpoint"><span class="method get">id</span> UUID</div>
+      <div class="endpoint"><span class="method get">user</span> UserSummary</div>
+      <div class="endpoint"><span class="method get">from_location</span> String</div>
+      <div class="endpoint"><span class="method get">to_location</span> String</div>
+      <div class="endpoint"><span class="method get">deadline</span> ISO 8601</div>
+      <div class="endpoint"><span class="method get">latitude</span> Double</div>
+      <div class="endpoint"><span class="method get">longitude</span> Double</div>
+      <div class="endpoint"><span class="method get">distance_km</span> Double</div>
+      <div class="endpoint"><span class="method get">status</span> ACTIVE|CLOSED</div>
+      <div class="endpoint"><span class="method get">wa_number</span> String</div>
+      <div class="endpoint"><span class="method get">created_at</span> ISO 8601</div>
+    </div>
+
+    <div class="api-group">
+      <div class="api-group-title">🛍️ Preloved Item Object</div>
+      <div class="endpoint"><span class="method post">id</span> UUID</div>
+      <div class="endpoint"><span class="method post">user</span> UserSummary</div>
+      <div class="endpoint"><span class="method post">title</span> String</div>
+      <div class="endpoint"><span class="method post">description</span> String?</div>
+      <div class="endpoint"><span class="method post">price</span> Long (IDR)</div>
+      <div class="endpoint"><span class="method post">condition</span> NEW|GOOD|FAIR</div>
+      <div class="endpoint"><span class="method post">category</span> CategoryRef</div>
+      <div class="endpoint"><span class="method post">images</span> List&lt;String&gt; (S3 URLs)</div>
+      <div class="endpoint"><span class="method post">wa_number</span> String</div>
+      <div class="endpoint"><span class="method post">is_sold</span> Boolean</div>
+      <div class="endpoint"><span class="method post">created_at</span> ISO 8601</div>
+    </div>
+
+    <div class="api-group">
+      <div class="api-group-title">🔐 Auth Flow & Response</div>
+      <div class="endpoint"><span class="method put">POST</span>/auth/login</div>
+      <div class="endpoint"><span class="method get">→ access_token</span> JWT (15m)</div>
+      <div class="endpoint"><span class="method get">→ refresh_token</span> JWT (30d)</div>
+      <div class="endpoint"><span class="method get">→ user</span> UserObject</div>
+      <div style="margin-top:10px;">
+      <div class="endpoint"><span class="method put">POST</span>/auth/refresh</div>
+      <div class="endpoint"><span class="method get">→ access_token</span> new JWT</div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="endpoint"><span class="method delete">Header</span>Authorization: Bearer &lt;token&gt;</div>
+        <div class="endpoint"><span class="method delete">Error</span>401 Unauthorized</div>
+        <div class="endpoint"><span class="method delete">Error</span>429 Rate Limited</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOTTOM: TEAM + PHASES -->
+<div class="bottom-grid">
+
+  <!-- Team -->
+  <div class="section-card">
+    <div class="section-label">Team & Ownership</div>
+    <div class="team-grid">
+      <div class="team-card team-card-1">
+        <div class="team-role">Dev 1</div>
+        <div class="team-name">Kamu 👨‍💻</div>
+        <div class="team-tasks">
+          <div class="team-task"><div class="task-dot dot-purple"></div>Android UI (Compose)</div>
+          <div class="team-task"><div class="task-dot dot-purple"></div>MVVM Architecture</div>
+          <div class="team-task"><div class="task-dot dot-purple"></div>Retrofit + API integration</div>
+          <div class="team-task"><div class="task-dot dot-purple"></div>Room local cache</div>
+          <div class="team-task"><div class="task-dot dot-purple"></div>Maps & Location</div>
+        </div>
+      </div>
+      <div class="team-card team-card-2">
+        <div class="team-role">Dev 2</div>
+        <div class="team-name">Temenmu 👨‍💻</div>
+        <div class="team-tasks">
+          <div class="team-task"><div class="task-dot dot-blue"></div>Ktor routing & plugin</div>
+          <div class="team-task"><div class="task-dot dot-blue"></div>Database schema & Exposed</div>
+          <div class="team-task"><div class="task-dot dot-blue"></div>JWT Auth implementation</div>
+          <div class="team-task"><div class="task-dot dot-blue"></div>S3 upload service</div>
+          <div class="team-task"><div class="task-dot dot-blue"></div>EC2 deploy & Nginx</div>
+        </div>
+      </div>
+    </div>
+    <div class="shared-title">🤝 Dikerjain Bareng</div>
+    <div class="shared-pills">
+      <span class="shared-pill">API Contract design</span>
+      <span class="shared-pill">Database schema review</span>
+      <span class="shared-pill">Code review</span>
+      <span class="shared-pill">Testing & QA</span>
+      <span class="shared-pill">Figma / Design review</span>
+    </div>
+  </div>
+
+  <!-- Phases -->
+  <div class="section-card">
+    <div class="section-label">Development Phases</div>
+    <div class="phase-list">
+
+      <div class="phase-item">
+        <div class="phase-num phase-1">1</div>
+        <div class="phase-content">
+          <div class="phase-name">Foundation</div>
+          <div class="phase-period">Week 1–2</div>
+          <div class="phase-tasks">Setup project Android + Ktor · Auth (register/login/JWT) · Struktur folder MVVM · DB schema PostgreSQL · EC2 + RDS setup dasar</div>
+        </div>
+      </div>
+
+      <div class="phase-item">
+        <div class="phase-num phase-2">2</div>
+        <div class="phase-content">
+          <div class="phase-name">Core Features</div>
+          <div class="phase-period">Week 3–5</div>
+          <div class="phase-tasks">Jastip CRUD + listing screen · Preloved CRUD + bento grid · S3 image upload · Location-based sort · WA redirect button</div>
+        </div>
+      </div>
+
+      <div class="phase-item">
+        <div class="phase-num phase-3">3</div>
+        <div class="phase-content">
+          <div class="phase-name">Polish & MVP</div>
+          <div class="phase-period">Week 6–8</div>
+          <div class="phase-tasks">Request Jastip flow · Filter & search · Push notification FCM · Profile screen · Internal testing · Bug fix</div>
+        </div>
+      </div>
+
+      <div class="phase-item">
+        <div class="phase-num phase-4">4</div>
+        <div class="phase-content">
+          <div class="phase-name">Launch & Scale</div>
+          <div class="phase-period">Week 9+</div>
+          <div class="phase-tasks">Beta launch ke mahasiswa Malang · Monitoring (CloudWatch) · Redis caching · Featured listing monetization · User feedback iteration</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

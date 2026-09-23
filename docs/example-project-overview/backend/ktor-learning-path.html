@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titip.in — Ktor Learning Path</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F2EC; --cream-dark: #EDE9DF; --warm-white: #FAFAF8;
+    --charcoal: #1A1A18; --c60: rgba(26,26,24,0.6); --c30: rgba(26,26,24,0.3); --c10: rgba(26,26,24,0.07);
+    --sage: #8FAF8A; --sage-pale: #E8F0E7;
+    --terra: #C8714A; --terra-pale: #F5E4DB;
+    --gold: #C4A862; --gold-pale: #F0E8D4;
+    --blue: #4A7FC8; --blue-pale: #DBE8F5;
+    --purple: #8A6FC8; --purple-pale: #EBE8F5;
+    --font-d: 'Fraunces', serif; --font-b: 'DM Sans', sans-serif; --font-m: 'DM Mono', monospace;
+    --shadow: 0 2px 16px rgba(26,26,24,0.07);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background: var(--cream); font-family: var(--font-b); color: var(--charcoal); padding: 48px; }
+
+  /* HEADER */
+  .header { margin-bottom: 52px; padding-bottom: 28px; border-bottom: 1px solid var(--c10); display: flex; justify-content: space-between; align-items: flex-end; }
+  .header-left .title { font-family: var(--font-d); font-size: 38px; font-weight: 300; font-style: italic; line-height: 1; margin-bottom: 6px; }
+  .header-left .sub { font-size: 13px; color: var(--c60); }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .profile-tag { background: var(--charcoal); color: var(--cream); border-radius: 999px; padding: 6px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+  .profile-desc { font-size: 11px; color: var(--c30); text-align: right; }
+
+  /* ANALOGY BANNER */
+  .analogy-banner {
+    background: var(--charcoal); color: var(--cream); border-radius: 24px; padding: 28px 32px; margin-bottom: 36px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;
+  }
+  .analogy-title { font-family: var(--font-d); font-size: 20px; font-style: italic; color: var(--cream); margin-bottom: 20px; grid-column: 1/-1; }
+  .analogy-col { }
+  .analogy-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(245,242,236,0.3); margin-bottom: 10px; }
+  .analogy-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .analogy-from { background: rgba(245,242,236,0.08); border-radius: 8px; padding: 5px 10px; font-family: var(--font-m); font-size: 11px; color: rgba(245,242,236,0.7); }
+  .analogy-arrow { color: rgba(245,242,236,0.2); font-size: 12px; }
+  .analogy-to { font-family: var(--font-m); font-size: 11px; color: var(--sage); font-weight: 600; }
+
+  /* PHASE CARDS */
+  .phases { display: flex; flex-direction: column; gap: 24px; margin-bottom: 48px; }
+
+  .phase-card { background: var(--warm-white); border-radius: 24px; border: 1px solid var(--c10); box-shadow: var(--shadow); overflow: hidden; }
+
+  .phase-header { display: flex; align-items: center; gap: 16px; padding: 22px 28px; border-bottom: 1px solid var(--c10); }
+  .phase-num { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; flex-shrink: 0; }
+  .num-1 { background: var(--terra-pale); color: var(--terra); }
+  .num-2 { background: var(--sage-pale); color: var(--sage); }
+  .num-3 { background: var(--blue-pale); color: var(--blue); }
+  .num-4 { background: var(--purple-pale); color: var(--purple); }
+  .num-5 { background: var(--gold-pale); color: var(--gold); }
+
+  .phase-meta { flex: 1; }
+  .phase-title { font-family: var(--font-d); font-size: 20px; font-weight: 400; color: var(--charcoal); margin-bottom: 2px; }
+  .phase-duration { font-size: 11px; color: var(--c30); font-family: var(--font-m); }
+  .phase-goal { font-size: 12px; color: var(--c60); margin-left: auto; max-width: 280px; text-align: right; line-height: 1.5; }
+
+  .phase-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .phase-col { padding: 24px 28px; }
+  .phase-col:first-child { border-right: 1px solid var(--c10); }
+  .col-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--c30); margin-bottom: 14px; }
+
+  /* Topics list */
+  .topic-list { display: flex; flex-direction: column; gap: 8px; }
+  .topic-item { display: flex; align-items: flex-start; gap: 10px; }
+  .topic-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .dot-terra { background: var(--terra); }
+  .dot-sage  { background: var(--sage); }
+  .dot-blue  { background: var(--blue); }
+  .dot-purple{ background: var(--purple); }
+  .dot-gold  { background: var(--gold); }
+  .topic-text { font-size: 13px; color: var(--charcoal); line-height: 1.4; }
+  .topic-sub { font-size: 11px; color: var(--c60); margin-top: 2px; }
+
+  /* Code block */
+  .code-block {
+    background: var(--charcoal); border-radius: 14px; padding: 18px; font-family: var(--font-m);
+    font-size: 11.5px; line-height: 1.9; color: rgba(245,242,236,0.8); overflow-x: auto; margin-top: 8px;
+  }
+  .ck { color: #8FA8C8; } /* key/keyword */
+  .cs { color: #A8C88F; } /* string */
+  .cn { color: #C8A862; } /* number/type */
+  .cc { color: rgba(245,242,236,0.25); } /* comment */
+  .cf { color: #C88FAA; } /* function */
+  .cg { color: var(--sage); } /* highlight */
+
+  /* Output box */
+  .output-box { background: var(--cream-dark); border-radius: 10px; padding: 12px 14px; font-family: var(--font-m); font-size: 11px; color: var(--c60); line-height: 1.8; margin-top: 8px; }
+  .output-label { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--c30); margin-bottom: 6px; }
+
+  /* Deliverable */
+  .deliverable { background: var(--sage-pale); border: 1.5px solid rgba(143,175,138,0.25); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+  .deliverable-icon { font-size: 18px; }
+  .deliverable-text { font-size: 12px; font-weight: 600; color: var(--charcoal); }
+  .deliverable-sub { font-size: 11px; color: var(--c60); margin-top: 2px; }
+
+  /* Phase body full width */
+  .phase-body-full { padding: 24px 28px; border-top: 1px solid var(--c10); }
+
+  /* DEPENDENCY TABLE */
+  .dep-section { background: var(--warm-white); border-radius: 24px; border: 1px solid var(--c10); box-shadow: var(--shadow); padding: 28px 32px; margin-bottom: 32px; }
+  .dep-title { font-family: var(--font-d); font-size: 22px; font-weight: 400; color: var(--charcoal); margin-bottom: 6px; }
+  .dep-sub { font-size: 12px; color: var(--c60); margin-bottom: 24px; }
+
+  /* TIPS */
+  .tips-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+  .tip-card { border-radius: 18px; padding: 20px; }
+  .tip-1 { background: var(--terra-pale); }
+  .tip-2 { background: var(--blue-pale); }
+  .tip-3 { background: var(--gold-pale); }
+  .tip-icon { font-size: 22px; margin-bottom: 10px; }
+  .tip-title { font-size: 13px; font-weight: 700; color: var(--charcoal); margin-bottom: 6px; }
+  .tip-desc { font-size: 12px; color: var(--c60); line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    body { padding: 24px 16px; }
+    .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .analogy-banner { grid-template-columns: 1fr; }
+    .phase-body { grid-template-columns: 1fr; }
+    .phase-col:first-child { border-right: none; border-bottom: 1px solid var(--c10); }
+    .tips-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="title">Ktor Learning Path</div>
+    <div class="sub">Titip.in Backend · Belajar sambil langsung bikin project</div>
+  </div>
+  <div class="header-right">
+    <div class="profile-tag">👥 Pernah pakai Express/Flask · Kotlin familiar · Project-based</div>
+    <div class="profile-desc">Kalian udah ngerti REST API concept → tinggal translate ke Kotlin + Ktor</div>
+  </div>
+</div>
+
+<!-- ANALOGY BANNER -->
+<div class="analogy-banner">
+  <div class="analogy-title">Tenang, konsepnya sama — tinggal ganti syntaxnya 🎯</div>
+  <div class="analogy-col">
+    <div class="analogy-label">Express.js → Ktor</div>
+    <div class="analogy-item">
+      <span class="analogy-from">app.get('/path')</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">get("/path") { }</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">app.post('/path')</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">post("/path") { }</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">req.body</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">call.receive&lt;T&gt;()</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">res.json(data)</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">call.respond(data)</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">req.params.id</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">call.parameters["id"]</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">req.query.page</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">call.request.queryParameters["page"]</span>
+    </div>
+  </div>
+  <div class="analogy-col">
+    <div class="analogy-label">Middleware → Plugins</div>
+    <div class="analogy-item">
+      <span class="analogy-from">app.use(cors())</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">install(CORS) { }</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">app.use(json())</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">install(ContentNegotiation)</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">app.use(auth())</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">install(Authentication)</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">next()</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">proceed() / plugin pipeline</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">router.use()</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">route("/prefix") { }</span>
+    </div>
+  </div>
+  <div class="analogy-col">
+    <div class="analogy-label">Async Model</div>
+    <div class="analogy-item">
+      <span class="analogy-from">async/await (JS)</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">suspend fun + coroutines</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">Promise.all()</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">coroutineScope { }</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">try/catch async</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">try/catch di suspend fun</span>
+    </div>
+    <div class="analogy-item">
+      <span class="analogy-from">callback hell</span>
+      <span class="analogy-arrow">→</span>
+      <span class="analogy-to">sequential suspend funs 🎉</span>
+    </div>
+  </div>
+</div>
+
+<!-- PHASES -->
+<div class="phases">
+
+  <!-- PHASE 1 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <div class="phase-num num-1">1</div>
+      <div class="phase-meta">
+        <div class="phase-title">Setup & Hello Ktor</div>
+        <div class="phase-duration">⏱ 1–2 hari · Berdua bareng</div>
+      </div>
+      <div class="phase-goal">Bisa jalanin Ktor server pertama, paham struktur project, bisa hit endpoint dari Postman</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-col">
+        <div class="col-label">Yang perlu dipelajari</div>
+        <div class="topic-list">
+          <div class="topic-item">
+            <div class="topic-dot dot-terra"></div>
+            <div>
+              <div class="topic-text">Buat project Ktor dari IntelliJ</div>
+              <div class="topic-sub">File → New Project → Ktor, centang: Routing, ContentNegotiation, kotlinx.serialization</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-terra"></div>
+            <div>
+              <div class="topic-text">Struktur file Application.kt</div>
+              <div class="topic-sub">fun main() → embeddedServer → module → plugin → routing</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-terra"></div>
+            <div>
+              <div class="topic-text">Bikin 3 endpoint pertama</div>
+              <div class="topic-sub">GET /health, GET /jastip, POST /jastip — return dummy JSON dulu</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-terra"></div>
+            <div>
+              <div class="topic-text">Test pake Postman</div>
+              <div class="topic-sub">Hit semua endpoint, pastiin response JSON keluar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phase-col">
+        <div class="col-label">Kode yang kalian tulis</div>
+        <div class="code-block">
+<span class="cc">// Application.kt — entry point</span>
+<span class="ck">fun</span> <span class="cf">main</span>() {
+  <span class="cf">embeddedServer</span>(Netty, port = <span class="cn">8080</span>) {
+    <span class="cf">install</span>(ContentNegotiation) {
+      <span class="cf">json</span>()
+    }
+    <span class="cf">install</span>(CORS) {
+      anyHost()
+    }
+    <span class="cf">configureRouting</span>()
+  }.<span class="cf">start</span>(wait = <span class="ck">true</span>)
+}
+
+<span class="cc">// Routing.kt</span>
+<span class="ck">fun</span> Application.<span class="cf">configureRouting</span>() {
+  <span class="cf">routing</span> {
+    <span class="cf">get</span>(<span class="cs">"/health"</span>) {
+      call.<span class="cf">respond</span>(mapOf(<span class="cs">"status"</span> <span class="ck">to</span> <span class="cs">"OK"</span>))
+    }
+    <span class="cf">get</span>(<span class="cs">"/jastip"</span>) {
+      <span class="cc">// dummy dulu, nanti connect DB</span>
+      call.<span class="cf">respond</span>(listOf(
+        mapOf(<span class="cs">"id"</span> <span class="ck">to</span> <span class="cs">"1"</span>, <span class="cs">"from"</span> <span class="ck">to</span> <span class="cs">"Giant Dinoyo"</span>)
+      ))
+    }
+    <span class="cf">post</span>(<span class="cs">"/jastip"</span>) {
+      <span class="ck">val</span> body = call.<span class="cf">receive</span>&lt;Map&lt;String, String&gt;&gt;()
+      call.<span class="cf">respond</span>(HttpStatusCode.Created, body)
+    }
+  }
+}
+        </div>
+        <div style="margin-top: 12px;">
+          <div class="deliverable">
+            <div class="deliverable-icon">✅</div>
+            <div>
+              <div class="deliverable-text">Deliverable Phase 1</div>
+              <div class="deliverable-sub">Server jalan di localhost:8080, 3 endpoint bisa di-hit dari Postman</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <div class="phase-num num-2">2</div>
+      <div class="phase-meta">
+        <div class="phase-title">Coroutines — Paham Dulu Ini</div>
+        <div class="phase-duration">⏱ 1 hari · Penting banget sebelum lanjut</div>
+      </div>
+      <div class="phase-goal">Ngerti suspend fun, cara kerja coroutines, kenapa Ktor butuh ini</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-col">
+        <div class="col-label">Konsep yang perlu dicerna</div>
+        <div class="topic-list">
+          <div class="topic-item">
+            <div class="topic-dot dot-sage"></div>
+            <div>
+              <div class="topic-text">suspend fun itu apa?</div>
+              <div class="topic-sub">Fungsi yang bisa di-pause tanpa block thread — kayak async/await tapi lebih ringan</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-sage"></div>
+            <div>
+              <div class="topic-text">launch vs async</div>
+              <div class="topic-sub">launch = fire & forget, async = mau ambil return value-nya</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-sage"></div>
+            <div>
+              <div class="topic-text">withContext(Dispatchers.IO)</div>
+              <div class="topic-sub">Pindahin operasi berat (DB query, network) ke thread yang tepat</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-sage"></div>
+            <div>
+              <div class="topic-text">Di Ktor, semua handler otomatis suspend</div>
+              <div class="topic-sub">Jadi kalian tinggal pakai withContext buat DB ops, sisanya auto</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phase-col">
+        <div class="col-label">Eksperimen kecil — jalanin ini</div>
+        <div class="code-block">
+<span class="cc">// Coba ini dulu di main.kt biasa</span>
+<span class="ck">import</span> kotlinx.coroutines.*
+
+<span class="ck">fun</span> <span class="cf">main</span>() = <span class="cf">runBlocking</span> {
+  println(<span class="cs">"Start"</span>)
+
+  <span class="cc">// launch: fire & forget</span>
+  <span class="ck">val</span> job = <span class="cf">launch</span> {
+    <span class="cf">delay</span>(<span class="cn">1000</span>)
+    println(<span class="cs">"Job selesai!"</span>)
+  }
+
+  <span class="cc">// async: mau hasil returnnya</span>
+  <span class="ck">val</span> deferred = <span class="cf">async</span> {
+    <span class="cf">delay</span>(<span class="cn">500</span>)
+    <span class="cs">"Hasil dari async"</span>
+  }
+
+  println(<span class="cs">"Nunggu deferred..."</span>)
+  println(deferred.<span class="cf">await</span>()) <span class="cc">// ambil hasilnya</span>
+  job.<span class="cf">join</span>()              <span class="cc">// tunggu job selesai</span>
+  println(<span class="cs">"Semua selesai!"</span>)
+}
+
+<span class="cc">// Di Ktor handler → langsung pakai:</span>
+<span class="cf">get</span>(<span class="cs">"/test"</span>) {
+  <span class="cc">// ini suspend context otomatis</span>
+  <span class="ck">val</span> result = <span class="cf">withContext</span>(Dispatchers.IO) {
+    <span class="cc">// simulasi DB query</span>
+    <span class="cf">delay</span>(<span class="cn">100</span>)
+    <span class="cs">"data dari DB"</span>
+  }
+  call.<span class="cf">respond</span>(mapOf(<span class="cs">"data"</span> <span class="ck">to</span> result))
+}
+        </div>
+        <div style="margin-top: 12px;">
+          <div class="deliverable">
+            <div class="deliverable-icon">✅</div>
+            <div>
+              <div class="deliverable-text">Deliverable Phase 2</div>
+              <div class="deliverable-sub">Bisa bedain launch/async, ngerti kenapa suspend fun ada, udah ga takut lihat coroutines</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <div class="phase-num num-3">3</div>
+      <div class="phase-meta">
+        <div class="phase-title">Connect Database — Exposed ORM</div>
+        <div class="phase-duration">⏱ 2–3 hari · Ini inti backend kalian</div>
+      </div>
+      <div class="phase-goal">Bisa CRUD data dari PostgreSQL, paham Exposed Table & transaction</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-col">
+        <div class="col-label">Yang perlu dipelajari</div>
+        <div class="topic-list">
+          <div class="topic-item">
+            <div class="topic-dot dot-blue"></div>
+            <div>
+              <div class="topic-text">Setup koneksi HikariCP + Exposed</div>
+              <div class="topic-sub">Database.connect() dengan HikariDataSource</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-blue"></div>
+            <div>
+              <div class="topic-text">Define tabel dengan Exposed DSL</div>
+              <div class="topic-sub">object JastipTable : Table() { ... } — mirip ORM lain tapi Kotlin-native</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-blue"></div>
+            <div>
+              <div class="topic-text">transaction { } block</div>
+              <div class="topic-sub">Semua DB operation harus dalam transaction block</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-blue"></div>
+            <div>
+              <div class="topic-text">CRUD dengan Exposed</div>
+              <div class="topic-sub">insert { }, selectAll(), update { }, deleteWhere { }</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-blue"></div>
+            <div>
+              <div class="topic-text">Flyway untuk migration</div>
+              <div class="topic-sub">File SQL di resources/db/migration/ — versioning schema</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phase-col">
+        <div class="col-label">Contoh kode yang kalian tulis</div>
+        <div class="code-block">
+<span class="cc">// database/tables/JastipTable.kt</span>
+<span class="ck">object</span> JastipTable : <span class="cn">UUIDTable</span>(<span class="cs">"jastip_listings"</span>) {
+  <span class="ck">val</span> userId      = <span class="cf">reference</span>(<span class="cs">"user_id"</span>, UsersTable)
+  <span class="ck">val</span> fromLocation = <span class="cf">varchar</span>(<span class="cs">"from_location"</span>, <span class="cn">255</span>)
+  <span class="ck">val</span> toLocation   = <span class="cf">varchar</span>(<span class="cs">"to_location"</span>, <span class="cn">255</span>)
+  <span class="ck">val</span> deadline     = <span class="cf">datetime</span>(<span class="cs">"deadline"</span>)
+  <span class="ck">val</span> latitude     = <span class="cf">double</span>(<span class="cs">"latitude"</span>)
+  <span class="ck">val</span> longitude    = <span class="cf">double</span>(<span class="cs">"longitude"</span>)
+  <span class="ck">val</span> notes        = <span class="cf">varchar</span>(<span class="cs">"notes"</span>, <span class="cn">500</span>).<span class="cf">nullable</span>()
+  <span class="ck">val</span> status       = <span class="cf">enumerationByName</span>(<span class="cs">"status"</span>, <span class="cn">20</span>, JastipStatus::<span class="ck">class</span>)
+  <span class="ck">val</span> createdAt    = <span class="cf">datetime</span>(<span class="cs">"created_at"</span>)
+}
+
+<span class="cc">// repository/JastipRepository.kt</span>
+<span class="ck">class</span> <span class="cn">JastipRepository</span> {
+
+  <span class="ck">suspend fun</span> <span class="cf">getAll</span>(): List&lt;JastipDto&gt; =
+    <span class="cf">dbQuery</span> {
+      JastipTable.<span class="cf">selectAll</span>()
+        .<span class="cf">map</span> { it.<span class="cf">toJastipDto</span>() }
+    }
+
+  <span class="ck">suspend fun</span> <span class="cf">create</span>(req: CreateJastipRequest): JastipDto =
+    <span class="cf">dbQuery</span> {
+      <span class="ck">val</span> id = JastipTable.<span class="cf">insertAndGetId</span> {
+        it[userId]       = req.userId
+        it[fromLocation] = req.fromLocation
+        it[toLocation]   = req.toLocation
+        it[deadline]     = req.deadline
+        it[latitude]     = req.latitude
+        it[longitude]    = req.longitude
+        it[status]       = JastipStatus.ACTIVE
+        it[createdAt]    = LocalDateTime.<span class="cf">now</span>()
+      }
+      JastipTable.<span class="cf">select</span> { JastipTable.id <span class="ck">eq</span> id }
+        .<span class="cf">single</span>().<span class="cf">toJastipDto</span>()
+    }
+}
+
+<span class="cc">// utils/DatabaseFactory.kt</span>
+<span class="ck">suspend fun</span> &lt;T&gt; <span class="cf">dbQuery</span>(block: () -> T): T =
+  <span class="cf">withContext</span>(Dispatchers.IO) {
+    <span class="cf">transaction</span> { block() }
+  }
+        </div>
+        <div style="margin-top: 12px;">
+          <div class="deliverable">
+            <div class="deliverable-icon">✅</div>
+            <div>
+              <div class="deliverable-text">Deliverable Phase 3</div>
+              <div class="deliverable-sub">GET /jastip baca dari DB, POST /jastip simpan ke DB — data persist setelah restart</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <div class="phase-num num-4">4</div>
+      <div class="phase-meta">
+        <div class="phase-title">Auth — JWT Implementation</div>
+        <div class="phase-duration">⏱ 1–2 hari</div>
+      </div>
+      <div class="phase-goal">Register, login, protect endpoint dengan JWT — sama persis flow yang di API Contract</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-col">
+        <div class="col-label">Yang perlu dipelajari</div>
+        <div class="topic-list">
+          <div class="topic-item">
+            <div class="topic-dot dot-purple"></div>
+            <div>
+              <div class="topic-text">Install plugin Authentication + JWT</div>
+              <div class="topic-sub">install(Authentication) { jwt("auth-jwt") { ... } }</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-purple"></div>
+            <div>
+              <div class="topic-text">Generate & verify JWT token</div>
+              <div class="topic-sub">Pakai library JJWT — sign dengan secret key, extract claims</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-purple"></div>
+            <div>
+              <div class="topic-text">Protect route dengan authenticate { }</div>
+              <div class="topic-sub">Semua route di dalam blok ini auto require JWT valid</div>
+            </div>
+          </div>
+          <div class="topic-item">
+            <div class="topic-dot dot-purple"></div>
+            <div>
+              <div class="topic-text">Extract user dari token di handler</div>
+              <div class="topic-sub">call.principal&lt;JWTPrincipal&gt;() untuk ambil userId dari token</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phase-col">
+        <div class="col-label">Contoh kode</div>
+        <div class="code-block">
+<span class="cc">// plugins/Security.kt</span>
+<span class="ck">fun</span> Application.<span class="cf">configureSecurity</span>() {
+  <span class="cf">install</span>(Authentication) {
+    <span class="cf">jwt</span>(<span class="cs">"auth-jwt"</span>) {
+      verifier(
+        JWT.<span class="cf">require</span>(Algorithm.<span class="cf">HMAC256</span>(secret))
+           .<span class="cf">withIssuer</span>(<span class="cs">"titip.in"</span>)
+           .<span class="cf">build</span>()
+      )
+      validate { credential ->
+        <span class="ck">if</span> (credential.payload.<span class="cf">getClaim</span>(<span class="cs">"userId"</span>)
+            .asString() != <span class="ck">null</span>)
+          JWTPrincipal(credential.payload)
+        <span class="ck">else null</span>
+      }
+    }
+  }
+}
+
+<span class="cc">// routes/JastipRoutes.kt</span>
+<span class="ck">fun</span> Route.<span class="cf">jastipRoutes</span>(repo: JastipRepository) {
+  <span class="cf">authenticate</span>(<span class="cs">"auth-jwt"</span>) {   <span class="cc">// 🔐 semua di sini protected</span>
+    <span class="cf">get</span>(<span class="cs">"/jastip"</span>) {
+      <span class="cc">// ambil userId dari token</span>
+      <span class="ck">val</span> principal = call.<span class="cf">principal</span>&lt;JWTPrincipal&gt;()
+      <span class="ck">val</span> userId = principal!!.payload
+        .<span class="cf">getClaim</span>(<span class="cs">"userId"</span>).<span class="cf">asString</span>()
+
+      <span class="ck">val</span> jastipList = repo.<span class="cf">getAll</span>()
+      call.<span class="cf">respond</span>(ApiResponse.<span class="cf">success</span>(jastipList))
+    }
+
+    <span class="cf">post</span>(<span class="cs">"/jastip"</span>) {
+      <span class="ck">val</span> body = call.<span class="cf">receive</span>&lt;CreateJastipRequest&gt;()
+      <span class="ck">val</span> result = repo.<span class="cf">create</span>(body)
+      call.<span class="cf">respond</span>(HttpStatusCode.Created,
+        ApiResponse.<span class="cf">success</span>(result))
+    }
+  }
+}
+        </div>
+        <div style="margin-top: 12px;">
+          <div class="deliverable">
+            <div class="deliverable-icon">✅</div>
+            <div>
+              <div class="deliverable-text">Deliverable Phase 4</div>
+              <div class="deliverable-sub">POST /auth/login return JWT, endpoint lain return 401 kalau tanpa token</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase-card">
+    <div class="phase-header">
+      <div class="phase-num num-5">5</div>
+      <div class="phase-meta">
+        <div class="phase-title">Modular Structure + Semua Endpoint</div>
+        <div class="phase-duration">⏱ 3–5 hari · Ini adalah project kalian sesungguhnya</div>
+      </div>
+      <div class="phase-goal">Semua endpoint di API Contract sudah jalan, struktur rapi per module</div>
+    </div>
+    <div class="phase-body-full">
+      <div class="col-label" style="margin-bottom: 16px;">Struktur folder final Ktor kalian</div>
+      <div class="code-block">
+titip-backend/
+├── src/main/kotlin/com/titipin/
+│   ├── <span class="cg">Application.kt</span>            <span class="cc">← entry point, install semua plugin</span>
+│   │
+│   ├── plugins/
+│   │   ├── <span class="cs">Routing.kt</span>             <span class="cc">← register semua route module</span>
+│   │   ├── <span class="cs">Security.kt</span>            <span class="cc">← JWT setup</span>
+│   │   ├── <span class="cs">Serialization.kt</span>       <span class="cc">← JSON config</span>
+│   │   └── <span class="cs">HTTP.kt</span>                <span class="cc">← CORS, compression</span>
+│   │
+│   ├── database/
+│   │   ├── <span class="cs">DatabaseFactory.kt</span>     <span class="cc">← HikariCP + Exposed setup</span>
+│   │   └── tables/
+│   │       ├── <span class="cs">UsersTable.kt</span>
+│   │       ├── <span class="cs">JastipTable.kt</span>
+│   │       ├── <span class="cs">PrelovedTable.kt</span>
+│   │       └── <span class="cs">RequestsTable.kt</span>
+│   │
+│   ├── modules/
+│   │   ├── auth/
+│   │   │   ├── <span class="cs">AuthRoutes.kt</span>          <span class="cc">← /auth/register, /auth/login</span>
+│   │   │   ├── <span class="cs">AuthService.kt</span>         <span class="cc">← logic register/login/JWT</span>
+│   │   │   └── <span class="cs">AuthModels.kt</span>          <span class="cc">← data class request/response</span>
+│   │   │
+│   │   ├── jastip/
+│   │   │   ├── <span class="cs">JastipRoutes.kt</span>
+│   │   │   ├── <span class="cs">JastipService.kt</span>
+│   │   │   ├── <span class="cs">JastipRepository.kt</span>
+│   │   │   └── <span class="cs">JastipModels.kt</span>
+│   │   │
+│   │   ├── preloved/
+│   │   │   ├── <span class="cs">PrelovedRoutes.kt</span>
+│   │   │   ├── <span class="cs">PrelovedService.kt</span>
+│   │   │   ├── <span class="cs">PrelovedRepository.kt</span>
+│   │   │   └── <span class="cs">PrelovedModels.kt</span>
+│   │   │
+│   │   ├── user/
+│   │   └── upload/
+│   │
+│   └── shared/
+│       ├── <span class="cs">ApiResponse.kt</span>         <span class="cc">← wrapper { success, data, error }</span>
+│       ├── <span class="cs">Extensions.kt</span>          <span class="cc">← toDto(), Row extensions</span>
+│       └── <span class="cs">Validators.kt</span>          <span class="cc">← validate request body</span>
+│
+├── src/main/resources/
+│   ├── <span class="cn">application.conf</span>           <span class="cc">← port, DB URL, JWT secret (dari env)</span>
+│   └── db/migration/
+│       ├── <span class="cn">V1__create_users.sql</span>
+│       ├── <span class="cn">V2__create_jastip.sql</span>
+│       └── <span class="cn">V3__create_preloved.sql</span>
+│
+└── <span class="cg">build.gradle.kts</span>               <span class="cc">← semua dependencies</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DEPENDENCIES -->
+<div class="dep-section">
+  <div class="dep-title">build.gradle.kts — Dependencies Lengkap</div>
+  <div class="dep-sub">Copy paste ini ke project kalian, semua yang dibutuhin sudah ada</div>
+  <div class="code-block">
+<span class="ck">val</span> ktor_version = <span class="cs">"2.3.7"</span>
+<span class="ck">val</span> exposed_version = <span class="cs">"0.44.1"</span>
+<span class="ck">val</span> kotlin_version = <span class="cs">"1.9.21"</span>
+
+dependencies {
+  <span class="cc">// Ktor server core</span>
+  implementation(<span class="cs">"io.ktor:ktor-server-core-jvm:$ktor_version"</span>)
+  implementation(<span class="cs">"io.ktor:ktor-server-netty-jvm:$ktor_version"</span>)
+
+  <span class="cc">// Routing & plugins</span>
+  implementation(<span class="cs">"io.ktor:ktor-server-content-negotiation-jvm:$ktor_version"</span>)
+  implementation(<span class="cs">"io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version"</span>)
+  implementation(<span class="cs">"io.ktor:ktor-server-cors-jvm:$ktor_version"</span>)
+  implementation(<span class="cs">"io.ktor:ktor-server-call-logging-jvm:$ktor_version"</span>)
+  implementation(<span class="cs">"io.ktor:ktor-server-status-pages-jvm:$ktor_version"</span>)
+
+  <span class="cc">// Auth JWT</span>
+  implementation(<span class="cs">"io.ktor:ktor-server-auth-jvm:$ktor_version"</span>)
+  implementation(<span class="cs">"io.ktor:ktor-server-auth-jwt-jvm:$ktor_version"</span>)
+
+  <span class="cc">// Database — Exposed ORM + HikariCP</span>
+  implementation(<span class="cs">"org.jetbrains.exposed:exposed-core:$exposed_version"</span>)
+  implementation(<span class="cs">"org.jetbrains.exposed:exposed-dao:$exposed_version"</span>)
+  implementation(<span class="cs">"org.jetbrains.exposed:exposed-jdbc:$exposed_version"</span>)
+  implementation(<span class="cs">"org.jetbrains.exposed:exposed-java-time:$exposed_version"</span>)
+  implementation(<span class="cs">"com.zaxxer:HikariCP:5.0.1"</span>)
+  implementation(<span class="cs">"org.postgresql:postgresql:42.6.0"</span>)
+
+  <span class="cc">// DB Migration</span>
+  implementation(<span class="cs">"org.flywaydb:flyway-core:9.22.3"</span>)
+
+  <span class="cc">// Security</span>
+  implementation(<span class="cs">"org.mindrot:jbcrypt:0.4"</span>)  <span class="cc">// BCrypt password hash</span>
+
+  <span class="cc">// AWS S3</span>
+  implementation(<span class="cs">"aws.sdk.kotlin:s3:0.33.1-beta"</span>)
+
+  <span class="cc">// Logging</span>
+  implementation(<span class="cs">"ch.qos.logback:logback-classic:1.4.11"</span>)
+
+  <span class="cc">// Testing</span>
+  testImplementation(<span class="cs">"io.ktor:ktor-server-test-host-jvm:$ktor_version"</span>)
+  testImplementation(<span class="cs">"io.kotest:kotest-runner-junit5:5.7.2"</span>)
+}
+  </div>
+</div>
+
+<!-- TIPS -->
+<div class="tips-grid">
+  <div class="tip-card tip-1">
+    <div class="tip-icon">🚀</div>
+    <div class="tip-title">Jangan langsung nulis semua</div>
+    <div class="tip-desc">Mulai dari 1 module dulu (Auth), sampai benar-benar jalan end-to-end. Baru tambah module berikutnya. Jangan buka semua file sekaligus.</div>
+  </div>
+  <div class="tip-card tip-2">
+    <div class="tip-icon">🤝</div>
+    <div class="tip-title">Pembagian berdua yang efektif</div>
+    <div class="tip-desc">Orang 1 fokus di Routes + Models, orang 2 fokus di Repository + Database. Ketemuan tiap hari 15 menit buat sync progress dan blockers.</div>
+  </div>
+  <div class="tip-card tip-3">
+    <div class="tip-icon">🧪</div>
+    <div class="tip-title">Test di Postman dulu, baru Android</div>
+    <div class="tip-desc">Tiap endpoint selesai, langsung test di Postman. Jangan tunggu Android selesai. Kalian berdua bisa parallel — backend test Postman, Android pakai mock data.</div>
+  </div>
+</div>
+
+</body>
+</html>
