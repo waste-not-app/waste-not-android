@@ -19,6 +19,7 @@ Semua desain dan spesifikasi produk berada di [`docs/WasteNot-Product-Design-Kit
 | [`PRD.md`](docs/WasteNot-Product-Design-Kit/PRD.md) | Untuk memahami aturan domain: definisi metrik, unit, XP, Reduce vs Recycle, scope MVP |
 | [`IMPLEMENTATION_PLAN.md`](docs/WasteNot-Product-Design-Kit/IMPLEMENTATION_PLAN.md) | Untuk prioritas tugas: backlog 4 minggu, gate per minggu, dan acceptance test |
 | [`QA.md`](docs/WasteNot-Product-Design-Kit/QA.md) | Untuk memahami batas-batas yang sudah diverifikasi di prototype HTML |
+| [`DEV_PLUGINS.md`](docs/DEV_PLUGINS.md) | Panduan setup, shortcuts, dan perintah plugin dev (HotSwan, NavGraph, ADB Idea, JSON to Kotlin) |
 
 Untuk review visual interaktif: buka [`docs/WasteNot-Product-Design-Kit/design-system.html`](docs/WasteNot-Product-Design-Kit/design-system.html) di browser — tidak perlu build atau koneksi internet.
 

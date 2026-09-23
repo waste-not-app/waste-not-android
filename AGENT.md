@@ -36,6 +36,7 @@ docs/WasteNot-Product-Design-Kit/
 | Domain logic (XP, recycling rate, Reduce) | `PRD.md §6–9` |
 | Fitur auth, token, sesi | `ARCHITECTURE.md §8`, `API.md §3` |
 | Accessibility, font scale, insets | `DESIGN.md §9`, `ARCHITECTURE.md §7` |
+| Setup plugin dev, hot reload, nav graph | `docs/DEV_PLUGINS.md` |
 | Acceptance test, QA criteria | `IMPLEMENTATION_PLAN.md §3–4`, `QA.md` |
 
 ## Aturan singkat untuk agent
