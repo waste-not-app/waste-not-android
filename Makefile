@@ -5,7 +5,7 @@
 # Contoh    : make build, make run, make branch TICKET=W1-03 NAME=theme-setup
 #
 # Prasyarat : GNU Make, JDK 17+, Android SDK, adb, git
-# Dokumen   : CLAUDE.md, AGENT.md, docs/WasteNot-Product-Design-Kit/
+# Dokumen   : CLAUDE.md, AGENT.md, docs/design-kit/
 # =============================================================================
 
 # ---------------------------------------------------------------------------
@@ -375,7 +375,7 @@ setup: ## Setup pertama kali: cek tools, buat branch develop, build awal
 	@echo "  1. Install Android Studio plugins:"
 	@echo "     - Compose HotSwan (hot reload)"
 	@echo "     - Compose Navigation Graph (visualisasi nav)"
-	@echo "  2. Baca $(BOLD)CLAUDE.md$(RESET) dan $(BOLD)docs/WasteNot-Product-Design-Kit/$(RESET)"
+	@echo "  2. Baca $(BOLD)CLAUDE.md$(RESET) dan $(BOLD)docs/design-kit/$(RESET)"
 	@echo "  3. Mulai: $(YELLOW)make branch-feature TICKET=W1-03 NAME=theme-setup$(RESET)"
 
 setup-hooks: ## Install git pre-commit hook (cek lint + test sebelum commit)

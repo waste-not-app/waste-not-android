@@ -199,7 +199,7 @@ Untuk kenyamanan development harian, dua plugin berikut sangat disarankan di-ins
     - **ADB Uninstall App**: Hapus aplikasi dari emulator/device.
 
 ### 4.2 JSON To Kotlin Class (JsonToKotlinClass)
-*   **Fungsi**: Mengonversi JSON payload dari API dokumentasi ([API.md](file:///home/oktaavsm/Code/github.com/wastenot-android/docs/WasteNot-Product-Design-Kit/API.md)) menjadi Kotlin `data class` lengkap dengan anotasi `@Serializable`.
+*   **Fungsi**: Mengonversi JSON payload dari API dokumentasi ([API.md](file:///home/oktaavsm/Code/github.com/wastenot-android/docs/design-kit/API.md)) menjadi Kotlin `data class` lengkap dengan anotasi `@Serializable`.
 *   **Cara Install**: Di Marketplace plugin Android Studio, cari **JSON To Kotlin Class**.
 *   **Shortcut**:
     - Di dalam folder source code Kotlin / package DTO, tekan `Alt + K`.

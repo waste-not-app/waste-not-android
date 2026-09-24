@@ -7,7 +7,7 @@ Indeks cepat untuk AI agent. Gunakan ini sebagai peta untuk menemukan informasi 
 ```
 CLAUDE.md (root)          ← Baca ini dulu. Konteks proyek + aturan utama.
 AGENT.md (root)           ← Quick reference, task-based reading guide.
-docs/WasteNot-Product-Design-Kit/
+docs/design-kit/
   ├── README.md            ← Ikhtisar kit, cara pakai design-system.html
   ├── PRD.md               ← Domain rules, scope, metrik
   ├── DESIGN.md            ← Token warna, font, spacing, komponen, aksesibilitas

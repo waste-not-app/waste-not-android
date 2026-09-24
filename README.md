@@ -140,7 +140,7 @@ wastenot-android/
 │       └── test/                          # Unit tests
 ├── docs/
 │   ├── DEV_PLUGINS.md                     # Panduan setup HotSwan, NavGraph, dan tooling
-│   └── WasteNot-Product-Design-Kit/       # Dokumen spesifikasi produk & design kit
+│   └── design-kit/                        # Dokumen spesifikasi produk & design kit
 │       ├── design-system.html             # Mockup visual & prototype interaktif (buka di browser)
 │       ├── DESIGN.md                      # Design system, token warna, typography, spacing
 │       ├── SCREEN_SPEC.md                 # Spesifikasi layar S01–S20, komponen C01–C34
@@ -161,23 +161,23 @@ wastenot-android/
 
 ## 📖 Dokumentasi Spesifikasi
 
-Seluruh dokumen produk, desain, dan arsitektur tersimpan di folder [`docs/WasteNot-Product-Design-Kit/`](docs/WasteNot-Product-Design-Kit/):
+Seluruh dokumen produk, desain, dan arsitektur tersimpan di folder [`docs/design-kit/`](docs/design-kit/):
 
 | Dokumen | Deskripsi |
 |---|---|
-| [**`DESIGN.md`**](docs/WasteNot-Product-Design-Kit/DESIGN.md) | Panduan visual: palet warna pinus–lime, tipografi Plus Jakarta Sans, spacing, material kaca navigasi, dan handoff Compose. |
-| [**`SCREEN_SPEC.md`**](docs/WasteNot-Product-Design-Kit/SCREEN_SPEC.md) | Spesifikasi interaksi dan UI untuk seluruh 20 layar (`S01` s/d `S20`), komponen (`C01` s/d `C34`), dan dialog (`D01` s/d `D04`). |
-| [**`PRD.md`**](docs/WasteNot-Product-Design-Kit/PRD.md) | Kebutuhan produk, aturan metrik (penanganan gram vs benda, logika persentase recycling rate, poin XP). |
-| [**`ARCHITECTURE.md`**](docs/WasteNot-Product-Design-Kit/ARCHITECTURE.md) | Panduan arsitektur Android Jetpack Compose, alur UDF, mitigasi process death, serta rekomendasi backend modular monolith. |
-| [**`API.md`**](docs/WasteNot-Product-Design-Kit/API.md) | Kontrak endpoint RESTful JSON `/v1`, penanganan autentikasi JWT Bearer, dan idempotensi `client_request_id`. |
-| [**`IMPLEMENTATION_PLAN.md`**](docs/WasteNot-Product-Design-Kit/IMPLEMENTATION_PLAN.md) | Roadmap 4 minggu dan 26 skenario Acceptance Test (`AT-01` s/d `AT-26`). |
-| [**`design-system.html`**](docs/WasteNot-Product-Design-Kit/design-system.html) | Prototype visual interaktif mandiri — dapat langsung dibuka di browser tanpa perlu server. |
+| [**`DESIGN.md`**](docs/design-kit/DESIGN.md) | Panduan visual: palet warna pinus–lime, tipografi Plus Jakarta Sans, spacing, material kaca navigasi, dan handoff Compose. |
+| [**`SCREEN_SPEC.md`**](docs/design-kit/SCREEN_SPEC.md) | Spesifikasi interaksi dan UI untuk seluruh 20 layar (`S01` s/d `S20`), komponen (`C01` s/d `C34`), dan dialog (`D01` s/d `D04`). |
+| [**`PRD.md`**](docs/design-kit/PRD.md) | Kebutuhan produk, aturan metrik (penanganan gram vs benda, logika persentase recycling rate, poin XP). |
+| [**`ARCHITECTURE.md`**](docs/design-kit/ARCHITECTURE.md) | Panduan arsitektur Android Jetpack Compose, alur UDF, mitigasi process death, serta rekomendasi backend modular monolith. |
+| [**`API.md`**](docs/design-kit/API.md) | Kontrak endpoint RESTful JSON `/v1`, penanganan autentikasi JWT Bearer, dan idempotensi `client_request_id`. |
+| [**`IMPLEMENTATION_PLAN.md`**](docs/design-kit/IMPLEMENTATION_PLAN.md) | Roadmap 4 minggu dan 26 skenario Acceptance Test (`AT-01` s/d `AT-26`). |
+| [**`design-system.html`**](docs/design-kit/design-system.html) | Prototype visual interaktif mandiri — dapat langsung dibuka di browser tanpa perlu server. |
 
 ---
 
 ## 🤝 Kontribusi & Workflow
 
-1. Sebelum membuat perubahan UI atau fitur, selalu baca dokumen terkait di [`docs/WasteNot-Product-Design-Kit/`](docs/WasteNot-Product-Design-Kit/).
+1. Sebelum membuat perubahan UI atau fitur, selalu baca dokumen terkait di [`docs/design-kit/`](docs/design-kit/).
 2. Buat branch baru dari `develop` menggunakan `make branch-feature TICKET=... NAME=...`.
 3. Jalankan `make check` sebelum commit (pre-commit hook akan otomatis memvalidasi lint dan test).
 4. Jalankan `make pr-ready` sebelum mengajukan Pull Request ke `develop`.

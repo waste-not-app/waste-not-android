@@ -8,20 +8,20 @@ Dokumen ini adalah panduan konteks utama untuk AI coding agent (Claude, Gemini, 
 
 ## Dokumen referensi wajib
 
-Semua desain dan spesifikasi produk berada di [`docs/WasteNot-Product-Design-Kit/`](docs/WasteNot-Product-Design-Kit/). **Baca dokumen yang relevan sebelum menulis kode UI, API client, atau logika domain.**
+Semua desain dan spesifikasi produk berada di [`docs/design-kit/`](docs/design-kit/). **Baca dokumen yang relevan sebelum menulis kode UI, API client, atau logika domain.**
 
 | Dokumen | Kapan harus dibaca |
 |---|---|
-| [`DESIGN.md`](docs/WasteNot-Product-Design-Kit/DESIGN.md) | Setiap kali mengerjakan UI, theme, warna, tipografi, spacing, komponen, animasi, aksesibilitas |
-| [`SCREEN_SPEC.md`](docs/WasteNot-Product-Design-Kit/SCREEN_SPEC.md) | Setiap kali membuat atau memodifikasi layar (S01–S20), komponen (C01–C34), atau dialog (D01–D04) |
-| [`ARCHITECTURE.md`](docs/WasteNot-Product-Design-Kit/ARCHITECTURE.md) | Setiap kali menyentuh navigasi, ViewModel, Repository, state management, DI, atau storage |
-| [`API.md`](docs/WasteNot-Product-Design-Kit/API.md) | Setiap kali membuat atau memodifikasi network layer, DTO, Retrofit interface, atau business rule |
-| [`PRD.md`](docs/WasteNot-Product-Design-Kit/PRD.md) | Untuk memahami aturan domain: definisi metrik, unit, XP, Reduce vs Recycle, scope MVP |
-| [`IMPLEMENTATION_PLAN.md`](docs/WasteNot-Product-Design-Kit/IMPLEMENTATION_PLAN.md) | Untuk prioritas tugas: backlog 4 minggu, gate per minggu, dan acceptance test |
-| [`QA.md`](docs/WasteNot-Product-Design-Kit/QA.md) | Untuk memahami batas-batas yang sudah diverifikasi di prototype HTML |
+| [`DESIGN.md`](docs/design-kit/DESIGN.md) | Setiap kali mengerjakan UI, theme, warna, tipografi, spacing, komponen, animasi, aksesibilitas |
+| [`SCREEN_SPEC.md`](docs/design-kit/SCREEN_SPEC.md) | Setiap kali membuat atau memodifikasi layar (S01–S20), komponen (C01–C34), atau dialog (D01–D04) |
+| [`ARCHITECTURE.md`](docs/design-kit/ARCHITECTURE.md) | Setiap kali menyentuh navigasi, ViewModel, Repository, state management, DI, atau storage |
+| [`API.md`](docs/design-kit/API.md) | Setiap kali membuat atau memodifikasi network layer, DTO, Retrofit interface, atau business rule |
+| [`PRD.md`](docs/design-kit/PRD.md) | Untuk memahami aturan domain: definisi metrik, unit, XP, Reduce vs Recycle, scope MVP |
+| [`IMPLEMENTATION_PLAN.md`](docs/design-kit/IMPLEMENTATION_PLAN.md) | Untuk prioritas tugas: backlog 4 minggu, gate per minggu, dan acceptance test |
+| [`QA.md`](docs/design-kit/QA.md) | Untuk memahami batas-batas yang sudah diverifikasi di prototype HTML |
 | [`DEV_PLUGINS.md`](docs/DEV_PLUGINS.md) | Panduan setup, shortcuts, dan perintah plugin dev (HotSwan, NavGraph, ADB Idea, JSON to Kotlin) |
 
-Untuk review visual interaktif: buka [`docs/WasteNot-Product-Design-Kit/design-system.html`](docs/WasteNot-Product-Design-Kit/design-system.html) di browser — tidak perlu build atau koneksi internet.
+Untuk review visual interaktif: buka [`docs/design-kit/design-system.html`](docs/design-kit/design-system.html) di browser — tidak perlu build atau koneksi internet.
 
 ## Tech stack
 
@@ -50,11 +50,11 @@ Untuk generate/export nav graph: `./gradlew :app:generateNavGraph` atau `./gradl
 ## Aturan penting
 
 ### Desain & UI
-- Semua token warna, typography, dan spacing **harus** mengacu ke [`DESIGN.md §2–4`](docs/WasteNot-Product-Design-Kit/DESIGN.md). Jangan hardcode hex color di composable.
+- Semua token warna, typography, dan spacing **harus** mengacu ke [`DESIGN.md §2–4`](docs/design-kit/DESIGN.md). Jangan hardcode hex color di composable.
 - Theme Material 3: `WasteNotTheme` (di `app/src/main/java/com/example/wastenot/theme/`). Dynamic color **dimatikan**.
-- Font: **Plus Jakarta Sans** saja. File font ada di [`docs/WasteNot-Product-Design-Kit/assets/fonts/`](docs/WasteNot-Product-Design-Kit/assets/fonts/).
+- Font: **Plus Jakarta Sans** saja. File font ada di [`docs/design-kit/assets/fonts/`](docs/design-kit/assets/fonts/).
 - Touch target minimal **48 dp**. Form tidak boleh tertutup keyboard. Edge-to-edge dengan inset yang benar.
-- Warna dock navigasi: glassmorphism/kaca sesuai [`DESIGN.md §2 Material v1.1`](docs/WasteNot-Product-Design-Kit/DESIGN.md). Baseline opak tetap harus berfungsi.
+- Warna dock navigasi: glassmorphism/kaca sesuai [`DESIGN.md §2 Material v1.1`](docs/design-kit/DESIGN.md). Baseline opak tetap harus berfungsi.
 
 ### Domain & metrik
 - **Reduce** = benda yang dihindari (avoided_count). Tidak menambah total sampah yang ditangani.

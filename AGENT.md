@@ -8,10 +8,10 @@ Panduan untuk AI coding agent yang bekerja di repositori ini. Dibaca bersama [`C
 
 ## Di mana membaca spesifikasi
 
-**Seluruh spesifikasi produk ada di [`docs/WasteNot-Product-Design-Kit/`](docs/WasteNot-Product-Design-Kit/).**
+**Seluruh spesifikasi produk ada di [`docs/design-kit/`](docs/design-kit/).**
 
 ```
-docs/WasteNot-Product-Design-Kit/
+docs/design-kit/
   README.md              → Ikhtisar dan cara pakai design kit
   PRD.md                 → Product requirements, aturan domain, metrik, scope MVP
   DESIGN.md              → Design system: warna, font, spacing, komponen, aksesibilitas
