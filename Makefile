@@ -101,6 +101,20 @@ build-release: ## Build release APK (perlu signing config)
 	$(GRADLEW) assembleRelease
 	@echo "$(GREEN)✔ Release APK siap$(RESET)"
 
+deploy-vm: ## Deploy release APK ke VM oktaavsm.bccdev.id via SSH pg-bcc
+	@echo "$(BLUE)▶ Deploying ke oktaavsm.bccdev.id via pg-bcc…$(RESET)"
+	@APK=$$(ls -t app/build/outputs/apk/release/*.apk 2>/dev/null | head -1); \
+	if [ -z "$$APK" ]; then \
+		echo "$(RED)✗ APK release belum di-build. Jalankan 'make build-release' dulu.$(RESET)"; \
+		exit 1; \
+	fi; \
+	VER=$$(grep -m 1 'versionName' app/build.gradle.kts | sed -E 's/.*"([^"]+)".*/\1/'); \
+	echo "$(CYAN)Mengunggah $$APK sebagai wastenot-v$$VER.apk…$(RESET)"; \
+	scp "$$APK" pg-bcc:/var/www/wastenot/apk/wastenot-v$$VER.apk && \
+	scp scripts/manage_releases.py pg-bcc:/var/www/wastenot/manage_releases.py && \
+	ssh pg-bcc "python3 /var/www/wastenot/manage_releases.py /var/www/wastenot" && \
+	echo "$(GREEN)✔ Berhasil deploy ke https://oktaavsm.bccdev.id/wastenot/$(RESET)"
+
 run: build ## Build + install + launch di device/emulator
 	@echo "$(BLUE)▶ Install ke device: $(DEVICE)$(RESET)"
 	@if [ -z "$(DEVICE)" ]; then \

@@ -61,6 +61,18 @@ make check
 
 ---
 
+## 🚀 CI/CD & Distribusi APK
+
+Aplikasi ini dilengkapi pipeline otomatis GitHub Actions untuk build, testing, dan rilis langsung ke server:
+*   **Landing Page**: [https://oktaavsm.bccdev.id/wastenot/](https://oktaavsm.bccdev.id/wastenot/)
+*   **Direct Download (Force Download APK Terbaru)**: [https://oktaavsm.bccdev.id/wastenot/download](https://oktaavsm.bccdev.id/wastenot/download)
+*   **Retensi Otomatis**: Menyimpan maksimal **3 versi** rilis (versi terbaru + 2 versi sebelumnya). Build terlama otomatis dihapus saat rilis baru diunggah.
+*   **Deploy Manual**: Tersedia target `make deploy-vm` untuk deploy cepat langsung dari lokal via SSH `pg-bcc`.
+
+👉 Panduan konfigurasi GitHub Repository Secrets & panduan rilis tersedia di [**`docs/CICD_SETUP.md`**](docs/CICD_SETUP.md).
+
+---
+
 ## 🛠️ Plugin Development & Tooling
 
 Proyek ini telah dilengkapi dengan plugin pengembang modern untuk memaksimalkan produktivitas tim:
@@ -143,7 +155,12 @@ wastenot-android/
 │       │   │   └── core/camera/           # ★ CameraManager, ImageCaptureHelper (AI)
 │       │   └── AndroidManifest.xml
 │       └── test/                          # Unit tests
+├── .github/
+│   └── workflows/                         # GitHub Actions CI/CD workflows
+│       ├── android-ci.yml                 # Test & build APK pada PR/push
+│       └── android-release.yml            # Build, sign, & deploy APK ke VM
 ├── docs/
+│   ├── CICD_SETUP.md                   ★  # Panduan setup GitHub Secrets & rilis APK
 │   ├── DEV_PLUGINS.md                     # Panduan setup HotSwan, NavGraph, dan tooling
 │   └── design-kit/                        # Dokumen spesifikasi produk & design kit v1.3
 │       ├── design-system.html             # Mockup visual & prototype interaktif incl. AI (buka di browser)
@@ -157,9 +174,11 @@ wastenot-android/
 │       ├── AGENT_INDEX.md                 # Indeks referensi cepat pencarian topik (incl. AI)
 │       ├── verify-ai.cjs                ★ # Automated test AI scan flow
 │       └── sources/AI_PLAN_ORIGINAL.md  ★ # Source rencana tim (referensi)
+├── scripts/
+│   └── manage_releases.py                 # Script retensi (max 3 versi) & generator landing page
 ├── gradle/
 │   └── libs.versions.toml                 # Version Catalog dependensi & plugin
-├── Makefile                               # Otomasi build, test, branching, dan nav tools
+├── Makefile                               # Otomasi build, test, branching, deploy, dan nav tools
 ├── CLAUDE.md                              # Konteks proyek & aturan AI untuk AI coding assistant
 ├── AGENT.md                               # Panduan cepat developer & agent
 └── settings.gradle.kts
@@ -169,11 +188,12 @@ wastenot-android/
 
 ## 📖 Dokumentasi Spesifikasi
 
-Seluruh dokumen produk, desain, dan arsitektur tersimpan di folder [`docs/design-kit/`](docs/design-kit/) **(v1.3 · 28 Sep 2026)**:
+Seluruh dokumen produk, desain, arsitektur, dan CI/CD tersimpan di folder [`docs/`](docs/):
 
 | Dokumen | Deskripsi |
 |---|---|
-| [**`AI_SPEC.md`**](docs/design-kit/AI_SPEC.md) | ★ **Baru** — Spesifikasi penuh AI pipeline: YOLO object detection, confidence bands, waste mapping, LLM recommendation, state machine kamera, privasi & retensi foto, release gates. |
+| [**`CICD_SETUP.md`**](docs/CICD_SETUP.md) | ★ **Baru** — Panduan lengkap setup GitHub Secrets, konfigurasi SSH VM, pipeline rilis otomatis, dan retensi 3 versi APK. |
+| [**`AI_SPEC.md`**](docs/design-kit/AI_SPEC.md) | Spesifikasi penuh AI pipeline: YOLO object detection, confidence bands, waste mapping, LLM recommendation, state machine kamera, privasi & retensi foto, release gates. |
 | [**`DESIGN.md`**](docs/design-kit/DESIGN.md) | Panduan visual v1.3: palet warna pinus–lime, tipografi Plus Jakarta Sans, spacing, material kaca navigasi, komponen AI (C35–C39), dan handoff Compose. |
 | [**`SCREEN_SPEC.md`**](docs/design-kit/SCREEN_SPEC.md) | Spesifikasi interaksi dan UI untuk seluruh 25 layar (`S01–S25` termasuk AI scan `S21–S25`), komponen (`C01–C39`), dan dialog (`D01–D04`). |
 | [**`PRD.md`**](docs/design-kit/PRD.md) | Kebutuhan produk v1.2, aturan metrik (gram vs benda, recycling rate, XP), dan AI increment scope. |
@@ -181,6 +201,7 @@ Seluruh dokumen produk, desain, dan arsitektur tersimpan di folder [`docs/design
 | [**`API.md`**](docs/design-kit/API.md) | Kontrak API v1.2: endpoint core + §10 AI endpoints (detections, recommendations), ai_provenance, error codes AI. |
 | [**`IMPLEMENTATION_PLAN.md`**](docs/design-kit/IMPLEMENTATION_PLAN.md) | Roadmap 4 minggu core + §10 AI increment stages `AI-01–AI-08`, acceptance tests `AT-01–AT-26` + `AT-AI-01–18`. |
 | [**`design-system.html`**](docs/design-kit/design-system.html) | Prototype visual interaktif termasuk AI scan flow — dapat langsung dibuka di browser tanpa server. |
+| [**`DEV_PLUGINS.md`**](docs/DEV_PLUGINS.md) | Panduan instalasi dan penggunaan plugin developer (HotSwan, NavGraph, ADB Idea). |
 | [**`AGENT_INDEX.md`**](docs/design-kit/AGENT_INDEX.md) | Indeks cepat semua topik → section dokumen, termasuk AI. |
 
 ---

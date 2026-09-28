@@ -15,12 +15,38 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
+    }
+
+    val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull
+    val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD").orNull
+    val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS").orNull
+    val releaseKeyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD").orNull
+
+    if (
+        releaseKeystorePath != null &&
+        releaseKeystorePassword != null &&
+        releaseKeyAlias != null &&
+        releaseKeyPassword != null
+    ) {
+        val rawFile = File(releaseKeystorePath)
+        val keystoreFile = if (rawFile.isAbsolute) rawFile else rootProject.file(releaseKeystorePath)
+        signingConfigs {
+            create("release") {
+                storeFile = keystoreFile
+                storePassword = releaseKeystorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfigs.findByName("release")?.let {
+                signingConfig = it
+            }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

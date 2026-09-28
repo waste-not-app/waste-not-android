@@ -21,6 +21,7 @@ Semua desain dan spesifikasi produk berada di [`docs/design-kit/`](docs/design-k
 | [`IMPLEMENTATION_PLAN.md`](docs/design-kit/IMPLEMENTATION_PLAN.md) | Untuk prioritas tugas: backlog 4 minggu core + AI stages AI-01–AI-08, acceptance tests |
 | [`QA.md`](docs/design-kit/QA.md) | Untuk memahami batas-batas yang sudah diverifikasi di prototype HTML |
 | [`DEV_PLUGINS.md`](docs/DEV_PLUGINS.md) | Panduan setup, shortcuts, dan perintah plugin dev (HotSwan, NavGraph, ADB Idea, JSON to Kotlin) |
+| [`CICD_SETUP.md`](docs/CICD_SETUP.md) | Panduan setup GitHub Secrets, pipeline CI/CD GitHub Actions, dan deployment ke VM oktaavsm.bccdev.id |
 
 Untuk review visual interaktif (termasuk AI scan flow): buka [`docs/design-kit/design-system.html`](docs/design-kit/design-system.html) di browser — tidak perlu build atau koneksi internet.
 

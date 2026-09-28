@@ -1,0 +1,147 @@
+name: Android Release & Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_override:
+        description: 'Custom Version (e.g., 1.0.1). Leave blank to use tag or build.gradle.kts'
+        required: false
+        default: ''
+      deploy_to_vm:
+        description: 'Deploy APK to backend VM (oktaavsm.bccdev.id)?'
+        type: boolean
+        required: true
+        default: true
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+
+jobs:
+  release-and-deploy:
+    name: Build, Sign, and Deploy APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
+      - name: Decode Release Keystore
+        id: keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/wastenot-release.jks"
+            echo "has_keystore=true" >> "$GITHUB_OUTPUT"
+            echo "keystore_path=$RUNNER_TEMP/wastenot-release.jks" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_keystore=false" >> "$GITHUB_OUTPUT"
+            echo "Warning: ANDROID_KEYSTORE_BASE64 secret not set. Building without custom release keystore."
+          fi
+
+      - name: Run Unit Tests
+        run: ./gradlew test
+
+      - name: Build Release APK
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ steps.keystore.outputs.keystore_path }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew assembleRelease
+
+      - name: Prepare APK Files
+        id: prepare_apk
+        run: |
+          set -euo pipefail
+
+          # Find release APK
+          APK_PATH="$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' | head -n 1)"
+          if [ -z "$APK_PATH" ]; then
+            echo "Error: No APK found in app/build/outputs/apk/release" >&2
+            exit 1
+          fi
+
+          # Determine version name
+          if [ -n "${{ github.event.inputs.version_override }}" ]; then
+            VERSION="${{ github.event.inputs.version_override }}"
+          elif [[ "${GITHUB_REF_TYPE:-}" == "tag" && "${GITHUB_REF_NAME:-}" == v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            BASE_VER="$(grep -m 1 'versionName' app/build.gradle.kts | sed -E 's/.*"([^"]+)".*/\1/')"
+            VERSION="${BASE_VER}-b${GITHUB_RUN_NUMBER}"
+          fi
+
+          mkdir -p "$RUNNER_TEMP/apk-release"
+          VERSIONED_APK="wastenot-v${VERSION}.apk"
+          cp "$APK_PATH" "$RUNNER_TEMP/apk-release/$VERSIONED_APK"
+          cp "$APK_PATH" "$RUNNER_TEMP/apk-release/latest.apk"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "versioned_apk=$VERSIONED_APK" >> "$GITHUB_OUTPUT"
+          echo "Built APK: $VERSIONED_APK (Source: $APK_PATH)"
+
+      - name: Upload Signed APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.prepare_apk.outputs.versioned_apk }}
+          path: ${{ runner.temp }}/apk-release/*.apk
+          if-no-files-found: error
+
+      - name: Deploy APK to Backend VM
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.deploy_to_vm == 'true' }}
+        env:
+          BACKEND_HOST: ${{ secrets.BACKEND_HOST || 'proxy.bccdev.id' }}
+          BACKEND_USER: ${{ secrets.BACKEND_USER || 'dev' }}
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT || '11023' }}
+          BACKEND_SSH_KEY: ${{ secrets.BACKEND_SSH_KEY }}
+          BACKEND_DIR: ${{ secrets.BACKEND_DIR || '/var/www/wastenot' }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$BACKEND_SSH_KEY" ]; then
+            echo "Error: BACKEND_SSH_KEY secret is not set. Deployment skipped." >&2
+            exit 1
+          fi
+
+          SSH_KEY_PATH="$RUNNER_TEMP/backend_deploy_key"
+          printf '%s\n' "$BACKEND_SSH_KEY" > "$SSH_KEY_PATH"
+          chmod 600 "$SSH_KEY_PATH"
+
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "$BACKEND_PORT" "$BACKEND_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          # Ensure destination directories exist
+          ssh -i "$SSH_KEY_PATH" -p "$BACKEND_PORT" "$BACKEND_USER@$BACKEND_HOST" \
+            "mkdir -p '$BACKEND_DIR/apk'"
+
+          # Copy versioned APK
+          scp -i "$SSH_KEY_PATH" -P "$BACKEND_PORT" \
+            "$RUNNER_TEMP/apk-release/${{ steps.prepare_apk.outputs.versioned_apk }}" \
+            "$BACKEND_USER@$BACKEND_HOST:$BACKEND_DIR/apk/"
+
+          # Copy release management script
+          scp -i "$SSH_KEY_PATH" -P "$BACKEND_PORT" \
+            scripts/manage_releases.py \
+            "$BACKEND_USER@$BACKEND_HOST:$BACKEND_DIR/manage_releases.py"
+
+          # Execute release management: prune old versions (>3), sync latest.apk, regenerate index.html & versions.json
+          ssh -i "$SSH_KEY_PATH" -p "$BACKEND_PORT" "$BACKEND_USER@$BACKEND_HOST" \
+            "python3 '$BACKEND_DIR/manage_releases.py' '$BACKEND_DIR'"
+
+          echo "Deployment successful! Check https://oktaavsm.bccdev.id/wastenot/"

@@ -1,0 +1,50 @@
+name: Android CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'fix/**'
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'fix/**'
+
+jobs:
+  verify:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
+      - name: Run Unit Tests
+        run: ./gradlew test
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Upload Release APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wastenot-release-apk
+          path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: error

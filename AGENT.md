@@ -49,6 +49,7 @@ docs/design-kit/
 | **★ ScanViewModel, CameraX integration** | `AI_SPEC.md §3`, `ARCHITECTURE.md §13` |
 | **★ Privacy / foto cleanup rules** | `AI_SPEC.md §8` |
 | **★ Release gate / acceptance AI** | `IMPLEMENTATION_PLAN.md §10`, `AI_SPEC.md §9` |
+| **★ CI/CD, deployment VM, & release** | `docs/CICD_SETUP.md`, `.github/workflows/` |
 
 ## Aturan singkat untuk agent
 
