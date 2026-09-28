@@ -16,8 +16,8 @@ fs.mkdirSync(output, {recursive:true});
  const live=page.locator('#live-phone');
  const screen=async id=>{await page.locator('#screen-select').selectOption(id);await page.waitForFunction(id=>window.WasteNotDemo.getState().route===id,id);};
  const check=(name)=>{report.push(name);console.log('PASS',name);};
- assert.equal(await page.locator('.gallery-item').count(),20);assert.equal(await page.locator('.component').count(),34);
- assert.equal(await page.evaluate(()=>document.fonts.check('400 16px Jakarta')),true);check('20 layar, 34 komponen, font lokal dimuat');
+ assert.equal(await page.locator('.gallery-item').count(),25);assert.equal(await page.locator('.component').count(),39);
+ assert.equal(await page.evaluate(()=>document.fonts.check('400 16px Jakarta')),true);check('25 layar, 39 komponen, font lokal dimuat');
  const domain=await page.evaluate(()=>{const d=WasteNotDemo;return {totals:d.totals(d.seed),empty:d.totals([]),reduce:d.totals([d.seed[2]]),kg:d.parseQuantity('0,250','kg'),invalid:['0','-1','1e3','1.0000','Infinity'].map(x=>d.parseQuantity(x,'kg')),count:d.parseQuantity('2.5','pcs'),streak:d.streak(d.seed),best:d.bestStreak(d.seed)};});
  assert.equal(domain.totals.weight,1400);assert.equal(domain.totals.rate,50);assert.equal(domain.totals.avoidedCount,2);assert.equal(domain.empty.rate,null);assert.equal(domain.reduce.weight,0);assert.equal(domain.reduce.rate,null);assert.deepEqual(domain.kg,{weight:250,count:0});assert.ok(domain.invalid.every(x=>x===null));assert.equal(domain.count,null);assert.equal(domain.streak,2);assert.equal(domain.best,2);check('Rumus dataset, Reduce-only, denominator kosong, parser unit dan streak');
  for(const theme of ['light','dark']){
@@ -26,13 +26,13 @@ fs.mkdirSync(output, {recursive:true});
    await page.setViewportSize({width,height:1000});
    const size=await page.evaluate(()=>({client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
    assert.ok(size.scroll<=size.client+1,`${theme} ${width}: page overflow ${JSON.stringify(size)}`);
-   for(let i=1;i<=20;i++){
+   for(let i=1;i<=25;i++){
     const id='S'+String(i).padStart(2,'0');await screen(id);
     const overflow=await live.locator('.phone-scroll').evaluate(e=>({scroll:e.scrollWidth,client:e.clientWidth}));
     assert.ok(overflow.scroll<=overflow.client+1,`${theme} ${width} ${id}: phone overflow ${JSON.stringify(overflow)}`);
    }
   }
-  check(`${theme}: seluruh 20 layar pada 360/390/768/1024/1512 px tanpa horizontal overflow`);
+  check(`${theme}: seluruh 25 layar pada 360/390/768/1024/1512 px tanpa horizontal overflow`);
  }
  await page.setViewportSize({width:1512,height:1100});await page.locator('#theme').selectOption('light');
  for(const id of ['S04','S07','S08','S11','S12','S13','S14','S15']){await screen(id);for(const s of ['loading','empty','error','offline','content']){await page.locator('#state-select').selectOption(s);assert.ok((await live.textContent()).length>50);}}
@@ -58,7 +58,7 @@ fs.mkdirSync(output, {recursive:true});
  await page.locator('[data-action="reset-demo"]').click();
  for(const [id] of [['S04'],['S07'],['S11'],['S13'],['S14']]){await live.locator(`.bottom-nav [data-go=${id}]`).click();assert.equal(await page.evaluate(()=>WasteNotDemo.getState().route),id);}check('5 tab navigasi membuka tujuan');
  const before=await page.locator('#C09 input').getAttribute('type');await page.locator('#C09 button').click();assert.notEqual(await page.locator('#C09 input').getAttribute('type'),before);await page.locator('#C14 button').first().click();assert.equal(await page.locator('#C14 button').first().getAttribute('aria-pressed'),'false');await page.locator('#C15 [data-component-range="30"]').click();assert.equal(await page.locator('#C15 [data-component-range="30"]').getAttribute('aria-pressed'),'true');await page.locator('#C26 button').click();await page.locator('#app-dialog select[name=category]').selectOption('GLASS');await page.locator('#app-dialog button[type=submit]').click();assert.equal(await live.locator('.log-row').count(),1);await page.locator('#C28 button').click();assert.match(await page.locator('#toast').textContent(),/Contoh/);await page.locator('#C30 input').check();await page.locator('#C10 input').fill('kertas');assert.match(await page.locator('[data-component-search-result]').textContent(),/kertas/);check('Komponen password, chip, segment, sheet, snackbar, switch, search');
- for(const group of ['access','tracking','insight','profile','optional','all']){await page.locator('#screen-filter').selectOption(group);assert.ok(await page.locator('.gallery-item').count()>0);}for(let i=1;i<=20;i++){const id='S'+String(i).padStart(2,'0');await page.locator(`[data-open=${id}]`).last().click();assert.equal(await page.evaluate(()=>WasteNotDemo.getState().route),id);}check('Filter galeri dan seluruh tombol Coba layar');
+ for(const group of ['access','tracking','insight','profile','optional','all']){await page.locator('#screen-filter').selectOption(group);assert.ok(await page.locator('.gallery-item').count()>0);}for(let i=1;i<=25;i++){const id='S'+String(i).padStart(2,'0');await page.locator(`[data-open=${id}]`).last().click();assert.equal(await page.evaluate(()=>WasteNotDemo.getState().route),id);}check('Filter galeri dan seluruh tombol Coba layar');
  await page.locator('[data-action="reset-demo"]').click();await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:path.join(output,'desktop-light.png')});await page.locator('#theme').selectOption('dark');await page.screenshot({path:path.join(output,'desktop-dark.png')});await page.locator('#theme').selectOption('light');
  for(const id of ['S02','S05','S07','S12','S13','S14','S15','S17','S18','S19','S20']){await screen(id);await live.screenshot({path:path.join(output,id+'.png')});}
  await page.setViewportSize({width:390,height:844});await screen('S05');await live.screenshot({path:path.join(output,'mobile-form.png')});await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:path.join(output,'mobile-light.png')});

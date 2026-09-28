@@ -44,3 +44,28 @@
 @media(prefers-reduced-transparency:reduce){.bottom-nav,.material-glass{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none}}
 @media(forced-colors:active){.bottom-nav,.material-glass{background:Canvas;backdrop-filter:none;border:1px solid CanvasText}.bottom-nav button[aria-current=page]{outline:2px solid Highlight}}
 @media print{.sidebar,.prototype-controls,.dialog-tools,.gallery-item>.btn,.toast{display:none}main{margin:0;padding:0}.doc-section{break-before:page}.phone{box-shadow:none}.bottom-nav,.material-glass{background:var(--surface);backdrop-filter:none}.screen-gallery{grid-template-columns:repeat(2,1fr)}.gallery-item{break-inside:avoid}}
+
+/* Primary capture action remains separate from the five navigation destinations. */
+.bottom-nav{margin-top:32px;padding-top:32px}
+.bottom-nav .scan-dock-action{position:absolute;left:50%;top:-27px;transform:translateX(-50%);display:flex;flex-direction:row;gap:8px;min-height:52px;min-width:136px;padding:10px 16px;border:3px solid var(--surface);border-radius:26px;background:linear-gradient(135deg,var(--lime-start),var(--lime-end));color:var(--on-accent);font-weight:800;box-shadow:0 6px 18px -8px var(--glass-shadow)}
+#scan-sheet{position:fixed;inset:auto 0 0;margin:0 auto;width:min(100%,460px);max-width:100%;max-height:92dvh;border-radius:28px 28px 0 0;padding:20px 24px max(24px,env(safe-area-inset-bottom));overflow:auto;background:var(--surface)}
+#scan-sheet h2{font-size:22px;margin:10px 0}#scan-sheet .stack{gap:16px}#scan-sheet p{margin:0}#scan-sheet .row{align-items:center}#scan-sheet select{width:100%;min-height:52px}#scan-sheet .field{display:flex;flex-direction:column;gap:8px}
+.sheet-handle{width:38px;height:4px;border-radius:4px;background:var(--line);margin:0 auto 10px}
+.scan-camera-placeholder{min-height:210px;padding:20px;background:#17261D;color:#F0F5ED;border-radius:20px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center}
+.scan-camera-placeholder svg{width:40px;height:40px}.scan-camera-placeholder span{font-size:13px}.scan-camera-placeholder video{width:100%;max-height:260px;border-radius:12px}.scan-photo{width:100%;max-height:280px;object-fit:contain;border-radius:16px;background:var(--soft)}
+.scan-detection{min-height:160px;background:var(--soft);padding:22px;border-radius:16px;display:grid;place-items:center}.scan-bbox{border:2px dashed var(--primary);padding:36px 12px;color:var(--ink);font-size:13px}
+@media(max-width:400px){#scan-sheet{padding:16px}.bottom-nav .scan-dock-action{font-size:12px}}
+
+/* Scan v1.3: shared panel previews and a readable, scrollable camera workflow. */
+.scan-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));list-style:none;padding:0;margin:18px 0 6px;gap:8px}
+.scan-steps li{display:flex;align-items:center;flex-direction:column;gap:6px;font-size:11px;color:var(--muted)}
+.scan-steps li>span{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--line);border-radius:50%;font-weight:700}
+.scan-steps li[aria-current=step]{color:var(--ink);font-weight:700}.scan-steps li[aria-current=step]>span{background:var(--accent);color:var(--on-accent);border-color:var(--on-accent)}
+#scan-sheet{padding:16px 0 0}.sheet-handle{flex-shrink:0}.scan-sheet-header{padding:0 24px 16px;border-bottom:1px solid var(--divider)}.scan-sheet-content{padding:20px 24px}
+#scan-sheet .scan-sheet-footer{position:sticky;bottom:0;display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:0;padding:12px 24px max(18px,env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--divider);font-size:12px;text-align:center}
+.scan-demo-tools,.scan-source{padding:12px 14px;background:var(--soft);border-radius:12px;font-size:13px}.scan-demo-tools summary,.scan-source summary{cursor:pointer;min-height:24px;font-weight:600}.scan-demo-tools[open] summary,.scan-source[open] summary{margin-bottom:14px}
+.scan-camera-placeholder{position:relative;overflow:hidden;min-height:230px;background:linear-gradient(145deg,#13261D,#294735);border:1px solid #647A6A}
+.scan-camera-placeholder:after{content:"";position:absolute;inset:24px;border:1px dashed #99B9A0;border-radius:14px;pointer-events:none}.scan-camera-placeholder strong,.scan-camera-placeholder span,.scan-camera-placeholder svg{position:relative;z-index:1;max-width:230px}
+.scan-detection{position:relative;min-height:200px;overflow:hidden;background:linear-gradient(140deg,var(--canvas-start),var(--canvas-end))}.scan-object-art svg{width:74px;height:104px;stroke-width:1.2;color:var(--primary)}.scan-bbox{position:absolute;inset:16px 34px;padding:8px;font-size:11px;display:flex;align-items:flex-end;justify-content:center;border-radius:10px}
+.scan-panel-preview .field{display:flex;flex-direction:column;gap:8px}.scan-panel-preview select{max-width:100%;width:100%}.scan-panel-preview .scan-camera-placeholder{min-height:190px}.scan-panel-preview .scan-demo-tools{display:none}
+@media(max-width:400px){#scan-sheet{padding:12px 0 0}.scan-sheet-header{padding:0 16px 12px}.scan-sheet-content{padding:16px}#scan-sheet .scan-sheet-footer{padding:12px 16px 18px}.scan-steps{gap:4px}}

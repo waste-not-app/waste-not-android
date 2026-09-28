@@ -1,6 +1,6 @@
 # WasteNot: Rencana Implementasi dan Pengujian
 
-Versi 1.1 · Rencana empat minggu, bukan pekerjaan yang sudah selesai
+Versi 1.2 · 28 September 2026 · Core + AI extension · Rancangan implementasi
 
 ## 1. Cara membagi pekerjaan
 
@@ -165,3 +165,56 @@ Hindari demo dengan angka palsu yang dipresentasikan sebagai data pengguna nyata
 - [ ] Hasil test disertai bukti, tidak hanya checklist kosong.
 
 Peluncuran publik membutuhkan pekerjaan tambahan yang belum tercakup demo: password reset, kebijakan privasi/retensi, alur penghapusan akun, operasi berkelanjutan, review keamanan, dan persyaratan kanal distribusi aktual.
+
+## 10. Increment AI setelah core (revisi 28 September)
+
+Permintaan terbaru mencakup computer vision, rekomendasi dan mockup tombol Catat/Scan pada navbar yang membuka kamera di bottom sheet. Empat minggu §2 tetap rencana core historis; estimasi tambahan AI disepakati setelah spike model/perangkat, tidak dianggap otomatis muat di minggu 4. Prioritaskan AI di atas Maps/reminder/foto lampiran jika itu fokus demo tim.
+
+| Tahap | Pemilik fungsi | Hasil / gate sebelum lanjut |
+|---|---|---|
+| AI-01 Kontrak & taxonomy | AI + backend + konten | Pilih checkpoint kandidat, baca label aktual, audit lisensi dataset/bobot, tetapkan kelas pilot dan capability |
+| AI-02 Camera sheet & manual | Android + desain | S21 capture/izin/close/Back; manual membuka S05; kamera berhenti saat background |
+| AI-03 Detection service | AI + backend | Endpoint multipart, bounded worker, preprocessing/bbox, TTL/cleanup, laporan latency baseline |
+| AI-04 Review & mapping | Android + backend | S22 multi-object satu pilihan, uncertain/unknown, koreksi kategori server-validated |
+| AI-05 Guide & context | Konten + Android | S23 kondisi independent, panduan PUBLISHED versioned, unknown/no guide fallback |
+| AI-06 Recommendation | Backend + AI | Provider terstruktur, schema + evidence + allowed methods + special handling, secrets/budget |
+| AI-07 Integrasi log | Android + backend | S24 → S05 jumlah manual → create satu log; provenance, statistik, XP tidak ganda |
+| AI-08 Evaluasi & pilot | QA + seluruh pemilik | Holdout report per kelas, safety/fallback, privasi, biaya, perangkat; keputusan go/no-go tertulis |
+
+Fine-tuning setelah baseline taxonomy, lalu benchmark on-device/quantization bila latency/biaya/privacy memang menuntutnya. Keduanya tidak menjadi alasan menunda fallback manual. Camera scan dan lampiran foto adalah pekerjaan terpisah.
+
+### Acceptance tambahan yang harus diuji pada implementasi
+
+| ID | Skenario | Hasil wajib |
+|---|---|---|
+| AT-AI-01 | Tap action tengah dock dari lima tab | Satu sheet kamera; tab sebelumnya tetap; close mengembalikan fokus |
+| AT-AI-02 | Izin denied/permanently denied, kamera tidak ada | Pesan relevan dan manual; tidak meminta berulang |
+| AT-AI-03 | Capture, tinjau, retake, cancel | Tidak upload sebelum konfirmasi; file sementara dibersihkan |
+| AT-AI-04 | Rotate/background/process death saat kamera | Tidak leak kamera, draf pulih, capture ulang bila file hilang |
+| AT-AI-05 | Banyak bbox | Satu pilihan eksplisit, tidak auto-count atau batch save |
+| AT-AI-06 | Threshold 0,49/0,50/0,699/0,70, unknown | State sesuai ambang kandidat; tidak mengklaim kepastian |
+| AT-AI-07 | Class bottle tanpa material | Wajib konfirmasi; tidak auto-map ke PLASTIC |
+| AT-AI-08 | Objek/kondisi berubah saat LLM request | Hasil lama diabaikan, rekomendasi diulang dengan konteks baru |
+| AT-AI-09 | LLM JSON/enum/evidence tidak valid | Method null dan fallback; tidak disimpan sebagai keputusan |
+| AT-AI-10 | Baterai/tajam/risiko khusus | Policy override, method null, panduan terkurasi, manual tersedia |
+| AT-AI-11 | Reduce dari foto sampah | Tidak direkomendasikan otomatis; jalur manual untuk aktivitas pencegahan |
+| AT-AI-12 | Network, timeout, overload, budget habis | Draf tetap, no retry loop; tracking manual berjalan |
+| AT-AI-13 | Terima/ubah saran, isi 250 g, simpan dua kali | Satu log final, 10 XP; tidak memakai confidence sebagai statistik |
+| AT-AI-14 | Owner silang/expired/linked recommendation | 404/410/409 tepat, no cross-account access, pilihan manual eksplisit |
+| AT-AI-15 | File palsu, oversize, orientation, bbox invalid | Validasi tepat, tidak crash/decompression bomb, overlay sejajar |
+| AT-AI-16 | Cleanup pada sukses, gagal, disconnect, crash | Tidak ada raw image di log/backup; scavenger memenuhi batas retensi |
+| AT-AI-17 | TalkBack, 200% font, keyboard, small landscape | Daftar objek bisa dipilih tanpa bbox; CTA/manual dapat dicapai |
+| AT-AI-18 | AI capability off | Catat manual tetap bisa dari action utama, auth/history tidak terganggu |
+
+### Demo AI tambahan 2–3 menit
+
+Dari navbar buka kamera sheet, ambil foto, konfirmasi kirim, pilih/koreksi objek, isi kondisi, periksa sumber, terima/ubah metode, isi jumlah sendiri, simpan, tunjukkan satu record dan perubahan XP. Ulang dengan kamera ditolak atau model tidak yakin untuk membuktikan manual fallback. Jika hanya memakai HTML, sebutkan hasil deteksi/rekomendasi adalah fixture simulasi; jangan mempresentasikan demo sebagai inference nyata.
+
+### Gate AI sebelum pilot
+
+- [ ] License/taxonomy/model/mapping/provider/guide versions tercatat.
+- [ ] Holdout evaluation dan target kelas pilot disepakati; belum ada angka akurasi yang diasumsikan.
+- [ ] AT-AI-01–18 mempunyai hasil dan bukti implementasi nyata.
+- [ ] Kamera, upload dan cleanup diuji pada perangkat Android; web test tidak menggantikannya.
+- [ ] Kebijakan special handling, penolakan invalid output dan manual fallback lulus.
+- [ ] Anggaran, rate limit, timeout, observability redaction dan rollback diuji.

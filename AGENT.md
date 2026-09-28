@@ -4,23 +4,28 @@ Panduan untuk AI coding agent yang bekerja di repositori ini. Dibaca bersama [`C
 
 ## Konteks proyek
 
-**WasteNot** adalah aplikasi Android pencatatan sampah pribadi (3R: Reduce, Reuse, Recycle + Trash). Stack: Kotlin, Jetpack Compose, Navigation 3, Material 3. Single module `:app`. Package: `com.example.wastenot`.
+**WasteNot** adalah aplikasi Android pencatatan sampah pribadi (3R: Reduce, Reuse, Recycle + Trash) dengan **AI-assisted waste detection** menggunakan YOLO + LLM recommendation pipeline. Stack: Kotlin, Jetpack Compose, Navigation 3, Material 3, CameraX. Single module `:app`. Package: `com.example.wastenot`.
 
 ## Di mana membaca spesifikasi
 
-**Seluruh spesifikasi produk ada di [`docs/design-kit/`](docs/design-kit/).**
+**Seluruh spesifikasi produk ada di [`docs/design-kit/`](docs/design-kit/) · v1.3 · 28 Sep 2026**
 
 ```
 docs/design-kit/
-  README.md              → Ikhtisar dan cara pakai design kit
-  PRD.md                 → Product requirements, aturan domain, metrik, scope MVP
-  DESIGN.md              → Design system: warna, font, spacing, komponen, aksesibilitas
-  SCREEN_SPEC.md         → Spesifikasi layar S01–S20, komponen C01–C34, dialog D01–D04
-  ARCHITECTURE.md        → Arsitektur Android: navigasi, state, network, security
-  API.md                 → Data model, kontrak API, DTO, enum, konvensi
-  IMPLEMENTATION_PLAN.md → Backlog 4 minggu, gate, dan acceptance test
+  README.md              → Ikhtisar dan cara pakai design kit v1.3
+  AI_SPEC.md           ★ → Spesifikasi AI pipeline: YOLO, mapping, LLM, privasi, state machine
+  PRD.md                 → Product requirements v1.2 incl. AI scan scope
+  DESIGN.md              → Design system v1.3: warna, font, spacing, komponen C01–C39 (incl. AI)
+  SCREEN_SPEC.md         → Layar S01–S25 (incl. AI scan S21–S25), komponen C01–C39, dialog
+  ARCHITECTURE.md        → Arsitektur Android v1.2 incl. §13 AI extension (ScanViewModel, Python worker)
+  API.md                 → Data model v1.2: kontrak API core + AI endpoints §10
+  IMPLEMENTATION_PLAN.md → Backlog 4 minggu core + AI stages AI-01–AI-08, AT-AI-01–18
   QA.md                  → Hasil QA prototype HTML, batas validasi
-  design-system.html     → Mockup interaktif + galeri semua layar (buka di browser)
+  design-system.html     → Mockup interaktif + AI scan flow (buka di browser)
+  verify-ai.cjs        ★ → Automated test khusus AI scan flow
+  assets/preview-ai.png ★ → Preview layar AI scan
+  sources/AI_PLAN_ORIGINAL.md ★ → Dokumen source rencana tim (referensi, bukan spec final)
+  AGENT_INDEX.md         → Indeks cepat topik → section dokumen
   assets/fonts/          → Plus Jakarta Sans variable font + lisensi SIL OFL
 ```
 
@@ -38,16 +43,24 @@ docs/design-kit/
 | Accessibility, font scale, insets | `DESIGN.md §9`, `ARCHITECTURE.md §7` |
 | Setup plugin dev, hot reload, nav graph | `docs/DEV_PLUGINS.md` |
 | Acceptance test, QA criteria | `IMPLEMENTATION_PLAN.md §3–4`, `QA.md` |
+| **★ Fitur AI scan, kamera, YOLO** | `AI_SPEC.md`, `SCREEN_SPEC.md §3.21–25`, `ARCHITECTURE.md §13` |
+| **★ API AI (detections, recommendations)** | `API.md §10`, `AI_SPEC.md §6` |
+| **★ Komponen AI (C35–C39)** | `SCREEN_SPEC.md §4`, `DESIGN.md §6` |
+| **★ ScanViewModel, CameraX integration** | `AI_SPEC.md §3`, `ARCHITECTURE.md §13` |
+| **★ Privacy / foto cleanup rules** | `AI_SPEC.md §8` |
+| **★ Release gate / acceptance AI** | `IMPLEMENTATION_PLAN.md §10`, `AI_SPEC.md §9` |
 
 ## Aturan singkat untuk agent
 
 1. **Jangan tulis kode UI tanpa membaca `DESIGN.md` dulu.** Token warna, font, spacing, radius — semua ada di sana.
-2. **Jangan buat layar baru tanpa cek `SCREEN_SPEC.md`.** S01–S20 sudah punya field, state, dan aksi yang didefinisikan.
-3. **UDF ketat**: state hanya mengalir satu arah. ViewModel tidak boleh menyimpan Activity/NavController/Context.
-4. **Idempoten**: setiap write request ke API harus disertai `client_request_id`. Retry tidak menciptakan record ganda.
-5. **Bahasa UI**: Indonesia. Semua string produksi di `strings.xml`.
-6. **Jangan komentar AI-slop**: jangan tulis komentar seperti "// This function handles...", "// We then...", dsb. Komentar hanya untuk hal yang tidak jelas dari kode itu sendiri.
-7. **YAGNI**: jangan tambahkan abstraksi yang belum dibutuhkan (BaseViewModel, use case 1:1 per endpoint, feature modules).
+2. **Jangan buat layar baru tanpa cek `SCREEN_SPEC.md`.** S01–S25 sudah punya field, state, dan aksi yang didefinisikan.
+3. **Jangan buat fitur AI scan tanpa baca `AI_SPEC.md` dulu.** Privacy, confidence bands, LLM output validation, REDUCE restriction — ada di sana.
+4. **UDF ketat**: state hanya mengalir satu arah. ViewModel tidak boleh menyimpan Activity/NavController/Context.
+5. **Idempoten**: setiap write request ke API harus disertai `client_request_id`. Retry tidak menciptakan record ganda.
+6. **Bahasa UI**: Indonesia. Semua string produksi di `strings.xml`.
+7. **Jangan komentar AI-slop**: jangan tulis komentar seperti `// This function handles...`, `// We then...`. Komentar hanya untuk hal yang tidak jelas dari kode itu sendiri.
+8. **YAGNI**: jangan tambahkan abstraksi yang belum dibutuhkan (BaseViewModel, use case 1:1 per endpoint, feature modules).
+9. **AI hanya support**: jangan auto-save log. Jangan rekomendasikan REDUCE dari foto. User selalu konfirmasi.
 
 ## Toolchain dev yang sudah terpasang
 
@@ -89,8 +102,10 @@ docs/design-kit/
 
 | File | Isi |
 |---|---|
-| [`CLAUDE.md`](CLAUDE.md) | Panduan utama untuk AI agent (konteks lengkap) |
+| [`CLAUDE.md`](CLAUDE.md) | Panduan utama untuk AI agent (konteks lengkap + aturan AI) |
 | [`AGENT.md`](AGENT.md) | Dokumen ini — quick reference untuk agent |
+| [`docs/design-kit/AI_SPEC.md`](docs/design-kit/AI_SPEC.md) | ★ Spesifikasi AI pipeline lengkap |
+| [`docs/design-kit/AGENT_INDEX.md`](docs/design-kit/AGENT_INDEX.md) | Indeks cepat topik → section dokumen |
 | [`gradle/libs.versions.toml`](gradle/libs.versions.toml) | Version catalog semua dependency |
 | [`app/build.gradle.kts`](app/build.gradle.kts) | Module config, semua plugin diterapkan di sini |
 | [`app/src/main/java/com/example/wastenot/MainActivity.kt`](app/src/main/java/com/example/wastenot/MainActivity.kt) | Entry point |

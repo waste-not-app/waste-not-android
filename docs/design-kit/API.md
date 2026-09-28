@@ -1,6 +1,6 @@
 # WasteNot: Data Model dan Kontrak API
 
-Versi rancangan 1.1 · 21 September 2026 · Belum diimplementasikan
+Versi 1.2 · 28 September 2026 · Core + AI extension · Rancangan implementasi
 
 Dokumen ini menetapkan kontrak usulan Android dan backend, melengkapi draft endpoint halaman 4 PDF. Aturan domain ada di [PRD.md](PRD.md). Prefix `/v1` merupakan keputusan rancangan. Contoh menggunakan data simulasi, bukan akun atau endpoint nyata.
 
@@ -100,6 +100,10 @@ Satu photo_id maksimal terkait satu log aktif dan harus milik user yang sama. Wa
 | GET | /v1/achievements | Achievement dan progres | Dari PDF, fitur opsional |
 | POST | /v1/photos | Upload multipart gambar privat | Opsional |
 | DELETE | /v1/photos/{id} | Hapus lampiran belum terpakai | Opsional |
+| POST | /v1/ai/detections | Scan foto sementara | AI extension §10 |
+| GET | /v1/ai/objects | Katalog koreksi objek | AI extension §10 |
+| POST | /v1/ai/recommendations | Rekomendasi tervalidasi | AI extension §10 |
+| DELETE | /v1/ai/detections/{id} | Buang sesi scan | AI extension §10 |
 | GET | /health/live | Proses hidup | Operasional |
 | GET | /health/ready | Aplikasi dan DB siap | Operasional, jangan bocorkan detail |
 
@@ -319,3 +323,121 @@ Create, uniqueness request, dan perubahan derived achievement dilakukan dalam tr
 Password disimpan dengan Argon2id melalui library yang terpelihara; simpan parameter dan salt bersama hash, jangan membuat fungsi hashing sendiri. Pilihan ini mengacu pada [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html). Rate limit auth per IP dan identitas ternormalisasi, tanpa mengunci permanen pengguna lewat serangan pihak lain; nilai limit disepakati setelah pengujian.
 
 Kasus wajib: user A tidak dapat membaca/mengubah/menghapus log user B; integer batas bawah/atas; XOR unit; semua enum invalid; hanya Reduce; tidak ada catatan; campuran unit; request create paralel dengan ID sama; version conflict; replay setelah delete; token expired/revoked; tanggal sekitar pergantian hari. Test penerimaan bersama Android/backend menggunakan dataset PRD §9.4.
+
+## 10. AI extension v1.2
+
+Kontrak ini memperluas core, menggunakan prefix `/v1` yang sama (contoh `/api/v1` pada plan dinormalisasi). Semua payload di bawah contoh rancangan. [AI_SPEC](AI_SPEC.md) menetapkan mapping, kebijakan rekomendasi, batas media, TTL dan retensi. Tidak ada endpoint AI yang membuat log atau XP.
+
+| Method | Endpoint | Fungsi |
+|---|---|---|
+| GET | /v1/ai/objects | Katalog object_key/category yang didukung dan versi mapping |
+| POST | /v1/ai/detections | Upload foto ephemeral, jalankan YOLO, simpan sesi hasil user-scoped |
+| POST | /v1/ai/recommendations | Konfirmasi/koreksi objek, retrieval panduan, saran tervalidasi |
+| DELETE | /v1/ai/detections/{id} | Buang sesi sendiri dan rekomendasi sementara; idempotent 204 |
+
+GET /v1/ai/objects mengembalikan data.items berisi object_key, label, category, special_handling dan catalog_version; tidak memuat arbitrary prompt. Kategori OTHER dapat dipilih manual tanpa memaksa object_key palsu.
+
+GET /v1/metadata menambah `capabilities.ai_scan` dan `capabilities.ai_recommendation` boolean serta `ai_object_catalog_version` nullable. Capability false tetap mempertahankan tombol Catat dengan input manual; bukan menyembunyikan seluruh pencatatan. Konfigurasi model mentah dan secret tidak masuk metadata publik.
+
+### 10.1 Deteksi
+
+Multipart fields: `image` JPEG/PNG, `client_request_id` UUID. Tidak menerima URL gambar eksternal/base64 JSON. File ≤5 MiB, decoded ≤12 MP dan sisi ≤4096, normalisasi orientasi/EXIF server-side. Autentikasi dan pembatasan akun dilakukan sebelum inference. Response 201 pertama, 200 replay identik selama TTL; ID sama dengan digest gambar berbeda → 409 IDEMPOTENCY_CONFLICT. Dedup scoped user dan digest tidak menjadi data training.
+
+```json
+{
+  "data": {
+    "detection_id": "7d58dd23-03c8-4f68-8caa-cefb0a720100",
+    "status": "REVIEW_REQUIRED",
+    "model_version": "candidate-unvalidated-01",
+    "mapping_version": "mapping-01",
+    "expires_at": "2026-09-29T03:00:00Z",
+    "image": {"width": 960, "height": 1280},
+    "objects": [{
+      "object_id": "object-1",
+      "raw_class": "bottle",
+      "confidence": 0.94,
+      "bbox": [0.12, 0.08, 0.62, 0.88],
+      "confidence_band": "OFFERED",
+      "object_key": null,
+      "category": null,
+      "requires_material_confirmation": true
+    }]
+  },
+  "request_id": "request-example-1"
+}
+```
+
+Tidak ada foto/URL permanen pada respons. `status`: REVIEW_REQUIRED bila ada kandidat ≥ambang lower; MANUAL_REQUIRED bila kosong/unknown/semua rendah. `objects` dapat kosong. Semua score finite 0..1; bbox tervalidasi sesuai AI_SPEC. `object_id` hanya unik di detection session. Raw class dan category berbeda. Skor rendah memakai UNCERTAIN; hasil <0,50 tidak dijadikan prefill. Nilai threshold adalah konfigurasi versioned, bukan magic constant UI.
+
+### 10.2 Rekomendasi
+
+```json
+{
+  "client_request_id": "5131c085-e592-4fe8-bd69-cf6b56d33be6",
+  "detection_id": "7d58dd23-03c8-4f68-8caa-cefb0a720100",
+  "object_id": "object-1",
+  "confirmed_object_key": "pet_bottle",
+  "confirmed_category": "PLASTIC",
+  "condition": {"cleanliness": "CLEAN", "integrity": "INTACT", "reusable": "UNKNOWN"},
+  "reuse_intention": false
+}
+```
+
+Server mengambil confidence/model/mapping dari sesi sendiri, bukan percaya nilai kiriman client. `confirmed_object_key` berasal dari katalog server; kategori harus cocok atau 422. Untuk kelas unknown tanpa panduan, gunakan manual dan jangan membuat recommendation palsu. Tidak menerima user_id, arbitrary guide_key, URL/prompt bebas atau allowed_methods dari client. Ownership dicek sebelum lookup model/LLM.
+
+```json
+{
+  "data": {
+    "recommendation_id": "10f6a0b0-533d-4fd4-85a7-ecf38e42b101",
+    "status": "READY",
+    "category": "PLASTIC",
+    "recommended_method": "RECYCLE",
+    "alternative_method": null,
+    "reason": "Contoh respons: periksa ketentuan penerimaan dalam panduan fasilitas.",
+    "special_handling": false,
+    "caution": "Ini contoh kontrak, bukan rekomendasi yang sudah diverifikasi.",
+    "guide_refs": [{"guide_id": "9fbd97ab-9450-4b6e-a43e-e0bda8a61011", "version": 1}],
+    "recommendation_version": "policy-01",
+    "expires_at": "2026-09-29T03:00:00Z"
+  },
+  "request_id": "request-example-2"
+}
+```
+
+`status` READY / SPECIAL_HANDLING / UNAVAILABLE. SPECIAL_HANDLING mengharuskan special_handling=true dan kedua method=null. UNAVAILABLE mengharuskan kedua method=null dengan reason_code seperti NO_REVIEWED_GUIDE atau INVALID_MODEL_OUTPUT. Tidak mengembalikan exception/provider raw text. Expiry recommendation tidak boleh melampaui sesi deteksi. Konfirmasi pengguna tidak disimpulkan dari tombol generate.
+
+Simpan rekomendasi identik/replay satu client_request_id tanpa memanggil provider lagi selama TTL. Payload berbeda dengan ID sama →409. Context berubah memakai request ID baru; respons lama dibuang di Android. Infrastruktur timeout memakai error 504 AI_TIMEOUT; provider unavailable 503 AI_UNAVAILABLE; output semantik invalid dapat kembali 200 status UNAVAILABLE sebagai hasil fallback yang terkontrol.
+
+### 10.3 Penyimpanan catatan dan metadata
+
+POST /v1/waste-logs tetap satu-satunya create path. Tambahan opsional pada body existing:
+
+```json
+{
+  "ai_provenance": {
+    "recommendation_id": "10f6a0b0-533d-4fd4-85a7-ecf38e42b101",
+    "user_confirmed_object": true,
+    "user_confirmed_method": true
+  }
+}
+```
+
+Ini fragmen tambahan, bukan request create lengkap; category/method/quantity/date/client_request_id tetap wajib seperti §5. Manual menghilangkan ai_provenance. Server memvalidasi ownership, TTL, kategori sama dengan konfirmasi, dan kedua confirmation=true. Metode akhir boleh berbeda dari saran; simpan final_category/final_method dari waste log dan flag accepted berdasarkan perbandingan server, bukan boolean client sebagai ukuran akurasi. REDUCE hanya lewat manual tanpa provenance rekomendasi disposal.
+
+Satu recommendation_id boleh terikat satu waste_log_id; constraint unik scoped user untuk mencegah double-save dengan request ID baru. Replay ID create core identik mengembalikan record yang sama. Reuse recommendation oleh log berbeda →409 AI_ALREADY_LINKED. Provenance invalid/expired →422 AI_REFERENCE_INVALID / 410 AI_SESSION_EXPIRED; pertahankan draf dan tawarkan simpan manual setelah pengguna melepas provenance. Jangan diam-diam mengubah hasil request idempotent.
+
+Entitas tambahan:
+
+| Entitas | Field minimum |
+|---|---|
+| ai_detection_sessions | id, user_id, client_request_id, image_digest, model_version, mapping_version, detections JSON validated, created_at, expires_at; UNIQUE(user_id,client_request_id) |
+| ai_recommendations | id, detection_id, user_id, client_request_id, request_hash, confirmed_object_key/category, condition JSON, reuse_intention, status, methods nullable, guide_snapshot_refs, policy/provider/model version, created_at, expires_at |
+| ai_log_metadata | waste_log_id UNIQUE FK, recommendation_id UNIQUE, user_id, model/mapping/policy/guide versions, raw_class/confidence, confirmed object/category, original suggestion, final category/method at creation, confirmation flags; tidak menyimpan foto/prompt mentah |
+
+Saat create, snapshot metadata dan waste log dibuat dalam transaksi yang sama. Snapshot tetap cukup untuk audit setelah sesi ephemeral dihapus (reference ID di metadata tidak menjadi FK yang memaksa sesi tetap hidup). Edit log tidak menghitung ulang model atau mengubah snapshot awal. Delete mengikuti retensi core dan menghapus metadata pada purge; statistik tidak membaca tabel AI. Migration tambahan nullable/terpisah sehingga log manual lama tetap valid.
+
+### 10.4 Error dan pengujian kontrak
+
+413/415/422 untuk ukuran/tipe/decoder; 401 sesi; 404 session milik orang lain; 410 AI_SESSION_EXPIRED; 429 RATE_LIMITED + Retry-After; 503 AI_UNAVAILABLE/AI_DISABLED; 504 AI_TIMEOUT. Error envelope tetap §8. Retry upload/inference harus eksplisit dan dibatasi; retry simpan core mempertahankan ID yang sama.
+
+Uji malformed bbox/NaN, spoof category/guide/confidence, AI lintas akun, replay identik/berbeda, expiry, special handling override, LLM schema/evidence invalid, unknown class, no guide, timeout, cancel, log transaction rollback, concurrent save, dan log manual tanpa metadata. Jangan mencatat body gambar/prompt/Authorization di access log.

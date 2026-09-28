@@ -1,6 +1,6 @@
 # WasteNot Design System
 
-Versi 1.1 · 23 September 2026 · Rancangan untuk Android Jetpack Compose
+Versi 1.3 · 28 September 2026 · Core + AI extension · Rancangan implementasi
 
 **Arah:** catatan kebiasaan yang segar, praktis, dan mudah dibaca. Desain ini ditentukan khusus untuk personal waste tracking dan panduan 3R, sesuai permintaan pengguna. Referensi Titip.in tidak menjadi sumber warna, font, bentuk komponen, atau komposisi WasteNot.
 
@@ -149,7 +149,7 @@ Web dokumentasi: sidebar pada desktop; navigasi wrap di atas pada mobile; galeri
 
 ## 6. Spesifikasi komponen
 
-Inventaris C01–C34 lengkap ada di [SCREEN_SPEC](SCREEN_SPEC.md). Ketentuan visual lintas komponen:
+Inventaris C01–C39 lengkap ada di [SCREEN_SPEC](SCREEN_SPEC.md). Ketentuan visual lintas komponen:
 
 | Kelompok | Default | Selected / focus | Disabled / error |
 |---|---|---|---|
@@ -201,13 +201,13 @@ Motion: state hover/press 120 ms, perubahan konten sederhana maksimum 180 ms; ti
 - Chart memakai deskripsi, tabel/list alternatif, serta unit; tidak bergantung warna saja.
 - State loading, empty, error, success tersedia di layar data. Gagal refresh mempertahankan data lama dengan penjelasan.
 - Contrast kedua tema diperiksa. Theme gelap tidak sekadar membalik warna.
-- Simulasi web tidak menyimpan password, tidak menghubungi backend, tidak mengaktifkan lokasi/notifikasi, dan tidak mengunggah foto.
+- Simulasi web tidak menyimpan password, tidak menghubungi backend, tidak mengaktifkan lokasi/notifikasi, dan tidak mengunggah foto. Kamera lokal hanya aktif setelah aksi dan izin; inference AI tetap simulasi.
 
 ## 10. Handoff Compose dan cakupan prototype
 
 Pemetaan implementasi: `WasteNotTheme` memilih ColorScheme terang/gelap/sistem, memuat Typography Plus Jakarta Sans dan Shapes; `Dimens` mengelompokkan spacing. Theme menjadi sumber nilai styling, sedangkan model domain tetap di layer data/state. Dynamic color dimatikan secara default pada rancangan ini agar pasangan kontras dan identitas tidak berubah tanpa QA; dukungan wallpaper color dapat menjadi keputusan berikutnya.
 
-HTML menyediakan seluruh S01–S20, katalog C01–C34, dialog D01–D04, switch tema, pencarian/filter, form validasi, simulasi tambah/ubah/hapus dan pembaruan ringkasan, pilihan state, serta preview foto lokal. Angka awal mengikuti PRD §9.4 dengan tanggal demo tetap 21 September 2026, meskipun revisi dokumen desain 23 September. Reset demo mengembalikan dataset acuan; reload juga mereset data simulasi.
+HTML menyediakan S01–S25, katalog C01–C39, dialog D01–D04, switch tema, pencarian/filter, form validasi, simulasi tambah/ubah/hapus dan pembaruan ringkasan, pilihan state, serta preview foto lokal. Angka awal mengikuti PRD §9.4 dengan tanggal demo tetap 21 September 2026, meskipun revisi dokumen desain 23 September. Reset demo mengembalikan dataset acuan; reload juga mereset data simulasi.
 
 Layar S10 adalah rancangan filter sheet; S18 panel lampiran; S20 galeri state, bukan tiga tab produk baru. Dalam galeri ditampilkan terpisah untuk handoff. Fitur autentikasi, conflict server, upload privat, permission Android, dan penjadwalan hanya disimulasikan. Penerimaan aplikasi Android tetap harus dibuktikan dengan implementasi dan pengujian di perangkat.
 
@@ -221,3 +221,23 @@ Layar S10 adalah rancangan filter sheet; S18 panel lampiran; S20 galeri state, b
 - [ ] Dataset contoh tidak masuk build produksi sebagai hasil pengguna nyata.
 - [ ] Konten panduan dan lokasi diverifikasi sebelum dipublikasikan.
 - [ ] QA Android dicatat terpisah dari QA HTML dokumentasi.
+
+## 12. Styling AI dan aksi utama navbar (v1.2)
+
+Arah visual pinus–lime, font Plus Jakarta Sans dan glass dock tetap berlaku. Permintaan 28 September menambah tombol utama di tengah navbar yang membuka bottom sheet kamera; manual fallback terlihat tanpa harus menggagalkan scan lebih dahulu.
+
+Action Catat/Scan diletakkan menonjol pada tengah atas dock (bukan mengganti tab Statistik/Panduan). Lime gradient, teks onAccent, ikon kamera 24 dp, tinggi minimal 52 dp dan lebar minimum 136 dp. Dock memberi ruang atas 32 dp supaya action tidak menutup lima label navigasi; area konten tetap berada di atas dock dalam aliran layout. Pada layar lebar action dekat rail; jangan memaksakan enam destinasi.
+
+Camera sheet opak surface, scrim belakang, radius atas 28 dp, padding 24 dp (16 pada ruang sempit), batas tinggi 92% ruang tersedia, scroll internal. Tombol close dan manual ≥48 dp. Keyboard/system bars tidak menutup fallback. Drag handle hanya dekoratif dalam HTML, bukan janji drag gesture; Android menggunakan perilaku sheet native dan Back. Fokus awal ke judul; Escape membatalkan dan kamera berhenti.
+
+Preview kamera memakai bidang gelap dengan teks putih terpisah dari feed; kontrol tidak menempatkan teks tanpa backing di atas gambar yang belum diketahui kontrasnya. Bbox adalah garis solid/putus dengan label dan daftar alternatif. Scoring ditulis “Skor deteksi”, tanpa checkmark kebenaran atau warna hijau yang menjanjikan keamanan. Low confidence/special handling memakai warning + teks, bukan warna saja.
+
+Konten saran: metode dominan, alasan ringkas, sumber dan tanggal review, caution, Ubah/Gunakan. Glass tidak dipakai di form kondisi atau kartu warning. Foto tidak menerima filter/gradasi yang mengubah tampilan material. Loading hanya indikator dan teks, tanpa persentase rekayasa. Konfirmasi berlanjut ke jumlah kosong; jangan menampilkan berat perkiraan dari foto.
+
+C35–C39 dan S21–S25 melengkapi katalog menjadi 39 komponen dan 25 layar/panel. [AI_SPEC](AI_SPEC.md) adalah sumber batasan model; [SCREEN_SPEC](SCREEN_SPEC.md) mengatur state. Implementasi HTML dapat mencoba kamera lokal tetapi deteksi/LLM selalu berlabel simulasi.
+
+## 13. Penyempurnaan visual v1.3
+
+Sheet menggunakan step indicator empat tahap, current step berupa lingkaran lime dengan label teks. Preview kamera memakai pinus gelap, area framing garis putus, dan teks berkontras tinggi. Hasil objek memakai ikon material besar dalam ilustrasi bbox berlabel contoh; tidak mengklaim koordinat hasil inference foto.
+
+Header, isi scroll, dan footer manual dipisahkan divider. Footer tetap opak agar teks tidak bercampur feed kamera dan dapat dicapai saat isi panjang. Pengaturan simulasi dan dasar rekomendasi memakai disclosure. Form manual Beranda/Riwayat menjadi aksi sekunder agar Catat/Scan di dock menjadi fokus utama. Radius, gradasi, glass dock dan typography v1.1 tetap dipakai.

@@ -4,24 +4,25 @@ Dokumen ini adalah panduan konteks utama untuk AI coding agent (Claude, Gemini, 
 
 ## Proyek
 
-**WasteNot** adalah aplikasi Android untuk pencatatan aktivitas pengelolaan sampah pribadi (Reduce, Reuse, Recycle, Trash). Ditulis dengan **Kotlin + Jetpack Compose + Navigation 3**, single-Activity, one Gradle module `:app`. Package: `com.example.wastenot`.
+**WasteNot** adalah aplikasi Android untuk pencatatan aktivitas pengelolaan sampah pribadi (Reduce, Reuse, Recycle, Trash), diperluas dengan **AI-assisted waste detection** menggunakan YOLO + LLM recommendation pipeline. Ditulis dengan **Kotlin + Jetpack Compose + Navigation 3**, single-Activity, one Gradle module `:app`. Package: `com.example.wastenot`.
 
 ## Dokumen referensi wajib
 
-Semua desain dan spesifikasi produk berada di [`docs/design-kit/`](docs/design-kit/). **Baca dokumen yang relevan sebelum menulis kode UI, API client, atau logika domain.**
+Semua desain dan spesifikasi produk berada di [`docs/design-kit/`](docs/design-kit/) **(v1.3 · 28 Sep 2026)**. **Baca dokumen yang relevan sebelum menulis kode UI, API client, atau logika domain.**
 
 | Dokumen | Kapan harus dibaca |
 |---|---|
-| [`DESIGN.md`](docs/design-kit/DESIGN.md) | Setiap kali mengerjakan UI, theme, warna, tipografi, spacing, komponen, animasi, aksesibilitas |
-| [`SCREEN_SPEC.md`](docs/design-kit/SCREEN_SPEC.md) | Setiap kali membuat atau memodifikasi layar (S01–S20), komponen (C01–C34), atau dialog (D01–D04) |
-| [`ARCHITECTURE.md`](docs/design-kit/ARCHITECTURE.md) | Setiap kali menyentuh navigasi, ViewModel, Repository, state management, DI, atau storage |
-| [`API.md`](docs/design-kit/API.md) | Setiap kali membuat atau memodifikasi network layer, DTO, Retrofit interface, atau business rule |
-| [`PRD.md`](docs/design-kit/PRD.md) | Untuk memahami aturan domain: definisi metrik, unit, XP, Reduce vs Recycle, scope MVP |
-| [`IMPLEMENTATION_PLAN.md`](docs/design-kit/IMPLEMENTATION_PLAN.md) | Untuk prioritas tugas: backlog 4 minggu, gate per minggu, dan acceptance test |
+| [`AI_SPEC.md`](docs/design-kit/AI_SPEC.md) | ★ Setiap kali menyentuh fitur AI: kamera, YOLO inference, LLM, mapping, confidence, state machine, privasi |
+| [`DESIGN.md`](docs/design-kit/DESIGN.md) | Setiap kali mengerjakan UI, theme, warna, tipografi, spacing, komponen (incl. C35–C39 AI), animasi, aksesibilitas |
+| [`SCREEN_SPEC.md`](docs/design-kit/SCREEN_SPEC.md) | Setiap kali membuat/memodifikasi layar (S01–S25 incl. AI scan S21–S25), komponen (C01–C39), atau dialog |
+| [`ARCHITECTURE.md`](docs/design-kit/ARCHITECTURE.md) | Setiap kali menyentuh navigasi, ViewModel, Repository, state management, DI, storage, atau AI extension §13 |
+| [`API.md`](docs/design-kit/API.md) | Setiap kali membuat/memodifikasi network layer, DTO, Retrofit interface, business rule, atau AI endpoints §10 |
+| [`PRD.md`](docs/design-kit/PRD.md) | Untuk memahami aturan domain: definisi metrik, unit, XP, Reduce vs Recycle, scope MVP + AI increment |
+| [`IMPLEMENTATION_PLAN.md`](docs/design-kit/IMPLEMENTATION_PLAN.md) | Untuk prioritas tugas: backlog 4 minggu core + AI stages AI-01–AI-08, acceptance tests |
 | [`QA.md`](docs/design-kit/QA.md) | Untuk memahami batas-batas yang sudah diverifikasi di prototype HTML |
 | [`DEV_PLUGINS.md`](docs/DEV_PLUGINS.md) | Panduan setup, shortcuts, dan perintah plugin dev (HotSwan, NavGraph, ADB Idea, JSON to Kotlin) |
 
-Untuk review visual interaktif: buka [`docs/design-kit/design-system.html`](docs/design-kit/design-system.html) di browser — tidak perlu build atau koneksi internet.
+Untuk review visual interaktif (termasuk AI scan flow): buka [`docs/design-kit/design-system.html`](docs/design-kit/design-system.html) di browser — tidak perlu build atau koneksi internet.
 
 ## Tech stack
 
@@ -31,7 +32,8 @@ Untuk review visual interaktif: buka [`docs/design-kit/design-system.html`](docs
 | UI | Jetpack Compose + Material 3 |
 | Navigation | Navigation 3 (`androidx.navigation3`) |
 | State | ViewModel + StateFlow (UDF) |
-| Network | Retrofit + OkHttp (belum disetup, lihat API.md) |
+| Network | Retrofit + OkHttp (lihat API.md) |
+| Camera | CameraX (ImageCapture + lifecycle-aware, untuk AI scan) |
 | Local storage | DataStore (preferences + draft) |
 | DI | Constructor injection + AppContainer sederhana |
 | AGP | 9.0.1, Gradle 9.1.0, Kotlin 2.3.20, Compose BOM 2026.03.01 |
@@ -63,6 +65,18 @@ Untuk generate/export nav graph: `./gradlew :app:generateNavGraph` atau `./gradl
 - Unit: berat dalam **gram** (integer), jumlah benda integer. Jangan konversi count ke kilogram.
 - Semua angka penting berasal dari server, bukan dihitung ulang di client secara mandiri.
 
+### AI — aturan kritis
+- **AI adalah decision support, bukan pengambil keputusan.** Pengguna wajib konfirmasi sebelum log disimpan.
+- **REDUCE tidak boleh direkomendasikan dari scan foto.** Hanya tersedia via input manual (tanpa ai_provenance).
+- **Tombol Catat/Scan = action di tengah atas dock, bukan tab ke-6.** Lima tab tetap: Home, History, Guide, Statistics, Profile.
+- Camera scan membuka `ModalBottomSheet` multi-step (S21–S25), bukan layar/route baru.
+- Foto sementara scan **harus dihapus** saat keluar alur, logout, atau paling lambat 1 jam. Jangan simpan permanen kecuali user opt-in foto lampiran.
+- Jangan kirim foto, nama, email, lokasi, atau token ke LLM. Kirim hanya: object_key, category, condition context, potongan panduan, allowed methods.
+- Output LLM **wajib divalidasi server** (enum, JSON schema, evidence check). Jangan percaya output raw dari LLM di client.
+- `recommended_method` yang invalid → respons UNAVAILABLE, method null, user pilih manual.
+- Confidence bands: ≥0.70 boleh ditawarkan; 0.50–0.69 tampilkan "belum yakin"; <0.50 → manual required.
+- `ScanViewModel` hanya menyimpan immutable state. Tidak menyimpan Activity/Context/Camera reference.
+
 ### Arsitektur
 - Satu Activity (`MainActivity`), satu module (`:app`), package by feature.
 - ViewModel + StateFlow + UDF. Jangan simpan context, Activity, atau NavController di ViewModel.
@@ -76,7 +90,7 @@ Untuk generate/export nav graph: `./gradlew :app:generateNavGraph` atau `./gradl
 - Error jaringan tidak membuang data yang sudah ditampilkan. Retry idempoten dengan `client_request_id`.
 - Jangan tampilkan keberhasilan sebelum konfirmasi dari server.
 
-## Struktur file yang disarankan (lihat ARCHITECTURE.md §3)
+## Struktur file yang disarankan (lihat ARCHITECTURE.md §3 & §13)
 
 ```
 app/src/main/java/com/example/wastenot/
@@ -89,11 +103,14 @@ app/src/main/java/com/example/wastenot/
   feature/home/        HomeRoute.kt, HomeScreen.kt, HomeViewModel.kt
   feature/log/         History*, LogDetail*, LogEditor*, FilterState.kt
   feature/guide/       GuideList*, GuideDetail*
+  feature/scan/        ★ ScanBottomSheet.kt, ScanViewModel.kt (AI)
   feature/statistics/  Statistics*
   feature/profile/     Profile*, Achievement*, Settings*
   data/network/        WasteNotApi.kt, dto/, AuthInterceptor.kt
   data/repository/     AuthRepository.kt, LogRepository.kt, ...
+  data/ai/             ★ AiRepository.kt, dto/ (AI detections, recommendations)
   data/local/          PreferencesStore.kt, DraftStore.kt, TokenStore.kt
+  core/camera/         ★ CameraManager.kt, ImageCaptureHelper.kt (AI)
   model/               WasteLog.kt, WasteCategory.kt, DisposalMethod.kt
 ```
 
@@ -118,3 +135,6 @@ app/src/main/java/com/example/wastenot/
 - Jangan simpan data sensitif di log, screenshot, atau Markdown.
 - Jangan tampilkan angka CO₂ atau "dampak terverifikasi" — WasteNot mencatat kebiasaan, bukan mengklaim dampak ilmiah.
 - Jangan gabungkan dua navigation library (hanya Navigation 3).
+- Jangan auto-save waste log tanpa konfirmasi user eksplisit.
+- Jangan simpan foto scan lebih dari 1 jam tanpa persetujuan user.
+- Jangan rekomendasikan REDUCE dari hasil scan AI.

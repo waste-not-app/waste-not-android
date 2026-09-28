@@ -7,7 +7,7 @@
 [![AGP](https://img.shields.io/badge/AGP-9.0.1-orange.svg)](https://developer.android.com/studio/releases/gradle-plugin)
 [![Gradle](https://img.shields.io/badge/Gradle-9.1.0-02303A.svg)](https://gradle.org)
 
-**WasteNot** adalah aplikasi Android untuk pencatatan dan pelacakan kebiasaan pengelolaan sampah pribadi berdasarkan prinsip **3R (Reduce, Reuse, Recycle)** dan Trash. Dirancang dengan antarmuka native modern yang bersih, segar, dan ramah pengguna, berorientasi pada refleksi kebiasaan sehari-hari tanpa menghakimi pengguna.
+**WasteNot** adalah aplikasi Android untuk pencatatan dan pelacakan kebiasaan pengelolaan sampah pribadi berdasarkan prinsip **3R (Reduce, Reuse, Recycle)** dan Trash. Dilengkapi fitur **AI-assisted waste detection** menggunakan YOLO object detection dan LLM recommendation untuk membantu pengguna mengidentifikasi jenis sampah dan metode penanganannya. AI berfungsi sebagai asisten; keputusan akhir tetap di tangan pengguna.
 
 ---
 
@@ -18,6 +18,8 @@
 *   **Typography**: Plus Jakarta Sans (Variable Font)
 *   **Navigation**: [Jetpack Navigation 3](https://developer.android.com/guide/navigation/navigation-3) (`androidx.navigation3`)
 *   **Architecture Pattern**: Single-Activity, Unidirectional Data Flow (UDF), ViewModel + StateFlow
+*   **Camera**: [CameraX](https://developer.android.com/training/camerax) (lifecycle-aware, untuk AI scan flow)
+*   **AI Pipeline**: YOLO object detection + LLM recommendation via backend inference service
 *   **Build Toolchain**: Android Gradle Plugin (AGP) `9.0.1`, Gradle `9.1.0`, JDK 17
 *   **SDK Target**: Compile SDK `36`, Target SDK `36`, Min SDK `24`
 *   **Dev Tools**: Hot-reload via [Compose HotSwan v2](https://hotswan.dev), visualisasi nav via [Compose Navigation Graph](https://skydoves.github.io/compose-nav-graph)
@@ -135,24 +137,30 @@ wastenot-android/
 │       │   │   ├── Navigation.kt          # Navigation 3 NavDisplay & root backstack
 │       │   │   ├── NavigationKeys.kt      # NavKey routes & data objects
 │       │   │   ├── theme/                 # Material 3 ColorScheme, Typography, Theme
-│       │   │   └── ui/main/               # Main screen Composable & ViewModel
+│       │   │   ├── ui/main/               # Main screen Composable & ViewModel
+│       │   │   ├── feature/scan/          # ★ ScanBottomSheet, ScanViewModel (AI)
+│       │   │   ├── data/ai/               # ★ AiRepository, AI DTO (AI)
+│       │   │   └── core/camera/           # ★ CameraManager, ImageCaptureHelper (AI)
 │       │   └── AndroidManifest.xml
 │       └── test/                          # Unit tests
 ├── docs/
 │   ├── DEV_PLUGINS.md                     # Panduan setup HotSwan, NavGraph, dan tooling
-│   └── design-kit/                        # Dokumen spesifikasi produk & design kit
-│       ├── design-system.html             # Mockup visual & prototype interaktif (buka di browser)
-│       ├── DESIGN.md                      # Design system, token warna, typography, spacing
-│       ├── SCREEN_SPEC.md                 # Spesifikasi layar S01–S20, komponen C01–C34
-│       ├── PRD.md                         # Product Requirements, domain rules, metrik 3R
-│       ├── ARCHITECTURE.md                # Arsitektur Android, State, Navigasi, Security
-│       ├── API.md                         # Data model backend, DTO, kontrak API v1
-│       ├── IMPLEMENTATION_PLAN.md         # Backlog 4 minggu, acceptance tests (AT-01 s/d AT-26)
-│       └── AGENT_INDEX.md                 # Indeks referensi cepat pencarian topik
+│   └── design-kit/                        # Dokumen spesifikasi produk & design kit v1.3
+│       ├── design-system.html             # Mockup visual & prototype interaktif incl. AI (buka di browser)
+│       ├── AI_SPEC.md                   ★ # Spesifikasi AI pipeline (YOLO/Guide/LLM)
+│       ├── DESIGN.md                      # Design system v1.3, komponen C01–C39
+│       ├── SCREEN_SPEC.md                 # Spesifikasi layar S01–S25 (incl. AI), C01–C39
+│       ├── PRD.md                         # Product Requirements v1.2, domain rules, AI scope
+│       ├── ARCHITECTURE.md                # Arsitektur Android v1.2, §13 AI extension
+│       ├── API.md                         # Kontrak API v1.2 core + §10 AI endpoints
+│       ├── IMPLEMENTATION_PLAN.md         # Backlog 4 minggu + §10 AI stages & acceptance tests
+│       ├── AGENT_INDEX.md                 # Indeks referensi cepat pencarian topik (incl. AI)
+│       ├── verify-ai.cjs                ★ # Automated test AI scan flow
+│       └── sources/AI_PLAN_ORIGINAL.md  ★ # Source rencana tim (referensi)
 ├── gradle/
 │   └── libs.versions.toml                 # Version Catalog dependensi & plugin
 ├── Makefile                               # Otomasi build, test, branching, dan nav tools
-├── CLAUDE.md                              # Konteks proyek untuk AI coding assistant
+├── CLAUDE.md                              # Konteks proyek & aturan AI untuk AI coding assistant
 ├── AGENT.md                               # Panduan cepat developer & agent
 └── settings.gradle.kts
 ```
@@ -161,17 +169,19 @@ wastenot-android/
 
 ## 📖 Dokumentasi Spesifikasi
 
-Seluruh dokumen produk, desain, dan arsitektur tersimpan di folder [`docs/design-kit/`](docs/design-kit/):
+Seluruh dokumen produk, desain, dan arsitektur tersimpan di folder [`docs/design-kit/`](docs/design-kit/) **(v1.3 · 28 Sep 2026)**:
 
 | Dokumen | Deskripsi |
 |---|---|
-| [**`DESIGN.md`**](docs/design-kit/DESIGN.md) | Panduan visual: palet warna pinus–lime, tipografi Plus Jakarta Sans, spacing, material kaca navigasi, dan handoff Compose. |
-| [**`SCREEN_SPEC.md`**](docs/design-kit/SCREEN_SPEC.md) | Spesifikasi interaksi dan UI untuk seluruh 20 layar (`S01` s/d `S20`), komponen (`C01` s/d `C34`), dan dialog (`D01` s/d `D04`). |
-| [**`PRD.md`**](docs/design-kit/PRD.md) | Kebutuhan produk, aturan metrik (penanganan gram vs benda, logika persentase recycling rate, poin XP). |
-| [**`ARCHITECTURE.md`**](docs/design-kit/ARCHITECTURE.md) | Panduan arsitektur Android Jetpack Compose, alur UDF, mitigasi process death, serta rekomendasi backend modular monolith. |
-| [**`API.md`**](docs/design-kit/API.md) | Kontrak endpoint RESTful JSON `/v1`, penanganan autentikasi JWT Bearer, dan idempotensi `client_request_id`. |
-| [**`IMPLEMENTATION_PLAN.md`**](docs/design-kit/IMPLEMENTATION_PLAN.md) | Roadmap 4 minggu dan 26 skenario Acceptance Test (`AT-01` s/d `AT-26`). |
-| [**`design-system.html`**](docs/design-kit/design-system.html) | Prototype visual interaktif mandiri — dapat langsung dibuka di browser tanpa perlu server. |
+| [**`AI_SPEC.md`**](docs/design-kit/AI_SPEC.md) | ★ **Baru** — Spesifikasi penuh AI pipeline: YOLO object detection, confidence bands, waste mapping, LLM recommendation, state machine kamera, privasi & retensi foto, release gates. |
+| [**`DESIGN.md`**](docs/design-kit/DESIGN.md) | Panduan visual v1.3: palet warna pinus–lime, tipografi Plus Jakarta Sans, spacing, material kaca navigasi, komponen AI (C35–C39), dan handoff Compose. |
+| [**`SCREEN_SPEC.md`**](docs/design-kit/SCREEN_SPEC.md) | Spesifikasi interaksi dan UI untuk seluruh 25 layar (`S01–S25` termasuk AI scan `S21–S25`), komponen (`C01–C39`), dan dialog (`D01–D04`). |
+| [**`PRD.md`**](docs/design-kit/PRD.md) | Kebutuhan produk v1.2, aturan metrik (gram vs benda, recycling rate, XP), dan AI increment scope. |
+| [**`ARCHITECTURE.md`**](docs/design-kit/ARCHITECTURE.md) | Panduan arsitektur Android v1.2 + §13 AI extension: ScanViewModel, Python YOLO worker, AI config vars, CI tambahan. |
+| [**`API.md`**](docs/design-kit/API.md) | Kontrak API v1.2: endpoint core + §10 AI endpoints (detections, recommendations), ai_provenance, error codes AI. |
+| [**`IMPLEMENTATION_PLAN.md`**](docs/design-kit/IMPLEMENTATION_PLAN.md) | Roadmap 4 minggu core + §10 AI increment stages `AI-01–AI-08`, acceptance tests `AT-01–AT-26` + `AT-AI-01–18`. |
+| [**`design-system.html`**](docs/design-kit/design-system.html) | Prototype visual interaktif termasuk AI scan flow — dapat langsung dibuka di browser tanpa server. |
+| [**`AGENT_INDEX.md`**](docs/design-kit/AGENT_INDEX.md) | Indeks cepat semua topik → section dokumen, termasuk AI. |
 
 ---
 

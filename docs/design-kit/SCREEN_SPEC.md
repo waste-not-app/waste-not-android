@@ -1,6 +1,6 @@
 # WasteNot: Spesifikasi Layar dan Komponen
 
-Versi 1.1 · Rancangan implementasi Android · 21 September 2026
+Versi 1.3 · 28 September 2026 · Core + AI extension · Rancangan implementasi
 
 Lihat [PRD](PRD.md) untuk aturan produk dan [DESIGN](DESIGN.md) untuk styling. ID layar di sini juga dipakai pada [HTML design system](design-system.html). Layar opsi tidak otomatis menjadi scope MVP. Seluruh data visual adalah simulasi berlabel, dengan acuan 21 September 2026.
 
@@ -38,6 +38,11 @@ Lihat [PRD](PRD.md) untuk aturan produk dan [DESIGN](DESIGN.md) untuk styling. I
 | S18 | Lampiran foto | Stretch | Menambahkan gambar pendukung | Panel editor |
 | S19 | Titik daur ulang | Could | Melihat fasilitas terverifikasi | RecyclingPoints |
 | S20 | State aplikasi | Dokumentasi | Membandingkan kondisi gagal/kosong/loading | Bukan route produksi tersendiri |
+| S21 | Kamera & scan | AI increment | Foto dan scan, fallback manual | Bottom sheet |
+| S22 | Konfirmasi objek | AI increment | Satu objek dan koreksi kategori | Fase sheet |
+| S23 | Kondisi objek | AI increment | Konteks dari pengguna | Fase sheet |
+| S24 | Konfirmasi saran | AI increment | Review metode sebelum jumlah | Fase sheet |
+| S25 | Fallback AI | AI increment | Pemulihan dan manual | Fase sheet |
 
 ## 3. Detail per layar
 
@@ -67,7 +72,7 @@ Fokus layar adalah total hari ini dan tindakan pencatatan. Susunan:
 2. Ringkasan “Sampah ditangani hari ini” dengan berat; jumlah benda ditangani muncul terpisah jika ada.
 3. Reduce terpisah: “2 benda dihindari” pada dataset contoh.
 4. Recycling rate dengan keterangan basis aktivitas; contoh hari ini 50% dari 2 aktivitas penanganan.
-5. Tombol utama “Catat aktivitas”.
+5. Tombol pendukung “Input manual”; action utama Catat/Scan berada di dock.
 6. Progres XP/level ringkas; contoh 50/100 XP di level 1.
 7. Tiga aktivitas terbaru, setiap baris membuka detail; “Lihat riwayat” menuju S07.
 
@@ -91,7 +96,7 @@ Jangan memakai konfeti berulang, suara otomatis, atau klaim “menyelamatkan bum
 
 ### S07: Riwayat
 
-Header Riwayat, filter, chip kriteria aktif, daftar kelompok tanggal menurun, serta tombol “Catat aktivitas”. Setiap baris berisi ikon kategori, kategori, metode, tanggal/catatan ringkas, dan nilai beserta unit. Reduce diberi label “dihindari”.
+Header Riwayat, filter, chip kriteria aktif, daftar kelompok tanggal menurun, serta tombol pendukung “Input manual”. Setiap baris berisi ikon kategori, kategori, metode, tanggal/catatan ringkas, dan nilai beserta unit. Reduce diberi label “dihindari”.
 
 Baris membuka S08. Pagination bertahap 20 catatan; loading/error halaman lanjutan berada di bawah daftar. Filter menggabungkan kategori, metode, dan tanggal. Scroll dan filter bertahan saat detail dibuka lalu ditutup. Empty awal mengajak mencatat; filtered-empty menawarkan reset. Penghapusan menghapus item hanya setelah 204, lalu merefresh agregat.
 
@@ -204,7 +209,7 @@ Tombol destructive memakai warna error, bukan warna CTA biasa. Request active me
 | C04 | Secondary button | label | Default/disabled/focus | OutlinedButton |
 | C05 | Text action | label | Normal/destructive | TextButton |
 | C06 | Icon button | icon, contentDescription | Selected/disabled | IconButton |
-| C07 | Extended action | label, icon | Catat aktivitas | ExtendedFloatingActionButton atau Button sesuai konteks |
+| C07 | Input manual | label | Buka S05 | OutlinedButton pendukung; C35 untuk scan |
 | C08 | Text field | value, label, helper, error | Empty/filled/focus/error/disabled | OutlinedTextField |
 | C09 | Password field | value, visibility | Masked/visible/error | TextField + visual transformation |
 | C10 | Search | query, onClear | Empty/query/no result | OutlinedTextField |
@@ -254,3 +259,35 @@ Bentuk komponen harus dipetakan ke token, bukan menyalin CSS px secara buta ke d
 Reviewer memeriksa setiap ID di HTML, lalu mencocokkan rule produk dengan PRD/API. Perbedaan HTML dan Android yang sengaja ada: HTML memakai browser form controls, dialog native, serta data simulasi; Android memakai komponen Compose dan API nyata. HTML tidak membuktikan autentikasi, upload privat, scheduling Android, server ownership, atau performa perangkat.
 
 Checklist: seluruh field memiliki label; setiap action memiliki destination/feedback; warna tidak menjadi satu-satunya status; teks error dapat dibaca; font besar tidak menutupi CTA; chart menjelaskan unit; source data dan opsi fitur terlihat; semua sublayar dapat kembali ke asal tanpa kehilangan filter/draf yang memang harus dipertahankan.
+
+## 8. AI camera bottom sheet, S21–S25
+
+Revisi 28 September menambahkan action Catat/Scan pada tengah atas dock, sambil mempertahankan lima tab. Ini tombol aksi, bukan tab keenam dan tidak memakai aria-current. Sheet opak, sudut atas 28, drag handle dekoratif, close ≥48 dp, judul dan fallback manual. Kamera hanya diaktifkan setelah aksi/izin. Android boleh langsung meminta izin ketika action scan diketuk; HTML menyediakan tombol Aktifkan kamera agar demo tidak memicu permission tanpa pilihan. Close/Escape/Back menghentikan kamera dan mengembalikan fokus ke pemicu.
+
+| ID | Panel / fokus | Field / aksi | Validasi & state |
+|---|---|---|---|
+| S21 | Kamera dan tinjau foto | Preview, aktifkan kamera, ambil foto, tinjau, scan, retake, manual | Permission denied, unavailable, capture belum siap; kirim hanya setelah konfirmasi |
+| S22 | Deteksi / konfirmasi satu objek | Bbox + daftar, skor, pemilihan objek, koreksi kategori, konfirmasi | Empty, low confidence, material unknown, multi-object; kategori tidak boleh kosong |
+| S23 | Kondisi objek | Cleanliness, integrity, reusable, reuse intention | UNKNOWN valid; field independent; perubahan membatalkan saran lama |
+| S24 | Rekomendasi | Metode, alasan, sumber/versi panduan, caution, ubah/gunakan | Tidak auto-save; special handling method null; lanjut S05 jumlah manual |
+| S25 | Gagal / tidak tersedia | Penyebab, ulang, manual, close | Kamera denied, unknown, offline, timeout, invalid LLM, no reviewed guide; tidak menambah XP |
+
+S21–S25 adalah fase satu alur sheet dalam produk; ditampilkan sebagai lima entry galeri untuk handoff. Preview HTML memakai ilustrasi bbox berlabel, bukan bbox terhadap foto kamera. Skor/objek/LLM adalah fixture. Kamera browser menggunakan getUserMedia jika didukung konteks aman; tidak mengunggah gambar. Pengujian kamera Android dan API tetap terpisah.
+
+S05 sesudah AI: prefill hanya kategori dan metode yang dikonfirmasi; jumlah kosong, unit default g; tanggal tetap aturan core. Pengguna dapat mengoreksi. Membatalkan scan tidak menciptakan log. Dirty draft existing harus dipertahankan atau meminta D03 sebelum diganti; jangan memaksa navigate dan membuang isian. Panduan default belum terverifikasi pada mockup tidak menjadi knowledge produksi.
+
+| Komponen tambahan | Padanan Compose | Perilaku |
+|---|---|---|
+| C35 Scan action | Button / FAB | Lime, ikon kamera + label Catat/Scan, sentuh ≥48 dp |
+| C36 Camera sheet | ModalBottomSheet + camera preview | Height adaptif, scroll, izin, capture/retake, manual fallback |
+| C37 Detection review | Canvas overlay + selectable list | Bbox sesuai image transform; label accessible menyebut objek dan skor |
+| C38 Object context | Select/radio controls | Tiga dimensi terpisah dan unknown; tidak menyimpulkan kondisi dari gambar |
+| C39 Recommendation review | Surface + method selection | Sumber, reason, caution; konfirmasi; error dan special handling punya manual |
+
+State prototipe bisa dipilih pada S21: satu objek, beberapa objek, skor rendah, tidak dikenali, penanganan khusus, jaringan gagal, rekomendasi gagal. Semua tersedia tanpa hardware kamera melalui “Gunakan contoh simulasi”. Tombol ini hanya untuk dokumentasi, tidak muncul sebagai fitur produksi. Refresh menghapus foto dan state sementara.
+
+## 9. Penyempurnaan mockup v1.3
+
+S21–S25 memakai isi komponen sheet yang sama, dengan field/aksi nyata sebagai preview inert. Buka “Coba bottom sheet” untuk interaksi. Tahap Foto → Objek → Kondisi → Saran mempunyai indikator current step. Pengaturan skenario simulasi berada pada disclosure agar jalur kamera lebih mudah dibaca. Input manual berada di footer opak yang menempel bagian bawah sheet.
+
+Kategori/objek/kondisi/niat penggunaan ulang tetap tersimpan ketika kembali untuk koreksi. Mengganti kategori mereset kondisi agar tidak memakai konteks benda lama. Memilih contoh simulasi menghentikan kamera aktif dan membuang hasil permission yang terlambat. Scan baru dari katalog ditolak dengan pesan saat editor mempunyai draf dirty; pengguna menyimpan atau kembali melalui D03 terlebih dahulu. Kamera/LLM tetap simulasi sebagaimana v1.2.

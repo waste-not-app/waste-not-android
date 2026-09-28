@@ -1,6 +1,6 @@
 # WasteNot: Product & Design Kit
 
-Dokumen produk 21 September 2026 · Design system 23 September 2026
+Product & design kit v1.3 · 28 September 2026
 
 Mulai dengan membuka **[design-system.html](design-system.html)** di browser. Tidak perlu build, instalasi dependency, atau koneksi internet. Pertahankan file CSS, JavaScript, dan folder `assets` di sebelah HTML. Jika memakai ZIP, ekstrak seluruh isinya dahulu.
 
@@ -8,15 +8,18 @@ Mulai dengan membuka **[design-system.html](design-system.html)** di browser. Ti
 
 | File | Isi |
 |---|---|
+| [AI_SPEC.md](AI_SPEC.md) | Pipeline YOLO/Guide/LLM, dataset, validasi, privasi, scope dan evaluasi |
+| [sources/AI_PLAN_ORIGINAL.md](sources/AI_PLAN_ORIGINAL.md) | Salinan plan tim sebagai sumber, bukan spesifikasi implementasi final |
 | [PRD.md](PRD.md) | Kebutuhan lengkap, scope, validasi, aturan metrik, acceptance, dan keputusan terbuka |
 | [DESIGN.md](DESIGN.md) | Identitas WasteNot, warna terang/gelap, font, spacing, komponen, accessibility dan handoff Compose |
-| [design-system.html](design-system.html) | Fondasi visual, 34 komponen, 20 layar/panel, dan prototype interaktif |
-| [SCREEN_SPEC.md](SCREEN_SPEC.md) | S01–S20, D01–D04, C01–C34, field, aksi, dan state |
+| [design-system.html](design-system.html) | Fondasi visual, 39 komponen, 25 layar/panel, dan prototype interaktif |
+| [SCREEN_SPEC.md](SCREEN_SPEC.md) | S01–S25, D01–D04, C01–C39, field, aksi, dan state |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Android Compose, state/navigation, backend dan infrastruktur |
 | [API.md](API.md) | Model data dan kontrak API usulan |
 | [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) | Backlog empat minggu dan skenario pengujian aplikasi |
 | [QA.md](QA.md) | Hasil pemeriksaan paket HTML dan batas validasinya |
 | `assets/fonts/` | Plus Jakarta Sans variable font dan lisensi SIL OFL |
+| `verify-ai.cjs` | Uji sheet, kamera virtual, koreksi hasil, skenario gagal dan manual fallback |
 | `verify.cjs` | Pemeriksaan ulang otomatis menggunakan Node.js dan Playwright |
 
 ## Cara meninjau mockup
@@ -33,7 +36,11 @@ Data prototype berada di memori dan hilang saat reload. Galeri dan cover adalah 
 
 ## Arah desain yang dipilih
 
-Hijau pinus untuk aksi, lime untuk progres, latar putih kehijauan, dan Plus Jakarta Sans. Desain disusun khusus untuk pencatatan dan kebiasaan 3R. Warna, font, dan UI marketplace dari contoh Titip.in tidak dipakai. Revisi v1.1 menambahkan gradasi pinus–lime, highlight lembut, dan dock navigasi kaca mengambang sesuai permintaan pengguna. Keputusan, fallback opak, dan handoff Compose tersedia di DESIGN.md.
+Hijau pinus untuk aksi, lime untuk progres, latar putih kehijauan, dan Plus Jakarta Sans. Desain disusun khusus untuk pencatatan dan kebiasaan 3R. Warna, font, dan UI marketplace dari contoh Titip.in tidak dipakai. Revisi v1.1 menambahkan gradasi pinus–lime, highlight lembut, dan dock navigasi kaca mengambang sesuai permintaan pengguna. Revisi v1.2 menambah action Catat/Scan di tengah atas dock dan camera bottom sheet dengan fallback manual. Keputusan, fallback opak, dan handoff Compose tersedia di DESIGN.md.
+
+## Cara mencoba AI scan
+
+Buka Beranda pada Coba alur, tekan Catat/Scan di tengah atas dock. Bottom sheet menyediakan Aktifkan kamera, ambil foto, scan simulasi, serta Input manual. Gunakan contoh simulasi untuk mencoba tanpa kamera. Pilih skenario satu/multi-object, skor rendah, unknown, special handling, jaringan atau LLM gagal; periksa objek/kondisi/metode, lalu isi jumlah dan simpan. Kamera membutuhkan dukungan browser dan izin; localhost/HTTPS dianjurkan. Tidak ada upload, YOLO atau LLM nyata di HTML.
 
 ## Batas prototype
 
@@ -47,8 +54,17 @@ Browser modern dapat langsung membuka HTML. Untuk mengulangi pemeriksaan otomati
 
 ```sh
 node verify.cjs
+node verify-ai.cjs
 ```
 
 Jika Playwright berada di lokasi lain, isi `PLAYWRIGHT_PATH` dengan path package tersebut. `QA_DIR` opsional menentukan folder screenshot/report. Tanpa `QA_DIR`, hasil masuk folder sementara sistem bernama `wastenot-qa`. Tidak diperlukan Playwright untuk memakai prototype.
 
 Paket ini tidak mengubah sumber PDF/HTML yang diberikan dan belum membuat project Android. Tim dapat menempatkan seluruh folder ini di `docs/product-design/` pada repository implementasi; tautan relatif tetap berfungsi.
+
+## Perubahan v1.2 dan keputusan terbuka
+
+Semua dokumen diperluas mengikuti plan tim dan arahan bottom sheet pengguna. Baseline AI memakai server inference privat, lima tab dipertahankan, jumlah diisi manual, Reduce tidak disimpulkan dari foto. Model/dataset/provider/hardware/biaya dan ambang evaluasi final harus dipilih tim. Uji web tidak membuktikan kualitas model atau implementasi Android. Sumber asli tetap disertakan; konflik teknis dijelaskan dalam AI_SPEC, bukan menyalin seluruh asumsi sumber sebagai fakta.
+
+## Penyempurnaan v1.3
+
+Preview S21–S25 kini menampilkan komponen sheet lengkap, indikator tahap, framing kamera, ilustrasi objek, kondisi dan review saran. Fallback manual tetap terlihat di footer sheet; pengaturan demo disembunyikan dalam disclosure. Koreksi mempertahankan isian, draf manual dilindungi, dan perpindahan dari kamera ke contoh simulasi menghentikan stream. Aturan produk/API v1.2 tetap berlaku.

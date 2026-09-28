@@ -1,6 +1,8 @@
 # AGENT_INDEX.md — WasteNot Design Kit Quick Index
 
-Indeks cepat untuk AI agent. Gunakan ini sebagai peta untuk menemukan informasi spesifik tanpa harus baca seluruh dokumen.
+Indeks cepat untuk AI coding agent. Gunakan ini sebagai peta untuk menemukan informasi spesifik tanpa harus baca seluruh dokumen.
+
+> **Versi kit ini: v1.3 · 28 September 2026** — Core + AI extension (YOLO + LLM recommendation pipeline, S21–S25, C35–C39)
 
 ## Peta dokumen
 
@@ -8,15 +10,25 @@ Indeks cepat untuk AI agent. Gunakan ini sebagai peta untuk menemukan informasi 
 CLAUDE.md (root)          ← Baca ini dulu. Konteks proyek + aturan utama.
 AGENT.md (root)           ← Quick reference, task-based reading guide.
 docs/design-kit/
-  ├── README.md            ← Ikhtisar kit, cara pakai design-system.html
-  ├── PRD.md               ← Domain rules, scope, metrik
-  ├── DESIGN.md            ← Token warna, font, spacing, komponen, aksesibilitas
-  ├── SCREEN_SPEC.md       ← Detail tiap layar dan komponen
-  ├── ARCHITECTURE.md      ← Struktur Android, navigasi, state, security
-  ├── API.md               ← Data model, enum, endpoint, DTO
-  ├── IMPLEMENTATION_PLAN.md ← Backlog & acceptance test
+  ├── README.md            ← Ikhtisar kit v1.3 dan cara pakai design-system.html
+  ├── AI_SPEC.md           ← ★ BARU — Spesifikasi penuh AI pipeline (YOLO/Guide/LLM)
+  ├── PRD.md               ← Domain rules, scope, metrik, AI increment v1.2
+  ├── DESIGN.md            ← Design system + komponen AI (C35–C39) v1.3
+  ├── SCREEN_SPEC.md       ← Layar + komponen termasuk S21–S25 AI scan v1.3
+  ├── ARCHITECTURE.md      ← Arsitektur Android + AI extension §13 v1.2
+  ├── API.md               ← Kontrak API core + AI endpoints §10 v1.2
+  ├── IMPLEMENTATION_PLAN.md ← Backlog 4 minggu + AI increment stages §10 v1.2
   ├── QA.md                ← QA HTML prototype
-  ├── design-system.html   ← Mockup visual interaktif (buka di browser)
+  ├── design-system.html   ← Mockup visual interaktif incl. AI scan flow (buka di browser)
+  ├── ai-demo.js           ← ★ BARU — Script demo AI untuk HTML prototype
+  ├── verify.cjs           ← Automated test inti
+  ├── verify-ai.cjs        ← ★ BARU — Automated test khusus AI scan flow
+  ├── assets/
+  │   ├── preview-ai.png   ← ★ BARU — Preview layar AI scan
+  │   ├── qa-core-v1.2/1.3.json ← ★ BARU — QA core hasil versioned
+  │   └── qa-ai-v1.2/1.3.json  ← ★ BARU — QA AI hasil versioned
+  ├── sources/
+  │   └── AI_PLAN_ORIGINAL.md ← ★ BARU — Dokumen source plan tim (referensi, bukan spec final)
   └── AGENT_INDEX.md       ← Dokumen ini
 ```
 
@@ -24,91 +36,118 @@ docs/design-kit/
 
 ## Cari informasi berdasarkan topik
 
+### ★ AI Pipeline (BARU — v1.2/1.3)
+- Overview pipeline (Camera → YOLO → Mapping → Guide → LLM → User confirm) → [`AI_SPEC.md §1–2`](AI_SPEC.md)
+- Kamera & siklus hidup CameraX (izin, capture, cancel, EXIF, process death) → [`AI_SPEC.md §3`](AI_SPEC.md)
+- Confidence bands (≥0.70 OFFERED / 0.50–0.69 UNCERTAIN / <0.50 MANUAL_REQUIRED) → [`AI_SPEC.md §4`](AI_SPEC.md)
+- Waste mapping (label YOLO → kategori WasteNot + guide_key + special_handling) → [`AI_SPEC.md §4`](AI_SPEC.md)
+- Context kondisi objek (cleanliness, integrity, reusable, reuse_intention) → [`AI_SPEC.md §5`](AI_SPEC.md)
+- LLM: apa yang dikirim, output JSON, validasi server, error UNAVAILABLE → [`AI_SPEC.md §6`](AI_SPEC.md)
+- State machine kamera (Idle → Permission → Preview → ReviewPhoto → Detecting → ...) → [`AI_SPEC.md §7`](AI_SPEC.md)
+- Privacy & retensi foto (ephemeral, TTL, cleanup, opt-in training) → [`AI_SPEC.md §8`](AI_SPEC.md)
+- Release gate AI (taxonomy, model, mapping, holdout target, AT-AI semua lulus) → [`AI_SPEC.md §9`](AI_SPEC.md)
+- Sumber original rencana tim → [`sources/AI_PLAN_ORIGINAL.md`](sources/AI_PLAN_ORIGINAL.md)
+
+### ★ Layar AI Scan (S21–S25, BARU)
+- S21: Camera & scan bottom sheet (preview, capture, scan, retake, manual fallback) → [`SCREEN_SPEC.md §3.21`](SCREEN_SPEC.md)
+- S22: Konfirmasi objek (bbox overlay, selectable list, category correction) → [`SCREEN_SPEC.md §3.22`](SCREEN_SPEC.md)
+- S23: Kondisi objek (cleanliness / integrity / reusable context form) → [`SCREEN_SPEC.md §3.23`](SCREEN_SPEC.md)
+- S24: Konfirmasi saran (method, reason, guide source, caution, confirm/change) → [`SCREEN_SPEC.md §3.24`](SCREEN_SPEC.md)
+- S25: Fallback AI (cause display, retry, manual, close) → [`SCREEN_SPEC.md §3.25`](SCREEN_SPEC.md)
+
+### ★ Komponen AI (C35–C39, BARU)
+- C35: Scan action button/FAB (lime, camera icon, "Catat/Scan", ≥48dp) → [`SCREEN_SPEC.md §4`](SCREEN_SPEC.md)
+- C36: Camera sheet (ModalBottomSheet + CameraX preview, adaptive height) → [`SCREEN_SPEC.md §4`](SCREEN_SPEC.md)
+- C37: Detection review (Canvas bbox overlay + accessible selectable list) → [`SCREEN_SPEC.md §4`](SCREEN_SPEC.md)
+- C38: Object context (select/radio untuk 3 dimensi kondisi + unknown default) → [`SCREEN_SPEC.md §4`](SCREEN_SPEC.md)
+- C39: Recommendation review (source, reason, caution; confirm; special handling) → [`SCREEN_SPEC.md §4`](SCREEN_SPEC.md)
+
+### ★ API AI (BARU — v1.2)
+- GET /v1/ai/objects (catalog object_key/category + mapping version) → [`API.md §10`](API.md)
+- POST /v1/ai/detections (upload foto ephemeral, YOLO, simpan session) → [`API.md §10`](API.md)
+- POST /v1/ai/recommendations (confirm/correct object, guide, LLM suggestion) → [`API.md §10`](API.md)
+- DELETE /v1/ai/detections/{id} (discard session + cleanup foto) → [`API.md §10`](API.md)
+- ai_provenance di POST /v1/waste-logs (link session AI ke log) → [`API.md §10`](API.md)
+- Error codes baru: AI_TIMEOUT (504), AI_UNAVAILABLE (503), AI_SESSION_EXPIRED (410) → [`API.md §10`](API.md)
+- REDUCE tidak boleh dari rekomendasi AI (manual only, no provenance) → [`API.md §10`](API.md)
+
+### ★ Arsitektur AI Android (BARU — §13)
+- ScanViewModel + WasteDetectionRepository + package feature/scan, data/ai, core/camera → [`ARCHITECTURE.md §13`](ARCHITECTURE.md)
+- Tombol Catat/Scan = action di tengah atas dock lima tab (bukan tab ke-6) → [`ARCHITECTURE.md §13`](ARCHITECTURE.md)
+- Go (auth, domain, mapping, LLM validation) vs Python (inference only, no DB/LLM key) → [`ARCHITECTURE.md §13`](ARCHITECTURE.md)
+- AI config vars (AI_SCAN_ENABLED, AI_INFERENCE_URL, LLM_PROVIDER, dll.) → [`ARCHITECTURE.md §13`](ARCHITECTURE.md)
+- CI tambahan untuk AI (schema/model adapter, mapping, cleanup, camera lifecycle, E2E) → [`ARCHITECTURE.md §13`](ARCHITECTURE.md)
+
+### ★ Implementation Roadmap AI (BARU — §10)
+- 8 AI stages (AI-01 Contract & taxonomy → ... → AI-08 Evaluation & pilot) → [`IMPLEMENTATION_PLAN.md §10`](IMPLEMENTATION_PLAN.md)
+- AT-AI-01–18 acceptance tests AI → [`IMPLEMENTATION_PLAN.md §10`](IMPLEMENTATION_PLAN.md)
+- Demo script AI (2–3 menit, kamera + fallback) → [`IMPLEMENTATION_PLAN.md §10`](IMPLEMENTATION_PLAN.md)
+- Gate sebelum pilot AI → [`IMPLEMENTATION_PLAN.md §10`](IMPLEMENTATION_PLAN.md)
+
+---
+
+## Cari informasi berdasarkan topik (Core — tidak berubah)
+
 ### Warna & tema
-- Token semantik (primary, surface, error, dll.) → [`DESIGN.md §2`](DESIGN.md#2-warna-semantik)
-- Gradasi pine–lime dan efek kaca navigasi → [`DESIGN.md §2 Material v1.1`](DESIGN.md#material-v11-gradasi-dan-kaca)
-- Handoff Compose (`WasteNotTheme`, `ColorScheme`, `dynamic color`) → [`DESIGN.md §10`](DESIGN.md#10-handoff-compose-dan-cakupan-prototype)
+- Token semantik (primary, surface, error, dll.) → [`DESIGN.md §2`](DESIGN.md)
+- Gradasi pine–lime, glassmorphism dock → [`DESIGN.md §2 Material v1.1`](DESIGN.md)
+- Handoff Compose (`WasteNotTheme`, ColorScheme, dynamic color off) → [`DESIGN.md §10`](DESIGN.md)
 
 ### Tipografi
-- Semua role typography (displayLarge hingga labelSmall) → [`DESIGN.md §3`](DESIGN.md#3-tipografi-dan-font)
-- Setup font di Compose (`FontFamily`, resource naming) → [`DESIGN.md §3 Font di Compose`](DESIGN.md#font-di-compose)
-- File font: `assets/fonts/PlusJakartaSans-Variable.ttf` + lisensi `OFL-PlusJakartaSans.txt`
+- Semua role typography (displayLarge hingga labelSmall) → [`DESIGN.md §3`](DESIGN.md)
+- Setup font Plus Jakarta Sans di Compose → [`DESIGN.md §3 Font di Compose`](DESIGN.md)
 
-### Spacing, ukuran, bentuk
-- Token spacing (space1–space12 dalam dp) → [`DESIGN.md §4`](DESIGN.md#4-spacing-ukuran-bentuk-dan-elevasi)
-- Radius, touch target, elevasi → [`DESIGN.md §4`](DESIGN.md#4-spacing-ukuran-bentuk-dan-elevasi)
+### Spacing, ukuran, bentuk, elevasi
+- Token spacing space1–space12 → [`DESIGN.md §4`](DESIGN.md)
+- Touch target minimal 48 dp, radius, elevasi → [`DESIGN.md §4`](DESIGN.md)
 
 ### Layout & breakpoint
-- Pola satu kolom / NavigationRail / list-detail → [`DESIGN.md §5`](DESIGN.md#5-layout-dan-hierarki-layar)
-- Breakpoint: <600 dp, 600–839 dp, ≥840 dp → [`DESIGN.md §5`](DESIGN.md#5-layout-dan-hierarki-layar)
-- Safe area, insets, keyboard → [`ARCHITECTURE.md §7`](ARCHITECTURE.md#7-theme-layout-dan-aksesibilitas-compose)
+- <600 dp / 600–839 dp / ≥840 dp → [`DESIGN.md §5`](DESIGN.md)
+- Safe area, insets, keyboard → [`ARCHITECTURE.md §7`](ARCHITECTURE.md)
 
-### Komponen UI (C01–C34)
-- Daftar lengkap semua komponen → [`SCREEN_SPEC.md §4`](SCREEN_SPEC.md)
-- Aturan visual per kelompok komponen → [`DESIGN.md §6`](DESIGN.md#6-spesifikasi-komponen)
-- Compose equivalents (OutlinedTextField, SegmentedButton, dll.) → [`DESIGN.md §6`](DESIGN.md#6-spesifikasi-komponen)
+### Komponen UI (C01–C34) — core
+- Inventaris C01–C39 (termasuk AI) → [`SCREEN_SPEC.md §4`](SCREEN_SPEC.md)
+- Aturan visual per kelompok → [`DESIGN.md §6`](DESIGN.md)
 
-### Layar (S01–S20)
-- Inventaris semua layar + prioritas + route → [`SCREEN_SPEC.md §2`](SCREEN_SPEC.md#2-inventaris-layar)
-- Detail field, state, dan aksi per layar → [`SCREEN_SPEC.md §3`](SCREEN_SPEC.md#3-detail-per-layar)
-- Layar auth: S01 (session), S02 (login), S03 (register) → [`SCREEN_SPEC.md §3`](SCREEN_SPEC.md)
-- Layar utama: S04 (home), S07 (history), S11 (guide), S13 (statistics), S14 (profile) → [`SCREEN_SPEC.md §3`](SCREEN_SPEC.md)
+### Layar core (S01–S20)
+- Inventaris + prioritas + route → [`SCREEN_SPEC.md §2`](SCREEN_SPEC.md)
+- Auth: S01 (session), S02 (login), S03 (register) → [`SCREEN_SPEC.md §3`](SCREEN_SPEC.md)
+- Utama: S04 (home), S07 (history), S11 (guide), S13 (statistics), S14 (profile) → [`SCREEN_SPEC.md §3`](SCREEN_SPEC.md)
 - Editor log: S05 (create), S09 (edit) → [`SCREEN_SPEC.md §3`](SCREEN_SPEC.md)
 
 ### Domain & metrik
-- Definisi Reduce, Reuse, Recycle, Trash → [`PRD.md §6`](PRD.md)
-- Aturan recycling rate (null vs 0, basis perhitungan) → [`PRD.md §9`](PRD.md)
-- XP per log, deduction saat delete, level → [`PRD.md §8`](PRD.md)
-- Dataset referensi: 5 log, 1.400 g, rate 50%, 50 XP, streak 2 → [`PRD.md §9.4`](PRD.md)
-- Acceptance test lengkap (AT-01 hingga AT-26) → [`IMPLEMENTATION_PLAN.md §3`](IMPLEMENTATION_PLAN.md#3-kasus-uji-penerimaan-utama)
+- Reduce, Reuse, Recycle, Trash definitions → [`PRD.md §6`](PRD.md)
+- Recycling rate (null vs 0, basis) → [`PRD.md §9`](PRD.md)
+- XP per log, deduction delete, level → [`PRD.md §8`](PRD.md)
+- Acceptance tests AT-01–AT-26 (core) → [`IMPLEMENTATION_PLAN.md §3`](IMPLEMENTATION_PLAN.md)
 
-### API & network
-- Semua enum (`category`, `method`, `quantity_kind`) → [`API.md §2.2`](API.md#22-enum)
-- Data model entities (users, sessions, waste_logs, dll.) → [`API.md §2.1`](API.md#21-entitas)
-- Endpoint auth (register, login, refresh, logout) → [`API.md §3`](API.md)
-- Endpoint waste log (create, list, detail, update, delete) → [`API.md §4`](API.md)
-- Idempoten dengan `client_request_id` → [`API.md §4`](API.md) dan [`PRD.md §7`](PRD.md)
-- Konvensi response format (`data`, `page`, `error`) → [`API.md §1`](API.md#1-konvensi)
+### API & network (core)
+- Enum (category, method, quantity_kind) → [`API.md §2.2`](API.md)
+- Entities (users, sessions, waste_logs, dll.) → [`API.md §2.1`](API.md)
+- Auth endpoints (register, login, refresh, logout) → [`API.md §3`](API.md)
+- Waste log CRUD → [`API.md §4`](API.md)
+- Idempoten `client_request_id` → [`API.md §4`](API.md)
 
-### Navigasi Android
-- Daftar semua route + argumen → [`ARCHITECTURE.md §6`](ARCHITECTURE.md#6-navigasi)
-- Perilaku back, dirty form, tab reselect → [`ARCHITECTURE.md §6`](ARCHITECTURE.md#6-navigasi)
-- Navigation 3 setup (sudah terpasang) → [`ARCHITECTURE.md §1`](ARCHITECTURE.md#1-keputusan-dasar)
+### Navigasi & arsitektur Android (core)
+- Routes + argumen → [`ARCHITECTURE.md §6`](ARCHITECTURE.md)
+- UDF flow, state daftar/editor → [`ARCHITECTURE.md §4`](ARCHITECTURE.md)
+- Token storage (Keystore) → [`ARCHITECTURE.md §8`](ARCHITECTURE.md)
 
-### State & arsitektur
-- UDF flow (event → ViewModel → Repository → state → UI) → [`ARCHITECTURE.md §4`](ARCHITECTURE.md#4-alur-state-dan-event)
-- State layout daftar, state editor → [`ARCHITECTURE.md §4`](ARCHITECTURE.md#4-alur-state-dan-event)
-- Pemulihan state rotasi, process death, back ke background → [`ARCHITECTURE.md §5`](ARCHITECTURE.md#5-pemulihan-state-dan-koneksi)
-
-### Security
-- Token storage (Keystore, bukan DataStore) → [`ARCHITECTURE.md §8`](ARCHITECTURE.md#8-penyimpanan-credential-dan-jaringan)
-- Refresh serialization, retry rules → [`ARCHITECTURE.md §8`](ARCHITECTURE.md#8-penyimpanan-credential-dan-jaringan)
-- Logging interceptor (redact Authorization/password) → [`ARCHITECTURE.md §8`](ARCHITECTURE.md#8-penyimpanan-credential-dan-jaringan)
-
-### Aksesibilitas
-- Target sentuh, fokus, label → [`DESIGN.md §9`](DESIGN.md#9-aksesibilitas-dan-resilience)
-- Chart tanpa dependensi warna → [`DESIGN.md §7`](DESIGN.md#7-ikon-imagery-dan-visualisasi)
-- Font scale 200%, reduced motion → [`DESIGN.md §9`](DESIGN.md#9-aksesibilitas-dan-resilience)
-
-### Microcopy & state text
-- Semua contoh teks state (empty, loading, error, success, hapus) → [`DESIGN.md §8`](DESIGN.md#8-state-microcopy-dan-motion)
-- Bahasa yang harus dihindari (jangan "CO₂ dihemat", jangan menghakimi Trash) → [`DESIGN.md §8`](DESIGN.md#8-state-microcopy-dan-motion)
-
-### Scope & priority MVP
-- Fitur must/should/stretch → [`PRD.md §5`](PRD.md#5-cakupan-dan-prioritas)
-- Gate per minggu → [`IMPLEMENTATION_PLAN.md §2`](IMPLEMENTATION_PLAN.md#2-backlog-per-minggu)
-- Fitur opsi: foto, reminder, recycling point → [`ARCHITECTURE.md §11`](ARCHITECTURE.md#11-fitur-opsional-android)
+### Aksesibilitas & microcopy
+- Touch target, focus, font scale, reduced motion → [`DESIGN.md §9`](DESIGN.md)
+- Contoh teks state (empty/loading/error/success) → [`DESIGN.md §8`](DESIGN.md)
 
 ---
 
-## Apa yang tidak ada di design kit ini
+## Apa yang TIDAK ada di design kit ini
 
-- Backend implementation (Go, PostgreSQL) → hanya ada kontrak di `API.md`
-- APK atau Android project yang sudah di-build → lihat root repo
+- Backend implementation (Go, PostgreSQL, Python YOLO worker) — hanya kontrak di `API.md` dan `ARCHITECTURE.md`
+- Trained/fine-tuned YOLO model — belum dipilih, lihat `AI_SPEC.md §9`
+- LLM provider yang sudah dipilih — belum diputuskan tim
+- APK atau Android project yang sudah di-build
 - Credential, token, atau data pengguna nyata
-- Library chart, map, atau analytics yang sudah dipilih
-- Keputusan tentang hosting, CI/CD, atau app signing
+- Dataset fine-tuning (lisensi belum diputuskan)
 
 ---
 
-*Tanggal paket: PRD & ARCHITECTURE 21 Sep 2026, DESIGN 23 Sep 2026. Verifikasi versi dependency di [`gradle/libs.versions.toml`](../../gradle/libs.versions.toml) sebelum memulai implementasi.*
+*Versi kit: README v1.3, PRD/ARCHITECTURE/API/IMPLEMENTATION_PLAN v1.2, DESIGN/SCREEN_SPEC v1.3 · 28 Sep 2026. Verifikasi versi dependency di [`gradle/libs.versions.toml`](../../gradle/libs.versions.toml).*

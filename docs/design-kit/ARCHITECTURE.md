@@ -1,6 +1,6 @@
 # WasteNot: Arsitektur Android dan Infrastruktur
 
-Versi rancangan 1.1 · 21 September 2026
+Versi 1.2 · 28 September 2026 · Core + AI extension · Rancangan implementasi
 
 Dokumen ini merupakan rancangan implementasi. Folder sumber yang diperiksa berisi PDF dan contoh proyek Titip.in; belum ditemukan project Android WasteNot yang dapat di-build. Nama package, versi dependency, hosting, dan pembagian tim belum dipin.
 
@@ -199,7 +199,7 @@ WorkManager digunakan untuk reminder fleksibel, bukan janji tepat pukul tertentu
 
 ### Foto
 
-Gunakan Android Photo Picker untuk memilih gambar dengan akses terbatas sesuai [panduan Photo Picker](https://developer.android.com/training/data-storage/shared/photo-picker). Camera capture bukan prasyarat versi pertama. Preview lokal dapat dibatalkan, upload menampilkan status, log tetap bisa disimpan tanpa foto. Backend melakukan validasi file dan menghapus EXIF seperti kontrak API.
+Gunakan Android Photo Picker untuk memilih gambar dengan akses terbatas sesuai [panduan Photo Picker](https://developer.android.com/training/data-storage/shared/photo-picker). Camera capture bukan prasyarat core manual, tetapi diperlukan oleh increment scan AI (§13). Preview lokal dapat dibatalkan, upload menampilkan status, log tetap bisa disimpan tanpa foto. Backend melakukan validasi file dan menghapus EXIF seperti kontrak API.
 
 ### Recycling point
 
@@ -210,3 +210,36 @@ Tampilkan daftar dan detail fasilitas yang memiliki sumber/tanggal verifikasi. P
 Pin versi stabil Kotlin, AGP, JDK, Compose BOM, Material 3, Navigation, Lifecycle, Retrofit/OkHttp, dan converter dalam version catalog saat kickoff. Min SDK usulan 26 untuk menyederhanakan perangkat demo dan API tanggal, bukan kewajiban produk yang sudah disetujui. Compile/target SDK dipilih menurut toolchain dan kanal distribusi yang benar-benar digunakan; jangan menyalin versi dari contoh Titip.in tanpa memeriksa kompatibilitas.
 
 Referensi resmi di dokumen ini diperiksa 21 September 2026. Detail versi dan persyaratan distribusi dapat berubah. Catat hasil Gradle sync/build pertama, perangkat/API emulator, dan versi backend/database aktual di README implementasi. Paket ini belum menjalankan build Android karena tidak membuat project aplikasi.
+
+## 13. AI extension: capture, inference, dan rekomendasi
+
+Revisi 28 September: [AI_SPEC](AI_SPEC.md) menetapkan pipeline dan [API §10](API.md) kontraknya. Baseline server inference dipilih sebagai rancangan prototype; on-device adalah optimasi berikutnya setelah pengukuran. CameraX diperlukan untuk scan, terpisah dari Photo Picker lampiran opsional. Tidak ada project Android/model/server yang dibangun oleh revisi dokumentasi ini.
+
+```mermaid
+flowchart LR
+  Camera[CameraX Preview + ImageCapture] --> Scan[Compose bottom sheet + ScanViewModel]
+  Scan --> Repo[WasteDetectionRepository]
+  Repo -->|HTTPS multipart| Go[Go API: auth / media validation]
+  Go -->|private network| Python[Python YOLO inference worker]
+  Python --> Go
+  Go --> DB[(PostgreSQL: sesi AI TTL dan panduan)]
+  Scan -->|konfirmasi objek dan kondisi| Rec[Go recommendation package]
+  Rec --> KB[PUBLISHED Waste Guide lookup]
+  KB --> LLM[LLM provider: metadata tanpa foto]
+  LLM --> Guard[Schema + aturan panduan + special handling]
+  Guard --> Scan
+  Scan --> Draft[Log editor: konfirmasi dan jumlah manual]
+  Draft --> Logs[API waste logs: transaksi + idempotensi]
+```
+
+Tambahkan package `feature/scan`, `data/ai`, `core/camera` di module Android yang sama; tidak perlu memecah Gradle module hanya karena contoh tree sumber. ScanViewModel menyimpan immutable state, objek dipilih, konteks, IDs dan fase request. Lifecycle kamera dan surface preview berada di UI adapter; ViewModel tidak menyimpan Activity/VideoView/bitmap besar. Foto di file internal sementara dengan reference, bukan SavedStateHandle berisi bytes. Repository menangani HTTP dan DTO; aturan safety/mapping authoritative di backend.
+
+Tombol Catat/Scan adalah action pada tengah atas dock lima tab, membuka satu ModalBottomSheet multi-step S21–S25. Sheet punya scroll, close/Back, manual fallback, camera preview, capture, hasil, kondisi, dan konfirmasi. Sheet ditutup saat masuk editor S05; bukan tab keenam. Untuk tablet action berada dekat NavigationRail dan sheet dibatasi lebar. Kembali/close menghentikan kamera; hasil request terlambat diabaikan. Setelah process death pulihkan draf nonfoto yang aman, minta capture lagi bila file tidak ada. Jangan menimpa log draft dirty dengan hasil scan baru tanpa dialog konfirmasi.
+
+Go tetap pemilik autentikasi, domain, mapping, knowledge retrieval, LLM validation dan penyimpanan. Python hanya menerima gambar tervalidasi dan mengembalikan deteksi; tidak memiliki DB credential atau LLM key. Private worker memakai timeout, request ID dan autentikasi service; port tidak dipublikasikan. Deploy satu worker bounded concurrency awal, CPU/GPU dipilih lewat benchmark. Tidak menambahkan queue broker/vector DB/Kubernetes untuk baseline.
+
+Model artifact dan mapping dipin dengan checksum/version; preprocessing/postprocessing teruji bbox terhadap orientasi gambar. Go menolak respons worker yang malformed. Worker readiness mengecek model termuat; kegagalan AI tidak membuat health core atau login/logs gagal. Circuit breaker sederhana/batas concurrency dan feature capability dapat mematikan AI sambil mempertahankan manual.
+
+Tambahan konfigurasi server: `AI_SCAN_ENABLED`, `AI_RECOMMENDATION_ENABLED`, `AI_INFERENCE_URL`, `AI_SERVICE_TOKEN`, `AI_MODEL_PATH`, `AI_MODEL_VERSION`, `AI_MAPPING_VERSION`, `AI_REQUEST_TIMEOUT`, `AI_SESSION_TTL`, `LLM_PROVIDER`, `LLM_MODEL`, `LLM_API_KEY`, `LLM_DAILY_BUDGET`. Model/runtime/license dipin saat eksperimen. Key tidak masuk APK. Batas waktu/retensi konkret mengikuti AI_SPEC §8, bukan duplikasi konfigurasi tak konsisten.
+
+CI tambahan: schema/model adapter fixture, mapping test, rekomendasi dengan fake provider, authorization/TTL/idempotensi, cleanup gambar, state machine/camera lifecycle dan E2E scanner. Pengujian model berkas asli terpisah dari unit test dan mengeluarkan evaluation report. Staging memakai dataset yang boleh digunakan, bukan foto pribadi otomatis. Rollback versi worker+mapping+policy dilakukan bersama; core schema tetap kompatibel log manual.

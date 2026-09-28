@@ -1,14 +1,27 @@
 # WasteNot: Pemeriksaan Design Kit
 
-Tanggal pemeriksaan: 23 September 2026 (revisi material v1.1). Cakupan: HTML/CSS/JavaScript, dokumen, font, dan simulasi interaksi. **Bukan** hasil pengujian aplikasi Android atau backend.
+Tanggal pemeriksaan terbaru: 28 September 2026 (penyempurnaan mockup v1.3). Bukti material v1.1 di bawah tetap dicatat sebagai riwayat. Cakupan: HTML/CSS/JavaScript, dokumen, font, dan simulasi interaksi. **Bukan** hasil pengujian aplikasi Android atau backend.
+
+## Hasil AI v1.2
+
+- PASS `verify.cjs`: 25 layar/panel, 39 komponen, lima viewport pada dua tema; regresi create/edit/delete, state, unit, navigasi dan font 200% lulus, tanpa JavaScript error.
+- PASS `verify-ai.cjs`: sheet pada 360/390/768/1512 px × dua tema; Escape menutup dan mengembalikan fokus ke action utama.
+- PASS: kategori wajib dikonfirmasi, metode dapat dikoreksi, jumlah tetap kosong; scan tidak menambah record/XP, satu submit valid menambah satu log.
+- PASS: multi-object, skor rendah, unknown, special handling, jaringan gagal dan LLM gagal mempunyai manual fallback. Special handling tidak menyediakan tombol gunakan saran.
+- PASS: capture dan retake menggunakan kamera virtual Chromium; capture/close menghentikan track. Penolakan izin diuji dengan fake getUserMedia rejection. Kamera fisik/Android belum diuji.
+- PASS: hasil async yang dibatalkan diabaikan; manual dapat dicapai pada teks sheet 200%; tidak ada JavaScript error.
+- Review visual: Beranda dengan action dock, sheet kamera dan hasil scan, serta preview S21–S25 diperiksa. Foto tidak diunggah; bbox dan saran berlabel ilustrasi/simulasi.
+- Dokumen PRD, DESIGN, SCREEN_SPEC, API, ARCHITECTURE, IMPLEMENTATION_PLAN, README diperbarui; AI_SPEC dan salinan plan sumber ditambahkan. Kontrak API/infrastructure masih rancangan.
+
+Belum diuji: YOLO nyata, model/dataset/accuracy/calibration, LLM provider/safety aktual, endpoint/backend/retensi file, latency/biaya, kamera Android dan izin perangkat fisik. Tidak ada klaim hasil AI berdasarkan simulasi browser.
 
 ## Hasil yang diperiksa
 
 | Pemeriksaan | Hasil / bukti |
 |---|---|
-| Inventaris | PASS: 20 elemen galeri S01–S20, 34 komponen C01–C34, 4 dialog D01–D04 |
+| Inventaris | PASS: 25 elemen galeri S01–S25, 39 komponen C01–C39, 4 dialog D01–D04 |
 | File offline | PASS: dibuka melalui file lokal dengan Chromium; font lokal dimuat; tidak memerlukan server data |
-| Desktop/mobile | PASS: semua 20 layar pada lebar 360, 390, 768, 1024, 1512 px; tidak ada horizontal overflow |
+| Desktop/mobile | PASS: semua 25 layar pada lebar 360, 390, 768, 1024, 1512 px; tidak ada horizontal overflow |
 | Tema | PASS: matriks ukuran diulang untuk terang dan gelap; kontrol tema dan alur pencatatan juga dicoba |
 | State | PASS: 8 layar data × loading/empty/error/offline/content; ditambah 6 contoh state pada S20 |
 | Angka contoh | PASS: 1.400 g, 2 benda dihindari, 50% recycling rate, streak 2; denominator kosong menghasilkan null |
@@ -35,7 +48,7 @@ Stress CSS 200% adalah pemeriksaan web, bukan pengganti uji Android fontScale/Ta
 
 | Elemen/alur | Tindakan dan hasil |
 |---|---|
-| Pilihan layar | S01–S20 masing-masing dibuka melalui selector dan tombol galeri; ID tujuan cocok |
+| Pilihan layar | S01–S25 masing-masing dibuka melalui selector dan tombol galeri; ID tujuan cocok |
 | Filter galeri | Akses/tracking/insight/profile/optional/semua mengubah kumpulan preview |
 | Theme selector | Terang/gelap memperbarui seluruh halaman dan prototype; sistem mengikuti preference browser |
 | Form catatan kosong | Simpan menampilkan permintaan memilih metode |
@@ -77,7 +90,7 @@ Kontrol noninteraktif seperti badge, progress, ikon dekoratif, dan preview galer
 ### Hard gate
 
 - R-02 PASS: tidak ada em dash dalam konten HTML/DESIGN yang diserahkan.
-- R-03 PASS: matriks 20 layar × 5 lebar × 2 tema tidak menghasilkan horizontal overflow.
+- R-03 PASS: matriks 25 layar × 5 lebar × 2 tema tidak menghasilkan horizontal overflow.
 - R-17 PASS: angka produk berasal dari dataset simulasi yang diberi label; jumlah layar/komponen dihitung dari DOM.
 - R-18 PASS: tidak ada testimonial, foto orang, atau klaim pengguna fiktif.
 - R-23 PASS: pengguna meminta penentuan arah desain; wordmark teks, avatar inisial demo, dan placeholder editorial ditandai.
@@ -135,3 +148,18 @@ Kontrol noninteraktif seperti badge, progress, ikon dekoratif, dan preview galer
 ## Belum dibuktikan oleh paket ini
 
 Build Android, TalkBack pada perangkat, fontScale Android, API ownership, session security, latency backend, query performance, proses upload privat, WorkManager, Maps provider, dan kebenaran editorial panduan. Semua itu harus diuji saat implementasi, mengikuti IMPLEMENTATION_PLAN.md.
+
+## Bukti mesin v1.2
+
+Laporan yang disertakan: [regresi core](assets/qa-core-v1.2.json), [AI browser simulation](assets/qa-ai-v1.2.json), dan [preview alur AI](assets/preview-ai.png). `verify.cjs` dan `verify-ai.cjs` dapat dijalankan ulang sesuai README. Pemeriksaan struktur menemukan 60 tautan lokal valid; salinan plan cocok byte-per-byte dengan berkas sumber.
+
+## Verifikasi mockup v1.3
+
+- PASS: 22 kelompok regresi core, 25 layar × 5 viewport × 2 tema; interaksi, font 200% dan JavaScript error checks.
+- PASS: alur sheet pada empat viewport × dua tema, skenario AI dan manual, capture kamera virtual, permission denied, dan fallback pada font 200%.
+- PASS: memilih contoh simulasi menghentikan kamera; stream dari izin yang datang terlambat langsung dihentikan; Escape menghentikan track sebelum dialog selesai ditutup.
+- PASS: draf dirty tidak ditimpa scan baru. Koreksi mempertahankan objek, kategori, kondisi dan reuse intention; penggantian material mereset kondisi sebelumnya.
+- Review visual: camera sheet dengan step indicator, footer manual, dan preview form kondisi memakai komponen yang sama dengan interaksi; teks dan target utama terbaca.
+- C07, susunan katalog, DESIGN, SCREEN_SPEC dan README diselaraskan dengan aksi manual sekunder serta Catat/Scan utama. Kontrak domain/API v1.2 tidak berubah.
+
+Bukti terbaru: [core v1.3](assets/qa-core-v1.3.json), [AI browser v1.3](assets/qa-ai-v1.3.json), [preview](assets/preview-ai.png). Laporan v1.2 disimpan sebagai riwayat. Kamera fisik, Android, YOLO dan LLM produksi belum diuji.

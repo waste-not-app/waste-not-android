@@ -1,8 +1,10 @@
 # WasteNot: Product Requirements Document
 
-Versi 1.1 · 21 September 2026 · Android MVP · Target pengerjaan 4 minggu
+Versi 1.2 · 28 September 2026 · Core + AI extension · Rancangan implementasi
 
 **Status:** spesifikasi rancangan untuk implementasi, bukan laporan fitur yang sudah tersedia. Dokumen ini memperluas seluruh 20 bagian `WasteNot_PRD.pdf` versi 1.0, 6 halaman. Detail baru diberi label **Keputusan rancangan** atau **Usulan**. Persetujuan produk dan hasil pengujian belum diasumsikan.
+
+Tambahan v1.2: computer vision dan rekomendasi AI mengikuti [AI_SPEC](AI_SPEC.md), dengan tombol utama navbar dan camera bottom sheet. Core empat minggu dipertahankan sebagai baseline historis; estimasi increment AI dibahas terpisah.
 
 Dokumen pendamping: [desain](DESIGN.md), [spesifikasi layar](SCREEN_SPEC.md), [arsitektur](ARCHITECTURE.md), [kontrak API](API.md), [rencana implementasi dan QA](IMPLEMENTATION_PLAN.md), [design system interaktif](design-system.html).
 
@@ -66,14 +68,15 @@ Tidak ada persona bernama, wawancara, atau kutipan pengguna yang direkayasa dala
 | XP dan level | Should, tetapi ada dalam acceptance PDF | Baseline demo | 10 XP per catatan aktif; aturan di §10 |
 | Streak dan achievement | Should | Iterasi setelah inti | Bisa dipangkas jika alur inti belum stabil |
 | Pengingat | Should | Setelah inti | Opt-in, lokal, waktu perkiraan |
-| Foto | Opsional/Stretch | Opsi perluasan | Tidak menghalangi penyimpanan catatan tanpa foto |
+| Foto lampiran | Opsional/Stretch | Opsi perluasan | Terpisah dari foto sementara scan |
+| AI scan + rekomendasi | Di luar PDF awal | Increment AI sesuai permintaan 28 Sep | Konfirmasi dan fallback manual; §21 |
 | Peta titik daur ulang | Could/Stretch | Opsi perluasan | Bergantung sumber lokasi terverifikasi |
 
 **Penyelesaian konflik sumber:** PDF menempatkan gamifikasi sebagai Should tetapi meminta perubahan XP/level/achievement dalam acceptance. Baseline mencakup XP dan level sederhana. Jika seluruh gamifikasi dipangkas, catat penyimpangan acceptance dan konfirmasikan dengan penilai, jangan mengklaim memenuhi seluruh PDF.
 
-### Tidak termasuk MVP
+### Tidak termasuk core atau AI increment awal
 
-AI image classification, IoT/smart bin, pickup, marketplace, pembayaran, jejaring sosial, leaderboard, QR recycling point, antrean sinkronisasi offline-first, export CSV/PDF, personalisasi reminder, klaim karbon atau sertifikasi lingkungan. Lupa password via email dan penghapusan akun mandiri belum masuk baseline demo; peluncuran publik memerlukan keputusan tambahan di §18.
+IoT/smart bin, pickup, marketplace, pembayaran, jejaring sosial, leaderboard, QR recycling point, antrean sinkronisasi offline-first, export CSV/PDF, personalisasi reminder, klaim karbon atau sertifikasi lingkungan. Lupa password via email dan penghapusan akun mandiri belum masuk baseline demo; peluncuran publik memerlukan keputusan tambahan di §18.
 
 ## 6. Prinsip pengalaman
 
@@ -250,7 +253,7 @@ Status achievement dihitung ulang setelah koreksi data. Bila syarat tidak lagi t
 
 ## 11. Kebutuhan layar dan state
 
-Spesifikasi per field, aksi, dan state berada di [SCREEN_SPEC.md](SCREEN_SPEC.md). Inventaris mencakup 20 layar/panel dan 4 dialog. Layar opsional tetap ditandai sebagai opsi desain.
+Spesifikasi per field, aksi, dan state berada di [SCREEN_SPEC.md](SCREEN_SPEC.md). Inventaris mencakup 25 layar/panel (termasuk lima fase sheet AI) dan 4 dialog konfirmasi. Layar opsional tetap ditandai sebagai opsi desain.
 
 | Kelompok | Layar |
 |---|---|
@@ -260,6 +263,7 @@ Spesifikasi per field, aksi, dan state berada di [SCREEN_SPEC.md](SCREEN_SPEC.md
 | Akun/kebiasaan | S14 Profil/progres; S15 Achievement; S16 Pengaturan; S17 Pengingat opsional |
 | Perluasan | S18 Foto opsional; S19 Titik daur ulang opsional |
 | Ketahanan | S20 Galeri state loading, kosong, tidak ditemukan, error, offline, sesi berakhir |
+| AI | S21 Kamera; S22 Konfirmasi objek; S23 Kondisi; S24 Rekomendasi; S25 Fallback |
 | Dialog | D01 Hapus; D02 Keluar; D03 Buang draf; D04 Konflik perubahan |
 
 Semua layar data memiliki loading, content, empty bila relevan, dan error. Refresh tidak harus mengosongkan data lama; tampilkan indikator data belum diperbarui. Tidak boleh menyajikan catatan milik akun sebelumnya ketika berganti akun.
@@ -301,7 +305,7 @@ Retensi akun, penghapusan akun, persetujuan privasi, kontak pengelola, dan duras
 
 Android Kotlin + Jetpack Compose/Material 3 + ViewModel + StateFlow + satu library navigasi + HTTP client. Backend Go modular monolith + PostgreSQL. Docker Compose mengorkestrasi backend/database; object storage hanya ditambahkan jika foto dikerjakan.
 
-Dependensi yang menghalangi core: API auth dan log, schema database, domain/TLS untuk penggunaan di luar lokal, data panduan terkurasi, perangkat demo. Maps SDK, provider geolokasi, camera, dan object storage tidak menjadi prasyarat pencatatan.
+Dependensi yang menghalangi core: API auth dan log, schema database, domain/TLS untuk penggunaan di luar lokal, data panduan terkurasi, perangkat demo. Maps SDK, provider geolokasi, dan object storage tidak menjadi prasyarat pencatatan.
 
 API draf pada PDF diperluas dengan logout/refresh, update/delete log, detail panduan, ringkasan dashboard, dan metadata kategori. Semua kontrak di [API.md](API.md) adalah proposal, belum endpoint terpasang.
 
@@ -380,3 +384,28 @@ Sumber kebutuhan: `docs/WasteNot_PRD.pdf`, versi 1.0, 6 halaman, dibaca pada 21 
 PDF mengatribusikan inspirasi produk kepada WasteNot oleh tim Supernova, BINUS, pada PROXO National IT Competition 2024. Atribusi ini diteruskan sebagai pernyataan dokumen sumber; tautan akademik final dan rincian prestasi masih perlu diverifikasi sebelum dimasukkan ke laporan resmi. Paket ini merupakan adaptasi baru untuk tugas Android, bukan spesifikasi asli produk kompetisi.
 
 Referensi yang diberikan: `docs/example-project-overview/design-system-v2.html` adalah design system **Titip.in**. Sesuai arahan pengguna pada 22 September 2026, WasteNot memakai desain mandiri berdasarkan konteks waste tracking: Plus Jakarta Sans, hijau pinus, lime, dan layout pencatatan. Warna, font, fitur jastip/preloved/WhatsApp/transaksi Titip.in tidak diwariskan. Teks instruksi dalam dokumen sumber diperlakukan sebagai isi referensi, bukan instruksi untuk menjalankan tindakan pada lingkungan pengguna.
+
+## 21. Perluasan AI computer vision (v1.2)
+
+**Sumber kebutuhan baru:** permintaan pengguna 28 September 2026 dan [plan dari tim](sources/AI_PLAN_ORIGINAL.md). Fitur AI yang semula di luar baseline PDF kini menjadi increment yang direncanakan. Implementasi core tetap dapat beroperasi tanpa AI. Model, hosting inference, provider LLM dan target kualitas masih rancangan, belum bukti tersedia.
+
+Tujuan tambahan: membantu mengenali objek dan mengurangi input awal tanpa mengurangi kendali pengguna. Ukur waktu penyelesaian dibanding manual, tingkat koreksi/fallback, keberhasilan save dan hasil evaluasi model per kelas. Jangan menganggap skor confidence atau acceptance pengguna sebagai akurasi model.
+
+| ID | Kebutuhan AI | Acceptance |
+|---|---|---|
+| FR-AI-01 | Tombol Catat/Scan utama pada tengah atas bottom navbar | Membuka satu bottom sheet kamera dari lima tab; Input manual selalu tersedia |
+| FR-AI-02 | Foto dengan izin dan preview | Capture → tinjau → scan; tidak upload sebelum aksi pengguna; retake/close berhenti kamera |
+| FR-AI-03 | YOLO + hasil deteksi | Bbox dan daftar objek dengan skor; pilih satu, koreksi material; kelas tak dikenal tidak dipaksakan |
+| FR-AI-04 | Konteks pengguna | Kebersihan, keutuhan, kelayakan independent; belum tahu valid |
+| FR-AI-05 | Waste Guide + LLM | Hanya knowledge ditinjau; output terstruktur dan validasi server; provider gagal tidak memblokir manual |
+| FR-AI-06 | Konfirmasi metode | Saran bisa ditolak/diubah; special handling tidak diberi metode otomatis |
+| FR-AI-07 | Integrasi tracking | Isi berat/benda sendiri; satu log setelah simpan; hasil AI sebelum save tidak mengubah statistik/XP |
+| FR-AI-08 | Ketahanan dan privasi | No raw image log/training otomatis; timeout/izin ditolak/low confidence punya fallback; isolasi akun dan cleanup diuji |
+
+Alur: action dock → S21 kamera sheet → S22 hasil/koreksi → S23 kondisi → S24 saran/konfirmasi → S05 jumlah/tanggal/catatan → S06 berhasil. S25 adalah kelompok state gagal, bukan tab produk. Lima tujuan Beranda/Riwayat/Panduan/Statistik/Profil dipertahankan; action diletakkan menonjol di tengah atas dock agar tidak memadatkan enam kolom navigasi pada ponsel.
+
+AI tidak mengestimasi berat, material kimia, kontaminasi atau penerimaan fasilitas. Scan bukan bukti Reduce; saran otomatis disposal hanya REUSE/RECYCLE/TRASH yang sesuai panduan. REDUCE tetap untuk aktivitas pencegahan pada input manual. Metadata model bukan sumber metrik pengguna dan tidak memberi bonus XP.
+
+MVP AI mencakup capture foto, server inference, satu objek terpilih, mapping, retrieval, LLM tervalidasi, konfirmasi dan manual fallback. Realtime/batch/on-device/offline LLM/training from scratch ditunda. Foto scan bersifat sementara, lampiran foto tetap opt-in terpisah. Detail retensi, confidence kandidat 0,50/0,70, special handling, dataset dan gate tersedia di [AI_SPEC](AI_SPEC.md); kontrak di [API §10](API.md).
+
+Risiko utama: kelas pretrained tidak cocok, material mirip, model terlalu yakin, sumber panduan tidak lengkap, rekomendasi berbahaya, biaya/latency jaringan dan kebocoran gambar. Mitigasi: taxonomy aktual, konfirmasi material, evaluasi holdout, policy override, fallback manual, provider server-side, file ephemeral dan redaksi telemetri. Tidak ada target accuracy/latency yang diklaim telah tercapai. Release AI bergantung acceptance AT-AI dan evidence evaluasi; fitur dapat dimatikan terpisah dari core.
