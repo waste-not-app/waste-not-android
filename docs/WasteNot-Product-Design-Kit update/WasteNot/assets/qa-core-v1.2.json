@@ -1,0 +1,27 @@
+{
+  "checks": [
+    "25 layar, 39 komponen, font lokal dimuat",
+    "Rumus dataset, Reduce-only, denominator kosong, parser unit dan streak",
+    "light: seluruh 25 layar pada 360/390/768/1024/1512 px tanpa horizontal overflow",
+    "dark: seluruh 25 layar pada 360/390/768/1024/1512 px tanpa horizontal overflow",
+    "8 layar data × 5 state dirender",
+    "Konversi g/kg mempertahankan nilai kanonik; g/benda mengosongkan nilai",
+    "Tambah invalid/valid, detail, edit tanpa XP baru, hapus batal/konfirmasi",
+    "Filter kategori AND metode dan reset",
+    "Cari panduan, hasil kosong, hapus pencarian, detail dan prefill",
+    "Rentang statistik dan alternatif teks chart",
+    "Dirty form: Back, Escape mempertahankan draf, konfirmasi membuang",
+    "4 dialog: buka, fokus keyboard, Escape; konflik dapat memuat ulang",
+    "Reminder opt-in, waktu, dan off, tanpa permission browser",
+    "Preview foto lokal, hapus, dan penolakan tipe salah",
+    "Lokasi tanpa data dan simulasi izin ditolak",
+    "6 contoh state interaktif",
+    "Registrasi mismatch/sukses, logout membersihkan sesi, login simulasi",
+    "5 tab navigasi membuka tujuan",
+    "Komponen password, chip, segment, sheet, snackbar, switch, search",
+    "Filter galeri dan seluruh tombol Coba layar",
+    "Stress ukuran teks 200% pada empat layar utama tanpa horizontal overflow",
+    "Tidak ada JavaScript page error"
+  ],
+  "errors": []
+}

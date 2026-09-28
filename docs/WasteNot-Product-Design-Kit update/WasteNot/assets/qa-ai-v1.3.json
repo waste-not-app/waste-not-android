@@ -1,0 +1,5 @@
+{
+  "passed": true,
+  "errors": [],
+  "scope": "Browser simulation and fake camera, not model or Android tests"
+}
