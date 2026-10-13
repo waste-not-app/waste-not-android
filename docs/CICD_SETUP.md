@@ -156,3 +156,5 @@ Setelah deployment selesai:
 ## Validasi branch pengembangan
 
 Branch `codex/**` menjalankan Android CI untuk lint, unit test dan build. Release/deployment tetap workflow tersendiri; push branch pengembangan tidak memicu deploy VM. Lihat [setup Android](ANDROID_SETUP.md) untuk konfigurasi API per build type serta batas pengujian yang belum dijalankan.
+
+Runner dipin ke `ubuntu-24.04`, sesuai image yang lulus uji A01. Workflow memakai rilis Actions berbasis Node 24: checkout 7.0.1, setup-java 6.0.1, upload-artifact 7.0.2 dan setup-gradle 6.4.0. Pembaruan ini menanggapi peringatan runtime pada run CI; lihat [migrasi Node 20](https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/) dan [rencana migrasi ubuntu-latest](https://github.com/actions/runner-images/issues/14748).
