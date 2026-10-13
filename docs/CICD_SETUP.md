@@ -82,14 +82,14 @@ Klik tombol **"New repository secret"** dan tambahkan secret berikut:
 
 ### B. Kredensial Signing APK (Release Keystore)
 
-Keystore release PKCS12 resmi WasteNot telah dibuat di `keystore/wastenot-release.jks`. Masukkan secret berikut agar release APK ditandatangani (signed):
+Signing memakai keystore milik tim yang disimpan di luar Git. Masukkan secret berikut agar release APK ditandatangani. Dokumentasi tidak menyimpan nilai password atau key; lokasi `keystore/wastenot-release.jks` adalah contoh lokal yang diabaikan Git.
 
 | Name | Value | Keterangan |
 |---|---|---|
 | `ANDROID_KEYSTORE_BASE64` | *(Hasil encode base64 keystore)* | Binary keystore dalam bentuk string Base64 |
-| `ANDROID_KEYSTORE_PASSWORD` | `WasteNotRelease2026!Store` | Password keystore |
+| `ANDROID_KEYSTORE_PASSWORD` | *(Isi dari penyimpanan rahasia tim; jangan tulis nilainya di Git)* | Password keystore |
 | `ANDROID_KEY_ALIAS` | `wastenot` | Alias key certificate |
-| `ANDROID_KEY_PASSWORD` | `WasteNotRelease2026!Store` | Password alias key |
+| `ANDROID_KEY_PASSWORD` | *(Isi dari penyimpanan rahasia tim; jangan tulis nilainya di Git)* | Password alias key |
 
 > **Cara mengambil `ANDROID_KEYSTORE_BASE64`:**
 > Jalankan perintah berikut di root folder project:
@@ -152,3 +152,7 @@ Setelah deployment selesai:
    curl -s https://oktaavsm.bccdev.id/wastenot/versions.json
    ```
    *Menampilkan struktur JSON ringkas yang dapat digunakan untuk pengecekan in-app auto-update.*
+
+## Validasi branch pengembangan
+
+Branch `codex/**` menjalankan Android CI untuk lint, unit test dan build. Release/deployment tetap workflow tersendiri; push branch pengembangan tidak memicu deploy VM. Lihat [setup Android](ANDROID_SETUP.md) untuk konfigurasi API per build type serta batas pengujian yang belum dijalankan.

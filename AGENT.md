@@ -8,10 +8,10 @@ Panduan untuk AI coding agent yang bekerja di repositori ini. Dibaca bersama [`C
 
 ## Di mana membaca spesifikasi
 
-**Seluruh spesifikasi produk ada di [`docs/design-kit/`](docs/design-kit/) · v1.3 · 28 Sep 2026**
+**Seluruh spesifikasi produk ada di [`docs/WasteNot-Product-Design-Kit update/WasteNot/`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/) · v1.3 · 28 Sep 2026**
 
 ```
-docs/design-kit/
+docs/WasteNot-Product-Design-Kit update/WasteNot/
   README.md              → Ikhtisar dan cara pakai design kit v1.3
   AI_SPEC.md           ★ → Spesifikasi AI pipeline: YOLO, mapping, LLM, privasi, state machine
   PRD.md                 → Product requirements v1.2 incl. AI scan scope
@@ -25,7 +25,6 @@ docs/design-kit/
   verify-ai.cjs        ★ → Automated test khusus AI scan flow
   assets/preview-ai.png ★ → Preview layar AI scan
   sources/AI_PLAN_ORIGINAL.md ★ → Dokumen source rencana tim (referensi, bukan spec final)
-  AGENT_INDEX.md         → Indeks cepat topik → section dokumen
   assets/fonts/          → Plus Jakarta Sans variable font + lisensi SIL OFL
 ```
 
@@ -105,8 +104,8 @@ docs/design-kit/
 |---|---|
 | [`CLAUDE.md`](CLAUDE.md) | Panduan utama untuk AI agent (konteks lengkap + aturan AI) |
 | [`AGENT.md`](AGENT.md) | Dokumen ini — quick reference untuk agent |
-| [`docs/design-kit/AI_SPEC.md`](docs/design-kit/AI_SPEC.md) | ★ Spesifikasi AI pipeline lengkap |
-| [`docs/design-kit/AGENT_INDEX.md`](docs/design-kit/AGENT_INDEX.md) | Indeks cepat topik → section dokumen |
+| [`docs/WasteNot-Product-Design-Kit update/WasteNot/AI_SPEC.md`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/AI_SPEC.md) | ★ Spesifikasi AI pipeline lengkap |
+| [`docs/WasteNot-Product-Design-Kit update/WasteNot/README.md`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/README.md) | Ikhtisar design kit dan tautan spesifikasi |
 | [`gradle/libs.versions.toml`](gradle/libs.versions.toml) | Version catalog semua dependency |
 | [`app/build.gradle.kts`](app/build.gradle.kts) | Module config, semua plugin diterapkan di sini |
 | [`app/src/main/java/com/example/wastenot/MainActivity.kt`](app/src/main/java/com/example/wastenot/MainActivity.kt) | Entry point |

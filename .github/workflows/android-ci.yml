@@ -7,12 +7,21 @@ on:
       - develop
       - 'feature/**'
       - 'fix/**'
+      - 'codex/**'
   push:
     branches:
       - main
       - develop
       - 'feature/**'
       - 'fix/**'
+      - 'codex/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   verify:
@@ -36,15 +45,34 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x ./gradlew
 
-      - name: Run Unit Tests
-        run: ./gradlew test
+      - name: Run Android Lint and Unit Tests
+        run: ./gradlew lintDebug lintStaging lintRelease testDebugUnitTest --no-daemon --max-workers=2
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease
+      - name: Build Debug, Staging and Release APKs
+        run: ./gradlew assembleDebug assembleStaging assembleRelease --no-daemon --max-workers=2
 
-      - name: Upload Release APK Artifact
+      - name: Verify environment configuration and packaged policies
+        run: python3 scripts/verify_build_environments.py
+
+      - name: Verify release packaging inputs
+        run: python3 scripts/verify_release_workflow.py
+
+      - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: wastenot-release-apk
-          path: app/build/outputs/apk/release/*.apk
+          name: wastenot-apks-${{ github.sha }}
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/staging/*.apk
+            app/build/outputs/apk/release/*.apk
           if-no-files-found: error
+
+      - name: Upload Verification Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-reports-${{ github.sha }}
+          path: |
+            app/build/reports/lint-results-*.html
+            app/build/reports/tests/
+          if-no-files-found: ignore
