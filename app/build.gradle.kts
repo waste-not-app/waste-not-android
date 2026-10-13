@@ -115,6 +115,11 @@ kotlin {
 
 dependencies {
   coreLibraryDesugaring(libs.desugar.jdk.libs)
+  implementation(libs.retrofit)
+  implementation(libs.retrofit.serialization)
+  implementation(libs.okhttp)
+  implementation(libs.kotlinx.serialization.json)
+  testImplementation(libs.mockwebserver)
   val composeBom = platform(libs.androidx.compose.bom)
   implementation(composeBom)
   androidTestImplementation(composeBom)
