@@ -1,3 +1,5 @@
+import java.net.URI
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
@@ -5,6 +7,26 @@ plugins {
   alias(libs.plugins.hotswan.compiler)
   alias(libs.plugins.ksp)
   alias(libs.plugins.skydoves.navgraph)
+}
+
+fun apiBaseUrl(property: String, defaultValue: String = "", allowLocalHttp: Boolean = false): String {
+    val value = providers.gradleProperty(property).orElse(defaultValue).get().trim()
+    if (value.isEmpty()) return ""
+    val uri = runCatching { URI(value) }.getOrElse {
+        error("$property must be an absolute API URL.")
+    }
+    require(!uri.host.isNullOrBlank() && (uri.port == -1 || uri.port in 1..65535)) {
+        "$property must have a valid host and port."
+    }
+    require(uri.rawUserInfo == null && uri.rawQuery == null && uri.rawFragment == null) {
+        "$property must not contain credentials, query parameters or a fragment."
+    }
+    val localHttp = allowLocalHttp && uri.scheme.equals("http", ignoreCase = true) &&
+        uri.host.lowercase() in setOf("10.0.2.2", "localhost", "127.0.0.1")
+    require(uri.scheme.equals("https", ignoreCase = true) || localHttp) {
+        "$property must use HTTPS; debug HTTP is limited to emulator/localhost."
+    }
+    return uri.toASCIIString().trimEnd('/') + "/"
 }
 
 android {
@@ -18,10 +40,14 @@ android {
         versionName = "1.0.0"
     }
 
-    val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull
-    val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD").orNull
-    val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS").orNull
-    val releaseKeyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD").orNull
+    val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull?.takeIf { it.isNotBlank() }
+    val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD").orNull?.takeIf { it.isNotBlank() }
+    val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS").orNull?.takeIf { it.isNotBlank() }
+    val releaseKeyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD").orNull?.takeIf { it.isNotBlank() }
+    val signingValues = listOf(releaseKeystorePath, releaseKeystorePassword, releaseKeyAlias, releaseKeyPassword)
+    require(signingValues.all { it == null } || signingValues.none { it == null }) {
+        "Release signing requires all four ANDROID_KEYSTORE_PATH/PASSWORD and ANDROID_KEY_ALIAS/PASSWORD variables."
+    }
 
     if (
         releaseKeystorePath != null &&
@@ -31,6 +57,7 @@ android {
     ) {
         val rawFile = File(releaseKeystorePath)
         val keystoreFile = if (rawFile.isAbsolute) rawFile else rootProject.file(releaseKeystorePath)
+        require(keystoreFile.isFile) { "Release keystore file does not exist." }
         signingConfigs {
             create("release") {
                 storeFile = keystoreFile
@@ -42,7 +69,20 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.debugApiBaseUrl", "http://10.0.2.2:8080/v1/", allowLocalHttp = true)}\"")
+        }
+        create("staging") {
+            initWith(getByName("debug"))
+            // HotSwan 2.0.1 only provides suspend-lambda rewrite tasks for the debug variant.
+            isDebuggable = false
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            matchingFallbacks += listOf("debug")
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.stagingApiBaseUrl")}\"")
+        }
         release {
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.releaseApiBaseUrl")}\"")
             isMinifyEnabled = false
             signingConfigs.findByName("release")?.let {
                 signingConfig = it
@@ -57,7 +97,7 @@ android {
     buildFeatures {
       compose = true
       aidl = false
-      buildConfig = false
+      buildConfig = true
       shaders = false
     }
 
