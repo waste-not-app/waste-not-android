@@ -8,11 +8,13 @@ Setiap task yang dikerjakan memiliki catatan perubahan, bukti pengujian, dan pek
 | A02 Model dan parser | [#5](https://github.com/waste-not-app/waste-not-android/issues/5) | [A02](A02-domain-models.md) | Model/parser dan pemetaan quantity request tersedia; repository write serta layar belum terhubung |
 | A03 HTTP, DTO, metadata, error | [#6](https://github.com/waste-not-app/waste-not-android/issues/6) | [A03](A03-network.md) | Transport/fixture diuji dan container terhubung; kontrak backend serta wiring layar masih terbuka |
 | A04 Credential dan refresh sesi | [#21](https://github.com/waste-not-app/waste-not-android/issues/21) | [A04](A04-session.md) | Keystore diuji perangkat; repository sesi/refresh dan isolasi akun diuji fixture; wiring UI/backend masih terbuka |
+| A06 Tema dan font | [#7](https://github.com/waste-not-app/waste-not-android/issues/7) | [A06](A06-theme.md) | Font/paket/kontras dan pemilih tema 200% lulus API 24; preview seluruh layar/root final masih berjalan |
+| A07 Komponen form | [#10](https://github.com/waste-not-app/waste-not-android/issues/10) | [A07](A07-form-controls.md) | Tiga tes interaksi lulus API 24; input, quantity, pilihan dan tanggal tersedia; wiring layar berjalan |
 | A11 Startup dan pemulihan sesi | [#34](https://github.com/waste-not-app/waste-not-android/issues/34) | [A11](A11-startup.md) | Bootstrap repository diuji; layar S01 dan root replacement belum terhubung |
 | A12 Masuk | [#35](https://github.com/waste-not-app/waste-not-android/issues/35) | [A12](A12-login.md) | Validator field dan normalisasi email tersedia; form/loading/autofill/root belum terhubung |
 | A13 Daftar | [#46](https://github.com/waste-not-app/waste-not-android/issues/46) | [A13](A13-registration.md) | Aturan registrasi dan fallback timezone tersedia; form serta backend nyata belum terverifikasi |
 | A29 Logout | [#40](https://github.com/waste-not-app/waste-not-android/issues/40) | [A29](A29-logout.md) | Cleanup credential/job dan hasil logout diuji; dialog, back stack, dan server nyata belum terverifikasi |
 
-Current iteration juga mencakup A06, A07, A09, dan A10. Catatan implementasinya ditambahkan ketika pekerjaan tersebut dilakukan. Kriteria layar, perangkat minimum, dan backend nyata tidak dianggap terpenuhi hanya karena build atau tes fixture berhasil.
+Current iteration juga mencakup A09 dan A10. Catatan implementasinya ditambahkan ketika pekerjaan tersebut dilakukan. Kriteria layar, perangkat minimum, dan backend nyata tidak dianggap terpenuhi hanya karena build atau tes fixture berhasil.
 
 Arahan terbaru mengizinkan dummy/placeholder untuk layar yang membutuhkan backend atau AI/ML. UI menandai data contoh dan memakai batas sumber data yang dapat diganti ke API. Bukti dummy tidak diklaim sebagai bukti backend atau inference nyata; integrasi server mengikuti rencana kontrak ketika tersedia.
