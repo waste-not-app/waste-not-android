@@ -11,6 +11,8 @@ import com.example.wastenot.data.network.dto.LoginDto
 import com.example.wastenot.data.network.dto.RegisterDto
 import com.example.wastenot.data.network.dto.RefreshDto
 import com.example.wastenot.data.network.dto.SessionDto
+import com.example.wastenot.data.network.dto.toRequestFields
+import com.example.wastenot.model.Quantity
 import java.io.IOException
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
@@ -31,6 +33,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -457,13 +461,21 @@ class SessionRepositoryTest {
                 }
             }
         }
-        val payload = Json.parseToJsonElement("""{"client_request_id":"00000000-0000-4000-8000-000000000011","category":"PLASTIC","method":"RECYCLE","quantity_kind":"WEIGHT","weight_g":250,"item_count":null,"activity_date":"2026-09-21","notes":"fixture notes"}""").jsonObject
+        val payload = buildJsonObject {
+            put("client_request_id", "00000000-0000-4000-8000-000000000011")
+            put("category", "PLASTIC")
+            put("method", "RECYCLE")
+            Quantity.Weight.of(250).toRequestFields().forEach { (key, value) -> put(key, value) }
+            put("activity_date", "2026-09-21")
+            put("notes", "fixture notes")
+        }
         val result = session.authenticated { credential ->
             network.executor.execute({ it }) { api.create(credential, payload) }
         }
         assertTrue(result is ApiResult.Success)
         assertEquals(2, bodies.size)
         assertEquals(bodies[0], bodies[1])
+        assertEquals(payload, Json.parseToJsonElement(bodies[0]).jsonObject)
     }
 
     @Test
