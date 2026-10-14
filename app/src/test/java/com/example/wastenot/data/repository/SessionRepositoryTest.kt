@@ -83,7 +83,9 @@ class SessionRepositoryTest {
         assertTrue(session.state.value is SessionState.Authenticated)
         val request = server.takeRequest()
         assertNull(request.getHeader("Authorization"))
-        assertEquals(login.password, Json.parseToJsonElement(request.body.readUtf8()).jsonObject["password"]?.jsonPrimitive?.content)
+        val body = Json.parseToJsonElement(request.body.readUtf8()).jsonObject
+        assertEquals("fixture-a@example.com", body["email"]?.jsonPrimitive?.content)
+        assertEquals(login.password, body["password"]?.jsonPrimitive?.content)
         assertFalse(session.state.value.toString().contains("fixture-access-old"))
         assertFalse(session.state.value.toString().contains("fixture-refresh-old"))
     }

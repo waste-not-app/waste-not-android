@@ -64,7 +64,7 @@ data class UserDto(
     fun toModel(): User {
         val canonicalId = UUID.fromString(id).toString()
         require(canonicalId.equals(id, ignoreCase = true))
-        require(name.isNotBlank() && name.length <= 60 && email.isNotBlank() && email.length <= 254)
+        require(name.isNotBlank() && name.codePointCount(0, name.length) <= 60 && email.isNotBlank() && email.length <= 254)
         require(timezone in ZoneId.getAvailableZoneIds())
         return User(canonicalId, name, email, ZoneId.of(timezone), progress?.toModel())
     }

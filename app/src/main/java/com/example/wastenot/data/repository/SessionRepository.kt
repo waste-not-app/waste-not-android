@@ -12,9 +12,9 @@ import com.example.wastenot.data.network.dto.RefreshDto
 import com.example.wastenot.data.network.dto.RegisterDto
 import com.example.wastenot.data.network.dto.SessionTokens
 import com.example.wastenot.model.User
+import com.example.wastenot.model.normalizeAccountEmail
 import java.io.IOException
 import java.time.ZoneId
-import java.util.Locale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
@@ -45,13 +45,13 @@ class SessionRepository(
 
     suspend fun login(email: String, password: String): ApiResult<User> = authenticate {
         val connection = network ?: return@authenticate failure(ApiFailureKind.NOT_CONFIGURED)
-        val input = LoginDto(email.trim().lowercase(Locale.ROOT), password)
+        val input = LoginDto(normalizeAccountEmail(email), password)
         connection.executor.execute({ it.toModel() }) { connection.api.login(input) }
     }
 
     suspend fun register(name: String, email: String, password: String, timezone: ZoneId): ApiResult<User> = authenticate {
         val connection = network ?: return@authenticate failure(ApiFailureKind.NOT_CONFIGURED)
-        val input = RegisterDto(name.trim(), email.trim().lowercase(Locale.ROOT), password, timezone.id)
+        val input = RegisterDto(name.trim(), normalizeAccountEmail(email), password, timezone.id)
         connection.executor.execute({ it.toModel() }) { connection.api.register(input) }
     }
 
