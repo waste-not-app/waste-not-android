@@ -42,7 +42,7 @@ class CoreNetworkTest {
         server = MockWebServer().apply { start() }
         network = requireNotNull(WasteNotNetwork.create(server.url("/v1/").toString(),
             accessToken = { "private-access-token" }, diagnostics = diagnostics::add,
-            clock = clock, allowLocalHttp = true, callTimeoutSeconds = 1))
+            clock = clock, allowLocalHttp = true))
         repository = CoreRepository(network)
     }
 
@@ -240,15 +240,30 @@ class CoreNetworkTest {
     }
 
     @Test
-    fun timeoutIsDirectedAndCancellationPropagatesToTheCaller() = runTest {
+    fun timeoutProducesADirectedFailure() = runTest {
+        val timedNetwork = requireNotNull(WasteNotNetwork.create(server.url("/v1/").toString(),
+            allowLocalHttp = true, callTimeoutSeconds = 1))
         server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE))
-        assertEquals(ApiFailureKind.TIMEOUT, (repository.metadata() as ApiResult.Failure).error.kind)
-        server.takeRequest()
+        try {
+            assertEquals(ApiFailureKind.TIMEOUT,
+                (CoreRepository(timedNetwork).metadata() as ApiResult.Failure).error.kind)
+        } finally {
+            timedNetwork.client.dispatcher.executorService.shutdown()
+            timedNetwork.client.connectionPool.evictAll()
+        }
+    }
+
+    @Test
+    fun cancellationStopsAnInFlightHttpRequest() = runTest {
         server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE))
         val request = async(Dispatchers.Default) { repository.metadata() }
-        assertNotNull(withContext(Dispatchers.IO) { server.takeRequest(5, TimeUnit.SECONDS) })
+        assertNotNull(withContext(Dispatchers.IO) { server.takeRequest(10, TimeUnit.SECONDS) })
         request.cancelAndJoin()
         assertTrue(request.isCancelled)
+    }
+
+    @Test
+    fun executorDoesNotSwallowCallerCancellation() = runTest {
         try {
             network.executor.execute<Unit, Unit>({ it }) { throw CancellationException("fixture cancellation") }
             fail("Cancellation must propagate")

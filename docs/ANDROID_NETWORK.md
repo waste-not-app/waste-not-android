@@ -31,6 +31,6 @@ Kategori/metode yang dikirim adalah pilihan tersedia yang dikenali aplikasi; tam
 ./gradlew :app:testDebugUnitTest --tests 'com.example.wastenot.data.network.*'
 ```
 
-15 tes MockWebServer menguji pemetaan data/pagination/error, metadata, respons invalid, pembatasan credential, redirect, deadline 429, timeout/cancellation, dan larangan replay write. Regresi 503 awalnya menghasilkan 201 karena POST dikirim ulang; setelah pengaman one-shot, POST/PUT/PATCH/DELETE masing-masing hanya terkirim satu kali. Fixture menggunakan data simulasi dan credential palsu. Ini bukan bukti login/backend nyata atau penerimaan UI.
+17 tes jaringan menguji pemetaan data/pagination/error, metadata, respons invalid, pembatasan credential, redirect, deadline 429, timeout/cancellation, dan larangan replay write. Regresi 503 awalnya menghasilkan 201 karena POST dikirim ulang; setelah pengaman one-shot, POST/PUT/PATCH/DELETE masing-masing hanya terkirim satu kali. Tes timeout memakai client khusus satu detik; tes cancellation memakai batas normal dan server baru agar tidak terpengaruh sisa koneksi timeout. Fixture menggunakan data simulasi dan credential palsu. Ini bukan bukti login/backend nyata atau penerimaan UI.
 
 Lapisan ini belum dibuat oleh AppContainer dan belum dipakai screen. A04 memasang penyimpanan sesi serta refresh terserialisasi; wiring aplikasi dilakukan setelah dependensi tersebut tersedia.
