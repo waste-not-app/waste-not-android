@@ -1,5 +1,7 @@
 package com.example.wastenot.data.network
 
+import com.example.wastenot.data.repository.RequestCredential
+
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -70,7 +72,8 @@ private class BearerInterceptor(private val base: HttpUrl, private val token: ()
         val publicAuth = request.url.encodedPath in setOf(
             "${base.encodedPath}auth/login", "${base.encodedPath}auth/register", "${base.encodedPath}auth/refresh")
         if (request.url.isApiUrl(base) && !publicAuth) {
-            token()?.let { builder.header("Authorization", "Bearer $it") }
+            (request.tag(RequestCredential::class.java)?.token?.value ?: token())
+                ?.let { builder.header("Authorization", "Bearer $it") }
         }
         return chain.proceed(builder.build())
     }

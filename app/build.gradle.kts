@@ -9,6 +9,11 @@ plugins {
   alias(libs.plugins.skydoves.navgraph)
 }
 
+hotSwanCompiler {
+    // HotSwan 2.0.1 cannot bridge this DTO's cross-file credential value classes.
+    exclude("com.example.wastenot.data.network.dto.SessionTokens")
+}
+
 fun apiBaseUrl(property: String, defaultValue: String = "", allowLocalHttp: Boolean = false): String {
     val value = providers.gradleProperty(property).orElse(defaultValue).get().trim()
     if (value.isEmpty()) return ""

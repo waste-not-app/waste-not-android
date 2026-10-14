@@ -79,6 +79,9 @@ Jika Anda perlu mereferensikan kembali bagaimana plugin ini dikonfigurasi di fil
 6. Perubahan akan langsung terlihat di layar device dalam hitungan milidetik tanpa merestart aplikasi.
 
 ### 2.5 Troubleshooting HotSwan
+
+`SessionTokens` dikecualikan secara spesifik melalui `hotSwanCompiler.exclude` di app Gradle. HotSwan 2.0.1 gagal membuat dispatch bridge `component2` untuk `RefreshToken` value class lintas file (`B3: ... has no primary constructor`). Dengan pengecualian DTO tersebut, build kembali lulus dan tipe credential tetap tervalidasi. Perubahan pada DTO ini memerlukan rebuild; hot reload UI tetap tersedia. Opsi pengecualian mengikuti [konfigurasi resmi HotSwan](https://hotswan.dev/docs/gradle-configuration#excluding-classes).
+
 - **Status tidak berubah ke WATCHING**: Pastikan path modul aplikasi diatur ke `:app` melalui **Settings** > **Tools** > **Compose HotSwan** > **App Module Path** (default: `:app`).
 - **Method yang di-skip**: Method lifecycle yang memanggil `super.<method>()` seperti `MainActivity.onCreate()` sengaja dilewati oleh interpreter dan tetap berjalan secara native. Modifikasi di luar itu (semua Composable functions) di-reload secara penuh.
 
