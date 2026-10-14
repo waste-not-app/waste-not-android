@@ -19,7 +19,7 @@ Tes awal membuktikan POST 503 dengan Retry-After: 0 terkirim ulang oleh library 
 
 CI berikutnya menemukan interferensi tes gabungan timeout/cancellation pada koneksi satu detik. Kedua kasus dipisah: timeout memakai client khusus dan cancellation memakai batas normal/server baru. Regresi dengan dua CPU serta seluruh **36 unit test** (17 jaringan, 16 domain, 3 starter) dan lint debug lulus hook.
 
-CI head `32227cb`: [PR](https://github.com/waste-not-app/waste-not-android/actions/runs/38497998952), [push](https://github.com/waste-not-app/waste-not-android/actions/runs/38497993789). Status final tiap run diverifikasi langsung di GitHub; dokumen ini tidak menganggap run yang masih berjalan sudah lulus.
+CI head `32227cb`: [PR](https://github.com/waste-not-app/waste-not-android/actions/runs/38497998952) dan [push](https://github.com/waste-not-app/waste-not-android/actions/runs/38497993789) sama-sama berhasil. Masing-masing run menyimpan dua artifact: APK dan laporan pemeriksaan.
 
 Tiga APK lokal berhasil dibangun; 13 pemeriksaan environment/paket dan lima fixture pengemasan release lulus. Install/startup pada API 36 dicatat di A01, dengan batas bukti perangkat yang sama.
 

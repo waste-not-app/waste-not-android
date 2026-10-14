@@ -4,6 +4,8 @@ Pekerjaan awal untuk [A01 / issue #3](https://github.com/waste-not-app/waste-not
 
 ## Kondisi starter
 
+Bagian ini mencatat baseline audit pada `e923f3c`. Perkembangan implementasi setelah audit dicatat per issue di [docs/tasks](tasks/README.md).
+
 Satu module `:app`, Kotlin 2.3.20, AGP 9.0.1, Gradle 9.1.0, JDK 17, Compose BOM 2026.03.01, Navigation 3, min SDK 24, compile/target SDK 36. Versi dipertahankan dari starter dan dicatat di version catalog serta Gradle wrapper.
 
 `HomeScreen` masih memakai data contoh dan callback pencatatan belum terhubung. Auth, repository HTTP, CRUD, statistik dan pipeline AI belum diimplementasikan. Pemeriksaan starter tidak membuktikan acceptance fitur tersebut.

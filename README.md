@@ -4,11 +4,12 @@ WasteNot membantu pengguna mencatat aktivitas Reduce, Reuse, Recycle dan Trash, 
 
 ## Status implementasi
 
-Starter saat ini memiliki satu module `:app`, Navigation 3, theme awal dan Beranda dengan data contoh. Autentikasi, HTTP client, pencatatan, statistik dan AI masih mengikuti backlog implementasi. Mockup HTML adalah referensi desain dan simulasi.
+Repo memiliki satu module `:app`, Navigation 3, theme awal dan Beranda dengan data contoh. Fondasi environment/CI, model dan parser, transport HTTP/fixture, serta penyimpanan refresh token berbasis Android Keystore sudah tersedia. Lapisan tersebut belum dihubungkan ke alur aplikasi; autentikasi, pencatatan, statistik dan AI masih dikerjakan sesuai backlog. Mockup HTML adalah referensi desain dan simulasi.
 
 - [Roadmap dan seluruh tugas](https://github.com/waste-not-app/waste-not-android/issues/2)
 - [Kanban iterasi berjalan](https://github.com/orgs/waste-not-app/projects/1/views/1)
 - [Setup Android dan konfigurasi lingkungan](docs/ANDROID_SETUP.md)
+- [Catatan perubahan, pengujian, dan checklist per task](docs/tasks/README.md)
 
 ## Toolchain
 
@@ -21,6 +22,7 @@ Siapkan JDK 17, Android SDK Platform 36, serta `ANDROID_HOME` atau `sdk.dir` dal
 ```sh
 ./gradlew lintDebug lintStaging lintRelease testDebugUnitTest
 ./gradlew assembleDebug assembleStaging assembleRelease
+./gradlew assembleDebugAndroidTest
 python3 scripts/verify_build_environments.py
 python3 scripts/verify_release_workflow.py
 ```
@@ -31,7 +33,7 @@ APK tersedia di `app/build/outputs/apk/{debug,staging,release}/`. Release tanpa 
 
 Buat branch tugas `codex/<ticket>-<nama>` dari commit dasar yang sudah diverifikasi. Remote saat audit memiliki `main`; checkout terpisah dapat dipakai untuk menjaga perubahan lokal lainnya. Commit hanya file terkait tugas setelah pemeriksaan lulus, lalu ajukan PR untuk review. Setiap perubahan kode harus menyebut issue terkait; merge ke main menjalankan pipeline rilis yang sudah ada.
 
-[Android CI](.github/workflows/android-ci.yml) menjalankan lint, unit test, pemeriksaan konfigurasi dan build tiga lingkungan pada branch pengembangan, termasuk `codex/**`. Workflow [release/deploy](.github/workflows/android-release.yml) terpisah dan membutuhkan konfigurasi signing serta secrets deployment. Panduannya ada di [CICD_SETUP.md](docs/CICD_SETUP.md).
+[Android CI](.github/workflows/android-ci.yml) menjalankan lint, unit test, pemeriksaan konfigurasi, build tiga lingkungan dan kompilasi APK instrumentasi pada branch pengembangan, termasuk `codex/**`. Tes perangkat Keystore dijalankan lokal dengan langkah pada [catatan A04](docs/tasks/A04-session.md). Workflow [release/deploy](.github/workflows/android-release.yml) terpisah dan membutuhkan konfigurasi signing serta secrets deployment. Panduannya ada di [CICD_SETUP.md](docs/CICD_SETUP.md).
 
 ## Referensi
 
