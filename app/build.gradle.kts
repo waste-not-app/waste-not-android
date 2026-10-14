@@ -1,17 +1,22 @@
 import java.net.URI
+import com.skydoves.compose.hotswan.interpreter.compiler.gradle.InterpreterExtension
 
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
-  alias(libs.plugins.hotswan.compiler)
+  alias(libs.plugins.hotswan.compiler) apply false
   alias(libs.plugins.ksp)
   alias(libs.plugins.skydoves.navgraph)
 }
 
-hotSwanCompiler {
-    // HotSwan 2.0.1 cannot bridge this DTO's cross-file credential value classes.
-    exclude("com.example.wastenot.data.network.dto.SessionTokens")
+// HotSwan 2.0.1 raises debug minSdk to 26; native verification covers API 24.
+if (providers.gradleProperty("wastenot.hotReload").orElse("true").get().toBooleanStrict()) {
+    pluginManager.apply("com.github.skydoves.compose.hotswan.compiler")
+    extensions.configure<InterpreterExtension> {
+        // HotSwan 2.0.1 cannot bridge this DTO's cross-file credential value classes.
+        exclude("com.example.wastenot.data.network.dto.SessionTokens")
+    }
 }
 
 fun apiBaseUrl(property: String, defaultValue: String = "", allowLocalHttp: Boolean = false): String {

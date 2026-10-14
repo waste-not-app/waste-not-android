@@ -48,6 +48,14 @@ jobs:
       - name: Run Android Lint and Unit Tests
         run: ./gradlew lintDebug lintStaging lintRelease testDebugUnitTest --no-daemon --max-workers=2
 
+      - name: Verify native minimum SDK and font distribution
+        run: |
+          ./gradlew assembleDebug assembleDebugAndroidTest -Pwastenot.hotReload=false --no-daemon --max-workers=2
+          python3 scripts/verify_minimum_sdk.py app/build/outputs/apk/debug/app-debug.apk
+          mkdir -p app/build/outputs/apk/native-verification
+          cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/native-verification/app-native-api24.apk
+          cp app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk app/build/outputs/apk/native-verification/app-native-api24-androidTest.apk
+
       - name: Build Debug, Staging, Release and Instrumentation APKs
         run: ./gradlew assembleDebug assembleStaging assembleRelease assembleDebugAndroidTest --no-daemon --max-workers=2
 
@@ -66,6 +74,7 @@ jobs:
             app/build/outputs/apk/staging/*.apk
             app/build/outputs/apk/release/*.apk
             app/build/outputs/apk/androidTest/debug/*.apk
+            app/build/outputs/apk/native-verification/*.apk
           if-no-files-found: error
 
       - name: Upload Verification Reports

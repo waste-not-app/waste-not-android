@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,9 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.wastenot.theme.Accent
 import com.example.wastenot.theme.OnAccent
-import com.example.wastenot.theme.OnSurfaceVariant
-import com.example.wastenot.theme.Pine700
-import com.example.wastenot.theme.Pine900
+import com.example.wastenot.theme.LocalWasteNotGradients
+import com.example.wastenot.theme.SummarySecondaryText
 import com.example.wastenot.theme.WasteNotTheme
 
 data class WasteActivity(
@@ -28,12 +26,6 @@ data class WasteActivity(
     val method: String,
     val amount: String,
     val timeAgo: String,
-)
-
-private val pineBrush = Brush.linearGradient(
-    colors = listOf(Pine900, Pine700),
-    start = androidx.compose.ui.geometry.Offset(0f, 0f),
-    end = androidx.compose.ui.geometry.Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY),
 )
 
 @Composable
@@ -74,14 +66,14 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(24.dp))
-                    .background(pineBrush)
+                    .background(LocalWasteNotGradients.current.summary)
                     .padding(24.dp),
             ) {
                 Column {
                     Text(
                         text = "Sampah ditangani",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFFDBEBDC),
+                        color = SummarySecondaryText,
                     )
                     Spacer(Modifier.height(4.dp))
                     Row(verticalAlignment = Alignment.Bottom) {
@@ -97,7 +89,7 @@ fun HomeScreen(
                         Text(
                             text = unit,
                             style = MaterialTheme.typography.titleLarge,
-                            color = Color(0xFFDBEBDC),
+                            color = SummarySecondaryText,
                             modifier = Modifier.padding(bottom = 6.dp),
                         )
                     }
@@ -240,7 +232,7 @@ private fun ActivityRow(
                 Text(
                     text = activity.timeAgo,
                     style = MaterialTheme.typography.bodySmall,
-                    color = OnSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Text(
