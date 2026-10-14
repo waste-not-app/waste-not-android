@@ -48,8 +48,8 @@ jobs:
       - name: Run Android Lint and Unit Tests
         run: ./gradlew lintDebug lintStaging lintRelease testDebugUnitTest --no-daemon --max-workers=2
 
-      - name: Build Debug, Staging and Release APKs
-        run: ./gradlew assembleDebug assembleStaging assembleRelease --no-daemon --max-workers=2
+      - name: Build Debug, Staging, Release and Instrumentation APKs
+        run: ./gradlew assembleDebug assembleStaging assembleRelease assembleDebugAndroidTest --no-daemon --max-workers=2
 
       - name: Verify environment configuration and packaged policies
         run: python3 scripts/verify_build_environments.py
@@ -65,6 +65,7 @@ jobs:
             app/build/outputs/apk/debug/*.apk
             app/build/outputs/apk/staging/*.apk
             app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/androidTest/debug/*.apk
           if-no-files-found: error
 
       - name: Upload Verification Reports

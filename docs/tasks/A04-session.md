@@ -23,6 +23,8 @@ Primitive mengikuti [Android Keystore](https://developer.android.com/privacy-and
 
 Pada pemeriksaan ini APK dipasang dan runner dipanggil melalui adb dengan selector class yang sama. Perangkat minimum API 24 belum diuji. Implementasi belum dipasang di AppContainer atau alur auth.
 
+CI juga membangun dan menyimpan APK instrumentasi agar kode tes perangkat diperiksa kompilasinya. Empat tes Keystore dijalankan lokal pada emulator; workflow saat ini belum menjalankan emulator otomatis di GitHub.
+
 ## Checklist yang masih terbuka
 
 - [x] Jalankan tes Keystore pada perangkat dan periksa ciphertext/penghapusan. Factory memakai noBackupFilesDir; aturan backup A01 telah diperiksa pada APK.
