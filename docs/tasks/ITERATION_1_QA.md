@@ -33,7 +33,17 @@ Emulator khusus QA Android 7.0/API 24 x86_64, 1080 × 1920, density 480 (360 dp)
 
 Jumlah di atas adalah **40 eksekusi dari 22 kasus perangkat**, termasuk pengulangan pada konfigurasi berbeda dan verifikasi perubahan terakhir. Locale emulator en-US; teks aplikasi tetap resource Indonesia. Window 600 dp memakai density 288 dengan resolusi fisik tetap; landscape memakai rotasi pada density 480. Emulasi ukuran tidak diklaim sebagai uji perangkat tablet/foldable fisik.
 
-Tidak mengklaim pengujian layanan TalkBack/password manager pihak ketiga atau predictive gesture API 36. Semantics, label, fokus, Back dispatcher dan target sentuh diperiksa oleh tes. CI membangun APK instrumentasi, tetapi emulator dijalankan lokal. Status CI untuk setiap push dibaca pada PR agar laporan tidak mengklaim hasil untuk head berbeda.
+CI membangun APK instrumentasi, tetapi emulator dijalankan lokal. Status CI untuk setiap push dibaca pada PR agar laporan tidak mengklaim hasil untuk head berbeda. Layanan password manager pihak ketiga dan backend nyata belum diuji; ContentType autofill/paste tersedia pada client.
+
+## Runtime debug dan aksesibilitas API 36
+
+APK debug normal dengan HotSwan dijalankan pada AVD API 36 x86_64, 1080 × 2400, density 420 (411 dp). Lima kasus AppNavigationTest lulus: dataset/lima tab/tema, create/edit/logout, filter/rotasi, keluar dari Home dan validasi dengan keyboard nyata. Pada percobaan pertama keyboard virtual tidak muncul karena `show_ime_with_hard_keyboard=0`; setelah konfigurasi QA diatur ke 1, kasus keyboard lulus dalam 11,683 detik. Empat kasus lainnya sudah lulus pada suite awal. Ini melengkapi bukti native API 24, bukan menggantikannya.
+
+**TalkBack 16.0.0.738667889, font 200%: satu tes lulus dalam 17,578 detik.** Tes memastikan layanan spoken feedback terikat dan touch exploration aktif, kemudian mempertahankan layanan melalui FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES. Keyboard USB virtual dibuat melalui perintah HID Android; tes menunggu InputDevice eksternal terdaftar sebelum mengirim report. Fokus aksesibilitas nyata dipantau saat shortcut next-item membawa pembaca ke email/password, lalu mengaktifkan Masuk, mencapai pesan password invalid, dan kembali ke aksi utama. Nilai input fixture diisi melalui ACTION_SET_TEXT; navigasi dan aktivasi memakai layanan TalkBack. Tidak mengklaim evaluasi kualitas suara atau seluruh gestur sentuh pembaca layar. Lihat [shortcut TalkBack](https://support.google.com/accessibility/android/answer/6110948?hl=en), [UiAutomation](https://developer.android.com/reference/android/app/UiAutomation#FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES), serta [protokol HID Android](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/cmds/hid/README.md).
+
+**Gestur Back API 36, font 200%: satu tes lulus dalam 23,150 detik.** Dengan navigation_mode=2 dan TalkBack nonaktif, usapan dari tepi kiri memicu D03 pada draf yang diubah. Lanjut mengisi mempertahankan teks dan editor; tidak kembali diam-diam ke tab. Bukti ini memeriksa hasil commit gestur Back dan kebijakan draf, bukan kualitas animasi predictive Back pada setiap frame.
+
+Ringkasan tambahan: **7 kasus/eksekusi sukses API 36** (5 runtime debug, 1 TalkBack, 1 gestur). Tes khusus pembaca/gestur memerlukan argumen eksplisit dan lingkungan yang sesuai; tidak dianggap lulus karena dilewati pada perangkat lain. Hasil ada di [platform-api36.json](../qa/iteration-1/platform-api36.json). Semua perubahan setting hanya pada emulator khusus QA dan dipulihkan setelah pengujian.
 
 ## Regresi yang ditemukan dan diperbaiki
 
@@ -52,9 +62,11 @@ Hari kalender Material 3 diekspos sebagai teks tanggal lengkap. Scroll-to pada h
 
 Hook commit repo menjalankan `lintDebug test --daemon -q` tanpa bypass. Report debug terakhir berisi **99 tes, 0 gagal/error/skip**: termasuk 27 tes repository sesi, 9 tes SessionViewModel dan 3 tes lifetime WorkspaceViewModel. Mapper payload, parser/model, transport, aturan akun, dataset dan draf juga masuk suite. Build native app/test, gate SDK/font/OFL/manifest dan hasil process death diperiksa terpisah dari unit test.
 
+Build debug/staging/release, APK instrumentasi dan lint staging/release juga lulus lokal. CI head `df7bf7a` lulus untuk [push](https://github.com/waste-not-app/waste-not-android/actions/runs/38669031416) dan [PR #95](https://github.com/waste-not-app/waste-not-android/actions/runs/38669087297); report PR yang diunduh berisi 99 tes, 0 gagal/skip, keberhasilan 100%. Hasil head berikutnya dicatat pada PR/issue setelah workflow selesai.
+
 ## Gambar perangkat
 
-Seluruh gambar berikut berasal dari APK native dan memakai data contoh. Beberapa layar digulir untuk memeriksa angka atau aksi tertentu; gambar tidak diubah.
+Lima gambar API 24 berasal dari APK native dan memakai data contoh. Gambar TalkBack tambahan berasal dari debug normal API 36 dan memakai input fixture. Beberapa layar digulir untuk memeriksa angka atau aksi tertentu; gambar tidak diubah.
 
 | Tampilan | Gambar |
 |---|---|
@@ -63,6 +75,7 @@ Seluruh gambar berikut berasal dari APK native dan memakai data contoh. Beberapa
 | Error dan aksi di atas keyboard, 200% | [Masuk](../qa/iteration-1/keyboard-font200.png) |
 | Editor bersama, 200% | [Edit](../qa/iteration-1/editor-font200.png) |
 | Rail lebar 600 dp, 200% | [Lima tujuan](../qa/iteration-1/rail600-font200.png) |
+| TalkBack aktif, font 200%, API 36/debug normal | [Fokus Masuk dan pesan validasi](../qa/iteration-1/talkback-font200.png) |
 
 ## Gate UI
 
@@ -88,3 +101,5 @@ adb shell am instrument -w -r \
 ```
 
 Gunakan emulator tersendiri. Pulihkan font/density setelah QA; jangan mengubah perangkat pengguna. WideNavigationTest dijalankan khusus pada window ≥600 dp dan dilewati pada ponsel sempit.
+
+Untuk TalkBackNavigationTest gunakan emulator API 36 tersendiri dengan layanan TalkBack aktif dan font_scale=2.0, lalu tambahkan `-e talkback true -e class com.example.wastenot.ui.main.TalkBackNavigationTest` pada perintah instrumentasi. APK debug normal dapat dipakai. Untuk gestur, nonaktifkan TalkBack, pastikan mode navigasi gestur, kemudian gunakan `-e predictiveGesture true -e class 'com.example.wastenot.ui.main.AppNavigationTest#edgeBackGestureUsesDirtyDraftPolicy'`. Tes HID melepas keyboard virtual dalam finally; tidak membutuhkan akun Google.

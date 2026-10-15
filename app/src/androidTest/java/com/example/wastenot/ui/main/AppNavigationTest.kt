@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.wastenot.MainActivity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import java.io.File
@@ -92,6 +93,25 @@ class AppNavigationTest {
         val activity = compose.activity
         compose.runOnUiThread { activity.onBackPressedDispatcher.onBackPressed() }
         compose.waitUntil(5_000) { activity.isFinishing }
+    }
+
+    @Test fun edgeBackGestureUsesDirtyDraftPolicy() {
+        assumeTrue(InstrumentationRegistry.getArguments().getString("predictiveGesture") == "true")
+        assumeTrue(android.os.Build.VERSION.SDK_INT >= 36)
+        assertEquals(2, android.provider.Settings.Secure.getInt(compose.activity.contentResolver, "navigation_mode"))
+        preview()
+        compose.onNodeWithText("Catat").performClick()
+        compose.onNode(hasText("Catatan", substring = true) and hasSetTextAction())
+            .performScrollTo().performTextReplacement("Draf gesture")
+        val height = compose.runOnUiThread { compose.activity.window.decorView.height }
+        val automation = InstrumentationRegistry.getInstrumentation().uiAutomation
+        automation.executeShellCommand("input touchscreen swipe 1 ${height / 2} 600 ${height / 2} 500").use {
+            android.os.ParcelFileDescriptor.AutoCloseInputStream(it).readBytes()
+        }
+        compose.waitUntil(5_000) { compose.onAllNodesWithText("Buang perubahan?").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Lanjut mengisi").performClick()
+        compose.onNodeWithText("Draf gesture").assertExists()
+        compose.onAllNodes(tabs).assertCountEquals(0)
     }
 
     @Test fun invalidPasswordStaysFocusedAboveKeyboardWithoutCallingAccountService() {

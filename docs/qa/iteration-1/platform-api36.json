@@ -1,0 +1,29 @@
+{
+  "device": "dedicated API 36 x86_64 AVD; 1080x2400, density 420",
+  "apk": "normal debug with HotSwan",
+  "runtime_cases_passed": 5,
+  "runtime_keyboard_rerun_seconds": 11.683,
+  "runtime_setup_correction": "show_ime_with_hard_keyboard=1 before keyboard case; other four passed in initial suite",
+  "talkback": {
+    "version": "16.0.0.738667889",
+    "font_scale": 2.0,
+    "cases_passed": 1,
+    "seconds": 17.578,
+    "input": "external virtual USB HID keyboard, actual reader next-item and activation",
+    "scope": "email/password labels, invalid password error, primary submit",
+    "speech_quality_reviewed": false
+  },
+  "edge_back": {
+    "api": 36,
+    "font_scale": 2.0,
+    "navigation_mode": 2,
+    "talkback_enabled": false,
+    "cases_passed": 1,
+    "seconds": 23.15,
+    "scope": "committed edge swipe invokes dirty confirmation; cancel preserves text/editor",
+    "animation_frames_reviewed": false
+  },
+  "total_successful_executions": 7,
+  "third_party_password_manager_tested": false,
+  "ci_device_execution": false
+}
