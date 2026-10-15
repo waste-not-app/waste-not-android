@@ -123,6 +123,26 @@ class SessionRepositoryTest {
     }
 
     @Test
+    fun uiGatewayRechecksNetworkBeforeEveryBootstrapAttempt() = runTest {
+        val token = RefreshToken.of("fixture-refresh-old")
+        store.saved.set(TokenReadResult.Available(token))
+        var online = false
+        var snapshots = 0
+        val gateway = RemoteAccountSession(session) { snapshots++; online }
+        gateway.bootstrap()
+        assertTrue(gateway.state.value is SessionState.ConnectionRequired)
+        assertEquals(token, store.token)
+        assertEquals(0, server.requestCount)
+        online = true
+        server.enqueue(unauthorized())
+        gateway.bootstrap()
+        assertTrue(gateway.state.value is SessionState.SignedOut)
+        assertNull(store.token)
+        assertEquals(1, server.requestCount)
+        assertEquals(2, snapshots)
+    }
+
+    @Test
     fun offlineRetryAfterKnownRotationDoesNotCallMeOrRotateAgain() = runTest {
         store.saved.set(TokenReadResult.Available(RefreshToken.of("fixture-refresh-old")))
         server.enqueue(json(fixture("auth-refresh")))
