@@ -20,7 +20,7 @@ CI head `d9060f2`: [push](https://github.com/waste-not-app/waste-not-android/act
 
 ## Checklist issue
 
-Lima butir implementasi model/aturan dan penerimaan parser 250 g ↔ 0,25 kg telah ditandai. Penerimaan request/UI dan tampilan dataset tetap terbuka sampai model dipakai layar terkait.
+Model/aturan dan parser kini dipakai editor, detail serta ringkasan sumber contoh. Mapper request menjaga quantity eksklusif, dan dataset PRD 9.4 diperiksa unit serta layar. Bukti penerimaan client ada di [laporan QA](ITERATION_1_QA.md); backend write nyata tetap integrasi berikutnya.
 
 ## Lanjutan pemetaan payload
 
@@ -28,8 +28,10 @@ Branch `codex/android-quantity-payload-a02` menambahkan `Quantity.toRequestField
 
 Tes request retry sesi sekarang memakai mapper ini pada body HTTP melalui MockWebServer. Lima tes baru memeriksa batas gram/count, g/kg koma/titik ke payload identik, pergantian jenis pada PATCH, dan null eksplisit meskipun opsi serializer menghilangkan null properti biasa. Kelimanya lulus pada jalur native tanpa rewrite HotSwan; seluruh 78 unit test debug dan lint debug lulus. Request fixture yang diulang setelah 401 mempertahankan body serta client_request_id identik.
 
-Repository write dan editor create/edit belum terhubung. Pengujian PATCH di sini memeriksa penggabungan field JSON sesuai kontrak, bukan update backend nyata. Checklist gabungan request/UI tetap terbuka. Sesuai arahan terbaru, layar boleh memakai sumber data dummy yang ditandai sambil menunggu implementasi backend.
+Pada PR #93 editor belum terhubung; branch lanjutan di bawah menyediakan create/edit dengan sumber contoh yang diizinkan pengguna. Pengujian PATCH memeriksa penggabungan field JSON sesuai kontrak, bukan update backend nyata.
 
 ## Batas dan tindak lanjut
 
-Formatter/QuantityInput belum dihubungkan ke editor atau statistik. DTO respons A03 dan mapper quantity request tersedia. Kontrak mengikuti rencana API; penggantian sumber dummy ke backend akan diverifikasi pada integrasi berikutnya. Tes domain/payload tidak membuktikan rendering atau TalkBack.
+Branch `codex/android-auth-navigation` menghubungkan QuantityInput/parser ke EditorDraft yang dipakai create/edit, serta formatter ke detail/beranda/statistik. DemoActivityStore menyediakan lima record PRD 9.4 dan demoSummary memisahkan handled/avoided, gram/benda serta denominator aktivitas. Live summary tidak dihitung dari halaman list parsial. Unit test memeriksa dataset/edit/idempotensi/draf; tes layar memeriksa angka 650 g, 1,4 kg, 2 benda serta denominator 1/2 dan 2/4.
+
+DTO respons A03 dan mapper quantity request tersedia. Kontrak mengikuti rencana API; penggantian sumber dummy ke backend akan diverifikasi pada integrasi berikutnya. Tes domain/payload tidak membuktikan rendering atau TalkBack.

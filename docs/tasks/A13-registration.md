@@ -1,6 +1,10 @@
 # A13 — Aturan registrasi dan timezone awal
 
-Issue [#46](https://github.com/waste-not-app/waste-not-android/issues/46) · branch `codex/android-auth-validation-a12-a13` · **In progress**. Layar S03 belum diimplementasikan.
+Issue [#46](https://github.com/waste-not-app/waste-not-android/issues/46) · **Siap review client**. Validator awal ada pada branch `codex/android-auth-validation-a12-a13`; wiring UI pada `codex/android-auth-navigation`.
+
+## Wiring S03 15 Oktober 2026
+
+Form berisi nama/email/password/konfirmasi dan timezone IANA awal yang terlihat. Password baru memakai ContentType.NewPassword; konfirmasi hanya di client. Validasi seluruh boundary memakai AccountInput yang sudah diuji; EMAIL_EXISTS dikaitkan dengan email dan tidak menghapus field lain. Adapter API tetap mendelegasikan register ke SessionRepository; demo secara eksplisit berlabel contoh dan tidak menerbitkan token. Tidak menambah checkbox dokumen yang belum tersedia. Uji VM penolakan invalid/duplikat serta tes perangkat fokus error, mismatch, IME dan sukses root lulus dengan gateway fixture. Hasil final ada di [laporan QA](ITERATION_1_QA.md).
 
 ## Perubahan yang sudah dikerjakan
 
@@ -8,7 +12,7 @@ Issue [#46](https://github.com/waste-not-app/waste-not-android/issues/46) · bra
 
 Hasil validasi memuat seluruh field invalid sebagai enum error, tanpa mengembalikan password/nama/email. Fungsi ini tidak menyimpan nilai atau mengirim request. Nama/email dinormalisasi pada repository; password dipertahankan persis. Batas nama profil pada DTO respons juga memakai Unicode code point agar nama yang valid saat registrasi tidak ditolak setelah API menerbitkan profil. Format email dan batas dukungannya dijelaskan pada [A12](A12-login.md).
 
-`initialAccountTimezone(deviceTimezoneId)` memilih ID timezone yang tersedia pada perangkat atau fallback Asia/Jakarta. Fungsi menerima ID secara eksplisit; tidak menyembunyikan pembacaan perangkat atau menulis preference. Label timezone dan pilihan yang terlihat masih harus dibuat pada layar. Backend B03 tetap perlu menyepakati validasi karakter dan timezone dengan client.
+`initialAccountTimezone(deviceTimezoneId)` memilih ID timezone yang tersedia pada perangkat atau fallback Asia/Jakarta. Fungsi menerima ID secara eksplisit; tidak menulis preference. Form menampilkan ID tersebut dan mengirim timezone melalui register; tes perangkat memeriksa timezone yang diterima gateway sama dengan profil sesudah sukses. Persistensi server tetap bagian integrasi B03.
 
 ## Pengujian
 
@@ -17,9 +21,9 @@ Tes ditambahkan untuk batas nama/password/email, karakter Unicode di luar BMP, w
 ## Pekerjaan berikutnya
 
 - [x] Jalankan 11 tes validasi native, seluruh 73 unit test debug, dan lint debug sebelum commit.
-- [ ] Buat field S03 dan pesan field Indonesia; hubungkan validator sebelum request.
-- [ ] Tampilkan timezone awal dan simpan pilihan pengguna melalui payload register.
-- [ ] Hubungkan EMAIL_EXISTS ke email tanpa menghapus field lain.
-- [ ] Batasi password/konfirmasi pada memori; uji process death, IME, autofill, dan font besar.
-- [ ] Hubungkan sesi yang diterbitkan API ke root Home dan uji Back.
+- [x] Buat field S03 dan pesan field Indonesia; hubungkan validator sebelum request.
+- [x] Tampilkan timezone awal dan kirim melalui payload register; persistensi backend belum diklaim.
+- [x] Hubungkan EMAIL_EXISTS ke email tanpa menghapus field lain.
+- [x] Batasi password/konfirmasi pada memori; IME/validasi/font besar dan hilangnya password pada process death diuji. Autofill ContentType tersedia; layanan password manager pihak ketiga belum diuji.
+- [x] Hubungkan state sesi gateway ke root Home; adapter produksi mendelegasikan penerbitan sesi ke repository, sementara uji UI memakai fixture eksplisit.
 - [ ] Verifikasi batas field, akun duplikat, timezone tersimpan, dan kontrak B03 nyata.

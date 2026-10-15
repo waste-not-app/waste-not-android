@@ -1,6 +1,12 @@
 # A04 — Credential storage dan refresh sesi
 
-Issue [#21](https://github.com/waste-not-app/waste-not-android/issues/21) · branch `codex/android-session-a04` · **In progress**.
+Issue [#21](https://github.com/waste-not-app/waste-not-android/issues/21) · branch `codex/android-session-a04` · **Siap review client**.
+
+## Wiring UI 15 Oktober 2026
+
+Branch `codex/android-auth-navigation` menambahkan AccountSession/RemoteAccountSession sebagai adapter tipis ke repository yang sudah diuji. DemoAccountSession hanya aktif melalui pilihan data contoh; tidak membuat JWT, menulis token atau memanggil server. MainNavigation mengikat root privat ke userId + epoch + mode demo dan memakai ViewModelStore entry akun untuk scope cache/job. Source checking/koneksi tidak merender entry akun lama. Root decorators tetap terpasang ketika target berganti agar store yang dipop dibersihkan.
+
+Delapan tes SessionViewModel lulus untuk validasi/single-flight, password in-memory, error field, demo eksplisit, bootstrap, cancellation lama dan hasil logout. Uji perangkat root/Back/isolasi cache sedang berjalan. Arahan pengguna mengizinkan dummy untuk tahap Android; bukti revoke/persistensi server tetap diverifikasi pada integrasi backend dan tidak diklaim oleh demo.
 
 ## Storage dan credential
 
@@ -35,7 +41,7 @@ Primitive mengikuti [Android Keystore](https://developer.android.com/privacy-and
   -Pandroid.testInstrumentationRunnerArguments.class=com.example.wastenot.data.local.KeystoreRefreshTokenStoreTest,com.example.wastenot.data.local.ApplicationContainerTest
 ```
 
-Pada pemeriksaan ini APK dipasang dan runner dipanggil melalui adb dengan selector class yang sama. Perangkat minimum API 24 belum diuji. AppContainer telah terhubung; root navigasi dan layar auth belum memakai implementasi sesi.
+Pada PR #91 awal APK dipasang dan runner dipanggil melalui adb dengan selector class yang sama di API 36. Lanjutan PR #94 dan branch auth/navigation menguji Keystore/container pada minimum API 24 serta menghubungkan adapter sesi ke root/auth. Bukti lintas task ada di [laporan QA Iteration 1](ITERATION_1_QA.md).
 
 CI juga membangun dan menyimpan APK instrumentasi agar kode tes perangkat diperiksa kompilasinya. Tes perangkat dijalankan lokal pada emulator; workflow saat ini belum menjalankan emulator otomatis di GitHub.
 
@@ -54,7 +60,7 @@ Fixture [auth-session.json](../../app/src/test/resources/contracts/auth-session.
 - [x] Batalkan pekerjaan akun dan cegah respons terlambat memulihkan credential/identitas setelah logout/ganti akun.
 - [x] Hubungkan session repository, network, dan Keystore melalui Application/AppContainer.
 - [x] Periksa debug penuh, regresi pembatalan storage, serta tes Application/container pada perangkat.
-- [ ] Hubungkan startup/login/logout dan root/private back stack pada UI A09/A11/A12/A13/A29.
+- [x] Hubungkan startup/login/logout dan root/private back stack pada UI A09/A11/A12/A13/A29; identitas memakai user ID dan epoch.
 - [ ] Verifikasi kontrak dan perilaku backend B03/B04 nyata, termasuk pencabutan server.
 
 Checkbox issue belum menyatakan task selesai. Catatan ini diperbarui setelah bukti berikutnya tersedia.

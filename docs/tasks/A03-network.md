@@ -25,4 +25,4 @@ Tiga APK lokal berhasil dibangun; 13 pemeriksaan environment/paket dan lima fixt
 
 ## Checklist issue dan tindak lanjut
 
-Implementasi client dan penerimaan fixture mempunyai bukti tes; issue tetap In review karena integrasi screen dan kesepakatan backend B01 masih terbuka. A04 menghubungkan AppContainer, credential storage serta refresh 401 terserialisasi; tes perangkat memastikan request privat tanpa sesi ditolak. Tidak ada klaim login melalui layar, backend deployed, atau penerimaan layar dari tes MockWebServer.
+Implementasi client dan penerimaan fixture mempunyai bukti tes; issue tetap terbuka untuk review. A04 menghubungkan AppContainer, credential storage serta refresh 401 terserialisasi; tes perangkat memastikan request privat tanpa sesi ditolak. Branch auth/navigation kemudian menghubungkan AccountSession/ActivityStore ke sesi serta list repository, dan memetakan jenis error ke pesan layar. Tes layar memakai gateway fixture/sumber contoh secara eksplisit; tidak mengklaim backend deployed. Bukti client terbaru ada di [laporan Iteration 1](ITERATION_1_QA.md); kesepakatan kontrak B01/B03/B04 tetap bagian integrasi backend.

@@ -1,6 +1,6 @@
 # A06: Tema dan font WasteNot
 
-Issue [#7](https://github.com/waste-not-app/waste-not-android/issues/7), branch `codex/android-theme-forms`, In progress.
+Issue [#7](https://github.com/waste-not-app/waste-not-android/issues/7), branch `codex/android-theme-forms`, Siap review client.
 
 ## Arah visual
 
@@ -32,8 +32,12 @@ Tes password A07 memeriksa teks layout yang benar-benar dirender; semantics pass
 
 - [x] Kontras pasangan teks utama, outline, dan gradien pada kedua tema.
 - [x] APK memuat lima font dan lisensi; native font loading pada minimum API 24.
-- [ ] Preview/perangkat untuk tema terang/gelap dan font 200%, tanpa clipping.
+- [x] Preview source dan perangkat untuk tema terang/gelap, font 200%, dock/rail dan form; lihat matriks QA serta batas layanan aksesibilitas.
 - [x] Pilihan sistem/terang/gelap pada root aplikasi dan kontrol tema tersimpan lokal.
-- [ ] Lint, unit test, build dan CI untuk perubahan final.
+- [x] Lint, unit test, build dan CI untuk fondasi tema/form pada PR #94.
 
-Beranda masih starter; navigasi lima tab, forms/auth, serta sumber data dummy dikerjakan pada task current iteration berikutnya. Tes pemilih tema 200% belum membuktikan seluruh layar pada font 200% atau pembacaan TalkBack. Catatan ini belum menyatakan UI final selesai.
+CI PR #94 head `db3d6c8` berhasil pada [push](https://github.com/waste-not-app/waste-not-android/actions/runs/38572316555) dan [PR](https://github.com/waste-not-app/waste-not-android/actions/runs/38572331872). Report CI yang diunduh berisi 78 unit test, 0 gagal/skip; gate native minimum SDK/font/OFL serta matrix APK berhasil. Lint staging/release dan seluruh build matrix juga lulus lokal. Verifikasi tambahan lokal melalui Gradle help terkena timeout host saat boot emulator API 36; gate yang sama lulus CI. UI perangkat API 36 belum diklaim diuji.
+
+Wiring A09 terbaru menempatkan pemilih tema pada auth dan Profil; beranda starter diganti sumber data contoh berlabel. Tes perangkat menjalankan auth, lima tab, create/edit, pemilih tema, dan keyboard pada font 200%. Rail memperlebar diri pada font besar tanpa mengecilkan ukuran teks sistem.
+
+Pada head PR #94 beranda masih starter; penggantinya dan hasil screenshot/layout terbaru didokumentasikan pada [laporan QA](ITERATION_1_QA.md). Uji semantics/fokus tidak diklaim sebagai pengujian layanan TalkBack atau password manager pihak ketiga.

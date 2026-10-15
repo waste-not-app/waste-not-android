@@ -1,0 +1,35 @@
+{
+  "device": "dedicated API 24 x86_64 AVD",
+  "unit_tests": 99,
+  "unit_failures": 0,
+  "native_cases": 22,
+  "native_executions": 40,
+  "runs": [
+    {
+      "case": "final-default20",
+      "passed": 20
+    },
+    {
+      "case": "final-font200-9",
+      "passed": 9
+    },
+    {
+      "case": "final-wide600-1",
+      "passed": 1
+    },
+    {
+      "case": "final-landscape640-2-reachable",
+      "passed": 2
+    },
+    {
+      "case": "final-offline-startup-phone200-5",
+      "passed": 5
+    },
+    {
+      "case": "final-offline-startup-landscape200-3",
+      "passed": 3
+    }
+  ],
+  "backend": "fixture / explicit demo, no production proof",
+  "ci_device_execution": false
+}

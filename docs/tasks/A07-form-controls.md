@@ -1,6 +1,6 @@
 # A07: Komponen form dan pilihan
 
-Issue [#10](https://github.com/waste-not-app/waste-not-android/issues/10), In progress.
+Issue [#10](https://github.com/waste-not-app/waste-not-android/issues/10), Siap review client.
 
 ## Perubahan
 
@@ -13,8 +13,8 @@ Issue [#10](https://github.com/waste-not-app/waste-not-android/issues/10), In pr
 
 ## Verifikasi
 
-Kompilasi dan build native lulus. Tiga tes interaksi lulus di API 24: 250 g → 0.25 kg tetap 250 integer gram, perpindahan benda mengosongkan berat dan menolak 2,5 benda lewat parser yang sama; password berganti antara bullet dan teks layout asli; loading menonaktifkan submit; metode awal kosong dan setiap ketukan hanya memilih satu metode. Suite perangkat gabungan A06/A07/Keystore/container berisi 11 tes dan lulus dalam 13,616 detik.
+Kompilasi dan build native lulus. Pada PR #94 tiga tes interaksi lulus di API 24: 250 g → 0.25 kg tetap 250 integer gram, perpindahan benda mengosongkan berat dan menolak 2,5 benda lewat parser yang sama; password berganti antara bullet dan teks layout asli; loading menonaktifkan submit; metode awal kosong dan setiap ketukan hanya memilih satu metode. Suite perangkat gabungan A06/A07/Keystore/container berisi 11 tes dan lulus dalam 13,616 detik.
 
-Keyboard/IME pada layar final, fokus error, seluruh label kategori/picker, TalkBack dan wiring create/edit masih dikerjakan. Preview source belum dianggap bukti rendering perangkat. Komponen ini belum menutup seluruh kriteria issue.
+Komponen sekarang dipakai oleh Login/Register, filter/range, dan satu LogEditorScreen untuk create/edit. QuantityField menerima inputModifier agar fokus error menuju text field yang benar, bukan chip satuan. Alur perangkat memeriksa perpindahan 0,25 kg ke benda, nilai yang dikosongkan, simpan/edit, kalender buka/batal, serta error login di atas keyboard nyata pada font 200%. Bukti final dan batas uji pembaca layar ada di [laporan QA](ITERATION_1_QA.md). Preview tetap source pendukung, bukan pengganti bukti perangkat.
 
-Time picker belum dibuat karena activity_date pada kontrak core hanya tanggal; kontrol waktu ditambahkan bersama task pengingat jika capability tersedia.
+DateField kini menggulir isi picker pada jendela pendek. Tes keempat memeriksa tanggal di luar batas, Apply/Cancel, pergantian bulan dan pilihan baris terbawah, termasuk landscape/font 200%. Time picker belum dibuat karena activity_date pada kontrak core hanya tanggal; kontrol waktu ditambahkan bersama task pengingat jika capability tersedia.

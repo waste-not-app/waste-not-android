@@ -24,4 +24,4 @@ Audit starter, konfigurasi environment, dokumentasi, pemeriksaan release, dan in
 
 ## Batas dan tindak lanjut
 
-Belum ada uji perangkat minimum API 24, penerimaan seluruh layar, atau backend nyata. URL staging/release dan identitas publik memerlukan keputusan tim. Credential signing yang pernah berada di riwayat perlu ditinjau pengelola tanpa mengganti certificate secara sembarang. Rincian operasi ada di [CICD_SETUP.md](../CICD_SETUP.md).
+Fondasi dilanjutkan oleh root/auth/editor pada `codex/android-auth-navigation`; starter HomeScreen dan callback TODO sudah diganti. APK native minimum API 24 kini diperiksa oleh gate paket dan uji perangkat di [laporan Iteration 1](ITERATION_1_QA.md). Gate juga memastikan adjustResize berada pada MainActivity, bukan application. URL staging/release dan identitas publik masih memerlukan keputusan tim. Credential signing yang pernah berada di riwayat perlu ditinjau pengelola tanpa mengganti certificate secara sembarang. Rincian operasi ada di [CICD_SETUP.md](../CICD_SETUP.md).
