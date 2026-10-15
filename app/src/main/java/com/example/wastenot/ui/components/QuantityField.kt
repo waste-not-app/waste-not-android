@@ -26,6 +26,7 @@ fun QuantityField(
     error: String? = null,
     avoided: Boolean = false,
     enabled: Boolean = true,
+    inputModifier: Modifier = Modifier,
 ) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.quantity_unit), style = MaterialTheme.typography.titleSmall)
@@ -44,7 +45,7 @@ fun QuantityField(
             value = input.rawText,
             onValueChange = { onChange(input.copy(rawText = it)) },
             label = stringResource(if (avoided) R.string.quantity_avoided else if (input.unit == QuantityUnit.ITEM) R.string.quantity_count else R.string.quantity_weight),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = inputModifier.fillMaxWidth(),
             helper = stringResource(if (avoided) R.string.reduce_separate else if (input.unit == QuantityUnit.ITEM) R.string.count_helper else R.string.weight_helper),
             errorText = error,
             enabled = enabled,

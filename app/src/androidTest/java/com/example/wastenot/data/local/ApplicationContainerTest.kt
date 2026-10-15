@@ -22,5 +22,7 @@ class ApplicationContainerTest {
         assertSame(first.sessions, app.container.sessions)
         assertEquals(SessionState.Checking, first.sessions.state.value)
         assertEquals(ApiFailureKind.UNAUTHENTICATED, (first.core.metadata() as ApiResult.Failure).error.kind)
+        first.accountSession.bootstrap()
+        assertEquals(SessionState.SignedOut(), first.sessions.state.value)
     }
 }

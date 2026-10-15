@@ -33,10 +33,12 @@ class MainActivity : ComponentActivity() {
           statusBarStyle = SystemBarStyle.auto(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT) { dark },
           navigationBarStyle = SystemBarStyle.auto(android.graphics.Color.argb(230, 255, 255, 255), android.graphics.Color.argb(128, 0, 0, 0)) { dark },
         )
+        if (android.os.Build.VERSION.SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
       }
       WasteNotTheme(darkTheme = dark) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          MainNavigation(themeMode = mode, onThemeModeChange = { mode = it; preferences.write(it) })
+          val container = (application as WasteNotApplication).container
+          MainNavigation(container.accountSession, container.core, mode, { mode = it; preferences.write(it) }, Modifier.fillMaxSize())
         }
       }
     }

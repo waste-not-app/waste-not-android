@@ -3,4 +3,15 @@ package com.example.wastenot
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-@Serializable data object Main : NavKey
+@Serializable data object SessionRoot : NavKey
+@Serializable data object AuthRoot : NavKey
+@Serializable data class AccountRoot(val userId: String, val epoch: Long, val demo: Boolean) : NavKey
+@Serializable data object Login : NavKey
+@Serializable data object Register : NavKey
+@Serializable data object Home : NavKey
+@Serializable data object History : NavKey
+@Serializable data object Guide : NavKey
+@Serializable data object Statistics : NavKey
+@Serializable data object Profile : NavKey
+@Serializable data class LogDetail(val id: String) : NavKey
+@Serializable data class LogEditor(val logId: String?, val requestId: String) : NavKey

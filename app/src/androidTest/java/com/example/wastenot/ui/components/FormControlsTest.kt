@@ -5,15 +5,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasSetTextAction
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.TextLayoutResult
@@ -27,6 +32,7 @@ import com.example.wastenot.theme.WasteNotTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDate
 
 class FormControlsTest {
     @get:Rule val compose = createComposeRule()
@@ -69,6 +75,18 @@ class FormControlsTest {
         return results.single().layoutInput.text.text
     }
 
+    private fun visibleCalendarDay(label: String): SemanticsNodeInteraction {
+        val day = compose.onNodeWithText(label)
+        val target = with(compose.density) { 48.dp.toPx() } - 1
+        repeat(5) {
+            if (day.fetchSemanticsNode().boundsInWindow.height >= target) return day
+            // The month has a horizontal LazyRow; scroll the outer vertical viewport by touch.
+            compose.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange))
+                .performTouchInput { swipeUp() }
+        }
+        error("Calendar day is not fully reachable: $label")
+    }
+
     @Test fun methodChoiceSelectsOneWithoutFillingAnInitialChoice() {
         val selected = mutableStateOf<DisposalMethod?>(null)
         compose.setContent { WasteNotTheme { MethodSelector(selected.value, { selected.value = it }) } }
@@ -77,5 +95,27 @@ class FormControlsTest {
         compose.runOnIdle { assertEquals(DisposalMethod.RECYCLE, selected.value) }
         compose.onNodeWithText("Reduce").performClick().assertIsSelected()
         compose.runOnIdle { assertEquals(DisposalMethod.REDUCE, selected.value) }
+    }
+
+    @Test fun calendarAppliesLocalDateAndRejectsFutureDay() {
+        val today = LocalDate.of(2026, 9, 21)
+        val selected = mutableStateOf(today)
+        compose.setContent { WasteNotTheme { DateField(selected.value, today.minusDays(30), today, { selected.value = it }) } }
+        compose.onNodeWithText("21 Sep 2026").performClick()
+        compose.onNodeWithText("Tuesday, September 22, 2026").assertIsNotEnabled()
+        visibleCalendarDay("Sunday, September 20, 2026").performClick()
+        compose.onNodeWithText("Sunday, September 20, 2026").assertIsSelected()
+        compose.onNodeWithText("Terapkan").performClick()
+        compose.runOnIdle { assertEquals(LocalDate.of(2026, 9, 20), selected.value) }
+        compose.onNodeWithText("20 Sep 2026").performClick()
+        visibleCalendarDay("Saturday, September 19, 2026").performClick()
+        compose.onNodeWithText("Batal").performClick()
+        compose.runOnIdle { assertEquals(LocalDate.of(2026, 9, 20), selected.value) }
+        compose.onNodeWithText("20 Sep 2026").performClick()
+        compose.onNodeWithContentDescription("Change to previous month").performScrollTo().performClick()
+        compose.onNodeWithText("Friday, August 21, 2026").assertIsNotEnabled()
+        visibleCalendarDay("Monday, August 31, 2026").performClick()
+        compose.onNodeWithText("Terapkan").performClick()
+        compose.runOnIdle { assertEquals(LocalDate.of(2026, 8, 31), selected.value) }
     }
 }
