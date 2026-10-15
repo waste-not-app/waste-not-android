@@ -2,7 +2,7 @@ package com.example.wastenot.theme
 
 import androidx.compose.ui.graphics.Color
 
-// WasteNot Design System v1.3 — Light
+// WasteNot Design System v1.3: Light
 val Background = Color(0xFFF4F7F2)
 val Surface = Color(0xFFFFFFFF)
 val SurfaceVariant = Color(0xFFE8EFE7)
@@ -18,12 +18,24 @@ val Accent = Color(0xFFD2EF69)
 val OnAccent = Color(0xFF24390E)
 val Error = Color(0xFFA82832)
 val ErrorContainer = Color(0xFFFDECEE)
+val OnError = Color(0xFFFFFFFF)
+val OnErrorContainer = Color(0xFFA82832)
+val Warning = Color(0xFF735117)
+val WarningContainer = Color(0xFFFAF0D7)
 
 // Pine gradient stops
 val Pine900 = Color(0xFF123F30)
 val Pine700 = Color(0xFF226948)
+val SummaryText = Color(0xFFFFFFFF)
+val SummarySecondaryText = Color(0xFFDBEBDC)
+val LimeStart = Color(0xFFEDF8BE)
+val LimeEnd = Color(0xFFC9EB72)
+val ActionStart = Color(0xFF226948)
+val ActionEnd = Color(0xFF164B35)
+val CanvasStart = Color(0xFFFCFDF9)
+val CanvasEnd = Color(0xFFDFEEDB)
 
-// WasteNot Design System v1.3 — Dark
+// WasteNot Design System v1.3: Dark
 val BackgroundDark = Color(0xFF101B15)
 val SurfaceDark = Color(0xFF19281F)
 val SurfaceVariantDark = Color(0xFF26392D)
@@ -35,3 +47,12 @@ val PrimaryDark = Color(0xFFB7DEB8)
 val OnPrimaryDark = Color(0xFF122C1C)
 val PrimaryContainerDark = Color(0xFF274C35)
 val OnPrimaryContainerDark = Color(0xFFD5EDD3)
+val ErrorDark = Color(0xFFFFB4BA)
+val OnErrorDark = Color(0xFF380B12)
+val ErrorContainerDark = Color(0xFF4A232B)
+val WarningDark = Color(0xFFEDD28E)
+val WarningContainerDark = Color(0xFF3B321C)
+val ActionStartDark = Color(0xFFD0EBC1)
+val ActionEndDark = Color(0xFFADD8B1)
+val CanvasStartDark = Color(0xFF17261D)
+val CanvasEndDark = Color(0xFF203D2B)

@@ -1,0 +1,38 @@
+package com.example.wastenot.data.repository
+
+import com.example.wastenot.data.network.ApiFailure
+import com.example.wastenot.data.network.ApiFailureKind
+import com.example.wastenot.data.network.ApiResult
+import com.example.wastenot.model.DisposalMethod
+import com.example.wastenot.model.Quantity
+import com.example.wastenot.model.WasteCategory
+import com.example.wastenot.model.WasteLog
+import java.time.LocalDate
+
+data class ActivityInput(
+    val category: WasteCategory,
+    val method: DisposalMethod,
+    val quantity: Quantity,
+    val date: LocalDate,
+    val notes: String,
+)
+
+interface ActivityStore {
+    val isDemo: Boolean
+    val referenceDate: LocalDate?
+    suspend fun load(): ApiResult<List<WasteLog>>
+    suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<WasteLog>
+    suspend fun update(id: String, version: Int, input: ActivityInput): ApiResult<WasteLog>
+    fun clear()
+}
+
+class RemoteActivityStore(private val core: CoreRepository) : ActivityStore {
+    override val isDemo = false
+    override val referenceDate: LocalDate? = null
+    override suspend fun load() = core.wasteLogs()
+    // shortcut: writes await the log API integration; UI retains the draft on this failure.
+    override suspend fun create(input: ActivityInput, clientRequestId: String) = unavailable()
+    override suspend fun update(id: String, version: Int, input: ActivityInput) = unavailable()
+    override fun clear() = Unit
+    private fun unavailable() = ApiResult.Failure(ApiFailure(ApiFailureKind.NOT_CONFIGURED))
+}

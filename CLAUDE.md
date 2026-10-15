@@ -8,22 +8,26 @@ Dokumen ini adalah panduan konteks utama untuk AI coding agent (Claude, Gemini, 
 
 ## Dokumen referensi wajib
 
-Semua desain dan spesifikasi produk berada di [`docs/design-kit/`](docs/design-kit/) **(v1.3 · 28 Sep 2026)**. **Baca dokumen yang relevan sebelum menulis kode UI, API client, atau logika domain.**
+Semua desain dan spesifikasi produk berada di [`docs/WasteNot-Product-Design-Kit update/WasteNot/`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/) **(v1.3 · 28 Sep 2026)**. **Baca dokumen yang relevan sebelum menulis kode UI, API client, atau logika domain.**
 
 | Dokumen | Kapan harus dibaca |
 |---|---|
-| [`AI_SPEC.md`](docs/design-kit/AI_SPEC.md) | ★ Setiap kali menyentuh fitur AI: kamera, YOLO inference, LLM, mapping, confidence, state machine, privasi |
-| [`DESIGN.md`](docs/design-kit/DESIGN.md) | Setiap kali mengerjakan UI, theme, warna, tipografi, spacing, komponen (incl. C35–C39 AI), animasi, aksesibilitas |
-| [`SCREEN_SPEC.md`](docs/design-kit/SCREEN_SPEC.md) | Setiap kali membuat/memodifikasi layar (S01–S25 incl. AI scan S21–S25), komponen (C01–C39), atau dialog |
-| [`ARCHITECTURE.md`](docs/design-kit/ARCHITECTURE.md) | Setiap kali menyentuh navigasi, ViewModel, Repository, state management, DI, storage, atau AI extension §13 |
-| [`API.md`](docs/design-kit/API.md) | Setiap kali membuat/memodifikasi network layer, DTO, Retrofit interface, business rule, atau AI endpoints §10 |
-| [`PRD.md`](docs/design-kit/PRD.md) | Untuk memahami aturan domain: definisi metrik, unit, XP, Reduce vs Recycle, scope MVP + AI increment |
-| [`IMPLEMENTATION_PLAN.md`](docs/design-kit/IMPLEMENTATION_PLAN.md) | Untuk prioritas tugas: backlog 4 minggu core + AI stages AI-01–AI-08, acceptance tests |
-| [`QA.md`](docs/design-kit/QA.md) | Untuk memahami batas-batas yang sudah diverifikasi di prototype HTML |
+| [`AI_SPEC.md`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/AI_SPEC.md) | ★ Setiap kali menyentuh fitur AI: kamera, YOLO inference, LLM, mapping, confidence, state machine, privasi |
+| [`DESIGN.md`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/DESIGN.md) | Setiap kali mengerjakan UI, theme, warna, tipografi, spacing, komponen (incl. C35–C39 AI), animasi, aksesibilitas |
+| [`SCREEN_SPEC.md`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/SCREEN_SPEC.md) | Setiap kali membuat/memodifikasi layar (S01–S25 incl. AI scan S21–S25), komponen (C01–C39), atau dialog |
+| [`ARCHITECTURE.md`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/ARCHITECTURE.md) | Setiap kali menyentuh navigasi, ViewModel, Repository, state management, DI, storage, atau AI extension §13 |
+| [`API.md`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/API.md) | Setiap kali membuat/memodifikasi network layer, DTO, Retrofit interface, business rule, atau AI endpoints §10 |
+| [`PRD.md`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/PRD.md) | Untuk memahami aturan domain: definisi metrik, unit, XP, Reduce vs Recycle, scope MVP + AI increment |
+| [`IMPLEMENTATION_PLAN.md`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/IMPLEMENTATION_PLAN.md) | Untuk prioritas tugas: backlog 4 minggu core + AI stages AI-01–AI-08, acceptance tests |
+| [`QA.md`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/QA.md) | Untuk memahami batas-batas yang sudah diverifikasi di prototype HTML |
 | [`DEV_PLUGINS.md`](docs/DEV_PLUGINS.md) | Panduan setup, shortcuts, dan perintah plugin dev (HotSwan, NavGraph, ADB Idea, JSON to Kotlin) |
 | [`CICD_SETUP.md`](docs/CICD_SETUP.md) | Panduan setup GitHub Secrets, pipeline CI/CD GitHub Actions, dan deployment ke VM oktaavsm.bccdev.id |
 
-Untuk review visual interaktif (termasuk AI scan flow): buka [`docs/design-kit/design-system.html`](docs/design-kit/design-system.html) di browser — tidak perlu build atau koneksi internet.
+Untuk review visual interaktif (termasuk AI scan flow): buka [`docs/WasteNot-Product-Design-Kit update/WasteNot/design-system.html`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/design-system.html) di browser — tidak perlu build atau koneksi internet.
+
+## Kondisi implementasi
+
+Startup, form Masuk/Daftar, sesi Keystore/refresh, lima back stack, tema/form bersama, editor manual dan logout sudah terhubung. Mode contoh dipilih eksplisit dan menyediakan pencatatan/edit/statistik lokal berlabel. Adapter HTTP tersedia; write aktivitas/ringkasan backend nyata, konten panduan dan AI masih menunggu integrasi. Untuk batas implementasi dan bukti pengujian, baca [catatan task](docs/tasks/README.md) serta [QA Iteration 1](docs/tasks/ITERATION_1_QA.md).
 
 ## Tech stack
 
@@ -35,7 +39,7 @@ Untuk review visual interaktif (termasuk AI scan flow): buka [`docs/design-kit/d
 | State | ViewModel + StateFlow (UDF) |
 | Network | Retrofit + OkHttp (lihat API.md) |
 | Camera | CameraX (ImageCapture + lifecycle-aware, untuk AI scan) |
-| Local storage | DataStore (preferences + draft) |
+| Local storage | SharedPreferences untuk tema, Saver untuk draf UI, Keystore untuk refresh token |
 | DI | Constructor injection + AppContainer sederhana |
 | AGP | 9.0.1, Gradle 9.1.0, Kotlin 2.3.20, Compose BOM 2026.03.01 |
 | Min SDK | 24, Compile/Target SDK 36 |
@@ -53,15 +57,15 @@ Untuk generate/export nav graph: `./gradlew :app:generateNavGraph` atau `./gradl
 ## Aturan penting
 
 ### Desain & UI
-- Semua token warna, typography, dan spacing **harus** mengacu ke [`DESIGN.md §2–4`](docs/design-kit/DESIGN.md). Jangan hardcode hex color di composable.
+- Semua token warna, typography, dan spacing **harus** mengacu ke [`DESIGN.md §2–4`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/DESIGN.md). Jangan hardcode hex color di composable.
 - Theme Material 3: `WasteNotTheme` (di `app/src/main/java/com/example/wastenot/theme/`). Dynamic color **dimatikan**.
-- Font: **Plus Jakarta Sans** saja. File font ada di [`docs/design-kit/assets/fonts/`](docs/design-kit/assets/fonts/).
+- Font: **Plus Jakarta Sans** saja. File font ada di [`docs/WasteNot-Product-Design-Kit update/WasteNot/assets/fonts/`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/assets/fonts/).
 - Touch target minimal **48 dp**. Form tidak boleh tertutup keyboard. Edge-to-edge dengan inset yang benar.
-- Warna dock navigasi: glassmorphism/kaca sesuai [`DESIGN.md §2 Material v1.1`](docs/design-kit/DESIGN.md). Baseline opak tetap harus berfungsi.
+- Warna dock navigasi: glassmorphism/kaca sesuai [`DESIGN.md §2 Material v1.1`](docs/WasteNot-Product-Design-Kit%20update/WasteNot/DESIGN.md). Baseline opak tetap harus berfungsi.
 
 ### Domain & metrik
 - **Reduce** = benda yang dihindari (avoided_count). Tidak menambah total sampah yang ditangani.
-- **Recycling rate** = weight_g Recycle / total weight_g semua metode selain Reduce. Null jika tidak ada data, bukan 0 atau NaN.
+- **Recycling rate** = jumlah aktivitas RECYCLE / jumlah aktivitas REUSE+RECYCLE+TRASH × 100. Denominator nol menghasilkan null. Berat/count/Reduce tetap terpisah; aturan kanonik ada di PRD §9.2.
 - **XP**: 10 per log; deduct saat delete. Hitung dari catatan aktif, bukan cache tersimpan.
 - Unit: berat dalam **gram** (integer), jumlah benda integer. Jangan konversi count ke kilogram.
 - Semua angka penting berasal dari server, bukan dihitung ulang di client secara mandiri.
@@ -82,7 +86,7 @@ Untuk generate/export nav graph: `./gradlew :app:generateNavGraph` atau `./gradl
 - Satu Activity (`MainActivity`), satu module (`:app`), package by feature.
 - ViewModel + StateFlow + UDF. Jangan simpan context, Activity, atau NavController di ViewModel.
 - Route hanya berisi primitive/serializable ID, bukan seluruh objek.
-- Password/refresh token: **hanya** di Android Keystore / secure storage. Jangan di DataStore atau SavedStateHandle.
+- Password hanya in-memory selama form aktif. Access token di memori; refresh token memakai penyimpanan berbasis Android Keystore dan dikecualikan backup. DataStore/SavedStateHandle hanya untuk state nonrahasia.
 - Retrofit interceptor: log hanya status/durasi/request-id, tidak pernah log Authorization header atau payload pribadi.
 
 ### Kualitas & safety
