@@ -4,6 +4,8 @@ Setiap task yang dikerjakan memiliki catatan perubahan, bukti pengujian, dan pek
 
 Bukti lintas task, batas sumber contoh/backend, regresi yang diperbaiki, dan langkah mengulang uji tersedia di [QA Iteration 1](ITERATION_1_QA.md).
 
+Temuan dan koreksi sebelum penggabungan PR #88–#95 tersedia di [review Iteration 1](PR_REVIEW.md).
+
 | Task | Issue | Catatan | Progres |
 |---|---|---|---|
 | A01 Fondasi dan environment | [#3](https://github.com/waste-not-app/waste-not-android/issues/3) | [A01](A01-foundation.md) | Implementasi dan startup diperiksa; review PR #88 |

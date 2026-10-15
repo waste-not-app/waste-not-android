@@ -60,7 +60,7 @@ class DemoActivityStore(private val zone: ZoneId) : ActivityStore {
         if (old.version != version) return failure(ApiFailureKind.VERSION_CONFLICT)
         if (!valid(input, old.activityDate)) return failure(ApiFailureKind.VALIDATION)
         val updated = old.copy(category = input.category, method = input.method, quantity = input.quantity,
-            activityDate = input.date, notes = input.notes, version = old.version + 1, updatedAt = instant)
+            activityDate = input.date, notes = input.notes, version = old.version + 1, updatedAt = maxOf(instant, old.updatedAt).plusSeconds(1))
         records[id] = updated
         return ApiResult.Success(updated)
     }

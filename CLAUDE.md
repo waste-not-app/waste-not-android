@@ -27,7 +27,7 @@ Untuk review visual interaktif (termasuk AI scan flow): buka [`docs/WasteNot-Pro
 
 ## Kondisi implementasi
 
-Repo baru memiliki starter, theme awal dan Beranda dengan data contoh. Auth, HTTP client, pencatatan, statistik dan AI pada design kit masih target pekerjaan. Gunakan kode serta hasil pengujian sebagai bukti implementasi.
+Startup, form Masuk/Daftar, sesi Keystore/refresh, lima back stack, tema/form bersama, editor manual dan logout sudah terhubung. Mode contoh dipilih eksplisit dan menyediakan pencatatan/edit/statistik lokal berlabel. Adapter HTTP tersedia; write aktivitas/ringkasan backend nyata, konten panduan dan AI masih menunggu integrasi. Untuk batas implementasi dan bukti pengujian, baca [catatan task](docs/tasks/README.md) serta [QA Iteration 1](docs/tasks/ITERATION_1_QA.md).
 
 ## Tech stack
 
@@ -39,7 +39,7 @@ Repo baru memiliki starter, theme awal dan Beranda dengan data contoh. Auth, HTT
 | State | ViewModel + StateFlow (UDF) |
 | Network | Retrofit + OkHttp (lihat API.md) |
 | Camera | CameraX (ImageCapture + lifecycle-aware, untuk AI scan) |
-| Local storage | DataStore (preferences + draft) |
+| Local storage | SharedPreferences untuk tema, Saver untuk draf UI, Keystore untuk refresh token |
 | DI | Constructor injection + AppContainer sederhana |
 | AGP | 9.0.1, Gradle 9.1.0, Kotlin 2.3.20, Compose BOM 2026.03.01 |
 | Min SDK | 24, Compile/Target SDK 36 |

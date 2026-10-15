@@ -37,6 +37,7 @@ class EditorDraft(val original: EditorValues) {
 
     fun validate(referenceDate: LocalDate): ActivityInput? {
         val current = values
+        val notes = current.notes.trim()
         val quantity = parseQuantity(current.quantity.rawText, current.quantity.unit)
         val found = buildMap {
             if (current.method == null) put(EditorField.METHOD, R.string.error_choose_method)
@@ -48,12 +49,12 @@ class EditorDraft(val original: EditorValues) {
                 QuantityParseResult.Invalid.OUT_OF_RANGE -> R.string.error_quantity_range
             })
             if (!ActivityDates.canSave(current.date, referenceDate, if (original.version != null) original.date else null)) put(EditorField.DATE, R.string.error_activity_date)
-            if (current.notes.length > 500) put(EditorField.NOTES, R.string.error_notes_length)
+            if (notes.length > 500) put(EditorField.NOTES, R.string.error_notes_length)
         }
         errors = found
         if (found.isNotEmpty()) { focusRequest++; return null }
-        return ActivityInput(checkNotNull(values.category), checkNotNull(values.method),
-            (quantity as QuantityParseResult.Valid).quantity, values.date, values.notes)
+        return ActivityInput(checkNotNull(current.category), checkNotNull(current.method),
+            (quantity as QuantityParseResult.Valid).quantity, current.date, notes)
     }
 
     companion object {

@@ -89,14 +89,14 @@ private fun SummaryBlock(summary: WasteSummary, title: String) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(title, color = SummarySecondaryText)
-            Text(formatted(WasteFormat.weight(summary.handled.weightGrams)), color = SummaryText, style = MaterialTheme.typography.displayLarge)
+            Text(formatted(WasteFormat.weight(summary.handled.weightGrams, summary = true)), color = SummaryText, style = MaterialTheme.typography.displayLarge)
             if (summary.handled.itemCount > 0) Text(stringResource(R.string.handled_items, WasteFormat.integer(summary.handled.itemCount)), color = SummaryText)
         }
         if (summary.avoided.itemCount > 0 || summary.avoided.weightGrams > 0) Surface(color = MaterialTheme.colorScheme.tertiaryContainer,
             contentColor = MaterialTheme.colorScheme.onTertiaryContainer, shape = MaterialTheme.shapes.medium) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 if (summary.avoided.itemCount > 0) Text(stringResource(R.string.avoided_items, WasteFormat.integer(summary.avoided.itemCount)), style = MaterialTheme.typography.titleLarge)
-                if (summary.avoided.weightGrams > 0) Text(stringResource(R.string.avoided_weight, formatted(WasteFormat.weight(summary.avoided.weightGrams))))
+                if (summary.avoided.weightGrams > 0) Text(stringResource(R.string.avoided_weight, formatted(WasteFormat.weight(summary.avoided.weightGrams, summary = true))))
                 Text(stringResource(R.string.reduce_separate), style = MaterialTheme.typography.bodySmall)
             }
         }

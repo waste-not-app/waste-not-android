@@ -4,7 +4,7 @@ WasteNot membantu pengguna mencatat aktivitas Reduce, Reuse, Recycle dan Trash, 
 
 ## Status implementasi
 
-Repo memiliki satu module `:app`, Navigation 3, theme awal dan Beranda dengan data contoh. Fondasi environment/CI, model dan parser, transport HTTP/fixture, serta repository sesi dengan refresh token berbasis Android Keystore sudah tersedia. Application/AppContainer menghubungkan network, penyimpanan credential dan repository; layar belum memakai alur sesi tersebut. Autentikasi UI, pencatatan, statistik dan AI masih dikerjakan sesuai backlog. Mockup HTML adalah referensi desain dan simulasi.
+Repo memiliki satu module `:app`, Navigation 3, tema terang/gelap, form bersama, transport HTTP dan penyimpanan sesi berbasis Android Keystore. Startup, Masuk/Daftar, lima tab, editor manual dan logout terhubung ke alur sesi. Pilihan **Lihat data contoh** membuka dataset berlabel untuk mencoba pencatatan, edit dan statistik lokal. Integrasi write/ringkasan backend nyata, konten panduan dan AI masih mengikuti backlog; adapter produksi tidak memalsukan simpan berhasil. Mockup HTML menjadi referensi desain. Bukti implementasi dan batas pengujian ada di [QA Iteration 1](docs/tasks/ITERATION_1_QA.md).
 
 - [Roadmap dan seluruh tugas](https://github.com/waste-not-app/waste-not-android/issues/2)
 - [Kanban iterasi berjalan](https://github.com/orgs/waste-not-app/projects/1/views/1)

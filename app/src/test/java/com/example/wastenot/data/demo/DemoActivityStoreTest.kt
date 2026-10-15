@@ -70,6 +70,20 @@ class DemoActivityStoreTest {
         assertNotEquals(first, next)
     }
 
+    @Test fun editsKeepCreationTimeAndAdvanceTheDemoUpdateTime() = runTest {
+        val source = store()
+        val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE, Quantity.Weight.of(255), source.referenceDate, "contoh")
+        val created = (source.create(input, UUID.randomUUID().toString()) as ApiResult.Success).value
+        val updated = (source.update(created.id, created.version, input.copy(notes = "koreksi")) as ApiResult.Success).value
+        assertEquals(created.createdAt, updated.createdAt)
+        assertTrue(updated.updatedAt > created.updatedAt)
+        val next = (source.update(updated.id, updated.version, input.copy(notes = "koreksi kedua")) as ApiResult.Success).value
+        assertEquals(created.createdAt, next.createdAt)
+        assertTrue(next.updatedAt > updated.updatedAt)
+        assertEquals(3, next.version)
+        assertEquals(6, source.load().value.size)
+    }
+
     @Test fun reduceOnlyHasNoHandledRateAndNoInventedGramConversion() = runTest {
         val source = store()
         val reduce = source.load().value.filter { it.method == DisposalMethod.REDUCE }

@@ -64,6 +64,22 @@ class EditorDraftTest {
         assertTrue(EditorField.DATE in draft.errors)
     }
 
+    @Test fun notesAreTrimmedBeforeTheLimitAndPayloadForCreateAndEdit() {
+        val valid = EditorDraft.from(log(), today).values
+        val note = "a".repeat(497) + "  b"
+        listOf(EditorDraft.from(null, today), EditorDraft.from(log(), today)).forEach { draft ->
+            val raw = "\t\n  $note  \n"
+            draft.change(EditorField.NOTES, valid.copy(notes = raw, version = draft.original.version))
+            assertEquals(note, draft.validate(today)!!.notes)
+            assertEquals(raw, draft.values.notes)
+            draft.change(EditorField.NOTES, draft.values.copy(notes = " \t\n "))
+            assertEquals("", draft.validate(today)!!.notes)
+            draft.change(EditorField.NOTES, draft.values.copy(notes = " $note! "))
+            assertNull(draft.validate(today))
+            assertTrue(EditorField.NOTES in draft.errors)
+        }
+    }
+
     private fun log() = WasteLog("00000000-0000-4000-8000-000000000001", WasteCategory.PLASTIC, DisposalMethod.RECYCLE,
         Quantity.Weight.of(250), today, ZoneId.of("Asia/Jakarta"), "", 1, Instant.EPOCH, Instant.EPOCH)
 }

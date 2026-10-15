@@ -60,9 +60,11 @@ Hari kalender Material 3 diekspos sebagai teks tanggal lengkap. Scroll-to pada h
 
 ## Verifikasi build dan unit
 
-Hook commit repo menjalankan `lintDebug test --daemon -q` tanpa bypass. Report debug terakhir berisi **99 tes, 0 gagal/error/skip**: termasuk 27 tes repository sesi, 9 tes SessionViewModel dan 3 tes lifetime WorkspaceViewModel. Mapper payload, parser/model, transport, aturan akun, dataset dan draf juga masuk suite. Build native app/test, gate SDK/font/OFL/manifest dan hasil process death diperiksa terpisah dari unit test.
+Hook commit repo menjalankan `lintDebug test --daemon -q` tanpa bypass. Pada checkpoint `d862cd7`, report debug berisi **99 tes, 0 gagal/error/skip**: termasuk 27 tes repository sesi, 9 tes SessionViewModel dan 3 tes lifetime WorkspaceViewModel. Mapper payload, parser/model, transport, aturan akun, dataset dan draf juga masuk suite. Build native app/test, gate SDK/font/OFL/manifest dan hasil process death diperiksa terpisah dari unit test.
 
 Build debug/staging/release, APK instrumentasi dan lint staging/release juga lulus lokal. CI head `df7bf7a` lulus untuk [push](https://github.com/waste-not-app/waste-not-android/actions/runs/38669031416) dan [PR #95](https://github.com/waste-not-app/waste-not-android/actions/runs/38669087297); report PR yang diunduh berisi 99 tes, 0 gagal/skip, keberhasilan 100%. Hasil head berikutnya dicatat pada PR/issue setelah workflow selesai.
+
+Review sebelum merge menambahkan regresi trim catatan dan timestamp edit demo: **101 unit test native lulus**. Dua tes API 24 tambahan lulus dalam 13,389 detik untuk presisi ringkasan handled/avoided dan alur create/edit/dirty Back/logout. Rincian koreksi dan batas review ada di [PR_REVIEW.md](PR_REVIEW.md).
 
 ## Gambar perangkat
 
