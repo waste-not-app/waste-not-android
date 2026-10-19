@@ -7,6 +7,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.wastenot.data.demo.DemoActivityStore
 import com.example.wastenot.data.network.ApiResult
+import com.example.wastenot.data.network.ApiFailure
+import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.ActivityInput
 import com.example.wastenot.data.repository.ActivityStore
 import com.example.wastenot.model.*
@@ -87,4 +89,160 @@ class WorkspaceViewModelTest {
         assertTrue(cleared)
         assertTrue(vm.state.value.records.isEmpty())
     }
+    @Test fun deleteRetainsTheRecordUntilConfirmationAndSerializesWrites() = runTest {
+        val demo = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+        val gate = CompletableDeferred<Unit>()
+        var calls = 0
+        val source = object : ActivityStore by demo {
+            override suspend fun delete(id: String, version: Int): ApiResult<Unit> {
+                calls++
+                gate.await()
+                return demo.delete(id, version)
+            }
+        }
+        val (vm, _) = model(source)
+        vm.load(); advanceUntilIdle()
+        val first = vm.state.value.records[0]
+        val other = vm.state.value.records[1]
+        vm.delete(first.id, first.version); runCurrent()
+        assertEquals(5, vm.state.value.records.size)
+        assertEquals(first.id, vm.state.value.deletingId)
+        vm.delete(other.id, other.version); runCurrent()
+        assertEquals(1, calls)
+        gate.complete(Unit); advanceUntilIdle()
+        assertEquals(4, vm.state.value.records.size)
+        assertFalse(vm.state.value.records.any { it.id == first.id })
+        assertTrue(vm.state.value.deletion!!.deleted)
+        vm.acknowledgeDelete("another-id")
+        assertNotNull(vm.state.value.deletion)
+        vm.acknowledgeDelete(first.id)
+        assertNull(vm.state.value.deletion)
+        assertNull(vm.state.value.deletingId)
+    }
+
+    @Test fun failedDeleteKeepsTheVisibleRecordAndCanBeRetried() = runTest {
+        val demo = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+        var failure: ApiFailureKind? = ApiFailureKind.STORAGE
+        val source = object : ActivityStore by demo {
+            override suspend fun delete(id: String, version: Int): ApiResult<Unit> =
+                failure?.let { ApiResult.Failure(ApiFailure(it)) } ?: demo.delete(id, version)
+        }
+        val (vm, _) = model(source)
+        vm.load(); advanceUntilIdle()
+        val log = vm.state.value.records.first()
+        listOf(ApiFailureKind.STORAGE, ApiFailureKind.NETWORK, ApiFailureKind.VERSION_CONFLICT, ApiFailureKind.PRECONDITION_REQUIRED).forEach { kind ->
+            failure = kind
+            vm.delete(log.id, log.version); advanceUntilIdle()
+            assertEquals(5, vm.state.value.records.size)
+            assertEquals(kind, vm.state.value.deletion!!.error)
+            assertFalse(vm.state.value.deletion!!.deleted)
+        }
+        failure = null
+        vm.delete(log.id, log.version); advanceUntilIdle()
+        assertEquals(4, vm.state.value.records.size)
+        assertTrue(vm.state.value.deletion!!.deleted)
+    }
+
+    @Test fun staleLoadCannotResurrectADeletedRecordEvenWhenRefreshFails() = runTest {
+        val demo = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+        val gate = CompletableDeferred<Unit>()
+        var reads = 0
+        val source = object : ActivityStore by demo {
+            override suspend fun load(): ApiResult<List<WasteLog>> {
+                val snapshot = demo.load()
+                return when (++reads) {
+                    2 -> { withContext(NonCancellable) { gate.await() }; snapshot }
+                    3 -> ApiResult.Failure(ApiFailure(ApiFailureKind.NETWORK))
+                    else -> snapshot
+                }
+            }
+        }
+        val (vm, _) = model(source)
+        vm.load(); advanceUntilIdle()
+        val log = vm.state.value.records.first()
+        vm.load(true); runCurrent()
+        vm.delete(log.id, log.version); runCurrent()
+        assertEquals(4, vm.state.value.records.size)
+        assertEquals(ApiFailureKind.NETWORK, vm.state.value.error)
+        gate.complete(Unit); advanceUntilIdle()
+        assertEquals(4, vm.state.value.records.size)
+        assertFalse(vm.state.value.records.any { it.id == log.id })
+        assertFalse(vm.state.value.loading)
+    }
+
+    @Test fun createWhileInitialLoadIsPendingRefreshesTheWholeSnapshot() = runTest {
+        val demo = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+        val gate = CompletableDeferred<Unit>()
+        var reads = 0
+        val source = object : ActivityStore by demo {
+            override suspend fun load(): ApiResult<List<WasteLog>> {
+                val snapshot = demo.load()
+                if (++reads == 1) withContext(NonCancellable) { gate.await() }
+                return snapshot
+            }
+        }
+        val (vm, _) = model(source)
+        vm.load(); runCurrent()
+        vm.save(ActivityInput(WasteCategory.METAL, DisposalMethod.RECYCLE, Quantity.Count.of(1), demo.referenceDate, ""),
+            null, null, UUID.randomUUID().toString())
+        runCurrent()
+        assertEquals(6, vm.state.value.records.size)
+        gate.complete(Unit); advanceUntilIdle()
+        assertEquals(6, vm.state.value.records.size)
+    }
+
+    @Test fun detailLoadsByIdEvenWhenTheListDoesNotContainTheRecord() = runTest {
+        val demo = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+        val record = demo.load().value.first()
+        val source = object : ActivityStore by demo {
+            override suspend fun load(): ApiResult<List<WasteLog>> = ApiResult.Success(emptyList())
+        }
+        val (vm, _) = model(source)
+        vm.load(); advanceUntilIdle()
+        assertTrue(vm.state.value.records.isEmpty())
+        vm.loadDetail(record.id); advanceUntilIdle()
+        assertEquals(record, vm.state.value.detail!!.log)
+        assertFalse(vm.state.value.detail!!.loading)
+        assertNull(vm.state.value.detail!!.error)
+    }
+
+    @Test fun aLateDetailResponseCannotResurrectADeletedRecord() = runTest {
+        val demo = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+        val gate = CompletableDeferred<Unit>()
+        val source = object : ActivityStore by demo {
+            override suspend fun get(id: String): ApiResult<WasteLog> {
+                val snapshot = demo.get(id)
+                withContext(NonCancellable) { gate.await() }
+                return snapshot
+            }
+        }
+        val (vm, _) = model(source)
+        vm.load(); advanceUntilIdle()
+        val record = vm.state.value.records.first()
+        vm.loadDetail(record.id); runCurrent()
+        vm.delete(record.id, record.version); runCurrent()
+        gate.complete(Unit); advanceUntilIdle()
+        assertEquals(4, vm.state.value.records.size)
+        assertNull(vm.state.value.detail!!.log)
+        assertEquals(ApiFailureKind.NOT_FOUND, vm.state.value.detail!!.error)
+    }
+
+    @Test fun missingDetailHidesTheCacheWhileNetworkFailureRetainsItForReading() = runTest {
+        val demo = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+        var failure = ApiFailureKind.NETWORK
+        val source = object : ActivityStore by demo {
+            override suspend fun get(id: String): ApiResult<WasteLog> = ApiResult.Failure(ApiFailure(failure))
+        }
+        val (vm, _) = model(source)
+        vm.load(); advanceUntilIdle()
+        val record = vm.state.value.records.first()
+        vm.loadDetail(record.id); advanceUntilIdle()
+        assertEquals(record, vm.state.value.detail!!.log)
+        assertEquals(ApiFailureKind.NETWORK, vm.state.value.detail!!.error)
+        failure = ApiFailureKind.NOT_FOUND
+        vm.loadDetail(record.id); advanceUntilIdle()
+        assertNull(vm.state.value.detail!!.log)
+        assertEquals(ApiFailureKind.NOT_FOUND, vm.state.value.detail!!.error)
+    }
+
 }

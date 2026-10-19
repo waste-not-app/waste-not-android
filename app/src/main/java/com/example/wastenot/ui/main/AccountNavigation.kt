@@ -31,8 +31,8 @@ import androidx.navigation3.runtime.*
 import androidx.navigation3.ui.NavDisplay
 import com.example.wastenot.*
 import com.example.wastenot.R
-import com.example.wastenot.data.demo.DemoActivityStore
 import com.example.wastenot.data.dummy.DummyActivityStore
+import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.data.repository.RemoteActivityStore
 import com.example.wastenot.model.User
@@ -76,7 +76,7 @@ fun AccountNavigation(
     val stack = stacks.getValue(selected)
     val current = stack.last()
     val editor = current as? LogEditor
-    val initial = data.records.find { it.id == editor?.logId }
+    val initial = data.detail?.takeIf { it.id == editor?.logId }?.log ?: data.records.find { it.id == editor?.logId }
     val date = model.referenceDate ?: LocalDate.now(user.timezone)
     val draft = if (editor != null && (editor.logId == null || initial != null)) {
         rememberSaveable(editor.requestId, saver = EditorDraft.Saver) { EditorDraft.from(initial, date) }
@@ -85,11 +85,23 @@ fun AccountNavigation(
     var leaving by remember { mutableStateOf(false) }
     var capture by remember { mutableStateOf(false) }
     var historyFilterOpen by rememberSaveable { mutableStateOf(false) }
+    var deletingId by rememberSaveable { mutableStateOf<String?>(null) }
+    var deleteVersion by rememberSaveable { mutableIntStateOf(0) }
+    var deletedNotice by rememberSaveable { mutableStateOf(false) }
+    fun history() {
+        if (stack.lastOrNull() is LogDetail) stack.removeLastOrNull()
+        selected = MainTab.HISTORY
+    }
     fun back() {
-        if (editor != null && data.saving) return
+        if (data.deletingId != null || (editor != null && data.saving)) return
         if (editor != null && draft?.dirty == true) { discard = true; return }
         if (stack.size > 1) stack.removeLastOrNull() else if (selected != MainTab.HOME) selected = MainTab.HOME
     }
+    fun detail(id: String) {
+        if ((stack.lastOrNull() as? LogDetail)?.id != id) stack.add(LogDetail(id))
+    }
+    val visibleDetail = current as? LogDetail
+    LaunchedEffect(visibleDetail) { visibleDetail?.let { model.loadDetail(it.id) } }
     fun edit(id: String? = null) {
         if (stack.lastOrNull() !is LogEditor) stack.add(LogEditor(id, UUID.randomUUID().toString()))
     }
@@ -97,9 +109,27 @@ fun AccountNavigation(
         val saved = data.save
         if (saved?.id != null && editor?.requestId == saved.requestId && stack.lastOrNull() == editor) {
             stack.removeLastOrNull()
-            val detail = LogDetail(saved.id)
-            if (stack.lastOrNull() != detail) stack.add(detail)
+            if ((stack.lastOrNull() as? LogDetail)?.id != saved.id) stack.add(LogDetail(saved.id))
             model.acknowledgeSave(saved.requestId)
+        }
+    }
+    LaunchedEffect(data.deletion) {
+        val result = data.deletion
+        if (result?.deleted == true) {
+            deletingId = null
+            deletedNotice = true
+            history()
+            model.acknowledgeDelete(result.id)
+        }
+    }
+    deletingId?.let { id ->
+        (data.detail?.takeIf { it.id == id }?.log ?: data.records.find { it.id == id })?.let { log ->
+            fun dismissDelete() { deletingId = null; model.acknowledgeDelete(id) }
+            DeleteLogDialog(log, data.deletingId == id, data.deletion?.takeIf { it.id == id }?.error,
+                onDismiss = ::dismissDelete,
+                onConfirm = { model.delete(id, deleteVersion) },
+                onReload = { dismissDelete(); model.loadDetail(id) },
+                onUnavailable = { dismissDelete(); history(); model.load(true) })
         }
     }
     if (discard) AlertDialog(
@@ -128,7 +158,9 @@ fun AccountNavigation(
                     is LogEditor -> if (current.logId == null) R.string.log_create else R.string.log_edit
                     else -> selected.label
                 }), style = MaterialTheme.typography.headlineMedium) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent), navigationIcon = {
-                    if (stack.size > 1) IconButton(onClick = ::back) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
+                    if (stack.size > 1) FilledIconButton(onClick = ::back, shape = MaterialTheme.shapes.small,
+                        colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                        modifier = Modifier.padding(start = 16.dp).size(48.dp)) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
                 }, actions = {
                     if (current == History) FilledIconButton(onClick = { historyFilterOpen = true }, shape = MaterialTheme.shapes.medium,
                         colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
@@ -136,17 +168,26 @@ fun AccountNavigation(
                         Icon(painterResource(R.drawable.ic_filter), stringResource(R.string.filter_history))
                     }
                 }) },
-                bottomBar = { if (!rail && editor == null) TabDock(selected, { selected = it }, { capture = true }) },
+                bottomBar = { if (!rail && current == selected.key) TabDock(selected, { selected = it }, { capture = true }) },
             ) { padding ->
                 val pageInsets = PaddingValues(0.dp)
                 val provider = entryProvider {
-                    entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, { selected = MainTab.HISTORY }, { stack.add(LogDetail(it)) }, { model.load(true) }, Modifier.fillMaxSize(), onProfile = { selected = MainTab.PROFILE }) }
-                    entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, { stack.add(LogDetail(it)) }, { model.load(true) }, Modifier.fillMaxSize(),
-                        today = date, filterOpen = historyFilterOpen, onOpenFilter = { historyFilterOpen = true }, onDismissFilter = { historyFilterOpen = false }) }
+                    entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, { selected = MainTab.HISTORY }, ::detail, { model.load(true) }, Modifier.fillMaxSize(), onProfile = { selected = MainTab.PROFILE }) }
+                    entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
+                        today = date, filterOpen = historyFilterOpen, onOpenFilter = { historyFilterOpen = true }, onDismissFilter = { historyFilterOpen = false },
+                        deletedNotice = deletedNotice, onDismissNotice = { deletedNotice = false }) }
                     entry<Guide> { GuidePlaceholderScreen(demo, pageInsets, Modifier.fillMaxSize()) }
                     entry<Statistics> { StatisticsScreen(data, demo, date, pageInsets, { model.load(true) }, Modifier.fillMaxSize()) }
                     entry<Profile> { ProfileScreen(user, data, demo, theme, pageInsets, onTheme, { leaving = true }, Modifier.fillMaxSize()) }
-                    entry<LogDetail> { key -> LogDetailScreen(data.records.find { it.id == key.id }, demo, pageInsets, { edit(key.id) }, Modifier.fillMaxSize()) }
+                    entry<LogDetail> { key ->
+                        val read = data.detail?.takeIf { it.id == key.id }
+                        val log = if (read != null) read.log else data.records.find { it.id == key.id }
+                        val missing = read?.error == ApiFailureKind.NOT_FOUND || read?.error == ApiFailureKind.DELETED
+                        LogDetailScreen(log, read == null || read.loading, read?.error != null && !missing, pageInsets,
+                            onEdit = { edit(key.id) },
+                            onDelete = { if (log != null && log.version > 0) { deletingId = log.id; deleteVersion = log.version } },
+                            onHistory = ::history, onRetry = { model.loadDetail(key.id) }, modifier = Modifier.fillMaxSize())
+                    }
                     entry<LogEditor> { key ->
                         if (draft != null && editor == key) LogEditorScreen(draft, date, demo, data.saving,
                             data.save?.requestId == key.requestId && data.save?.error != null, pageInsets,

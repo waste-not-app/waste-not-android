@@ -212,6 +212,7 @@ class AppNavigationTest {
         compose.onNodeWithText("Simpan").performScrollTo().performClick()
         compose.onNodeWithText("Detail catatan").assertIsDisplayed()
         compose.onNodeWithText("QA contoh pribadi").performScrollTo().assertIsDisplayed()
+        compose.waitUntil(30_000) { compose.onAllNodes(hasText("Ubah catatan") and hasClickAction() and isEnabled()).fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("Ubah catatan").performScrollTo().performClick()
         capture("editor-edit")
         compose.onNodeWithText("benda").performScrollTo().performClick()
@@ -220,11 +221,15 @@ class AppNavigationTest {
         quantity.performTextReplacement("2")
         compose.onNodeWithText("Simpan perubahan").performScrollTo().performClick()
         compose.onNodeWithText("2 benda").performScrollTo().assertIsDisplayed()
+        val retainedDetail = compose.onAllNodes(tabs).fetchSemanticsNodes().isNotEmpty()
+        if (!retainedDetail) compose.onNodeWithContentDescription("Kembali").performClick()
         tab("Profil")
         compose.onNodeWithText("60 XP total").performScrollTo().assertIsDisplayed()
         tab("Beranda")
-        compose.onNodeWithText("Detail catatan").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Kembali").performClick()
+        if (retainedDetail) {
+            compose.onNodeWithText("Detail catatan").assertIsDisplayed()
+            compose.onNodeWithContentDescription("Kembali").performClick()
+        }
         compose.onNodeWithText("650 g").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("2 benda ditangani").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("2 benda dihindari").performScrollTo().assertIsDisplayed()

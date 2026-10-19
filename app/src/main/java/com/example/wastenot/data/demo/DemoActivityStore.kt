@@ -23,6 +23,7 @@ class DemoActivityStore(private val zone: ZoneId) : ActivityStore {
     override val referenceDate: LocalDate = LocalDate.of(2026, 9, 21)
     private val instant = referenceDate.atTime(12, 0).atZone(zone).toInstant()
     private val records = linkedMapOf<String, WasteLog>()
+    private val deleted = mutableSetOf<String>()
     private val requests = mutableMapOf<String, Pair<ActivityInput, String>>()
 
     init {
@@ -42,9 +43,16 @@ class DemoActivityStore(private val zone: ZoneId) : ActivityStore {
 
     override suspend fun load() = ApiResult.Success(records.values.sortedWith(compareByDescending<WasteLog> { it.activityDate }.thenByDescending { it.createdAt }))
 
+    override suspend fun get(id: String): ApiResult<WasteLog> =
+        records[id]?.let { ApiResult.Success(it) } ?: failure(ApiFailureKind.NOT_FOUND)
+
     override suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<WasteLog> {
         requests[clientRequestId]?.let { (previous, id) ->
-            return if (previous == input) ApiResult.Success(checkNotNull(records[id])) else failure(ApiFailureKind.IDEMPOTENCY_CONFLICT)
+            return when {
+                previous != input -> failure(ApiFailureKind.IDEMPOTENCY_CONFLICT)
+                id in deleted -> failure(ApiFailureKind.DELETED)
+                else -> ApiResult.Success(checkNotNull(records[id]))
+            }
         }
         if (!valid(input)) return failure(ApiFailureKind.VALIDATION)
         val id = UUID.randomUUID().toString()
@@ -65,7 +73,16 @@ class DemoActivityStore(private val zone: ZoneId) : ActivityStore {
         return ApiResult.Success(updated)
     }
 
-    override fun clear() { records.clear(); requests.clear() }
+    override suspend fun delete(id: String, version: Int): ApiResult<Unit> {
+        if (id in deleted) return ApiResult.Success(Unit)
+        val old = records[id] ?: return failure(ApiFailureKind.NOT_FOUND)
+        if (old.version != version) return failure(ApiFailureKind.VERSION_CONFLICT)
+        records.remove(id)
+        deleted.add(id)
+        return ApiResult.Success(Unit)
+    }
+
+    override fun clear() { records.clear(); requests.clear(); deleted.clear() }
 
     private fun valid(input: ActivityInput, originalDate: LocalDate? = null) =
         input.notes.length <= 500 && ActivityDates.canSave(input.date, referenceDate, originalDate)

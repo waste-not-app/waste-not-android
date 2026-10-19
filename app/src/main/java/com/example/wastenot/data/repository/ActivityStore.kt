@@ -21,8 +21,10 @@ interface ActivityStore {
     val isDemo: Boolean
     val referenceDate: LocalDate?
     suspend fun load(): ApiResult<List<WasteLog>>
+    suspend fun get(id: String): ApiResult<WasteLog>
     suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<WasteLog>
     suspend fun update(id: String, version: Int, input: ActivityInput): ApiResult<WasteLog>
+    suspend fun delete(id: String, version: Int): ApiResult<Unit>
     fun clear()
 }
 
@@ -30,9 +32,11 @@ class RemoteActivityStore(private val core: CoreRepository) : ActivityStore {
     override val isDemo = false
     override val referenceDate: LocalDate? = null
     override suspend fun load() = core.wasteLogs()
+    override suspend fun get(id: String) = unavailable()
     // shortcut: writes await the log API integration; UI retains the draft on this failure.
     override suspend fun create(input: ActivityInput, clientRequestId: String) = unavailable()
     override suspend fun update(id: String, version: Int, input: ActivityInput) = unavailable()
+    override suspend fun delete(id: String, version: Int) = unavailable()
     override fun clear() = Unit
     private fun unavailable() = ApiResult.Failure(ApiFailure(ApiFailureKind.NOT_CONFIGURED))
 }

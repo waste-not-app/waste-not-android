@@ -1,6 +1,6 @@
 # Checkpoint dock, Beranda dan dummy
 
-Kelanjutan terbaru untuk S07/S10 tersedia pada [bukti Riwayat dan filter](HISTORY.md). Angka tes pada halaman ini merujuk checkpoint awal `1693e7c`, bukan total source terbaru.
+Kelanjutan S07/S10 tersedia pada [bukti Riwayat dan filter](HISTORY.md), serta S08/D01 pada [bukti Detail dan hapus](DETAIL.md). Angka tes pada halaman ini merujuk checkpoint awal `1693e7c`, bukan total source terbaru.
 
 19 Oktober 2026. Branch `codex/android-iteration-2-design`, dasar `ceb8707`. Ini bukti untuk perubahan checkpoint, **bukan penerimaan seluruh layar WasteNot**. Matriks pekerjaan lengkap ada di [Iteration 2](../../tasks/ITERATION_2_DESIGN.md).
 

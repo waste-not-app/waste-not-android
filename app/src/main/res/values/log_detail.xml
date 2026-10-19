@@ -1,0 +1,20 @@
+<resources>
+    <string name="log_unavailable">Catatan tidak tersedia</string>
+    <string name="log_unavailable_message">Catatan mungkin sudah dihapus. Kembali ke riwayat untuk memilih catatan lain.</string>
+    <string name="reduce_detail">Dihindari, bukan sampah ditangani.</string>
+    <string name="timezone_label">Zona waktu</string>
+    <string name="notes_title">Catatan</string>
+    <string name="created_timestamp">Dibuat %1$s</string>
+    <string name="updated_timestamp">Diperbarui %1$s</string>
+    <string name="delete_log">Hapus catatan</string>
+    <string name="delete_log_title">Hapus catatan?</string>
+    <string name="delete_log_message">%1$s · %2$s. Statistik dan XP akan dihitung ulang.</string>
+    <string name="delete_action">Hapus</string>
+    <string name="deleting_log">Menghapus…</string>
+    <string name="delete_failed">Catatan belum dihapus. Coba lagi; catatan terakhir tetap tersedia.</string>
+    <string name="log_deleted_notice">Catatan dihapus.</string>
+    <string name="log_version_required">Perlu memeriksa versi catatan</string>
+    <string name="log_conflict_title">Catatan telah berubah</string>
+    <string name="log_conflict_message">Muat versi terbaru sebelum mencoba lagi.</string>
+    <string name="load_latest_log">Muat versi terbaru</string>
+</resources>

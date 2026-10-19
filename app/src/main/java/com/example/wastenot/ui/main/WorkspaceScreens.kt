@@ -42,7 +42,7 @@ internal fun pagePadding(padding: PaddingValues): PaddingValues {
 }
 
 @Composable
-private fun ScrollPage(padding: PaddingValues, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+internal fun ScrollPage(padding: PaddingValues, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Box(modifier, contentAlignment = Alignment.TopCenter) {
         Column(
             modifier = Modifier
@@ -268,22 +268,6 @@ fun GuidePlaceholderScreen(demo: Boolean, padding: PaddingValues, modifier: Modi
     ScrollPage(padding, modifier) {
         Text(stringResource(R.string.guide_pending_title), style = MaterialTheme.typography.headlineSmall)
         Text(stringResource(R.string.guide_pending_message))
-    }
-}
-
-@Composable
-fun LogDetailScreen(log: WasteLog?, demo: Boolean, padding: PaddingValues, onEdit: () -> Unit, modifier: Modifier = Modifier) {
-    ScrollPage(padding, modifier) {
-        if (log == null) Text(stringResource(R.string.log_not_loaded)) else {
-            Text(stringResource(log.category.labelResource), style = MaterialTheme.typography.headlineMedium)
-            Text(formatted(WasteFormat.quantity(log.quantity)), style = MaterialTheme.typography.displayMedium)
-            Text(stringResource(log.method.labelResource) + if (log.method == DisposalMethod.REDUCE) stringResource(R.string.avoided_suffix) else "")
-            Text(WasteFormat.activityDate(log.activityDate))
-            Text(log.activityTimezone.id)
-            Text(log.notes.ifBlank { stringResource(R.string.no_notes) })
-            Text(stringResource(R.string.record_version, log.version), style = MaterialTheme.typography.bodySmall)
-            ActionButton(stringResource(R.string.log_edit), onEdit, Modifier.fillMaxWidth())
-        }
     }
 }
 

@@ -32,7 +32,7 @@ class HistoryDesignTest {
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    private fun show(restoration: StateRestorationTester? = null, dark: State<Boolean>? = null, onDetail: (String) -> Unit = {}) {
+    private fun show(restoration: StateRestorationTester? = null, dark: State<Boolean>? = null, notice: MutableState<Boolean>? = null, onDetail: (String) -> Unit = {}) {
         val content: @Composable () -> Unit = {
             WasteNotTheme(darkTheme = dark?.value ?: false) {
                 var open by rememberSaveable { mutableStateOf(false) }
@@ -41,7 +41,8 @@ class HistoryDesignTest {
                         TextButton(onClick = { open = true }) { Text("Filter riwayat") }
                     })
                     HistoryScreen(WorkspaceUiState(records, loading = false), true, PaddingValues(), {}, onDetail, {},
-                        Modifier.weight(1f).fillMaxWidth(), today, open, { open = true }, { open = false })
+                        Modifier.weight(1f).fillMaxWidth(), today, open, { open = true }, { open = false },
+                        deletedNotice = notice?.value ?: false, onDismissNotice = { notice?.value = false })
                 }
             }
         }
@@ -121,6 +122,17 @@ class HistoryDesignTest {
         compose.onNodeWithText("Batal").performScrollTo().performClick()
         compose.runOnIdle { dark.value = false }
         open(); capture("filter-light")
+    }
+
+    @Test fun deletionNoticeStaysVisibleAboveAScrolledHistory() {
+        val notice = mutableStateOf(false)
+        show(notice = notice)
+        listText("Input manual")
+        compose.runOnIdle { notice.value = true }
+        compose.onNodeWithText("Catatan dihapus.").assertIsDisplayed()
+        compose.onNodeWithText("Tutup").performClick()
+        compose.onNodeWithText("Catatan dihapus.").assertDoesNotExist()
+        compose.onNodeWithText("Input manual").assertIsDisplayed()
     }
 
     private fun capture(name: String) {

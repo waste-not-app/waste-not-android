@@ -1,5 +1,6 @@
 package com.example.wastenot.ui.main
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -50,6 +51,8 @@ fun HistoryScreen(
     filterOpen: Boolean = false,
     onOpenFilter: () -> Unit = {},
     onDismissFilter: () -> Unit = {},
+    deletedNotice: Boolean = false,
+    onDismissNotice: () -> Unit = {},
 ) {
     var filter by rememberSaveable(stateSaver = FilterSaver) { mutableStateOf(HistoryFilter()) }
     // shortcut: paginates the loaded dummy snapshot; replace with repository cursors for A18.
@@ -67,9 +70,14 @@ fun HistoryScreen(
         applyFilter(it)
         onDismissFilter()
     })
-    Box(modifier, contentAlignment = Alignment.TopCenter) {
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        if (deletedNotice) Row(Modifier.widthIn(max = 840.dp).fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MessageBanner(stringResource(R.string.log_deleted_notice), Modifier.weight(1f))
+            TextButton(onClick = onDismissNotice) { Text(stringResource(R.string.close)) }
+        }
         LazyColumn(
-            modifier = Modifier.widthIn(max = 840.dp).fillMaxWidth().testTag("history-list"),
+            modifier = Modifier.weight(1f).widthIn(max = 840.dp).fillMaxWidth().testTag("history-list"),
             state = list,
             contentPadding = pagePadding(padding),
         ) {
@@ -123,7 +131,7 @@ fun HistoryScreen(
                 }
             }
             item(key = "manual") {
-                OutlinedButton(onClick = onRecord, shape = MaterialTheme.shapes.small,
+                OutlinedButton(onClick = onRecord, shape = MaterialTheme.shapes.small, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     modifier = Modifier.fillMaxWidth().padding(top = 20.dp).heightIn(min = 52.dp)) { Text(stringResource(R.string.manual_input)) }
             }
         }
@@ -172,7 +180,7 @@ private fun HistoryFilterSheet(
                 attempted = true
                 if (draft.dateError == null) onApply(draft)
             }, Modifier.fillMaxWidth())
-            OutlinedButton(onClick = { draft = HistoryFilter(); attempted = false }, shape = MaterialTheme.shapes.small,
+            OutlinedButton(onClick = { draft = HistoryFilter(); attempted = false }, shape = MaterialTheme.shapes.small, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                 modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(stringResource(R.string.reset_filter_draft)) }
         }
     }
