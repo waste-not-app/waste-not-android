@@ -3,8 +3,6 @@ package com.example.wastenot.ui.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -37,7 +35,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-private fun pagePadding(padding: PaddingValues): PaddingValues {
+internal fun pagePadding(padding: PaddingValues): PaddingValues {
     val direction = LocalLayoutDirection.current
     return PaddingValues(padding.calculateStartPadding(direction) + 20.dp, padding.calculateTopPadding() + 20.dp,
         padding.calculateEndPadding(direction) + 20.dp, padding.calculateBottomPadding() + 24.dp)
@@ -180,49 +178,45 @@ private fun DemoProgress(count: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HistoryScreen(data: WorkspaceUiState, demo: Boolean, padding: PaddingValues, onRecord: () -> Unit,
-    onDetail: (String) -> Unit, onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    var category by rememberSaveable { mutableStateOf<WasteCategory?>(null) }
-    var method by rememberSaveable { mutableStateOf<DisposalMethod?>(null) }
-    val visible = data.records.filter { (category == null || it.category == category) && (method == null || it.method == method) }
-    LazyColumn(modifier = modifier, contentPadding = pagePadding(padding), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        if (!demo) item { Text(stringResource(R.string.loaded_records_only), style = MaterialTheme.typography.bodySmall) }
-        item { TextButton(onClick = onRecord, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.manual_input)) } }
-        item { CategoryPicker(category, { category = it }, Modifier.fillMaxWidth()) }
-        item { MethodSelector(method, { method = it }, Modifier.fillMaxWidth()) }
-        if (category != null || method != null) item {
-            TextButton(onClick = { category = null; method = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.clear_filters)) }
-        }
-        if (data.loading) item { CircularProgressIndicator() }
-        if (data.error != null) item {
-            MessageBanner(stringResource(R.string.logs_load_failed), isError = true)
-            TextButton(onClick = onRetry) { Text(stringResource(R.string.retry)) }
-        }
-        if (!data.loading && data.error == null && visible.isEmpty()) item { Text(stringResource(if (data.records.isEmpty()) R.string.logs_empty else R.string.filtered_empty)) }
-        items(visible, key = WasteLog::id) { log -> ActivityRow(log, { onDetail(log.id) }, Modifier.fillMaxWidth()) }
-    }
-}
-
-@Composable
-private fun ActivityRow(log: WasteLog, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(onClick = onClick, modifier = modifier.heightIn(min = 64.dp), color = androidx.compose.ui.graphics.Color.Transparent) {
+internal fun ActivityRow(log: WasteLog, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(onClick = onClick, modifier = modifier.heightIn(min = 64.dp), color = Color.Transparent, contentColor = MaterialTheme.colorScheme.onSurface) {
         Column {
             Row(Modifier.padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(44.dp).background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small), contentAlignment = Alignment.Center) {
                     Icon(painterResource(log.category.iconResource), null, Modifier.size(24.dp), tint = MaterialTheme.colorScheme.primary)
                 }
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(stringResource(log.category.labelResource), style = MaterialTheme.typography.titleMedium)
-                        Text(formatted(WasteFormat.quantity(log.quantity)), style = MaterialTheme.typography.titleLarge)
+                if (androidx.compose.ui.platform.LocalDensity.current.fontScale >= 1.5f) {
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ActivityMetadata(log, Modifier.fillMaxWidth())
+                        ActivityQuantity(log)
                     }
-                    Text(stringResource(R.string.date_method, stringResource(log.method.labelResource), WasteFormat.activityDate(log.activityDate)) +
-                        if (log.method == DisposalMethod.REDUCE) stringResource(R.string.avoided_suffix) else "",
-                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                } else {
+                    ActivityMetadata(log, Modifier.weight(1f))
+                    ActivityQuantity(log)
                 }
             }
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         }
+    }
+}
+
+@Composable
+private fun ActivityMetadata(log: WasteLog, modifier: Modifier = Modifier) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(log.category.labelResource), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.date_method, stringResource(log.method.labelResource), WasteFormat.activityDate(log.activityDate)),
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (log.notes.isNotBlank()) Text(log.notes, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun ActivityQuantity(log: WasteLog, modifier: Modifier = Modifier) {
+    Column(modifier, horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(formatted(WasteFormat.quantity(log.quantity)), style = MaterialTheme.typography.titleSmall)
+        if (log.method == DisposalMethod.REDUCE) Text(stringResource(R.string.avoided_label),
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

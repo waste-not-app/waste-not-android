@@ -84,6 +84,7 @@ fun AccountNavigation(
     var discard by remember { mutableStateOf(false) }
     var leaving by remember { mutableStateOf(false) }
     var capture by remember { mutableStateOf(false) }
+    var historyFilterOpen by rememberSaveable { mutableStateOf(false) }
     fun back() {
         if (editor != null && data.saving) return
         if (editor != null && draft?.dirty == true) { discard = true; return }
@@ -128,13 +129,20 @@ fun AccountNavigation(
                     else -> selected.label
                 }), style = MaterialTheme.typography.headlineMedium) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent), navigationIcon = {
                     if (stack.size > 1) IconButton(onClick = ::back) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
+                }, actions = {
+                    if (current == History) FilledIconButton(onClick = { historyFilterOpen = true }, shape = MaterialTheme.shapes.medium,
+                        colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                        modifier = Modifier.padding(end = 12.dp).size(48.dp)) {
+                        Icon(painterResource(R.drawable.ic_filter), stringResource(R.string.filter_history))
+                    }
                 }) },
                 bottomBar = { if (!rail && editor == null) TabDock(selected, { selected = it }, { capture = true }) },
             ) { padding ->
                 val pageInsets = PaddingValues(0.dp)
                 val provider = entryProvider {
                     entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, { selected = MainTab.HISTORY }, { stack.add(LogDetail(it)) }, { model.load(true) }, Modifier.fillMaxSize(), onProfile = { selected = MainTab.PROFILE }) }
-                    entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, { stack.add(LogDetail(it)) }, { model.load(true) }, Modifier.fillMaxSize()) }
+                    entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, { stack.add(LogDetail(it)) }, { model.load(true) }, Modifier.fillMaxSize(),
+                        today = date, filterOpen = historyFilterOpen, onOpenFilter = { historyFilterOpen = true }, onDismissFilter = { historyFilterOpen = false }) }
                     entry<Guide> { GuidePlaceholderScreen(demo, pageInsets, Modifier.fillMaxSize()) }
                     entry<Statistics> { StatisticsScreen(data, demo, date, pageInsets, { model.load(true) }, Modifier.fillMaxSize()) }
                     entry<Profile> { ProfileScreen(user, data, demo, theme, pageInsets, onTheme, { leaving = true }, Modifier.fillMaxSize()) }

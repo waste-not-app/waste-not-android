@@ -161,8 +161,13 @@ class AppNavigationTest {
 
     @Test fun historyFilterAndRangeSurviveDetailTabsAndRotation() {
         preview(); tab("Riwayat")
-        compose.onNodeWithText("Kategori").performScrollTo().performClick()
+        capture("history-native")
+        compose.onNodeWithContentDescription("Filter riwayat").performClick()
+        capture("history-filter-native")
+        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
         compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
+        compose.onNodeWithText("Terapkan filter").performScrollTo().performClick()
+        capture("history-filtered-native")
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("250 g"))
         compose.onNodeWithText("250 g").performScrollTo().performClick()
         capture("history-detail")

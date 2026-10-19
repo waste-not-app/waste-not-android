@@ -67,15 +67,7 @@ internal fun CaptureSheet(onDismiss: () -> Unit, onManual: () -> Unit, modifier:
     ModalBottomSheet(onDismissRequest = onDismiss, modifier = modifier,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)) {
-        val view = LocalView.current
-        DisposableEffect(view) {
-            val window = if (android.os.Build.VERSION.SDK_INT < 26) generateSequence(view) { it.parent as? android.view.View }
-                .filterIsInstance<DialogWindowProvider>().firstOrNull()?.window else null
-            val previous = window?.navigationBarColor
-            // API 24–25 cannot draw dark navigation icons over the sheet's light surface.
-            if (window != null) window.navigationBarColor = Pine900.toArgb()
-            onDispose { if (window != null && previous != null) window.navigationBarColor = previous }
-        }
+        SheetSystemBar()
         Column(
             modifier = Modifier.fillMaxWidth().testTag("capture-sheet").verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -97,4 +89,23 @@ internal fun CaptureSheet(onDismiss: () -> Unit, onManual: () -> Unit, modifier:
             ActionButton(stringResource(R.string.manual_input), onManual, Modifier.fillMaxWidth())
         }
     }
+}
+
+@Composable
+internal fun SheetSystemBar() {
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val window = if (android.os.Build.VERSION.SDK_INT < 26) generateSequence(view) { it.parent as? android.view.View }
+            .filterIsInstance<DialogWindowProvider>().firstOrNull()?.window else null
+        val previous = window?.navigationBarColor
+        // API 24–25 cannot draw dark navigation icons over the sheet's light surface.
+        if (window != null) window.navigationBarColor = Pine900.toArgb()
+        onDispose { if (window != null && previous != null) window.navigationBarColor = previous }
+    }
+}
+
+@Composable
+internal fun SheetDragHandle(modifier: Modifier = Modifier) {
+    Box(modifier.padding(vertical = 20.dp).size(width = 32.dp, height = 4.dp)
+        .background(MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(2.dp)))
 }

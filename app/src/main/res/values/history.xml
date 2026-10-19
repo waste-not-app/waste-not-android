@@ -1,0 +1,21 @@
+<resources>
+    <string name="filter_history">Filter riwayat</string>
+    <string name="filter_description">Pilih catatan yang ingin kamu lihat.</string>
+    <string name="all_categories">Semua kategori</string>
+    <string name="all_methods">Semua metode</string>
+    <string name="filter_from">Dari tanggal</string>
+    <string name="filter_to">Sampai tanggal</string>
+    <string name="choose_filter_date">Pilih tanggal</string>
+    <string name="filter_dates_incomplete">Isi tanggal mulai dan akhir, atau kosongkan keduanya.</string>
+    <string name="filter_dates_reversed">Tanggal mulai tidak boleh melewati tanggal akhir.</string>
+    <string name="apply_filters">Terapkan filter</string>
+    <string name="reset_filter_draft">Reset pilihan</string>
+    <string name="history_count">%1$s aktivitas tercatat.</string>
+    <string name="history_filtered_count">%1$s aktivitas sesuai filter.</string>
+    <string name="history_today">Hari ini</string>
+    <string name="history_yesterday">Kemarin</string>
+    <string name="history_date_range">%1$s – %2$s</string>
+    <string name="load_more_logs">Muat catatan berikutnya</string>
+    <string name="history_shown">%1$s dari %2$s catatan ditampilkan</string>
+    <string name="avoided_label">dihindari</string>
+</resources>

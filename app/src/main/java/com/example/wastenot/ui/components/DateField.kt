@@ -1,5 +1,13 @@
 package com.example.wastenot.ui.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Alignment
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.res.painterResource
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,22 +40,32 @@ import java.time.ZoneOffset
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateField(
-    date: LocalDate,
+    date: LocalDate?,
     minimum: LocalDate,
     maximum: LocalDate,
     onChange: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     error: String? = null,
+    label: String = stringResource(R.string.activity_date),
 ) {
-    var choosing by remember { mutableStateOf(false) }
+    var choosing by rememberSaveable { mutableStateOf(false) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(R.string.activity_date), style = MaterialTheme.typography.titleSmall)
+        Text(label, style = MaterialTheme.typography.titleSmall)
         OutlinedButton(
             onClick = { choosing = true },
             enabled = enabled,
+            shape = MaterialTheme.shapes.small,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
             modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
-        ) { Text(WasteFormat.activityDate(date)) }
+        ) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(date?.let(WasteFormat::activityDate) ?: stringResource(R.string.choose_filter_date),
+                    Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+                Icon(painterResource(R.drawable.ic_calendar), null, Modifier.size(24.dp))
+            }
+        }
         if (error != null) Text(error, color = MaterialTheme.colorScheme.error)
     }
     if (choosing) {
@@ -59,8 +77,9 @@ fun DateField(
             }
         }
         val picker = rememberDatePickerState(
-            initialSelectedDateMillis = date.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
-            yearRange = minOf(date.year, minimum.year)..maxOf(date.year, maximum.year),
+            initialSelectedDateMillis = date?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
+            initialDisplayedMonthMillis = (date ?: maximum).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
+            yearRange = minOf(date?.year ?: minimum.year, minimum.year)..maxOf(date?.year ?: maximum.year, maximum.year),
             selectableDates = dates,
         )
         DatePickerDialog(
