@@ -1,6 +1,7 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,11 +12,20 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import com.example.wastenot.R
 import com.example.wastenot.data.demo.demoSummary
 import com.example.wastenot.model.*
@@ -23,6 +33,8 @@ import com.example.wastenot.theme.*
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.*
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 private fun pagePadding(padding: PaddingValues): PaddingValues {
@@ -47,70 +59,124 @@ private fun ScrollPage(padding: PaddingValues, modifier: Modifier = Modifier, co
 }
 
 @Composable
-private fun DemoCaption(date: LocalDate? = null) {
-    Text(stringResource(if (date != null) R.string.demo_caption_date else R.string.demo_caption,
-        date?.let(WasteFormat::activityDate).orEmpty()), style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant)
-}
-
-@Composable
 fun OverviewScreen(user: User, data: WorkspaceUiState, demo: Boolean, date: LocalDate, padding: PaddingValues,
-    onRecord: () -> Unit, onHistory: () -> Unit, onDetail: (String) -> Unit, onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    onRecord: () -> Unit, onHistory: () -> Unit, onDetail: (String) -> Unit, onRetry: () -> Unit, modifier: Modifier = Modifier,
+    onProfile: () -> Unit = {}) {
     if (data.records.isEmpty() && (data.loading || data.error != null)) {
         WorkspaceLoading(data, onRetry, padding, modifier)
         return
     }
     ScrollPage(padding, modifier) {
-        if (demo) DemoCaption(date)
-        Text(stringResource(R.string.greeting, user.name), style = MaterialTheme.typography.titleLarge)
-        Text(WasteFormat.activityDate(date), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.forLanguageTag("id-ID"))),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.greeting, user.name), style = MaterialTheme.typography.headlineMedium)
+            }
+            FilledIconButton(onClick = onProfile, shape = MaterialTheme.shapes.medium,
+                colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                modifier = Modifier.size(48.dp)) {
+                Icon(painterResource(R.drawable.ic_profile), stringResource(R.string.open_profile))
+            }
+        }
         if (data.error != null) MessageBanner(stringResource(R.string.refresh_failed), isError = true)
         if (demo) {
             val today = demoSummary(data.records.filter { it.activityDate == date })
-            SummaryBlock(today, stringResource(R.string.handled_today))
+            SummaryBlock(today, stringResource(R.string.handled_today), afterPrimary = {
+                OutlinedButton(onClick = onRecord, shape = MaterialTheme.shapes.small,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.onSurface),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(stringResource(R.string.manual_input)) }
+            }, personal = true)
             DemoProgress(data.records.size)
         } else MessageBanner(stringResource(R.string.summary_pending))
-        TextButton(onClick = onRecord, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.manual_input)) }
-        Text(stringResource(R.string.recent_activities), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.recent_activities), style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.weight(1f).semantics { heading() })
+            TextButton(onClick = onHistory) { Text(stringResource(R.string.see_history)) }
+        }
         if (data.records.isEmpty()) Text(stringResource(R.string.logs_empty))
         data.records.take(3).forEach { log -> ActivityRow(log, { onDetail(log.id) }, Modifier.fillMaxWidth()) }
-        TextButton(onClick = onHistory, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.see_history)) }
     }
 }
 
 @Composable
-private fun SummaryBlock(summary: WasteSummary, title: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+private fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifier = Modifier,
+    personal: Boolean = false, afterPrimary: @Composable () -> Unit = {}) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(20.dp)) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(MaterialTheme.shapes.large)
                 .background(LocalWasteNotGradients.current.summary, MaterialTheme.shapes.large)
+                .drawBehind {
+                    drawCircle(Color.White.copy(alpha = 0.06f), radius = 82.dp.toPx(),
+                        center = Offset(size.width, 0f), style = Stroke(width = 20.dp.toPx()))
+                }
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(title, color = SummarySecondaryText)
-            Text(formatted(WasteFormat.weight(summary.handled.weightGrams, summary = true)), color = SummaryText, style = MaterialTheme.typography.displayLarge)
+            val weight = WasteFormat.weight(summary.handled.weightGrams, summary = true)
+            Text(buildAnnotatedString {
+                append(weight.amount)
+                withStyle(SpanStyle(fontSize = MaterialTheme.typography.headlineSmall.fontSize)) {
+                    append(" " + stringResource(weight.unit.labelResource))
+                }
+            }, color = SummaryText, style = MaterialTheme.typography.displayLarge)
+            Text(stringResource(R.string.summary_activity_count, summary.activityCount), color = SummarySecondaryText,
+                style = MaterialTheme.typography.bodyMedium)
             if (summary.handled.itemCount > 0) Text(stringResource(R.string.handled_items, WasteFormat.integer(summary.handled.itemCount)), color = SummaryText)
+            if (personal) {
+                HorizontalDivider(Modifier.padding(top = 12.dp, bottom = 8.dp), color = SummarySecondaryText.copy(alpha = 0.4f))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(painterResource(R.drawable.ic_history), null, Modifier.size(20.dp), tint = SummarySecondaryText)
+                    Text(stringResource(R.string.summary_footer), style = MaterialTheme.typography.bodySmall, color = SummarySecondaryText)
+                }
+            }
         }
-        if (summary.avoided.itemCount > 0 || summary.avoided.weightGrams > 0) Surface(color = MaterialTheme.colorScheme.tertiaryContainer,
-            contentColor = MaterialTheme.colorScheme.onTertiaryContainer, shape = MaterialTheme.shapes.medium) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                if (summary.avoided.itemCount > 0) Text(stringResource(R.string.avoided_items, WasteFormat.integer(summary.avoided.itemCount)), style = MaterialTheme.typography.titleLarge)
-                if (summary.avoided.weightGrams > 0) Text(stringResource(R.string.avoided_weight, formatted(WasteFormat.weight(summary.avoided.weightGrams, summary = true))))
-                Text(stringResource(R.string.reduce_separate), style = MaterialTheme.typography.bodySmall)
+        afterPrimary()
+        if (summary.avoided.itemCount > 0 || summary.avoided.weightGrams > 0) Row(
+            modifier = Modifier.fillMaxWidth().background(LocalWasteNotGradients.current.accent, MaterialTheme.shapes.medium).padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(painterResource(R.drawable.ic_leaf), null, Modifier.size(24.dp), tint = OnAccent)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (summary.avoided.itemCount > 0) Text(stringResource(R.string.avoided_items, WasteFormat.integer(summary.avoided.itemCount)), style = MaterialTheme.typography.titleMedium, color = OnAccent)
+                if (summary.avoided.weightGrams > 0) Text(stringResource(R.string.avoided_weight, formatted(WasteFormat.weight(summary.avoided.weightGrams, summary = true))), color = OnAccent)
+                Text(stringResource(R.string.reduce_separate), style = MaterialTheme.typography.bodyMedium, color = OnAccent)
             }
         }
         val rate = WasteFormat.percentage(summary.recyclingRatePercent)
-        Text(if (rate == null) stringResource(R.string.rate_unavailable) else stringResource(R.string.recycling_rate, rate, summary.recycledActivityCount, summary.handledActivityCount))
-        Text(stringResource(R.string.activity_count, summary.activityCount))
+        Column {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(stringResource(R.string.rate_title), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.rate_basis), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text(if (rate == null) stringResource(R.string.rate_empty) else stringResource(R.string.rate_value, rate), style = MaterialTheme.typography.headlineSmall)
+            }
+            if (rate != null) Text(stringResource(R.string.rate_fraction, summary.recycledActivityCount, summary.handledActivityCount),
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            HorizontalDivider(Modifier.padding(top = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
+        }
     }
 }
 
 @Composable
-private fun DemoProgress(count: Int) {
+private fun DemoProgress(count: Int, modifier: Modifier = Modifier) {
     val xp = count * 10
-    Text(stringResource(R.string.progress_summary, 1 + xp / 100, xp % 100), style = MaterialTheme.typography.titleSmall)
-    LinearProgressIndicator(progress = { (xp % 100) / 100f }, modifier = Modifier.fillMaxWidth())
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(stringResource(R.string.level_title, 1 + xp / 100), style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.xp_total, xp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        LinearProgressIndicator(progress = { (xp % 100) / 100f }, modifier = Modifier.fillMaxWidth().height(7.dp),
+            color = MaterialTheme.colorScheme.primary, trackColor = MaterialTheme.colorScheme.outlineVariant,
+            drawStopIndicator = {})
+        Text(stringResource(R.string.xp_next, 100 - xp % 100, 2 + xp / 100), style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
 }
 
 @Composable
@@ -120,7 +186,7 @@ fun HistoryScreen(data: WorkspaceUiState, demo: Boolean, padding: PaddingValues,
     var method by rememberSaveable { mutableStateOf<DisposalMethod?>(null) }
     val visible = data.records.filter { (category == null || it.category == category) && (method == null || it.method == method) }
     LazyColumn(modifier = modifier, contentPadding = pagePadding(padding), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { if (demo) DemoCaption() else Text(stringResource(R.string.loaded_records_only), style = MaterialTheme.typography.bodySmall) }
+        if (!demo) item { Text(stringResource(R.string.loaded_records_only), style = MaterialTheme.typography.bodySmall) }
         item { TextButton(onClick = onRecord, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.manual_input)) } }
         item { CategoryPicker(category, { category = it }, Modifier.fillMaxWidth()) }
         item { MethodSelector(method, { method = it }, Modifier.fillMaxWidth()) }
@@ -139,26 +205,41 @@ fun HistoryScreen(data: WorkspaceUiState, demo: Boolean, padding: PaddingValues,
 
 @Composable
 private fun ActivityRow(log: WasteLog, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(onClick = onClick, modifier = modifier.heightIn(min = 48.dp), shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surface, border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(stringResource(log.category.labelResource), style = MaterialTheme.typography.titleMedium)
-                Text(formatted(WasteFormat.quantity(log.quantity)), style = MaterialTheme.typography.titleLarge)
+    Surface(onClick = onClick, modifier = modifier.heightIn(min = 64.dp), color = androidx.compose.ui.graphics.Color.Transparent) {
+        Column {
+            Row(Modifier.padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(44.dp).background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small), contentAlignment = Alignment.Center) {
+                    Icon(painterResource(log.category.iconResource), null, Modifier.size(24.dp), tint = MaterialTheme.colorScheme.primary)
+                }
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(stringResource(log.category.labelResource), style = MaterialTheme.typography.titleMedium)
+                        Text(formatted(WasteFormat.quantity(log.quantity)), style = MaterialTheme.typography.titleLarge)
+                    }
+                    Text(stringResource(R.string.date_method, stringResource(log.method.labelResource), WasteFormat.activityDate(log.activityDate)) +
+                        if (log.method == DisposalMethod.REDUCE) stringResource(R.string.avoided_suffix) else "",
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
-            Text(stringResource(log.method.labelResource) + if (log.method == DisposalMethod.REDUCE) stringResource(R.string.avoided_suffix) else "",
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(WasteFormat.activityDate(log.activityDate), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            if (log.notes.isNotBlank()) Text(log.notes, style = MaterialTheme.typography.bodyMedium)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         }
     }
+}
+
+private val WasteCategory.iconResource: Int get() = when (this) {
+    WasteCategory.ORGANIC -> R.drawable.ic_leaf
+    WasteCategory.PLASTIC -> R.drawable.ic_bottle
+    WasteCategory.PAPER -> R.drawable.ic_paper
+    WasteCategory.GLASS -> R.drawable.ic_jar
+    WasteCategory.METAL -> R.drawable.ic_metal
+    WasteCategory.ELECTRONIC -> R.drawable.ic_device
+    WasteCategory.OTHER -> R.drawable.ic_more
 }
 
 @Composable
 fun StatisticsScreen(data: WorkspaceUiState, demo: Boolean, date: LocalDate, padding: PaddingValues, onRetry: () -> Unit, modifier: Modifier = Modifier) {
     var days by rememberSaveable { mutableIntStateOf(7) }
     ScrollPage(padding, modifier) {
-        if (demo) DemoCaption(date)
         RangeSelector(days, { days = it })
         Text(stringResource(R.string.date_range, WasteFormat.activityDate(date.minusDays(days - 1L)), WasteFormat.activityDate(date)))
         if (demo) {
@@ -174,7 +255,6 @@ fun StatisticsScreen(data: WorkspaceUiState, demo: Boolean, date: LocalDate, pad
 fun ProfileScreen(user: User, data: WorkspaceUiState, demo: Boolean, theme: ThemeMode, padding: PaddingValues,
     onTheme: () -> Unit, onLogout: () -> Unit, modifier: Modifier = Modifier) {
     ScrollPage(padding, modifier) {
-        if (demo) DemoCaption()
         Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.primaryContainer) {
             Text(user.name.split(' ').filter(String::isNotBlank).take(2).mapNotNull { it.firstOrNull()?.uppercaseChar() }.joinToString(""),
                 Modifier.padding(20.dp), style = MaterialTheme.typography.headlineMedium)
@@ -192,7 +272,6 @@ fun ProfileScreen(user: User, data: WorkspaceUiState, demo: Boolean, theme: Them
 @Composable
 fun GuidePlaceholderScreen(demo: Boolean, padding: PaddingValues, modifier: Modifier = Modifier) {
     ScrollPage(padding, modifier) {
-        if (demo) DemoCaption()
         Text(stringResource(R.string.guide_pending_title), style = MaterialTheme.typography.headlineSmall)
         Text(stringResource(R.string.guide_pending_message))
     }
@@ -201,7 +280,6 @@ fun GuidePlaceholderScreen(demo: Boolean, padding: PaddingValues, modifier: Modi
 @Composable
 fun LogDetailScreen(log: WasteLog?, demo: Boolean, padding: PaddingValues, onEdit: () -> Unit, modifier: Modifier = Modifier) {
     ScrollPage(padding, modifier) {
-        if (demo) DemoCaption()
         if (log == null) Text(stringResource(R.string.log_not_loaded)) else {
             Text(stringResource(log.category.labelResource), style = MaterialTheme.typography.headlineMedium)
             Text(formatted(WasteFormat.quantity(log.quantity)), style = MaterialTheme.typography.displayMedium)

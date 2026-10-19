@@ -28,6 +28,8 @@ Starter menyediakan task unit test debug (termasuk renderer Navigation Graph); t
 
 ## Konfigurasi lingkungan
 
+Iteration 2 menggunakan `BuildConfig.USE_DUMMY_DATA=true` secara default pada debug/staging/release, sesuai permintaan pengerjaan UI tanpa backend. Sesi dan catatan fixture tersimpan lokal per akun; tidak ada tombol mode demo. Base URL di bawah tetap divalidasi, tetapi request akun/catatan tidak dipakai selama adapter dummy aktif. Untuk menguji adapter remote, tambahkan `-Pwastenot.useDummyData=false` bersama URL yang sesuai. Adapter write/agregat remote belum lengkap, sehingga konfigurasi ini bukan klaim backend sudah terintegrasi.
+
 | Build type | Property Gradle | Default | Kebijakan |
 |---|---|---|---|
 | debug | `wastenot.debugApiBaseUrl` | `http://10.0.2.2:8080/v1/` | HTTP hanya untuk emulator/localhost |
@@ -38,13 +40,13 @@ Nilai kosong berarti backend belum dikonfigurasi; bukan alamat layanan produksi.
 
 ```sh
 # Backend lokal di host emulator
-./gradlew assembleDebug
+./gradlew assembleDebug -Pwastenot.useDummyData=false
 
 # HTTPS staging: isi URL nyata dari tim melalui environment lokal
-./gradlew assembleStaging "-Pwastenot.stagingApiBaseUrl=$WASTENOT_STAGING_API_BASE_URL"
+./gradlew assembleStaging -Pwastenot.useDummyData=false "-Pwastenot.stagingApiBaseUrl=$WASTENOT_STAGING_API_BASE_URL"
 
 # HTTPS release: isi URL nyata dari tim melalui environment lokal
-./gradlew assembleRelease "-Pwastenot.releaseApiBaseUrl=$WASTENOT_RELEASE_API_BASE_URL"
+./gradlew assembleRelease -Pwastenot.useDummyData=false "-Pwastenot.releaseApiBaseUrl=$WASTENOT_RELEASE_API_BASE_URL"
 ```
 
 Base URL harus absolute, memiliki host/port yang valid, serta tidak memuat user info, query atau fragment. Trailing slash dinormalisasi. Cleartext debug dibatasi ke `10.0.2.2`, `localhost` dan `127.0.0.1`; staging/release menggunakan kebijakan jaringan HTTPS. Implementasi mengikuti [Network Security Configuration Android](https://developer.android.com/privacy-and-security/security-config) dan [build variants](https://developer.android.com/build/build-variants).

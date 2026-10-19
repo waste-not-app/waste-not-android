@@ -52,8 +52,6 @@ fun AuthScreen(
     onChange: (AccountField, String) -> Unit,
     onSubmit: () -> Unit,
     onSwitchForm: () -> Unit,
-    onPreview: () -> Unit,
-    onUseRealAccount: () -> Unit,
     modifier: Modifier = Modifier,
     logoutState: LogoutUiState = LogoutUiState.None,
     onRetryCleanup: () -> Unit = {},
@@ -81,8 +79,7 @@ fun AuthScreen(
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.semantics { heading() },
             )
-            if (isDemo) MessageBanner(stringResource(R.string.demo_account_message))
-            else if (logoutState == LogoutUiState.None && state.failure == null && reason !in setOf(SignOutReason.NONE, SignOutReason.LOGOUT_CONFIRMED, SignOutReason.LOGOUT_LOCAL_ONLY)) {
+            if (logoutState == LogoutUiState.None && state.failure == null && reason !in setOf(SignOutReason.NONE, SignOutReason.LOGOUT_CONFIRMED, SignOutReason.LOGOUT_LOCAL_ONLY)) {
                 MessageBanner(stringResource(R.string.session_expired_message))
             }
             when (logoutState) {
@@ -124,7 +121,7 @@ fun AuthScreen(
             }
             state.failure?.let { MessageBanner(stringResource(it.messageResource), isError = true) }
             ActionButton(
-                label = stringResource(if (register) if (isDemo) R.string.register_demo else R.string.register_action else if (isDemo) R.string.login_demo else R.string.login_action),
+                label = stringResource(if (register) R.string.register_action else R.string.login_action),
                 onClick = onSubmit,
                 loading = state.submitting,
                 loadingLabel = stringResource(if (register) R.string.register_loading else R.string.login_loading),
@@ -133,11 +130,6 @@ fun AuthScreen(
             TextButton(onClick = onSwitchForm, enabled = !state.submitting, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                 Text(stringResource(if (register) R.string.go_to_login else R.string.go_to_register))
             }
-            TextButton(
-                onClick = if (isDemo) onUseRealAccount else onPreview,
-                enabled = !state.submitting,
-                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-            ) { Text(stringResource(if (isDemo) R.string.use_real_account else R.string.preview_application)) }
         }
     }
 }

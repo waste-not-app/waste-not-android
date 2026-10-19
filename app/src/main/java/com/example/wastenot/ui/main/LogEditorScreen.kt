@@ -70,7 +70,7 @@ fun LogEditorScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            MessageBanner(stringResource(if (demo) R.string.demo_write_message else R.string.remote_write_message))
+            if (!demo) MessageBanner(stringResource(R.string.remote_write_message))
             if (value.version != null) MessageBanner(stringResource(R.string.edit_progress_message))
             MethodSelector(value.method, { draft.change(EditorField.METHOD, value.copy(method = it)) }, fieldModifier(EditorField.METHOD),
                 draft.errors[EditorField.METHOD]?.let { stringResource(it) }, enabled = !saving)
@@ -88,7 +88,7 @@ fun LogEditorScreen(
                 errorText = draft.errors[EditorField.NOTES]?.let { stringResource(it) }, enabled = !saving)
             if (saveError) MessageBanner(stringResource(R.string.save_failed_message), isError = true)
             ActionButton(
-                stringResource(if (value.version != null) R.string.save_changes else if (demo) R.string.save_example else R.string.save_activity),
+                stringResource(if (value.version != null) R.string.save_changes else R.string.save_activity),
                 { draft.validate(referenceDate)?.let(onSave) }, Modifier.fillMaxWidth(), loading = saving,
                 loadingLabel = stringResource(R.string.saving), enabled = value.version == null || draft.dirty,
             )

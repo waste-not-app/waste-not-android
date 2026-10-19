@@ -21,6 +21,8 @@ class TalkBackNavigationTest {
         assumeTrue("Run explicitly on a dedicated TalkBack-enabled emulator",
             InstrumentationRegistry.getArguments().getString("talkback") == "true")
         assumeTrue(android.os.Build.VERSION.SDK_INT >= 36)
+        instrumentation.targetContext.getSharedPreferences("dummy_session", android.content.Context.MODE_PRIVATE)
+            .edit().clear().putBoolean("signed_out", true).commit()
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
         automation.serviceInfo = automation.serviceInfo.apply {
             flags = flags or AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS

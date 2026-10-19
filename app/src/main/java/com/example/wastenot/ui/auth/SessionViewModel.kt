@@ -2,7 +2,6 @@ package com.example.wastenot.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wastenot.data.demo.DemoAccountSession
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.repository.AccountSession
@@ -50,7 +49,6 @@ data class AuthUiState(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SessionViewModel(private val remote: AccountSession) : ViewModel() {
-    private val demo = DemoAccountSession()
     private val selected = MutableStateFlow(remote)
     val session = selected.flatMapLatest { source -> source.state.map { SessionUiState(it, source.isDemo) } }
         .stateIn(viewModelScope, SharingStarted.Eagerly, SessionUiState(remote.state.value, remote.isDemo))
@@ -133,24 +131,6 @@ class SessionViewModel(private val remote: AccountSession) : ViewModel() {
                 if (selected.value === source && authRevision == revision) mutableAuth.update { it.copy(submitting = false) }
             }
         }
-    }
-
-    fun preview() {
-        if (pending?.isActive == true || selected.value.state.value !is SessionState.SignedOut) return
-        authRevision++
-        mutableAuth.value = AuthUiState()
-        mutableLogout.value = LogoutUiState.None
-        selected.value = demo
-        demo.openPreview()
-    }
-
-    fun useRealAccount() {
-        if (pending?.isActive == true || selected.value.state.value !is SessionState.SignedOut) return
-        authRevision++
-        mutableAuth.value = AuthUiState()
-        mutableLogout.value = LogoutUiState.None
-        selected.value = remote
-        bootstrap(retry = true)
     }
 
     fun logout() {

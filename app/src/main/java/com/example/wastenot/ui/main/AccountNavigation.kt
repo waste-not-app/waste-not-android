@@ -1,6 +1,10 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
@@ -13,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -27,12 +32,14 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.wastenot.*
 import com.example.wastenot.R
 import com.example.wastenot.data.demo.DemoActivityStore
+import com.example.wastenot.data.dummy.DummyActivityStore
 import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.data.repository.RemoteActivityStore
 import com.example.wastenot.model.User
 import com.example.wastenot.theme.Accent
 import com.example.wastenot.theme.OnAccent
 import com.example.wastenot.theme.ThemeMode
+import com.example.wastenot.theme.LocalWasteNotGradients
 import java.time.LocalDate
 import java.util.UUID
 
@@ -55,8 +62,11 @@ fun AccountNavigation(
     onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current.applicationContext
     val factory = remember(user.id, demo, core) { viewModelFactory { initializer {
-        WorkspaceViewModel(if (demo) DemoActivityStore(user.timezone) else RemoteActivityStore(core))
+        WorkspaceViewModel(if (demo) DummyActivityStore(
+            context.getSharedPreferences("dummy_logs_${user.id}", android.content.Context.MODE_PRIVATE), user.timezone,
+        ) else RemoteActivityStore(core))
     } } }
     val model: WorkspaceViewModel = viewModel(factory = factory)
     val data by model.state.collectAsStateWithLifecycle()
@@ -73,6 +83,7 @@ fun AccountNavigation(
     } else null
     var discard by remember { mutableStateOf(false) }
     var leaving by remember { mutableStateOf(false) }
+    var capture by remember { mutableStateOf(false) }
     fun back() {
         if (editor != null && data.saving) return
         if (editor != null && draft?.dirty == true) { discard = true; return }
@@ -98,29 +109,31 @@ fun AccountNavigation(
     )
     if (leaving) AlertDialog(
         onDismissRequest = { leaving = false }, title = { Text(stringResource(R.string.logout_title)) },
-        text = { Text(stringResource(if (demo) R.string.logout_demo_message else R.string.logout_message)) },
+        text = { Text(stringResource(R.string.logout_message)) },
         confirmButton = { TextButton(onClick = { leaving = false; onLogout() }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(stringResource(R.string.logout_action)) } },
         dismissButton = { TextButton(onClick = { leaving = false }) { Text(stringResource(R.string.cancel)) } },
     )
+    if (capture) CaptureSheet(onDismiss = { capture = false }, onManual = { capture = false; edit() })
     BoxWithConstraints(modifier) {
         val rail = maxWidth >= 600.dp
         val railWidth = if (LocalDensity.current.fontScale >= 1.5f) 144.dp else 112.dp
-        Row(Modifier.fillMaxSize()) {
-            if (rail && editor == null) TabRail(selected, { selected = it }, { edit() }, Modifier.width(railWidth).fillMaxHeight())
+        Row(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas)) {
+            if (rail && editor == null) TabRail(selected, { selected = it }, { capture = true }, Modifier.width(railWidth).fillMaxHeight())
             Scaffold(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
-                topBar = { TopAppBar(title = { Text(stringResource(when (current) {
+                containerColor = Color.Transparent,
+                topBar = { if (current != Home) TopAppBar(title = { Text(stringResource(when (current) {
                     is LogDetail -> R.string.log_detail
                     is LogEditor -> if (current.logId == null) R.string.log_create else R.string.log_edit
                     else -> selected.label
-                }), style = MaterialTheme.typography.titleMedium) }, navigationIcon = {
+                }), style = MaterialTheme.typography.headlineMedium) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent), navigationIcon = {
                     if (stack.size > 1) IconButton(onClick = ::back) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
                 }) },
-                bottomBar = { if (!rail && editor == null) TabDock(selected, { selected = it }, { edit() }) },
+                bottomBar = { if (!rail && editor == null) TabDock(selected, { selected = it }, { capture = true }) },
             ) { padding ->
                 val pageInsets = PaddingValues(0.dp)
                 val provider = entryProvider {
-                    entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, { selected = MainTab.HISTORY }, { stack.add(LogDetail(it)) }, { model.load(true) }, Modifier.fillMaxSize()) }
+                    entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, { selected = MainTab.HISTORY }, { stack.add(LogDetail(it)) }, { model.load(true) }, Modifier.fillMaxSize(), onProfile = { selected = MainTab.PROFILE }) }
                     entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, { stack.add(LogDetail(it)) }, { model.load(true) }, Modifier.fillMaxSize()) }
                     entry<Guide> { GuidePlaceholderScreen(demo, pageInsets, Modifier.fillMaxSize()) }
                     entry<Statistics> { StatisticsScreen(data, demo, date, pageInsets, { model.load(true) }, Modifier.fillMaxSize()) }
@@ -138,7 +151,10 @@ fun AccountNavigation(
                 }
                 val entries = if (selected == MainTab.HOME) decorated.getValue(MainTab.HOME)
                     else decorated.getValue(MainTab.HOME) + decorated.getValue(selected)
-                NavDisplay(entries = entries, onBack = ::back, modifier = Modifier
+                NavDisplay(entries = entries, onBack = ::back,
+                    transitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
+                    popTransitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
+                    modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .consumeWindowInsets(padding))
@@ -148,30 +164,20 @@ fun AccountNavigation(
 }
 
 @Composable
-private fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, vertical: Boolean = false) {
-    Button(onClick, modifier.heightIn(min = 52.dp),
-        contentPadding = if (vertical) PaddingValues(horizontal = 8.dp, vertical = 12.dp) else ButtonDefaults.ContentPadding,
-        colors = ButtonDefaults.buttonColors(containerColor = Accent, contentColor = OnAccent)) {
-        if (vertical) Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Icon(painterResource(R.drawable.ic_add), null)
-            Text(stringResource(R.string.record_action), textAlign = TextAlign.Center)
-        } else {
-            Icon(painterResource(R.drawable.ic_add), null)
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.record_action))
-        }
-    }
-}
-
-@Composable
 private fun TabDock(selected: MainTab, onSelect: (MainTab) -> Unit, onRecord: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(modifier, color = MaterialTheme.colorScheme.surface, shadowElevation = 4.dp) {
-        Column(Modifier.navigationBarsPadding().padding(top = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            RecordAction(onRecord)
-            Row(Modifier.fillMaxWidth().selectableGroup()) {
+    Box(modifier.navigationBarsPadding().padding(start = 7.dp, end = 7.dp, bottom = 9.dp)) {
+        Surface(
+            modifier = Modifier.fillMaxWidth().padding(top = 27.dp),
+            color = MaterialTheme.colorScheme.surface,
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            shadowElevation = 2.dp,
+        ) {
+            Row(Modifier.padding(top = 32.dp, bottom = 7.dp, start = 2.dp, end = 2.dp).selectableGroup()) {
                 MainTab.entries.forEach { tab -> TabItem(tab, tab == selected, { onSelect(tab) }, Modifier.weight(1f)) }
             }
         }
+        RecordAction(onRecord, Modifier.align(Alignment.TopCenter))
     }
 }
 
@@ -196,15 +202,17 @@ private fun TabRail(selected: MainTab, onSelect: (MainTab) -> Unit, onRecord: ()
 private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .heightIn(min = 80.dp)
+            .heightIn(min = 64.dp)
             .selectable(selected, role = Role.Tab, onClick = onClick)
-            .padding(horizontal = 4.dp, vertical = 8.dp),
+            .padding(horizontal = 2.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Icon(painterResource(tab.icon), null, Modifier.background(if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent, MaterialTheme.shapes.medium).padding(8.dp),
-            tint = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(stringResource(tab.label), style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center,
+        Box(Modifier.size(width = 44.dp, height = 28.dp).then(if (selected) Modifier.background(LocalWasteNotGradients.current.accent,
+            androidx.compose.foundation.shape.RoundedCornerShape(10.dp)) else Modifier), contentAlignment = Alignment.Center) {
+            Icon(painterResource(tab.icon), null, Modifier.size(20.dp), tint = if (selected) OnAccent else MaterialTheme.colorScheme.onSurface)
+        }
+        Text(stringResource(tab.label), style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center,
             color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

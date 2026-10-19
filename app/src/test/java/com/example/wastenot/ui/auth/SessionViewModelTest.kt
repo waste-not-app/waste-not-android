@@ -94,26 +94,17 @@ class SessionViewModelTest {
         assertEquals("", model().auth.value.password)
     }
 
-    @Test fun previewIsExplicitAndEveryDemoLifetimeIsDifferent() = runTest {
+    @Test fun bootstrapKeepsTheInjectedAccountSourceWithoutPreviewSwitching() = runTest {
         val source = FakeSession()
         val vm = model(source)
         runCurrent()
         assertFalse(vm.session.value.isDemo)
-        vm.preview()
-        advanceUntilIdle()
-        val first = vm.session.value.phase as SessionState.Authenticated
-        assertTrue(vm.session.value.isDemo)
-        assertEquals("Pengguna Demo", first.user.name)
-        assertEquals(0, source.loginCalls)
-        assertEquals(0, source.registerCalls)
-        vm.logout()
+        vm.bootstrap()
         advanceUntilIdle()
         assertTrue(vm.session.value.phase is SessionState.SignedOut)
-        vm.preview()
-        advanceUntilIdle()
-        val second = vm.session.value.phase as SessionState.Authenticated
-        assertEquals(first.user.id, second.user.id)
-        assertTrue(second.epoch > first.epoch)
+        assertFalse(vm.session.value.isDemo)
+        assertEquals(0, source.loginCalls)
+        assertEquals(0, source.registerCalls)
     }
 
     @Test fun serverFieldErrorsOnlyFocusFieldsPresentInTheSubmittedForm() = runTest {

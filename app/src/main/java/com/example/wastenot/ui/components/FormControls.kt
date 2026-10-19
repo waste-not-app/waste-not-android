@@ -46,6 +46,7 @@ fun ActionButton(
         onClick = onClick,
         modifier = modifier.heightIn(min = 52.dp),
         enabled = enabled && !loading,
+        shape = MaterialTheme.shapes.small,
         colors = if (destructive) ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.error,
             contentColor = MaterialTheme.colorScheme.onError,

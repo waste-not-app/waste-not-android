@@ -134,12 +134,12 @@ private fun AuthNavigation(model: SessionViewModel, demo: Boolean, phase: Sessio
             entryProvider = entryProvider {
                 entry<Login> {
                     AuthScreen(false, form, demo, phase.reason, model::change, { model.submit(false) },
-                        { model.clearPasswords(); if (stack.last() != Register) stack.add(Register) }, model::preview, model::useRealAccount,
+                        { model.clearPasswords(); if (stack.last() != Register) stack.add(Register) },
                         Modifier.fillMaxSize(), logout, model::logout)
                 }
                 entry<Register> {
                     AuthScreen(true, form, demo, phase.reason, model::change, { model.submit(true) }, ::back,
-                        model::preview, model::useRealAccount, Modifier.fillMaxSize(), logout, model::logout)
+                        Modifier.fillMaxSize(), logout, model::logout)
                 }
             },
         )

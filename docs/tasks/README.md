@@ -1,5 +1,7 @@
 # Catatan pekerjaan Android
 
+Pekerjaan aktif: [Iteration 2, kesesuaian desain dan sumber dummy](ITERATION_2_DESIGN.md). Penerimaan visual dibuka kembali; implementasi fungsional Iteration 1 belum berarti semua screen sesuai mockup.
+
 Setiap task yang dikerjakan memiliki catatan perubahan, bukti pengujian, dan pekerjaan tersisa di folder ini. Checkbox issue GitHub mengikuti bukti tersebut; status review tidak berarti fitur sudah terintegrasi atau dirilis.
 
 Bukti lintas task, batas sumber contoh/backend, regresi yang diperbaiki, dan langkah mengulang uji tersedia di [QA Iteration 1](ITERATION_1_QA.md).
