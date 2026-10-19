@@ -33,7 +33,7 @@ Pilihan implementasi: ENERGY 2 / RHYTHM 2 / MOTION 1. Pinus memberi fokus pada a
 | S17–S19 | Pengingat/lampiran/lokasi mengikuti capability dan state jujur | Should/Stretch/Could mengikuti kit; jangan mengarang layanan siap |
 | S20 | Loading/empty/error/success dipakai ulang, bukan menu produk | Perlu audit pada semua layar yang selesai |
 | S21–S25 | Foto/objek/kondisi/saran/fallback, konfirmasi, tidak auto-save | Dock membuka sheet dan manual; foto/AI belum selesai |
-| Navigasi | Stack/scroll/draf, Back konsisten, transisi pendek | Fade ditambahkan; perlu audit gerak dan regresi perangkat |
+| Navigasi | Stack/scroll/draf, Back konsisten, transisi pendek | Fade 180 ms, stack per tab, Back detail dan tujuan daftar Riwayat setelah delete diuji; audit gerak per frame dan cakupan seluruh layar belum selesai |
 | QA | Screenshot tiap layar; terang/gelap, teks 200%, ponsel/rail | [Dock/Beranda/dummy](../qa/iteration-2/README.md), [Riwayat/filter](../qa/iteration-2/HISTORY.md) dan [Detail/hapus](../qa/iteration-2/DETAIL.md); belum semua layar sesuai |
 | Git/CI | Branch `codex/`, commit terarah, hook dan Actions diperiksa | Branch `codex/android-iteration-2-design` |
 

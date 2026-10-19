@@ -90,6 +90,8 @@ fun AccountNavigation(
     var deletedNotice by rememberSaveable { mutableStateOf(false) }
     fun history() {
         if (stack.lastOrNull() is LogDetail) stack.removeLastOrNull()
+        val historyStack = stacks.getValue(MainTab.HISTORY)
+        while (historyStack.lastOrNull() is LogDetail) historyStack.removeLastOrNull()
         selected = MainTab.HISTORY
     }
     fun back() {
@@ -172,7 +174,7 @@ fun AccountNavigation(
             ) { padding ->
                 val pageInsets = PaddingValues(0.dp)
                 val provider = entryProvider {
-                    entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, { selected = MainTab.HISTORY }, ::detail, { model.load(true) }, Modifier.fillMaxSize(), onProfile = { selected = MainTab.PROFILE }) }
+                    entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, ::history, ::detail, { model.load(true) }, Modifier.fillMaxSize(), onProfile = { selected = MainTab.PROFILE }) }
                     entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
                         today = date, filterOpen = historyFilterOpen, onOpenFilter = { historyFilterOpen = true }, onDismissFilter = { historyFilterOpen = false },
                         deletedNotice = deletedNotice, onDismissNotice = { deletedNotice = false }) }

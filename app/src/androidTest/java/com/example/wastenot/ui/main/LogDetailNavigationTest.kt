@@ -10,6 +10,7 @@ import com.example.wastenot.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExternalResource
+import org.junit.Assume.assumeTrue
 import java.io.File
 
 class LogDetailNavigationTest {
@@ -103,6 +104,25 @@ class LogDetailNavigationTest {
             compose.onNodeWithContentDescription("Kembali").performClick()
         }
         compose.onNodeWithText("650 g").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test fun wideDeleteReturnsToHistoryListWhenHistoryRetainsAnotherDetail() {
+        assumeTrue(compose.activity.resources.configuration.screenWidthDp >= 600)
+        ready()
+        tab("Riwayat")
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("400 g"))
+        compose.onNodeWithText("400 g").performClick()
+        detailReady()
+        tab("Beranda")
+        open()
+        delete()
+        compose.onNodeWithText("Hapus", substring = false).performScrollTo().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodesWithText("Catatan dihapus.").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNode(tabs and hasText("Riwayat")).assertIsSelected()
+        compose.onNodeWithText("Detail catatan").assertDoesNotExist()
+        compose.onNodeWithText("Catatan dihapus.").assertIsDisplayed()
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("400 g"))
+        compose.onNodeWithText("400 g").assertIsDisplayed()
     }
 
     private fun capture(name: String) {
