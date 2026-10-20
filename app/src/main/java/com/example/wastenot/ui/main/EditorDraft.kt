@@ -35,11 +35,15 @@ class EditorDraft(val original: EditorValues) {
 
     fun change(field: EditorField, updated: EditorValues) { values = updated; errors = errors - field }
 
-    fun validate(referenceDate: LocalDate): ActivityInput? {
+    fun validateField(field: EditorField, referenceDate: LocalDate) {
+        errors = errors - field + validationErrors(referenceDate).filterKeys { it == field }
+    }
+
+    private fun validationErrors(referenceDate: LocalDate): Map<EditorField, Int> {
         val current = values
         val notes = current.notes.trim()
         val quantity = parseQuantity(current.quantity.rawText, current.quantity.unit)
-        val found = buildMap {
+        return buildMap {
             if (current.method == null) put(EditorField.METHOD, R.string.error_choose_method)
             if (current.category == null) put(EditorField.CATEGORY, R.string.error_choose_category)
             if (quantity is QuantityParseResult.Invalid) put(EditorField.QUANTITY, when (quantity) {
@@ -51,10 +55,16 @@ class EditorDraft(val original: EditorValues) {
             if (!ActivityDates.canSave(current.date, referenceDate, if (original.version != null) original.date else null)) put(EditorField.DATE, R.string.error_activity_date)
             if (notes.length > 500) put(EditorField.NOTES, R.string.error_notes_length)
         }
+    }
+
+    fun validate(referenceDate: LocalDate): ActivityInput? {
+        val current = values
+        val quantity = parseQuantity(current.quantity.rawText, current.quantity.unit)
+        val found = validationErrors(referenceDate)
         errors = found
         if (found.isNotEmpty()) { focusRequest++; return null }
         return ActivityInput(checkNotNull(current.category), checkNotNull(current.method),
-            (quantity as QuantityParseResult.Valid).quantity, current.date, notes)
+            (quantity as QuantityParseResult.Valid).quantity, current.date, current.notes.trim())
     }
 
     companion object {

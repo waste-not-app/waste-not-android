@@ -35,6 +35,22 @@ class EditorDraftTest {
         assertEquals(Quantity.Count.of(2), edit.validate(today)!!.quantity)
     }
 
+    @Test fun blurValidatesOnlyTheVisitedFieldAndDoesNotRequestFocus() {
+        val draft = EditorDraft.from(null, today)
+        assertTrue(draft.errors.isEmpty())
+        draft.validateField(EditorField.QUANTITY, today)
+        assertEquals(setOf(EditorField.QUANTITY), draft.errors.keys)
+        assertEquals(0, draft.focusRequest)
+        draft.change(EditorField.QUANTITY, draft.values.copy(quantity = QuantityInput("250")))
+        draft.validateField(EditorField.QUANTITY, today)
+        assertTrue(draft.errors.isEmpty())
+        draft.validateField(EditorField.NOTES, today)
+        assertTrue(draft.errors.isEmpty())
+        assertNull(draft.validate(today))
+        assertEquals(EditorField.METHOD, draft.errors.keys.first())
+        assertEquals(1, draft.focusRequest)
+    }
+
     @Test fun excessPrecisionAndFractionalItemsAreRejectedWithoutRounding() {
         val draft = EditorDraft.from(log(), today)
         listOf(QuantityInput("0.0001", QuantityUnit.KILOGRAM), QuantityInput("2,5", QuantityUnit.ITEM)).forEach {

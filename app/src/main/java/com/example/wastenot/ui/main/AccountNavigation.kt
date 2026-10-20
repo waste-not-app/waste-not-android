@@ -209,7 +209,7 @@ fun AccountNavigation(
                             onHistory = ::history, onRetry = { model.loadDetail(key.id) }, modifier = Modifier.fillMaxSize())
                     }
                     entry<LogEditor> { key ->
-                        if (draft != null && editor == key) LogEditorScreen(draft, date, demo, data.saving,
+                        if (draft != null && editor == key) LogEditorScreen(draft, date, user.timezone.id, demo, data.saving,
                             data.save?.requestId == key.requestId && data.save?.error != null, pageInsets,
                             { model.save(it, key.logId, draft.values.version, key.requestId) }, Modifier.fillMaxSize())
                         else WorkspaceLoading(data, { model.load(true) }, pageInsets, Modifier.fillMaxSize())

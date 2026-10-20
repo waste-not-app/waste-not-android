@@ -1,0 +1,117 @@
+{
+  "tested_api": 24,
+  "native_profile": "wastenot.hotReload=false",
+  "debug_unit_results": {
+    "tests": 114,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "apk_sha256": {
+    "native-editor-api24.apk": "0327d5dbde3968ac827712d804f80e096fc28ad7deea6a615aa7d34b27edb092",
+    "native-editor-api24-tests.apk": "630be6437f653e7d8401718d82d5df6bc7ca63fd892b43d3edfb06914e544913"
+  },
+  "native_executions": 35,
+  "unique_native_cases": 14,
+  "configurations": [
+    {
+      "width_dp": 360,
+      "font_scale": 1.0,
+      "api": 24,
+      "executed": 12,
+      "failed": 0,
+      "seconds": 395.131,
+      "run": "editor-kit-normal-scoped",
+      "screenshots": [
+        "editor-create-light-360.png",
+        "editor-create-end-light-360.png",
+        "editor-edit-light-360.png",
+        "editor-edit-end-light-360.png",
+        "editor-unit-light-360.png",
+        "editor-create-dark-360.png",
+        "editor-create-end-dark-360.png",
+        "editor-edit-dark-360.png",
+        "editor-edit-end-dark-360.png",
+        "editor-unit-dark-360.png"
+      ]
+    },
+    {
+      "width_dp": 360,
+      "font_scale": 2.0,
+      "api": 24,
+      "executed": 12,
+      "failed": 0,
+      "seconds": 71.427,
+      "run": "editor-kit-phone200-resumed",
+      "screenshots": [
+        "editor-create-light-360-font200.png",
+        "editor-create-end-light-360-font200.png",
+        "editor-edit-light-360-font200.png",
+        "editor-edit-end-light-360-font200.png",
+        "editor-create-dark-360-font200.png",
+        "editor-create-end-dark-360-font200.png",
+        "editor-edit-dark-360-font200.png",
+        "editor-edit-end-dark-360-font200.png"
+      ]
+    },
+    {
+      "width_dp": 600,
+      "font_scale": 2.0,
+      "api": 24,
+      "executed": 11,
+      "failed": 0,
+      "seconds": 104.184,
+      "run": "editor-kit-wide200-resumed",
+      "screenshots": [
+        "editor-create-light-600-font200.png",
+        "editor-create-end-light-600-font200.png",
+        "editor-edit-light-600-font200.png",
+        "editor-edit-end-light-600-font200.png",
+        "editor-create-dark-600-font200.png",
+        "editor-create-end-dark-600-font200.png",
+        "editor-edit-dark-600-font200.png",
+        "editor-edit-end-dark-600-font200.png"
+      ]
+    }
+  ],
+  "cases": [
+    "com.example.wastenot.ui.components.FormControlsTest#calendarAppliesLocalDateAndRejectsFutureDay",
+    "com.example.wastenot.ui.components.FormControlsTest#editCalendarAllowsOnlyOriginalOldDateOutsideCreateWindow",
+    "com.example.wastenot.ui.components.FormControlsTest#methodChoiceSelectsOneWithoutFillingAnInitialChoice",
+    "com.example.wastenot.ui.components.FormControlsTest#staleCreateDateCanBeReviewedWithoutAllowingItOutsideTheWindow",
+    "com.example.wastenot.ui.components.FormControlsTest#unitChangesUseExactParserAndClearOtherQuantityKind",
+    "com.example.wastenot.ui.components.FormControlsTest#visibilityToggleChangesRenderedTextAndLoadingDisablesSubmit",
+    "com.example.wastenot.ui.main.AppNavigationTest#dirtyBackCreateAndEditKeepExclusiveQuantityAndDoNotAddEditXp",
+    "com.example.wastenot.ui.main.AppNavigationTest#historyFilterAndRangeSurviveDetailTabsAndRotation",
+    "com.example.wastenot.ui.main.AppNavigationTest#invalidPasswordStaysFocusedAboveKeyboardWithoutCallingAccountService",
+    "com.example.wastenot.ui.main.EditorDesignNavigationTest#darkEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+    "com.example.wastenot.ui.main.EditorDesignNavigationTest#lightEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+    "com.example.wastenot.ui.main.Iteration2DesignTest#directDummyHomeDockAndManualFallbackRetainAllFiveStacks",
+    "com.example.wastenot.ui.main.SaveConfirmationNavigationTest#confirmedCreateSurvivesRecreationAndEditNeverAnnouncesNewXp",
+    "com.example.wastenot.ui.main.WideNavigationTest#railScrollsAndManualEditorFitsWideWindow"
+  ],
+  "contrast": {
+    "OnSurface/Surface": 14.94,
+    "OnSurfaceVariant/Surface": 6.33,
+    "OnPrimaryContainer/PrimaryContainer": 8.06,
+    "OnSurfaceVariant/PrimaryContainer": 5.3,
+    "OnSurfaceVariant/SurfaceVariant": 5.4,
+    "Outline/Surface": 3.97,
+    "Primary/PrimaryContainer": 6.75,
+    "OnSurfaceVariant/CanvasStart": 6.19,
+    "OnSurfaceVariant/CanvasEnd": 5.24,
+    "Error/CanvasStart": 6.82,
+    "Error/CanvasEnd": 5.77,
+    "OnSurfaceDark/SurfaceDark": 13.91,
+    "OnSurfaceVariantDark/SurfaceDark": 8.4,
+    "OnPrimaryContainerDark/PrimaryContainerDark": 7.78,
+    "OnSurfaceVariantDark/PrimaryContainerDark": 5.28,
+    "OnSurfaceVariantDark/SurfaceVariantDark": 6.72,
+    "OutlineDark/SurfaceDark": 4.74,
+    "PrimaryDark/PrimaryContainerDark": 6.52,
+    "OnSurfaceVariantDark/CanvasStartDark": 8.61,
+    "OnSurfaceVariantDark/CanvasEndDark": 6.5,
+    "ErrorDark/CanvasStartDark": 9.38,
+    "ErrorDark/CanvasEndDark": 7.08
+  }
+}

@@ -69,7 +69,7 @@ class Iteration2DesignTest {
             compose.onAllNodes(tabs).assertCountEquals(0)
             compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
             compose.onNodeWithText("Simpan contoh").assertDoesNotExist()
-            compose.onNodeWithText("Simpan").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Simpan catatan").performScrollTo().assertIsDisplayed()
             compose.onNodeWithContentDescription("Kembali").performClick()
             compose.onNode(tabs and hasText(label)).assertIsSelected()
         }

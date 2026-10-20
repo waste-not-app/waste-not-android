@@ -56,10 +56,10 @@
     <string name="record_version">Versi catatan %1$d</string>
     <string name="demo_write_message">Mode contoh. Catatan percobaan hanya tersimpan selama sesi ini.</string>
     <string name="remote_write_message">Penyimpanan catatan belum tersedia. Isianmu tetap ada bila penyimpanan gagal.</string>
-    <string name="edit_progress_message">Perubahan memperbarui ringkasan. Mengubah catatan tidak menambah XP.</string>
-    <string name="notes_optional">Catatan opsional</string>
+    <string name="edit_progress_message">Perubahan memperbarui statistik, tanpa XP tambahan.</string>
+    <string name="notes_optional">Catatan (opsional)</string>
     <string name="notes_helper">Maksimal 500 karakter.</string>
-    <string name="save_activity">Simpan</string>
+    <string name="save_activity">Simpan catatan</string>
     <string name="save_example">Simpan contoh</string>
     <string name="save_changes">Simpan perubahan</string>
     <string name="saving">Menyimpan…</string>

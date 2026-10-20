@@ -10,6 +10,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
@@ -48,6 +50,7 @@ fun DateField(
     enabled: Boolean = true,
     error: String? = null,
     label: String = stringResource(R.string.activity_date),
+    preservedDate: LocalDate? = null,
 ) {
     var choosing by rememberSaveable { mutableStateOf(false) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -56,9 +59,18 @@ fun DateField(
             onClick = { choosing = true },
             enabled = enabled,
             shape = MaterialTheme.shapes.small,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
-            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+            border = BorderStroke(1.dp, if (error != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline),
+            contentPadding = PaddingValues(16.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 56.dp)
+                .focusProperties { canFocus = enabled },
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(date?.let(WasteFormat::activityDate) ?: stringResource(R.string.choose_filter_date),
@@ -69,17 +81,21 @@ fun DateField(
         if (error != null) Text(error, color = MaterialTheme.colorScheme.error)
     }
     if (choosing) {
-        val dates = remember(minimum, maximum) {
+        val firstYear = minOf(minimum.year, preservedDate?.year ?: minimum.year)
+        val lastYear = maxOf(maximum.year, preservedDate?.year ?: maximum.year)
+        val dates = remember(minimum, maximum, preservedDate) {
             object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean =
-                    Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneOffset.UTC).toLocalDate() in minimum..maximum
-                override fun isSelectableYear(year: Int): Boolean = year in minimum.year..maximum.year
+                    Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneOffset.UTC).toLocalDate().let {
+                        it == preservedDate || it in minimum..maximum
+                    }
+                override fun isSelectableYear(year: Int): Boolean = year in firstYear..lastYear
             }
         }
         val picker = rememberDatePickerState(
             initialSelectedDateMillis = date?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
             initialDisplayedMonthMillis = (date ?: maximum).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
-            yearRange = minOf(date?.year ?: minimum.year, minimum.year)..maxOf(date?.year ?: maximum.year, maximum.year),
+            yearRange = minOf(date?.year ?: firstYear, firstYear)..maxOf(date?.year ?: lastYear, lastYear),
             selectableDates = dates,
         )
         DatePickerDialog(
