@@ -31,7 +31,7 @@ data class ActivityDetailState(val id: String, val log: WasteLog? = null, val lo
 
 data class ActivityDeleteResult(val id: String, val deleted: Boolean = false, val error: ApiFailureKind? = null)
 
-data class ActivitySaveResult(val requestId: String, val id: String? = null, val error: ApiFailureKind? = null)
+data class ActivitySaveResult(val requestId: String, val id: String? = null, val error: ApiFailureKind? = null, val created: Boolean = false)
 
 class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
     private val mutableState = MutableStateFlow(WorkspaceUiState())
@@ -94,12 +94,19 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
         mutableState.update { it.copy(saving = true, save = null) }
         writing = viewModelScope.launch {
             try {
-                val result = if (id == null) store.create(input, requestId) else store.update(id, checkNotNull(version), input)
+                var created = false
+                val result = if (id == null) when (val receipt = store.create(input, requestId)) {
+                    is ApiResult.Success -> {
+                        created = receipt.value.created
+                        ApiResult.Success(receipt.value.log)
+                    }
+                    is ApiResult.Failure -> receipt
+                } else store.update(id, checkNotNull(version), input)
                 currentCoroutineContext().ensureActive()
                 when (result) {
                     is ApiResult.Success -> {
                         refreshAfterMutation { records -> records.filterNot { it.id == result.value.id } + result.value }
-                        mutableState.update { it.copy(save = ActivitySaveResult(requestId, id = result.value.id)) }
+                        mutableState.update { it.copy(save = ActivitySaveResult(requestId, id = result.value.id, created = created)) }
                     }
                     is ApiResult.Failure -> mutableState.update { it.copy(save = ActivitySaveResult(requestId, error = result.error.kind)) }
                 }

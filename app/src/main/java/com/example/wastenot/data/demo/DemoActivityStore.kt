@@ -4,6 +4,7 @@ import com.example.wastenot.data.network.ApiFailure
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.repository.ActivityInput
+import com.example.wastenot.data.repository.ActivityCreation
 import com.example.wastenot.data.repository.ActivityStore
 import com.example.wastenot.model.ActivityDates
 import com.example.wastenot.model.DisposalMethod
@@ -46,12 +47,12 @@ class DemoActivityStore(private val zone: ZoneId) : ActivityStore {
     override suspend fun get(id: String): ApiResult<WasteLog> =
         records[id]?.let { ApiResult.Success(it) } ?: failure(ApiFailureKind.NOT_FOUND)
 
-    override suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<WasteLog> {
+    override suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation> {
         requests[clientRequestId]?.let { (previous, id) ->
             return when {
                 previous != input -> failure(ApiFailureKind.IDEMPOTENCY_CONFLICT)
                 id in deleted -> failure(ApiFailureKind.DELETED)
-                else -> ApiResult.Success(checkNotNull(records[id]))
+                else -> ApiResult.Success(ActivityCreation(checkNotNull(records[id]), created = false))
             }
         }
         if (!valid(input)) return failure(ApiFailureKind.VALIDATION)
@@ -60,7 +61,7 @@ class DemoActivityStore(private val zone: ZoneId) : ActivityStore {
         val log = WasteLog(id, input.category, input.method, input.quantity, input.date, zone, input.notes, 1, created, created)
         records[id] = log
         requests[clientRequestId] = input to id
-        return ApiResult.Success(log)
+        return ApiResult.Success(ActivityCreation(log, created = true))
     }
 
     override suspend fun update(id: String, version: Int, input: ActivityInput): ApiResult<WasteLog> {

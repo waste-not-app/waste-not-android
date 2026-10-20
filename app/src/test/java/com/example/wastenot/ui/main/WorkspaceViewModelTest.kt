@@ -10,6 +10,7 @@ import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.network.ApiFailure
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.ActivityInput
+import com.example.wastenot.data.repository.ActivityCreation
 import com.example.wastenot.data.repository.ActivityStore
 import com.example.wastenot.model.*
 import java.time.ZoneId
@@ -46,6 +47,7 @@ class WorkspaceViewModelTest {
         advanceUntilIdle()
         assertEquals(request, vm.state.value.save!!.requestId)
         val id = vm.state.value.save!!.id!!
+        assertTrue(vm.state.value.save!!.created)
         assertEquals(6, vm.state.value.records.size)
         vm.acknowledgeSave("other-request")
         assertNotNull(vm.state.value.save)
@@ -53,8 +55,36 @@ class WorkspaceViewModelTest {
         assertNull(vm.state.value.save)
         vm.save(input.copy(notes = "diubah"), id, 1, request)
         advanceUntilIdle()
+        assertFalse(vm.state.value.save!!.created)
         assertEquals(6, vm.state.value.records.size)
         assertEquals(2, vm.state.value.records.first { it.id == id }.version)
+    }
+
+    @Test fun retryAfterCommittedResponseIsLostDoesNotAnnounceAnotherCreation() = runTest {
+        val source = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+        var loseResponse = true
+        val gateway = object : ActivityStore by source {
+            override suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation> {
+                val receipt = source.create(input, clientRequestId)
+                return if (loseResponse) {
+                    loseResponse = false
+                    ApiResult.Failure(ApiFailure(ApiFailureKind.TIMEOUT))
+                } else receipt
+            }
+        }
+        val (vm, _) = model(gateway)
+        vm.load(); advanceUntilIdle()
+        val request = UUID.randomUUID().toString()
+        val input = ActivityInput(WasteCategory.METAL, DisposalMethod.RECYCLE, Quantity.Count.of(1), source.referenceDate, "")
+        vm.save(input, null, null, request); advanceUntilIdle()
+        assertEquals(ApiFailureKind.TIMEOUT, vm.state.value.save!!.error)
+        assertNull(vm.state.value.save!!.id)
+        assertEquals(5, vm.state.value.records.size)
+        vm.save(input, null, null, request); advanceUntilIdle()
+        assertNotNull(vm.state.value.save!!.id)
+        assertFalse(vm.state.value.save!!.created)
+        assertEquals(6, vm.state.value.records.size)
+        assertEquals(6, source.load().value.size)
     }
 
     @Test fun removingAccountOwnerClearsDataAndReplayCache() = runTest {

@@ -88,21 +88,35 @@ fun AccountNavigation(
     var deletingId by rememberSaveable { mutableStateOf<String?>(null) }
     var deleteVersion by rememberSaveable { mutableIntStateOf(0) }
     var deletedNotice by rememberSaveable { mutableStateOf(false) }
+    var savedNoticeId by rememberSaveable { mutableStateOf<String?>(null) }
+    var savedWasCreated by rememberSaveable { mutableStateOf(false) }
     fun history() {
+        savedNoticeId = null
         if (stack.lastOrNull() is LogDetail) stack.removeLastOrNull()
         val historyStack = stacks.getValue(MainTab.HISTORY)
         while (historyStack.lastOrNull() is LogDetail) historyStack.removeLastOrNull()
         selected = MainTab.HISTORY
     }
+    fun home() {
+        savedNoticeId = null
+        if (stack.lastOrNull() is LogDetail) stack.removeLastOrNull()
+        val homeStack = stacks.getValue(MainTab.HOME)
+        while (homeStack.lastOrNull() is LogDetail) homeStack.removeLastOrNull()
+        selected = MainTab.HOME
+    }
     fun back() {
         if (data.deletingId != null || (editor != null && data.saving)) return
         if (editor != null && draft?.dirty == true) { discard = true; return }
+        if (current is LogDetail && current.id == savedNoticeId) savedNoticeId = null
         if (stack.size > 1) stack.removeLastOrNull() else if (selected != MainTab.HOME) selected = MainTab.HOME
     }
     fun detail(id: String) {
         if ((stack.lastOrNull() as? LogDetail)?.id != id) stack.add(LogDetail(id))
     }
     val visibleDetail = current as? LogDetail
+    val visibleRead = data.detail?.takeIf { it.id == visibleDetail?.id }
+    val visibleLog = if (visibleRead != null) visibleRead.log else data.records.find { it.id == visibleDetail?.id }
+    val showingConfirmation = visibleDetail != null && visibleDetail.id == savedNoticeId && visibleLog != null
     LaunchedEffect(visibleDetail) { visibleDetail?.let { model.loadDetail(it.id) } }
     fun edit(id: String? = null) {
         if (stack.lastOrNull() !is LogEditor) stack.add(LogEditor(id, UUID.randomUUID().toString()))
@@ -110,6 +124,8 @@ fun AccountNavigation(
     LaunchedEffect(data.save) {
         val saved = data.save
         if (saved?.id != null && editor?.requestId == saved.requestId && stack.lastOrNull() == editor) {
+            savedNoticeId = saved.id
+            savedWasCreated = saved.created
             stack.removeLastOrNull()
             if ((stack.lastOrNull() as? LogDetail)?.id != saved.id) stack.add(LogDetail(saved.id))
             model.acknowledgeSave(saved.requestId)
@@ -156,11 +172,11 @@ fun AccountNavigation(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 containerColor = Color.Transparent,
                 topBar = { if (current != Home) TopAppBar(title = { Text(stringResource(when (current) {
-                    is LogDetail -> R.string.log_detail
+                    is LogDetail -> if (showingConfirmation) R.string.save_confirm_title else R.string.log_detail
                     is LogEditor -> if (current.logId == null) R.string.log_create else R.string.log_edit
                     else -> selected.label
                 }), style = MaterialTheme.typography.headlineMedium) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent), navigationIcon = {
-                    if (stack.size > 1) FilledIconButton(onClick = ::back, shape = MaterialTheme.shapes.small,
+                    if (stack.size > 1 && !showingConfirmation) FilledIconButton(onClick = ::back, shape = MaterialTheme.shapes.small,
                         colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
                         modifier = Modifier.padding(start = 16.dp).size(48.dp)) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
                 }, actions = {
@@ -185,7 +201,9 @@ fun AccountNavigation(
                         val read = data.detail?.takeIf { it.id == key.id }
                         val log = if (read != null) read.log else data.records.find { it.id == key.id }
                         val missing = read?.error == ApiFailureKind.NOT_FOUND || read?.error == ApiFailureKind.DELETED
-                        LogDetailScreen(log, read == null || read.loading, read?.error != null && !missing, pageInsets,
+                        if (current == key && savedNoticeId == key.id && log != null) SaveConfirmationScreen(log, savedWasCreated, pageInsets,
+                            onView = { savedNoticeId = null }, onHome = ::home, modifier = Modifier.fillMaxSize())
+                        else LogDetailScreen(log, read == null || read.loading, read?.error != null && !missing, pageInsets,
                             onEdit = { edit(key.id) },
                             onDelete = { if (log != null && log.version > 0) { deletingId = log.id; deleteVersion = log.version } },
                             onHistory = ::history, onRetry = { model.loadDetail(key.id) }, modifier = Modifier.fillMaxSize())

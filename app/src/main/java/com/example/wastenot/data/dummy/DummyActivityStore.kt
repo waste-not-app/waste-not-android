@@ -5,6 +5,7 @@ import com.example.wastenot.data.network.ApiFailure
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.repository.ActivityInput
+import com.example.wastenot.data.repository.ActivityCreation
 import com.example.wastenot.data.repository.ActivityStore
 import com.example.wastenot.model.*
 import java.time.Instant
@@ -31,14 +32,14 @@ class DummyActivityStore(
         records.find { it.id == id }?.let { ApiResult.Success(it) } ?: failure(ApiFailureKind.NOT_FOUND)
     }
 
-    override suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<WasteLog> = transact { records, requests, deleted ->
+    override suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation> = transact { records, requests, deleted ->
         val previous = requests.optJSONObject(clientRequestId)
         if (previous != null) {
             val old = records.find { it.id == previous.getString("id") }
             when {
                 previous.getString("payload") != encodeInput(input) -> failure(ApiFailureKind.IDEMPOTENCY_CONFLICT)
                 previous.getString("id") in deleted -> failure(ApiFailureKind.DELETED)
-                old != null -> ApiResult.Success(old)
+                old != null -> ApiResult.Success(ActivityCreation(old, created = false))
                 else -> failure(ApiFailureKind.STORAGE)
             }
         } else if (!valid(input)) failure(ApiFailureKind.VALIDATION)
@@ -47,7 +48,7 @@ class DummyActivityStore(
             val log = WasteLog(UUID.randomUUID().toString(), input.category, input.method, input.quantity,
                 input.date, zone, input.notes, 1, now, now)
             requests.put(clientRequestId, JSONObject().put("id", log.id).put("payload", encodeInput(input)))
-            persist(records + log, requests, deleted, log)
+            persist(records + log, requests, deleted, ActivityCreation(log, created = true))
         }
     }
 

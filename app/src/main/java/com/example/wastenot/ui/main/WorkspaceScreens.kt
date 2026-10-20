@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -42,11 +43,11 @@ internal fun pagePadding(padding: PaddingValues): PaddingValues {
 }
 
 @Composable
-internal fun ScrollPage(padding: PaddingValues, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+internal fun ScrollPage(padding: PaddingValues, modifier: Modifier = Modifier, maxWidth: Dp = 840.dp, content: @Composable ColumnScope.() -> Unit) {
     Box(modifier, contentAlignment = Alignment.TopCenter) {
         Column(
             modifier = Modifier
-                .widthIn(max = 840.dp)
+                .widthIn(max = maxWidth)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(pagePadding(padding)),

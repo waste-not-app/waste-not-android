@@ -210,6 +210,8 @@ class AppNavigationTest {
         compose.onNodeWithText(com.example.wastenot.model.WasteFormat.activityDate(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Jakarta")))).performScrollTo().performClick()
         compose.onNodeWithText("Batal").performClick()
         compose.onNodeWithText("Simpan").performScrollTo().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodesWithText("+10 XP untuk aktivitas baru ini.").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Lihat catatan").performScrollTo().performClick()
         compose.onNodeWithText("Detail catatan").assertIsDisplayed()
         compose.onNodeWithText("QA contoh pribadi").performScrollTo().assertIsDisplayed()
         compose.waitUntil(30_000) { compose.onAllNodes(hasText("Ubah catatan") and hasClickAction() and isEnabled()).fetchSemanticsNodes().isNotEmpty() }
@@ -220,6 +222,9 @@ class AppNavigationTest {
         assertEquals("", quantity.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
         quantity.performTextReplacement("2")
         compose.onNodeWithText("Simpan perubahan").performScrollTo().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodesWithText("Catatanmu sudah tersimpan. Tidak ada XP tambahan.").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("+10 XP", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Lihat catatan").performScrollTo().performClick()
         compose.onNodeWithText("2 benda").performScrollTo().assertIsDisplayed()
         val retainedDetail = compose.onAllNodes(tabs).fetchSemanticsNodes().isNotEmpty()
         if (!retainedDetail) compose.onNodeWithContentDescription("Kembali").performClick()

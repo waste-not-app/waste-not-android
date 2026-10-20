@@ -32,11 +32,14 @@ class DummyDataTest {
             assertEquals(5, initial.size)
             assertEquals(3, initial.count { it.activityDate == date })
             val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE, Quantity.Count.of(3), date, "Catatan fixture")
-            val created = (store.create(input, "fixture-request") as ApiResult.Success).value
+            val receipt = (store.create(input, "fixture-request") as ApiResult.Success).value
+            val created = receipt.log
+            assertTrue(receipt.created)
             store.clear()
             val restored = DummyActivityStore(preferences, zone) { date }
             val replay = (restored.create(input, "fixture-request") as ApiResult.Success).value
-            assertEquals(created, replay)
+            assertEquals(created, replay.log)
+            assertFalse(replay.created)
             assertEquals(6, (restored.load() as ApiResult.Success).value.size)
             val changed = (restored.update(created.id, 1, input.copy(notes = "Diubah")) as ApiResult.Success).value
             assertEquals(created.createdAt, changed.createdAt)
@@ -93,7 +96,7 @@ class DummyDataTest {
             val store = DummyActivityStore(preferences, zone) { date }
             val input = ActivityInput(WasteCategory.METAL, DisposalMethod.RECYCLE, Quantity.Count.of(2), date, "")
             val request = UUID.randomUUID().toString()
-            val created = (store.create(input, request) as ApiResult.Success).value
+            val created = (store.create(input, request) as ApiResult.Success).value.log
             assertEquals(created.id, UUID.fromString(created.id).toString())
             val edited = (store.update(created.id, created.version, input.copy(notes = "Terbaru")) as ApiResult.Success).value
             assertEquals(ApiFailureKind.VERSION_CONFLICT, (store.delete(created.id, created.version) as ApiResult.Failure).error.kind)
@@ -119,7 +122,7 @@ class DummyDataTest {
             val healthy = DummyActivityStore(preferences, zone) { date }
             val input = ActivityInput(WasteCategory.PAPER, DisposalMethod.RECYCLE, Quantity.Weight.of(150), date, "")
             val request = UUID.randomUUID().toString()
-            val created = (healthy.create(input, request) as ApiResult.Success).value
+            val created = (healthy.create(input, request) as ApiResult.Success).value.log
             listOf(false, true).forEach { updateCache ->
                 var commits = 0
                 val failing = failingPreferences(preferences) { editor ->
@@ -131,7 +134,9 @@ class DummyDataTest {
                 assertEquals(ApiFailureKind.STORAGE, result.error.kind)
                 assertEquals(2, commits)
                 assertEquals(6, (healthy.load() as ApiResult.Success).value.size)
-                assertEquals(created, (healthy.create(input, request) as ApiResult.Success).value)
+                val replay = (healthy.create(input, request) as ApiResult.Success).value
+                assertEquals(created, replay.log)
+                assertFalse(replay.created)
                 assertFalse(preferences.getStringSet("deleted", emptySet())!!.contains(created.id))
             }
         } finally { preferences.edit().clear().commit() }
@@ -146,7 +151,8 @@ class DummyDataTest {
             val values = coroutineScope { (1..16).map {
                 async { (DummyActivityStore(preferences, zone) { date }.create(input, request) as ApiResult.Success).value }
             }.awaitAll() }
-            assertEquals(1, values.map { it.id }.toSet().size)
+            assertEquals(1, values.map { it.log.id }.toSet().size)
+            assertEquals(1, values.count { it.created })
             assertEquals(6, (DummyActivityStore(preferences, zone) { date }.load() as ApiResult.Success).value.size)
         } finally { preferences.edit().clear().commit() }
     }

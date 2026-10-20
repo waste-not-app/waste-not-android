@@ -17,12 +17,14 @@ data class ActivityInput(
     val notes: String,
 )
 
+data class ActivityCreation(val log: WasteLog, val created: Boolean)
+
 interface ActivityStore {
     val isDemo: Boolean
     val referenceDate: LocalDate?
     suspend fun load(): ApiResult<List<WasteLog>>
     suspend fun get(id: String): ApiResult<WasteLog>
-    suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<WasteLog>
+    suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation>
     suspend fun update(id: String, version: Int, input: ActivityInput): ApiResult<WasteLog>
     suspend fun delete(id: String, version: Int): ApiResult<Unit>
     fun clear()
