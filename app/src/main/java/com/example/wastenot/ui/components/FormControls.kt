@@ -1,5 +1,6 @@
 package com.example.wastenot.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +24,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -33,8 +36,10 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
+import com.example.wastenot.theme.LocalWasteNotGradients
 
 @Composable
 fun ActionButton(
@@ -46,19 +51,26 @@ fun ActionButton(
     enabled: Boolean = true,
     destructive: Boolean = false,
 ) {
+    val actionable = enabled && !loading
+    val colors = MaterialTheme.colorScheme
     Button(
         onClick = onClick,
-        modifier = modifier.heightIn(min = 52.dp),
-        enabled = enabled && !loading,
+        modifier = modifier
+            .heightIn(min = 52.dp)
+            .then(if (actionable && !destructive) Modifier.background(LocalWasteNotGradients.current.action, MaterialTheme.shapes.small) else Modifier),
+        enabled = actionable,
         shape = MaterialTheme.shapes.small,
-        colors = if (destructive) ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.error,
-            contentColor = MaterialTheme.colorScheme.onError,
-        ) else ButtonDefaults.buttonColors(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (destructive) colors.error else Color.Transparent,
+            contentColor = if (destructive) colors.onError else colors.onPrimary,
+            disabledContainerColor = colors.surfaceContainer,
+            disabledContentColor = colors.onSurfaceVariant,
+        ),
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
             if (loading) CircularProgressIndicator(Modifier.size(20.dp), color = LocalContentColor.current, strokeWidth = 2.dp)
-            Text(if (loading) loadingLabel else label, Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+            Text(if (loading) loadingLabel else label,
+                Modifier.weight(1f, fill = false).semantics { liveRegion = LiveRegionMode.Polite }, textAlign = TextAlign.Center)
         }
     }
 }

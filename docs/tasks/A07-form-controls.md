@@ -20,3 +20,12 @@ Komponen sekarang dipakai oleh Login/Register, filter/range, dan satu LogEditorS
 DateField kini menggulir isi picker pada jendela pendek. Tes keempat memeriksa tanggal di luar batas, Apply/Cancel, pergantian bulan dan pilihan baris terbawah, termasuk landscape/font 200%. Time picker belum dibuat karena activity_date pada kontrak core hanya tanggal; kontrol waktu ditambahkan bersama task pengingat jika capability tersedia.
 
 TalkBack nyata 16.0 pada API 36/font 200% kini diuji: keyboard USB virtual menavigasi fokus ke label email/password, mengaktifkan Masuk, mencapai pesan validasi, lalu kembali ke aksi utama. Tes menjaga layanan spoken feedback tetap aktif; bukti dan gambar ada di laporan QA. Password manager eksternal tetap belum diuji.
+
+
+## Checkpoint Iteration 2: material dan keterbacaan C03
+
+Branch `codex/android-iteration-2-design`, melanjutkan `15ef839`. ActionButton kini memakai brush action dari theme pada keadaan aktif; disabled/loading memakai surfaceContainer/onSurfaceVariant opak. Destructive tetap error/onError. Minimum 52 dp, radius 12 dp dan Button Material dipertahankan; indikator berada di tengah vertikal dan teks dapat membungkus.
+
+[Bukti sebelum/sesudah C03](../qa/iteration-2/ACTIONS.md) mengukur kontras label disabled/loading naik dari sekitar 1,67/2,30:1 menjadi minimal 5,40/6,72:1 (terang/gelap). APK tes yang identik gagal pada app lama karena warna/kontras lalu lulus sesudah perbaikan. Ada 27 eksekusi native dari 11 kasus unik tanpa skip pada API 24, 360/600 dp dan font normal/200%; 72 pasangan foreground/background memenuhi 4,5:1. Touch/Enter tidak memanggil aksi saat loading atau disabled. Regresi mencakup editor kedua tema, STORAGE/recreate/koreksi, save/edit/XP, dock/rail dan pilihan tema.
+
+Issue A07 tetap terbuka untuk penyempurnaan: highlight/bayangan CTA kit, secondary/text/icon controls, seluruh state field dan audit spoken feedback masih mengikuti matriks Iteration 2. Bukti ini tidak menyatakan semua komponen dan screen sudah selesai.
