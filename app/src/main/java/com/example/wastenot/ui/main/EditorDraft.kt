@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.listSaver
 import com.example.wastenot.R
+import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.ActivityInput
 import com.example.wastenot.model.ActivityDates
 import com.example.wastenot.model.DisposalMethod
@@ -31,12 +32,39 @@ class EditorDraft(val original: EditorValues) {
         private set
     var focusRequest by mutableStateOf(0)
         private set
+    var submittedValues by mutableStateOf<EditorValues?>(null)
+        private set
+    var submissionError by mutableStateOf<ApiFailureKind?>(null)
+        private set
     val dirty: Boolean get() = values != original
+    val locked: Boolean get() = submittedValues != null
+    val retryBlocked: Boolean get() = submissionError == ApiFailureKind.IDEMPOTENCY_CONFLICT || submissionError == ApiFailureKind.DELETED
 
-    fun change(field: EditorField, updated: EditorValues) { values = updated; errors = errors - field }
+    fun change(field: EditorField, updated: EditorValues) {
+        if (locked) return
+        values = updated
+        errors = errors - field
+        submissionError = null
+    }
 
     fun validateField(field: EditorField, referenceDate: LocalDate) {
+        if (locked) return
         errors = errors - field + validationErrors(referenceDate).filterKeys { it == field }
+    }
+
+    fun prepareSubmission(referenceDate: LocalDate): ActivityInput? {
+        if (retryBlocked) return null
+        val submitted = submittedValues
+        if (submitted != null) return input(submitted)
+        return validate(referenceDate)?.also {
+            submittedValues = values
+            submissionError = null
+        }
+    }
+
+    fun submissionFailed(error: ApiFailureKind) {
+        submissionError = error
+        if (!error.saveOutcomeUnknown() && !retryBlocked) submittedValues = null
     }
 
     private fun validationErrors(referenceDate: LocalDate): Map<EditorField, Int> {
@@ -59,15 +87,16 @@ class EditorDraft(val original: EditorValues) {
 
     fun validate(referenceDate: LocalDate): ActivityInput? {
         val current = values
-        val quantity = parseQuantity(current.quantity.rawText, current.quantity.unit)
         val found = validationErrors(referenceDate)
         errors = found
         if (found.isNotEmpty()) { focusRequest++; return null }
-        return ActivityInput(checkNotNull(current.category), checkNotNull(current.method),
-            (quantity as QuantityParseResult.Valid).quantity, current.date, current.notes.trim())
+        return input(current)
     }
 
     companion object {
+        private fun input(value: EditorValues) = ActivityInput(checkNotNull(value.category), checkNotNull(value.method),
+            (parseQuantity(value.quantity.rawText, value.quantity.unit) as QuantityParseResult.Valid).quantity, value.date, value.notes.trim())
+
         fun from(log: WasteLog?, date: LocalDate) = EditorDraft(EditorValues(log?.category, log?.method,
             when (val quantity = log?.quantity) {
                 is Quantity.Weight -> QuantityInput(quantity.grams.toString(), QuantityUnit.GRAM)
@@ -81,8 +110,14 @@ class EditorDraft(val original: EditorValues) {
             value[1].takeIf(String::isNotEmpty)?.let(DisposalMethod::valueOf), QuantityInput(value[2], QuantityUnit.valueOf(value[3])),
             LocalDate.parse(value[4]), value[5], value[6].toIntOrNull())
         val Saver = listSaver<EditorDraft, String>(
-            save = { encode(it.original) + encode(it.values) },
-            restore = { EditorDraft(decode(it.take(7))).apply { values = decode(it.drop(7)) } },
+            save = { encode(it.original) + encode(it.values) +
+                (it.submittedValues?.let(::encode) ?: List(7) { "" }) + it.submissionError?.name.orEmpty() },
+            restore = { EditorDraft(decode(it.take(7))).apply {
+                values = decode(it.drop(7).take(7))
+                if (it.getOrNull(14)?.isNotEmpty() == true) submittedValues = decode(it.drop(14).take(7))
+                submissionError = it.getOrNull(21)?.takeIf(String::isNotEmpty)?.let(ApiFailureKind::valueOf)
+                    ?: ApiFailureKind.TIMEOUT.takeIf { submittedValues != null }
+            } },
         )
     }
 }

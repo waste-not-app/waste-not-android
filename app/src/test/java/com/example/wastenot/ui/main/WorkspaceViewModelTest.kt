@@ -87,6 +87,62 @@ class WorkspaceViewModelTest {
         assertEquals(6, source.load().value.size)
     }
 
+    @Test fun anUnresolvedCreateRejectsChangedPayloadBeforeCallingTheStore() = runTest {
+        val source = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+        val requests = mutableListOf<Pair<String, ActivityInput>>()
+        val gateway = object : ActivityStore by source {
+            override suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation> {
+                requests.add(clientRequestId to input)
+                val receipt = source.create(input, clientRequestId)
+                return if (requests.size == 1) ApiResult.Failure(ApiFailure(ApiFailureKind.TIMEOUT)) else receipt
+            }
+        }
+        val (vm, _) = model(gateway)
+        vm.load(); advanceUntilIdle()
+        val request = UUID.randomUUID().toString()
+        val input = ActivityInput(WasteCategory.METAL, DisposalMethod.RECYCLE, Quantity.Count.of(1), source.referenceDate, "awal")
+        vm.save(input, null, null, request); advanceUntilIdle()
+        vm.save(input.copy(notes = "koreksi"), null, null, request); advanceUntilIdle()
+        assertEquals("Changed payload must never reach the store", 1, requests.size)
+        assertEquals(ApiFailureKind.IDEMPOTENCY_CONFLICT, vm.state.value.save!!.error)
+        vm.save(input, null, null, request); advanceUntilIdle()
+        assertEquals(listOf(request to input, request to input), requests)
+        assertNotNull(vm.state.value.save!!.id)
+        assertFalse(vm.state.value.save!!.created)
+        assertEquals(6, vm.state.value.records.size)
+        assertEquals("awal", vm.state.value.records.first { it.id == vm.state.value.save!!.id }.notes)
+    }
+
+    @Test fun definiteCreateRejectionAllowsCorrectionsAndRapidTapsNeverStartAnotherWrite() = runTest {
+        val source = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+        val gate = CompletableDeferred<Unit>()
+        val received = mutableListOf<ActivityInput>()
+        val gateway = object : ActivityStore by source {
+            override suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation> {
+                received.add(input)
+                if (received.size == 1) {
+                    gate.await()
+                    return ApiResult.Failure(ApiFailure(ApiFailureKind.VALIDATION))
+                }
+                return source.create(input, clientRequestId)
+            }
+        }
+        val (vm, _) = model(gateway)
+        val request = UUID.randomUUID().toString()
+        val input = ActivityInput(WasteCategory.METAL, DisposalMethod.RECYCLE, Quantity.Count.of(1), source.referenceDate, "awal")
+        vm.save(input, null, null, request); runCurrent()
+        vm.save(input, null, null, request)
+        vm.save(input.copy(notes = "koreksi"), null, null, UUID.randomUUID().toString()); runCurrent()
+        assertEquals(listOf(input), received)
+        assertTrue(vm.state.value.saving)
+        gate.complete(Unit); advanceUntilIdle()
+        assertEquals(ApiFailureKind.VALIDATION, vm.state.value.save!!.error)
+        vm.save(input.copy(notes = "koreksi"), null, null, request); advanceUntilIdle()
+        assertEquals(listOf(input, input.copy(notes = "koreksi")), received)
+        assertTrue(vm.state.value.save!!.created)
+        assertEquals(6, vm.state.value.records.size)
+    }
+
     @Test fun removingAccountOwnerClearsDataAndReplayCache() = runTest {
         val source = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
         val (vm, owner) = model(source)

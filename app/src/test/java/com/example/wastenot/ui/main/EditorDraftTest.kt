@@ -1,6 +1,7 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.runtime.saveable.SaverScope
+import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.model.*
 import java.time.Instant
 import java.time.LocalDate
@@ -93,6 +94,76 @@ class EditorDraftTest {
             draft.change(EditorField.NOTES, draft.values.copy(notes = " $note! "))
             assertNull(draft.validate(today))
             assertTrue(EditorField.NOTES in draft.errors)
+        }
+    }
+
+    @Test fun uncertainSubmissionFreezesRawValuesAndRetriesTheCanonicalSnapshotEvenAfterDateWindowMoves() {
+        val draft = EditorDraft.from(null, today)
+        draft.change(EditorField.QUANTITY, draft.values.copy(category = WasteCategory.PLASTIC, method = DisposalMethod.RECYCLE,
+            quantity = QuantityInput("0,25", QuantityUnit.KILOGRAM), notes = "  awal  "))
+        val submitted = draft.prepareSubmission(today)!!
+        assertEquals(Quantity.Weight.of(250), submitted.quantity)
+        assertEquals("awal", submitted.notes)
+        assertTrue(draft.locked)
+        val raw = draft.values
+        draft.change(EditorField.NOTES, raw.copy(notes = "koreksi"))
+        assertEquals(raw, draft.values)
+        listOf(ApiFailureKind.TIMEOUT, ApiFailureKind.NETWORK, ApiFailureKind.SERVER,
+            ApiFailureKind.HTTP, ApiFailureKind.MALFORMED_RESPONSE).forEach { error ->
+            draft.submissionFailed(error)
+            assertTrue(draft.locked)
+            assertEquals(submitted, draft.prepareSubmission(today.plusDays(31)))
+            assertEquals(raw, draft.values)
+            assertTrue(draft.errors.isEmpty())
+        }
+    }
+
+    @Test fun restoringAnUncertainSubmissionKeepsItsSnapshotAndError() {
+        val draft = EditorDraft.from(log(), today)
+        draft.change(EditorField.NOTES, draft.values.copy(notes = "  awal  "))
+        val input = draft.prepareSubmission(today)!!
+        draft.submissionFailed(ApiFailureKind.TIMEOUT)
+        val scope = object : SaverScope { override fun canBeSaved(value: Any) = true }
+        val saved = with(EditorDraft.Saver) { scope.save(draft) }!!
+        val restored = EditorDraft.Saver.restore(saved)!!
+        assertEquals(draft.values, restored.values)
+        assertEquals(draft.submittedValues, restored.submittedValues)
+        assertEquals(ApiFailureKind.TIMEOUT, restored.submissionError)
+        assertEquals(input, restored.prepareSubmission(today.plusDays(31)))
+        val oldFormat = EditorDraft.Saver.restore((saved as List<*>).take(14))!!
+        assertFalse(oldFormat.locked)
+        assertNull(oldFormat.submissionError)
+    }
+
+    @Test fun restoringAnInterruptedActiveSubmissionRequiresAnExplicitRetry() {
+        val draft = EditorDraft.from(log(), today)
+        val input = draft.prepareSubmission(today)!!
+        val scope = object : SaverScope { override fun canBeSaved(value: Any) = true }
+        val saved = with(EditorDraft.Saver) { scope.save(draft) }!!
+        val restored = EditorDraft.Saver.restore(saved)!!
+        assertTrue(restored.locked)
+        assertEquals(ApiFailureKind.TIMEOUT, restored.submissionError)
+        assertEquals(input, restored.prepareSubmission(today))
+    }
+
+    @Test fun definiteRejectionAllowsCorrectionsButConflictAndDeletedRequestsNeverRetry() {
+        listOf(ApiFailureKind.VALIDATION, ApiFailureKind.NOT_CONFIGURED, ApiFailureKind.STORAGE,
+            ApiFailureKind.RATE_LIMITED).forEach { error ->
+            val draft = EditorDraft.from(log(), today)
+            draft.prepareSubmission(today)
+            draft.submissionFailed(error)
+            assertFalse(draft.locked)
+            draft.change(EditorField.NOTES, draft.values.copy(notes = "koreksi"))
+            assertNull(draft.submissionError)
+            assertEquals("koreksi", draft.prepareSubmission(today)!!.notes)
+        }
+        listOf(ApiFailureKind.IDEMPOTENCY_CONFLICT, ApiFailureKind.DELETED).forEach { error ->
+            val draft = EditorDraft.from(log(), today)
+            draft.prepareSubmission(today)
+            draft.submissionFailed(error)
+            assertTrue(draft.locked)
+            assertTrue(draft.retryBlocked)
+            assertNull(draft.prepareSubmission(today))
         }
     }
 

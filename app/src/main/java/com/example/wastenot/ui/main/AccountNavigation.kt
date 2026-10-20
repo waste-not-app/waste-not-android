@@ -106,7 +106,7 @@ fun AccountNavigation(
     }
     fun back() {
         if (data.deletingId != null || (editor != null && data.saving)) return
-        if (editor != null && draft?.dirty == true) { discard = true; return }
+        if (editor != null && (draft?.dirty == true || draft?.locked == true)) { discard = true; return }
         if (current is LogDetail && current.id == savedNoticeId) savedNoticeId = null
         if (stack.size > 1) stack.removeLastOrNull() else if (selected != MainTab.HOME) selected = MainTab.HOME
     }
@@ -129,6 +129,9 @@ fun AccountNavigation(
             stack.removeLastOrNull()
             if ((stack.lastOrNull() as? LogDetail)?.id != saved.id) stack.add(LogDetail(saved.id))
             model.acknowledgeSave(saved.requestId)
+        } else if (saved?.error != null && editor?.requestId == saved.requestId && draft != null) {
+            draft.submissionFailed(saved.error)
+            model.acknowledgeSave(saved.requestId)
         }
     }
     LaunchedEffect(data.deletion) {
@@ -150,10 +153,13 @@ fun AccountNavigation(
                 onUnavailable = { dismissDelete(); history(); model.load(true) })
         }
     }
+    val pendingOutcome = draft?.submissionError?.saveOutcomeUnknown() == true
     if (discard) AlertDialog(
-        onDismissRequest = { discard = false }, title = { Text(stringResource(R.string.discard_title)) },
-        text = { Text(stringResource(R.string.discard_message)) },
-        confirmButton = { TextButton(onClick = { discard = false; stack.removeLastOrNull() }) { Text(stringResource(R.string.discard_action)) } },
+        onDismissRequest = { discard = false }, title = { Text(stringResource(if (pendingOutcome) R.string.close_editor_title else R.string.discard_title)) },
+        text = { Text(stringResource(if (pendingOutcome) R.string.discard_pending_message else R.string.discard_message)) },
+        confirmButton = { TextButton(onClick = { discard = false; stack.removeLastOrNull() }) {
+            Text(stringResource(if (pendingOutcome) R.string.close_editor else R.string.discard_action))
+        } },
         dismissButton = { TextButton(onClick = { discard = false }) { Text(stringResource(R.string.keep_editing)) } },
     )
     if (leaving) AlertDialog(
@@ -209,9 +215,9 @@ fun AccountNavigation(
                             onHistory = ::history, onRetry = { model.loadDetail(key.id) }, modifier = Modifier.fillMaxSize())
                     }
                     entry<LogEditor> { key ->
-                        if (draft != null && editor == key) LogEditorScreen(draft, date, user.timezone.id, demo, data.saving,
-                            data.save?.requestId == key.requestId && data.save?.error != null, pageInsets,
-                            { model.save(it, key.logId, draft.values.version, key.requestId) }, Modifier.fillMaxSize())
+                        if (draft != null && editor == key) LogEditorScreen(draft, date, user.timezone.id, demo, data.saving, pageInsets,
+                            { model.save(it, key.logId, draft.values.version, key.requestId) },
+                            { stack.removeLastOrNull(); history(); model.load(true) }, Modifier.fillMaxSize())
                         else WorkspaceLoading(data, { model.load(true) }, pageInsets, Modifier.fillMaxSize())
                     }
                 }

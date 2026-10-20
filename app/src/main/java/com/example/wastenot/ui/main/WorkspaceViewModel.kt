@@ -33,6 +33,12 @@ data class ActivityDeleteResult(val id: String, val deleted: Boolean = false, va
 
 data class ActivitySaveResult(val requestId: String, val id: String? = null, val error: ApiFailureKind? = null, val created: Boolean = false)
 
+internal fun ApiFailureKind.saveOutcomeUnknown() = when (this) {
+    ApiFailureKind.TIMEOUT, ApiFailureKind.NETWORK, ApiFailureKind.SERVER,
+    ApiFailureKind.HTTP, ApiFailureKind.MALFORMED_RESPONSE -> true
+    else -> false
+}
+
 class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
     private val mutableState = MutableStateFlow(WorkspaceUiState())
     val state = mutableState.asStateFlow()
@@ -41,6 +47,7 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
     private var writing: Job? = null
     private var detailLoading: Job? = null
     private var started = false
+    private val unresolvedCreates = mutableMapOf<String, ActivityInput>()
 
     fun load(retry: Boolean = false) {
         if (writing?.isActive == true || loading?.isActive == true || (started && !retry)) return
@@ -91,6 +98,14 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
 
     fun save(input: ActivityInput, id: String?, version: Int?, requestId: String) {
         if (writing?.isActive == true) return
+        if (id == null) {
+            val pending = unresolvedCreates[requestId]
+            if (pending != null && pending != input) {
+                mutableState.update { it.copy(save = ActivitySaveResult(requestId, error = ApiFailureKind.IDEMPOTENCY_CONFLICT)) }
+                return
+            }
+            unresolvedCreates[requestId] = input
+        }
         mutableState.update { it.copy(saving = true, save = null) }
         writing = viewModelScope.launch {
             try {
@@ -105,10 +120,14 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
                 currentCoroutineContext().ensureActive()
                 when (result) {
                     is ApiResult.Success -> {
+                        if (id == null) unresolvedCreates.remove(requestId)
                         refreshAfterMutation { records -> records.filterNot { it.id == result.value.id } + result.value }
                         mutableState.update { it.copy(save = ActivitySaveResult(requestId, id = result.value.id, created = created)) }
                     }
-                    is ApiResult.Failure -> mutableState.update { it.copy(save = ActivitySaveResult(requestId, error = result.error.kind)) }
+                    is ApiResult.Failure -> {
+                        if (id == null && !result.error.kind.saveOutcomeUnknown()) unresolvedCreates.remove(requestId)
+                        mutableState.update { it.copy(save = ActivitySaveResult(requestId, error = result.error.kind)) }
+                    }
                 }
             } finally {
                 mutableState.update { it.copy(saving = false) }
@@ -159,6 +178,7 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
     }
 
     override fun onCleared() {
+        unresolvedCreates.clear()
         store.clear()
         mutableState.value = WorkspaceUiState(loading = false)
     }

@@ -54,8 +54,10 @@ Screenshot footer diambil setelah menggulir ke CTA, bukan klaim seluruh form mua
 - **Liveliness PASS untuk editor:** ENERGY 2 / RHYTHM 2 / MOTION 1, satu fokus form, variasi grid/list mengikuti ruang, tanpa gerak dekoratif.
 - **Craft PASS pada konfigurasi tercatat:** tema terang/gelap, teks normal/200%, form/rail dan keyboard diperiksa. Kontras token aktual: teks minimal 5,24:1, label selected minimal 7,78:1, helper selected 5,28:1, error pada canvas minimal 5,77:1 dan outline input minimal 3,97:1. Ini belum audit spoken feedback atau seluruh state aplikasi.
 
-## Batas yang masih terbuka
+## Batas pada checkpoint editor
 
 S05 memerlukan snapshot payload/ID serta pemulihan hasil POST yang belum pasti sebelum koreksi; S09 memerlukan konflik D04 dan reload yang menjaga draf. Persistensi draf lintas process death dan akun perlu dibuktikan tersendiri. Pengukuran CTA editor terhadap jendela IME nyata, integrasi write HTTP, spoken feedback TalkBack, audit fokus/motion per frame dan material CTA bersama tetap pekerjaan berikutnya. Tidak ada klaim seluruh layar sudah sesuai atau backend nyata sudah terintegrasi.
+
+Lanjutan snapshot/retry eksplisit dan pesan typed error kini tersedia pada [checkpoint submission](SUBMISSION.md). Pemulihan state layar di sana belum menggantikan penyimpanan draf ke disk/per akun maupun konflik version D04.
 
 Panduan/detail, pagination cursor/pull-to-refresh, grafik Statistik, Profil/achievement/pengaturan dan foto/AI tetap bagian sasaran penuh Iteration 2. Issue Android terkait tetap terbuka dengan checklist parsial berdasarkan bukti.

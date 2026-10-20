@@ -1,0 +1,11 @@
+<resources>
+    <string name="save_outcome_unknown">Hasil penyimpanan belum diketahui. Coba lagi dengan isian awal sebelum mengubah catatan.</string>
+    <string name="save_request_conflict">Permintaan ini sudah dipakai untuk isian lain. Periksa riwayat sebelum membuat catatan baru.</string>
+    <string name="save_record_deleted">Catatan dari permintaan ini sudah dihapus. Catatan tidak dibuat ulang.</string>
+    <string name="save_rejected">Isian belum diterima. Periksa kembali metode, kategori, jumlah, tanggal, dan catatan sebelum menyimpan lagi.</string>
+    <string name="save_rate_limited">Terlalu banyak permintaan. Tunggu sebentar sebelum mencoba lagi. Isianmu tetap tersedia.</string>
+    <string name="save_storage_failed">Catatan belum bisa disimpan di perangkat. Isianmu tetap tersedia; coba lagi.</string>
+    <string name="discard_pending_message">Menutup formulir tidak membatalkan permintaan yang sudah dikirim. Hasilnya mungkin sudah tersimpan. Periksa riwayat sebelum membuat catatan yang sama lagi.</string>
+    <string name="close_editor">Tutup formulir</string>
+    <string name="close_editor_title">Tutup formulir?</string>
+</resources>
