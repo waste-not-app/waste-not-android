@@ -1,0 +1,9 @@
+{
+  "object_key": "toothbrush",
+  "category": "OTHER",
+  "condition": {"reusable": "NO"},
+  "recycling_access": "NO",
+  "recommendation_goal": "HANDLING",
+  "reuse_intention": false,
+  "risk_flag": false
+}

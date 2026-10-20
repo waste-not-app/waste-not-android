@@ -1,0 +1,7 @@
+{
+  "object_key": "glass_cup",
+  "category": "GLASS",
+  "condition": {"integrity": "DAMAGED", "reusable": "NO"},
+  "reuse_intention": false,
+  "recommendation_goal": "AUTO"
+}

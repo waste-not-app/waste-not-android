@@ -2,6 +2,62 @@
 
 WasteNot membantu pengguna mencatat aktivitas Reduce, Reuse, Recycle dan Trash, mencari panduan, serta memantau kebiasaan pribadi.
 
+Prototipe lokal **YOLO + Gemini**, katalog objek pilot, baseline inference, pengujian policy dan worker privat tersedia di [panduan AI](ai/README.md). Panduan tersebut mencakup cara mencoba YOLO/LLM, konfigurasi Gemini, dan langkah integrasi backend Go serta frontend Android. Integrasi AI ke aplikasi masih mengikuti backlog; mode fixture dan panduan draf diberi label khusus.
+
+## Menggunakan YOLO dan Gemini
+
+**Demo kamera interaktif:** setelah environment AI siap, jalankan dari root repo:
+
+```powershell
+.\ai\demo-camera.bat
+```
+
+Browser terbuka di `http://127.0.0.1:8092` dan meminta izin kamera. Izinkan kamera → ambil foto → tinjau dan kirim untuk deteksi → klik bbox/daftar objek → konfirmasi material serta kondisi → minta rekomendasi Gemini. Tombol **Pilih foto** dan katalog manual tersedia jika kamera tidak bisa digunakan. Hentikan server dengan `Ctrl+C` pada terminal.
+
+Gemini memilih **satu** label **Reduce, Reuse, Recycle, atau Trash**, disertai alasan, langkah dan tautan sumber panduan. Reduce ditandai sebagai pencegahan penggunaan berikutnya. **Penanganan khusus menjadi peringatan tambahan**, bukan pengganti label: kaca pecah → Trash dengan pengemasan pelindung; baterai → Recycle melalui pengelola khusus. Contoh keempat label dan kontrak backend/frontend ada di [kontrak rekomendasi](ai/docs/RECOMMENDATION_CONTRACT.md). Saat layanan/panduan tidak tersedia, demo menampilkan kegagalan dengan jelas.
+
+Demo memakai katalog 68 pilihan benda/material yang terhubung ke 58 kelas visual checkpoint COCO; jenis yang belum memiliki kelas, misalnya kaleng/kardus/baterai, tetap dipilih manual. Semua panduan perlu review lokal; launcher ini mengaktifkan mode draf berlabel khusus demonstrasi. Langkah, cakupan dan batasnya ada di [demo kamera](ai/README.md#demo-kamera-di-browser).
+
+Semua perintah berikut dijalankan dari root repository melalui PowerShell. Prototipe Python dapat dicoba tanpa menjalankan Android atau backend Go.
+
+```powershell
+python -m venv .venv-ai
+.\.venv-ai\Scripts\python.exe -m pip install -e "./ai[yolo,worker,test]" -c ai/constraints.txt
+# Salin konfigurasi contoh hanya jika file lokal belum ada.
+if (-not (Test-Path -LiteralPath ai/.env)) { Copy-Item -LiteralPath ai/.env.example -Destination ai/.env }
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli fetch-assets
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli doctor
+```
+
+Untuk Gemini sungguhan, isi `GEMINI_API_KEY` dan `GEMINI_MODEL` pada `ai/.env` dengan kredensial/model yang tersedia di akunmu. File lokal tersebut diabaikan Git. `--demo-guides` pada contoh di bawah mengizinkan panduan draf khusus demonstrasi; tanpa flag itu, panduan bawaan belum dapat dipakai untuk rekomendasi produksi.
+
+Untuk rotasi lima key, isi `GEMINI_API_KEY_1` sampai `GEMINI_API_KEY_5` di `ai/.env`, lalu mulai ulang demo. Slot kosong/duplikat dilewati; key dipakai bergiliran dan diistirahatkan saat HTTP 429 sebelum mencoba key lain yang tersedia. Jika semua slot bernomor kosong, key tunggal lama tetap digunakan. Periksa jumlah key dengan `doctor`. [Panduan rotasi dan cooldown](ai/README.md#gemini-api) menjelaskan batas percobaan dan integrasi backend. Google menerapkan [kuota per proyek](https://ai.google.dev/gemini-api/docs/rate-limits), sehingga banyak key pada satu proyek tetap berbagi limit.
+
+```powershell
+# Coba YOLO saja; tidak membutuhkan Gemini API key.
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli detect ai/data/local/smoke/bottle.jpg --output ai/artifacts/detection.json
+
+# Coba Gemini saja dengan konteks contoh; membutuhkan API key.
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli recommend --context ai/examples/context-glass.json --provider gemini --demo-guides --output ai/artifacts/gemini-demo.json
+
+# Coba alur rekomendasi offline dengan simulator yang diberi label fixture.
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli recommend --context ai/examples/context-glass.json --provider fixture --demo-guides
+```
+
+Ganti path foto untuk memakai gambarmu sendiri. Ubah context JSON mengikuti material dan kondisi yang dikonfirmasi pengguna. CLI menampilkan hasil rekomendasi untuk ditinjau; penyimpanan aktivitas tetap melalui backend setelah konfirmasi metode dan input jumlah.
+
+| Kebutuhan | Panduan |
+|---|---|
+| Instalasi, objek pilot dan batas model | [Mulai](ai/README.md#mulai-di-powershell), [objek pilot](ai/README.md#objek-pilot-awal) |
+| Mencoba YOLO + Gemini dalam satu alur | [Percobaan langkah demi langkah](ai/README.md#percobaan-langkah-demi-langkah) |
+| API key, model dan output Gemini | [Konfigurasi Gemini](ai/README.md#gemini-api) |
+| Menjalankan worker dan menghubungkannya ke Go | [Integrasi backend](ai/README.md#integrasi-backend-go) |
+| Endpoint, DTO dan alur scan Android | [Integrasi frontend](ai/README.md#integrasi-frontend-android) |
+| Error dan pemeriksaan hasil | [Troubleshooting](ai/README.md#troubleshooting) |
+| Pembagian tanggung jawab dan pekerjaan integrasi tersisa | [Handoff](ai/docs/HANDOFF.md) |
+
+Worker Python untuk deteksi sudah tersedia. Endpoint AI publik, sesi/idempotensi dan pemanggilan Gemini produksi masih perlu diimplementasikan pada Go; frontend kemudian berkomunikasi melalui Go. Gemini key dan token worker hanya berada pada lingkungan server.
+
 ## Status implementasi
 
 Repo memiliki satu module `:app`, Navigation 3, tema terang/gelap, form bersama, transport HTTP dan penyimpanan sesi berbasis Android Keystore. Startup, Masuk/Daftar, lima tab, editor manual dan logout terhubung ke alur sesi. Pilihan **Lihat data contoh** membuka dataset berlabel untuk mencoba pencatatan, edit dan statistik lokal. Integrasi write/ringkasan backend nyata, konten panduan dan AI masih mengikuti backlog; adapter produksi tidak memalsukan simpan berhasil. Mockup HTML menjadi referensi desain. Bukti implementasi dan batas pengujian ada di [QA Iteration 1](docs/tasks/ITERATION_1_QA.md).

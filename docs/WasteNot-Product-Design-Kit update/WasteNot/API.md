@@ -2,6 +2,8 @@
 
 Versi 1.2 · 28 September 2026 · Core + AI extension · Rancangan implementasi
 
+Pembaruan AI 20 Oktober 2026: satu label REDUCE/REUSE/RECYCLE/TRASH, alasan dan sumber menggantikan rekomendasi dengan alternatif. Lihat [kontrak empat metode](../../../ai/docs/RECOMMENDATION_CONTRACT.md) untuk perilaku prototipe dan perubahan integrasi yang belum diimplementasikan pada Go/Android.
+
 Dokumen ini menetapkan kontrak usulan Android dan backend, melengkapi draft endpoint halaman 4 PDF. Aturan domain ada di [PRD.md](PRD.md). Prefix `/v1` merupakan keputusan rancangan. Contoh menggunakan data simulasi, bukan akun atau endpoint nyata.
 
 ## 1. Konvensi
@@ -379,7 +381,9 @@ Tidak ada foto/URL permanen pada respons. `status`: REVIEW_REQUIRED bila ada kan
   "confirmed_object_key": "pet_bottle",
   "confirmed_category": "PLASTIC",
   "condition": {"cleanliness": "CLEAN", "integrity": "INTACT", "reusable": "UNKNOWN"},
-  "reuse_intention": false
+  "reuse_intention": false,
+  "recommendation_goal": "AUTO",
+  "recycling_access": "UNKNOWN"
 }
 ```
 
@@ -392,19 +396,21 @@ Server mengambil confidence/model/mapping dari sesi sendiri, bukan percaya nilai
     "status": "READY",
     "category": "PLASTIC",
     "recommended_method": "RECYCLE",
-    "alternative_method": null,
+    "recommendation_scope": "HANDLING",
     "reason": "Contoh respons: periksa ketentuan penerimaan dalam panduan fasilitas.",
     "special_handling": false,
     "caution": "Ini contoh kontrak, bukan rekomendasi yang sudah diverifikasi.",
     "guide_refs": [{"guide_id": "9fbd97ab-9450-4b6e-a43e-e0bda8a61011", "version": 1}],
-    "recommendation_version": "policy-01",
+    "source_urls": ["https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"],
+    "steps": ["Periksa ketentuan fasilitas penerima."],
+    "recommendation_version": "pilot-policy-03",
     "expires_at": "2026-09-29T03:00:00Z"
   },
   "request_id": "request-example-2"
 }
 ```
 
-`status` READY / SPECIAL_HANDLING / UNAVAILABLE. SPECIAL_HANDLING mengharuskan special_handling=true dan kedua method=null. UNAVAILABLE mengharuskan kedua method=null dengan reason_code seperti NO_REVIEWED_GUIDE atau INVALID_MODEL_OUTPUT. Tidak mengembalikan exception/provider raw text. Expiry recommendation tidak boleh melampaui sesi deteksi. Konfirmasi pengguna tidak disimpulkan dari tombol generate.
+`status` READY / UNAVAILABLE. READY memiliki tepat satu recommended_method dari REDUCE/REUSE/RECYCLE/TRASH, reason, source_urls dan recommendation_scope=PREVENTION untuk REDUCE atau HANDLING untuk lainnya. Tidak ada alternative_method atau status SPECIAL_HANDLING. special_handling=true adalah peringatan tambahan yang boleh menyertai READY; tidak mengosongkan metode. Contoh: kaca pecah READY/TRASH/true, baterai READY/RECYCLE/true melalui pengelola khusus. recommendation_goal=AUTO/PREVENTION/HANDLING dan recycling_access=YES/NO/UNKNOWN memiliki default AUTO/UNKNOWN. UNAVAILABLE memakai metode/scope null saat panduan/layanan/output tidak siap, dengan reason_code seperti NO_REVIEWED_GUIDE atau INVALID_MODEL_OUTPUT; caution risiko tetap ditampilkan. Tidak mengembalikan exception/provider raw text. Expiry recommendation tidak boleh melampaui sesi deteksi. Konfirmasi pengguna tidak disimpulkan dari tombol generate.
 
 Simpan rekomendasi identik/replay satu client_request_id tanpa memanggil provider lagi selama TTL. Payload berbeda dengan ID sama →409. Context berubah memakai request ID baru; respons lama dibuang di Android. Infrastruktur timeout memakai error 504 AI_TIMEOUT; provider unavailable 503 AI_UNAVAILABLE; output semantik invalid dapat kembali 200 status UNAVAILABLE sebagai hasil fallback yang terkontrol.
 

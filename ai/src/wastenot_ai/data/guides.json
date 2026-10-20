@@ -1,0 +1,241 @@
+[
+  {
+    "id": "pilot-pet-bottle",
+    "version": 3,
+    "object_key": "pet_bottle",
+    "category": "PLASTIC",
+    "publication_status": "DRAFT",
+    "reviewed_at": null,
+    "reviewer": null,
+    "valid_until": null,
+    "source_urls": [
+      "https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"
+    ],
+    "scope_note": "Referensi AS; perlu review penerapan lokal Indonesia.",
+    "special_handling": false,
+    "steps": [
+      "Kosongkan botol dan periksa ketentuan fasilitas penerima."
+    ],
+    "caution": "Jangan anggap semua fasilitas menerima plastik ini.",
+    "evidence": [
+      {
+        "id": "pet-clean-recycle-v1",
+        "method": "RECYCLE",
+        "text": "Botol plastik bersih dapat diarahkan ke daur ulang bila fasilitas menerimanya.",
+        "requires": {
+          "cleanliness": "CLEAN",
+          "integrity": "INTACT"
+        }
+      },
+      {
+        "id": "pet_bottle-prevent-waste-v2",
+        "method": "REDUCE",
+        "requires": {},
+        "risk_compatible": true,
+        "text": "Untuk mencegah sampah berikutnya, kurangi pembelian yang tidak diperlukan dan pilih produk tahan lama atau kemasan lebih sedikit. Ini saran pencegahan, bukan pembuangan benda saat ini.",
+        "source_urls": [
+          "https://www.epa.gov/climate-change/what-you-can-do-about-climate-change-waste"
+        ],
+        "steps": [
+          "Pada pembelian berikutnya, beli sesuai kebutuhan dan pertimbangkan produk tahan lama atau kemasan lebih sedikit."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pilot-glass-bottle",
+    "version": 3,
+    "object_key": "glass_bottle",
+    "category": "GLASS",
+    "publication_status": "DRAFT",
+    "reviewed_at": null,
+    "reviewer": null,
+    "valid_until": null,
+    "source_urls": [
+      "https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"
+    ],
+    "scope_note": "Referensi AS; perlu review penerapan lokal Indonesia.",
+    "special_handling": false,
+    "steps": [
+      "Periksa ketentuan penerimaan wadah kaca."
+    ],
+    "caution": "Kaca pecah memerlukan panduan penanganan khusus.",
+    "evidence": [
+      {
+        "id": "glass-intact-recycle-v1",
+        "method": "RECYCLE",
+        "text": "Botol kaca utuh dapat diarahkan ke daur ulang bila fasilitas menerimanya.",
+        "requires": {
+          "cleanliness": "CLEAN",
+          "integrity": "INTACT"
+        }
+      },
+      {
+        "id": "glass_bottle-prevent-waste-v2",
+        "method": "REDUCE",
+        "requires": {},
+        "risk_compatible": true,
+        "text": "Untuk mencegah sampah berikutnya, kurangi pembelian yang tidak diperlukan dan pilih produk tahan lama atau kemasan lebih sedikit. Ini saran pencegahan, bukan pembuangan benda saat ini.",
+        "source_urls": [
+          "https://www.epa.gov/climate-change/what-you-can-do-about-climate-change-waste"
+        ],
+        "steps": [
+          "Pada pembelian berikutnya, beli sesuai kebutuhan dan pertimbangkan produk tahan lama atau kemasan lebih sedikit."
+        ]
+      },
+      {
+        "id": "glass-broken-trash-v3",
+        "method": "TRASH",
+        "risk_compatible": true,
+        "requires": {
+          "category": "GLASS",
+          "integrity": "DAMAGED"
+        },
+        "text": "Kaca pecah diarahkan ke Trash sebagai residu dengan pengemasan pelindung agar tidak melukai petugas. Panduan Cornwall menempatkan pecahan kaca pada jalur residu; konfirmasikan aturan penerima setempat.",
+        "source_urls": [
+          "https://www.cornwall.gov.uk/rubbish-recycling-and-waste/recycling/recycling-items/broken-glass/"
+        ],
+        "steps": [
+          "Jangan gunakan kembali kaca yang retak atau pecah dan hindari kontak langsung dengan tepi tajam.",
+          "Gunakan pembungkus pelindung atau wadah kokoh dan beri label berisi pecahan kaca; minta bantuan petugas bila tidak aman.",
+          "Serahkan melalui jalur residu sesuai petunjuk pengelola setempat; jangan campur pecahan lepas dengan daur ulang biasa."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pilot-aluminium-can",
+    "version": 3,
+    "object_key": "aluminium_can",
+    "category": "METAL",
+    "publication_status": "DRAFT",
+    "reviewed_at": null,
+    "reviewer": null,
+    "valid_until": null,
+    "source_urls": [
+      "https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"
+    ],
+    "scope_note": "Referensi AS; perlu review penerapan lokal Indonesia.",
+    "special_handling": false,
+    "steps": [
+      "Periksa aturan fasilitas untuk kaleng aluminium."
+    ],
+    "caution": "Penerimaan tetap bergantung fasilitas setempat.",
+    "evidence": [
+      {
+        "id": "can-clean-recycle-v1",
+        "method": "RECYCLE",
+        "text": "Kaleng aluminium bersih dapat diarahkan ke daur ulang bila diterima.",
+        "requires": {
+          "cleanliness": "CLEAN",
+          "integrity": "INTACT"
+        }
+      },
+      {
+        "id": "aluminium_can-prevent-waste-v2",
+        "method": "REDUCE",
+        "requires": {},
+        "risk_compatible": true,
+        "text": "Untuk mencegah sampah berikutnya, kurangi pembelian yang tidak diperlukan dan pilih produk tahan lama atau kemasan lebih sedikit. Ini saran pencegahan, bukan pembuangan benda saat ini.",
+        "source_urls": [
+          "https://www.epa.gov/climate-change/what-you-can-do-about-climate-change-waste"
+        ],
+        "steps": [
+          "Pada pembelian berikutnya, beli sesuai kebutuhan dan pertimbangkan produk tahan lama atau kemasan lebih sedikit."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pilot-cardboard",
+    "version": 3,
+    "object_key": "cardboard",
+    "category": "PAPER",
+    "publication_status": "DRAFT",
+    "reviewed_at": null,
+    "reviewer": null,
+    "valid_until": null,
+    "source_urls": [
+      "https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"
+    ],
+    "scope_note": "Referensi AS; perlu review penerapan lokal Indonesia.",
+    "special_handling": false,
+    "steps": [
+      "Periksa kebersihan dan aturan penerimaan kardus."
+    ],
+    "caution": "Kardus tercemar makanan tidak otomatis layak didaur ulang.",
+    "evidence": [
+      {
+        "id": "cardboard-clean-recycle-v1",
+        "method": "RECYCLE",
+        "text": "Kardus bersih dapat diarahkan ke daur ulang sesuai aturan fasilitas.",
+        "requires": {
+          "cleanliness": "CLEAN",
+          "integrity": "INTACT"
+        }
+      },
+      {
+        "id": "cardboard-prevent-waste-v2",
+        "method": "REDUCE",
+        "requires": {},
+        "risk_compatible": true,
+        "text": "Untuk mencegah sampah berikutnya, kurangi pembelian yang tidak diperlukan dan pilih produk tahan lama atau kemasan lebih sedikit. Ini saran pencegahan, bukan pembuangan benda saat ini.",
+        "source_urls": [
+          "https://www.epa.gov/climate-change/what-you-can-do-about-climate-change-waste"
+        ],
+        "steps": [
+          "Pada pembelian berikutnya, beli sesuai kebutuhan dan pertimbangkan produk tahan lama atau kemasan lebih sedikit."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pilot-battery",
+    "version": 3,
+    "object_key": "battery",
+    "category": "ELECTRONIC",
+    "publication_status": "DRAFT",
+    "reviewed_at": null,
+    "reviewer": null,
+    "valid_until": null,
+    "source_urls": [
+      "https://www.epa.gov/recycle/used-household-batteries"
+    ],
+    "scope_note": "Referensi AS; perlu review penerapan lokal Indonesia.",
+    "special_handling": true,
+    "steps": [
+      "Cari fasilitas atau petugas resmi yang menerima jenis baterai tersebut."
+    ],
+    "caution": "Jangan membongkar atau membakar baterai. Ikuti panduan petugas setempat.",
+    "evidence": [
+      {
+        "id": "battery-prevent-waste-v2",
+        "method": "REDUCE",
+        "requires": {},
+        "risk_compatible": true,
+        "text": "Untuk mencegah sampah berikutnya, kurangi pembelian yang tidak diperlukan dan pilih produk tahan lama atau kemasan lebih sedikit. Ini saran pencegahan, bukan pembuangan benda saat ini.",
+        "source_urls": [
+          "https://www.epa.gov/climate-change/what-you-can-do-about-climate-change-waste"
+        ],
+        "steps": [
+          "Pada pembelian berikutnya, beli sesuai kebutuhan dan pertimbangkan produk tahan lama atau kemasan lebih sedikit."
+        ]
+      },
+      {
+        "id": "battery-specialist-recycle-v3",
+        "method": "RECYCLE",
+        "risk_compatible": true,
+        "requires": {},
+        "text": "Baterai bekas diarahkan ke Recycle melalui pengumpul baterai atau pengelola limbah khusus yang menerima jenisnya. Bahan berharga dapat dipulihkan; jangan mencampurnya ke sampah rumah tangga atau tong daur ulang biasa.",
+        "source_urls": [
+          "https://www.epa.gov/recycle/used-household-batteries"
+        ],
+        "steps": [
+          "Hubungi pengumpul baterai atau pengelola limbah khusus untuk memastikan jenis baterai diterima.",
+          "Jika baterai rusak, bocor atau menggembung, minta prosedur penanganan kepada produsen/petugas dan jangan membongkarnya.",
+          "Serahkan sesuai prosedur layanan khusus; jangan dibakar atau dimasukkan ke tong sampah/daur ulang biasa."
+        ]
+      }
+    ]
+  }
+]
