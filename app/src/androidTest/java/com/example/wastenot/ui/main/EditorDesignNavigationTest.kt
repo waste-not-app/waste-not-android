@@ -35,6 +35,42 @@ class EditorDesignNavigationTest {
     @Test fun lightEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail() = journey(false)
     @Test fun darkEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail() = journey(true)
 
+    @Test fun storageFailureKeepsTheDraftAcrossRecreationAndAllowsCorrection() {
+        waitFor("650 g")
+        compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
+        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).performScrollTo().performClick()
+        compose.onNodeWithText("Recycle").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
+        compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
+        compose.onNodeWithContentDescription("Berat").performScrollTo().performTextReplacement("250")
+        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Isian gagal tersimpan")
+        val preferences = InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("dummy_logs_dummy-owner", Context.MODE_PRIVATE)
+        val original = checkNotNull(preferences.getString("records", null))
+        try {
+            compose.runOnIdle { check(preferences.edit().putString("records", "{").commit()) }
+            compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
+            val failure = "Catatan belum bisa disimpan di perangkat. Isianmu tetap tersedia; coba lagi."
+            waitFor(failure)
+            compose.onNodeWithContentDescription("Catatan (opsional)").assertIsEnabled().assertTextContains("Isian gagal tersimpan")
+            compose.activityRule.scenario.recreate()
+            compose.waitForIdle()
+            compose.onNodeWithText(failure).assertExists()
+            compose.onNodeWithContentDescription("Berat").assertTextContains("250")
+            compose.onNodeWithContentDescription("Catatan (opsional)").assertIsEnabled().assertTextContains("Isian gagal tersimpan")
+            compose.runOnIdle {
+                assertEquals("{", preferences.getString("records", null))
+                check(preferences.edit().putString("records", original).commit())
+            }
+            compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Koreksi eksplisit")
+            compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
+            waitFor("+10 XP untuk aktivitas baru ini.")
+            compose.runOnIdle { assertEquals(6, org.json.JSONArray(preferences.getString("records", null)).length()) }
+        } finally {
+            if (preferences.getString("records", null) == "{") check(preferences.edit().putString("records", original).commit())
+        }
+    }
+
     private fun journey(dark: Boolean) {
         waitFor("650 g")
         compose.onNode(tabs and hasText("Profil")).performClick()

@@ -117,12 +117,27 @@ class AppNavigationTest {
         openEditor()
         compose.onNodeWithContentDescription("Catatan (opsional)")
             .performScrollTo().performTextReplacement("Draf gesture")
+        fun imeVisible() = compose.runOnUiThread {
+            ViewCompat.getRootWindowInsets(compose.activity.window.decorView)?.isVisible(WindowInsetsCompat.Type.ime()) == true
+        }
+        compose.waitUntil(8_000) { imeVisible() }
+        capture("gesture-keyboard")
         val height = compose.runOnUiThread { compose.activity.window.decorView.height }
         val automation = InstrumentationRegistry.getInstrumentation().uiAutomation
-        automation.executeShellCommand("input touchscreen swipe 1 ${height / 2} 600 ${height / 2} 500").use {
-            android.os.ParcelFileDescriptor.AutoCloseInputStream(it).readBytes()
+        fun gestureBack() {
+            automation.executeShellCommand("input touchscreen swipe 1 ${height / 2} 600 ${height / 2} 500").use {
+                android.os.ParcelFileDescriptor.AutoCloseInputStream(it).readBytes()
+            }
         }
+        gestureBack()
+        compose.waitUntil(5_000) { !imeVisible() }
+        compose.onNodeWithText("Draf gesture").assertExists()
+        compose.onNodeWithText("Buang perubahan?").assertDoesNotExist()
+        compose.onAllNodes(tabs).assertCountEquals(0)
+        capture("gesture-ime-hidden")
+        gestureBack()
         compose.waitUntil(5_000) { compose.onAllNodesWithText("Buang perubahan?").fetchSemanticsNodes().isNotEmpty() }
+        capture("gesture-dirty-dialog")
         compose.onNodeWithText("Lanjut mengisi").performClick()
         compose.onNodeWithText("Draf gesture").assertExists()
         compose.onAllNodes(tabs).assertCountEquals(0)

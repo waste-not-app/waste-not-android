@@ -51,6 +51,8 @@ enum class MainTab(val key: NavKey, val label: Int, val icon: Int) {
     PROFILE(Profile, R.string.tab_profile, R.drawable.ic_profile),
 }
 
+private data class EditorEntryDraft(val requestId: String, val draft: EditorDraft)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountNavigation(
@@ -76,11 +78,9 @@ fun AccountNavigation(
     val stack = stacks.getValue(selected)
     val current = stack.last()
     val editor = current as? LogEditor
-    val initial = data.detail?.takeIf { it.id == editor?.logId }?.log ?: data.records.find { it.id == editor?.logId }
     val date = model.referenceDate ?: LocalDate.now(user.timezone)
-    val draft = if (editor != null && (editor.logId == null || initial != null)) {
-        rememberSaveable(editor.requestId, saver = EditorDraft.Saver) { EditorDraft.from(initial, date) }
-    } else null
+    var activeEditorDraft by remember { mutableStateOf<EditorEntryDraft?>(null) }
+    val draft = activeEditorDraft?.takeIf { it.requestId == editor?.requestId }?.draft
     var discard by remember { mutableStateOf(false) }
     var leaving by remember { mutableStateOf(false) }
     var capture by remember { mutableStateOf(false) }
@@ -121,7 +121,7 @@ fun AccountNavigation(
     fun edit(id: String? = null) {
         if (stack.lastOrNull() !is LogEditor) stack.add(LogEditor(id, UUID.randomUUID().toString()))
     }
-    LaunchedEffect(data.save) {
+    LaunchedEffect(data.save, editor?.requestId, draft) {
         val saved = data.save
         if (saved?.id != null && editor?.requestId == saved.requestId && stack.lastOrNull() == editor) {
             savedNoticeId = saved.id
@@ -215,10 +215,18 @@ fun AccountNavigation(
                             onHistory = ::history, onRetry = { model.loadDetail(key.id) }, modifier = Modifier.fillMaxSize())
                     }
                     entry<LogEditor> { key ->
-                        if (draft != null && editor == key) LogEditorScreen(draft, date, user.timezone.id, demo, data.saving, pageInsets,
-                            { model.save(it, key.logId, draft.values.version, key.requestId) },
-                            { stack.removeLastOrNull(); history(); model.load(true) }, Modifier.fillMaxSize())
-                        else WorkspaceLoading(data, { model.load(true) }, pageInsets, Modifier.fillMaxSize())
+                        val initial = data.detail?.takeIf { it.id == key.logId }?.log ?: data.records.find { it.id == key.logId }
+                        if (key.logId == null || initial != null) {
+                            val entryDraft = rememberSaveable(key.requestId, saver = EditorDraft.Saver) { EditorDraft.from(initial, date) }
+                            DisposableEffect(key.requestId, entryDraft) {
+                                activeEditorDraft = EditorEntryDraft(key.requestId, entryDraft)
+                                onDispose { if (activeEditorDraft?.requestId == key.requestId) activeEditorDraft = null }
+                            }
+                            val leavingAfterSave = current != key && entryDraft.locked && entryDraft.submissionError == null
+                            LogEditorScreen(entryDraft, date, user.timezone.id, demo, data.saving || leavingAfterSave, pageInsets,
+                                { model.save(it, key.logId, entryDraft.values.version, key.requestId) },
+                                { stack.removeLastOrNull(); history(); model.load(true) }, Modifier.fillMaxSize())
+                        } else WorkspaceLoading(data, { model.load(true) }, pageInsets, Modifier.fillMaxSize())
                     }
                 }
                 val decorated = stacks.mapValues { (_, value) ->

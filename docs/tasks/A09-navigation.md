@@ -24,3 +24,14 @@ Sembilan tes SessionViewModel memeriksa validasi sebelum request, single flight,
 Starter Hello Android, repository sample, beranda angka/emoji tanpa provenance dan tes yang hanya memeriksa Loading/greeting dihapus karena tidak dipakai alur baru. Tes penggantinya memeriksa perilaku sesi, draf, dataset dan navigasi aplikasi.
 
 Pada API 36/debug normal/font 200%, gestur Back dari tepi layar dengan navigation_mode=2 memunculkan D03 untuk draf dirty. Lanjut mengisi mempertahankan isian dan editor. Tes ini melengkapi app bar/dispatcher; tidak menilai animasi predictive per frame. Lima kasus runtime debug biasa juga lulus pada API 36, terpisah dari suite native API 24.
+
+
+## Checkpoint Iteration 2: transisi editor
+
+Branch `codex/android-iteration-2-design`, melanjutkan `fac827c`. Catatan Iteration 1 di atas adalah riwayat implementasi; sumber default sekarang dummy persisten per akun dan pintu masuk demo telah dihapus. Status akhir A09 tetap dalam pengerjaan.
+
+Draf dipindahkan ke lifetime entry Navigation 3 agar form yang sedang keluar tidak diganti fallback gagal memuat setelah simpan berhasil. Parent mengakses draf entry aktif untuk kebijakan Back dan hasil save; disposal tidak boleh membersihkan draf request lain. Form yang sudah berhasil disimpan tetap nonaktif selama keluar.
+
+[Bukti native dan screenshot](../qa/iteration-2/NAVIGATION_MOTION.md) mencakup lima alur transisi, 40 eksekusi dari 14 kasus unik pada API 24/36, ponsel/rail dan teks normal/200%, tanpa skip. Regresi meliputi failure STORAGE/Activity recreate/koreksi, filter dan gestur Android 36: Back pertama menutup keyboard, berikutnya membuka D03, Batal mempertahankan isian. Probe awal dengan APK tes identik berubah dari 14 sampel fallback error menjadi nol. Durasi fade tetap 180/120 ms.
+
+Ini penerimaan checkpoint yang diuji, bukan audit motion seluruh aplikasi atau predictive seek per frame. Layar dan komponen lain mengikuti [matriks Iteration 2](ITERATION_2_DESIGN.md).

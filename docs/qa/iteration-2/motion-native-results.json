@@ -1,0 +1,499 @@
+{
+  "accepted_executions": 40,
+  "unique_cases": 14,
+  "unit_counts": {
+    "tests": 120,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "app_apk_sha256": "77386cbde7be2050bf68dcdabb7a1a13463d6480f24553823597169470b93d52",
+  "before": {
+    "frames_observed": 20,
+    "confirmation_frame": 3,
+    "error_frames": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "clock_elapsed_ms": 336
+  },
+  "first_fixed_probe": {
+    "frames_observed": 20,
+    "confirmation_frame": 3,
+    "error_frames": [],
+    "clock_elapsed_ms": 336
+  },
+  "same_initial_test_apk_sha256": "ec953961329540eaca6317ce0e930d3eaacd9fbddb6ad6b7d0c5ada5f9a3fdb5",
+  "suites": [
+    {
+      "suite": "transition-normal-motion1",
+      "api": 24,
+      "serial": "emulator-5554",
+      "width_dp": 360,
+      "font_scale": 1.0,
+      "density": "Physical density: 480",
+      "size": "Physical size: 1080x1920",
+      "animations": {
+        "animator_duration_scale": "1.0",
+        "transition_animation_scale": "1.0",
+        "window_animation_scale": "1.0"
+      },
+      "passed": 11,
+      "skipped": 0,
+      "seconds": 104.722,
+      "cases": [
+        {
+          "test": "discardKeepsItsFormDuringExitAndTheNextDraftStartsEmpty",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "confirmedCreateDoesNotFlashALoadErrorWhileTheEditorExits",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "cleanBackKeepsItsFormUntilHomeReturns",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "darkConfirmedCreateKeepsItsFormDuringExit",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "confirmedEditKeepsItsFormUntilTheUpdatedReceiptAppears",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "lightEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest"
+        },
+        {
+          "test": "darkEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest"
+        },
+        {
+          "test": "dirtyBackCreateAndEditKeepExclusiveQuantityAndDoNotAddEditXp",
+          "class": "com.example.wastenot.ui.main.AppNavigationTest"
+        },
+        {
+          "test": "historyFilterAndRangeSurviveDetailTabsAndRotation",
+          "class": "com.example.wastenot.ui.main.AppNavigationTest"
+        },
+        {
+          "test": "confirmedCreateSurvivesRecreationAndEditNeverAnnouncesNewXp",
+          "class": "com.example.wastenot.ui.main.SaveConfirmationNavigationTest"
+        },
+        {
+          "test": "directDummyHomeDockAndManualFallbackRetainAllFiveStacks",
+          "class": "com.example.wastenot.ui.main.Iteration2DesignTest"
+        }
+      ],
+      "phases": [
+        {
+          "phase": "create",
+          "frames_observed": 20,
+          "target_frame": 3,
+          "error_frames": [],
+          "clock_elapsed_ms": 336,
+          "capture_count": 5
+        },
+        {
+          "phase": "create-dark",
+          "frames_observed": 20,
+          "target_frame": 3,
+          "error_frames": [],
+          "clock_elapsed_ms": 336,
+          "capture_count": 5
+        },
+        {
+          "phase": "edit",
+          "frames_observed": 20,
+          "target_frame": 3,
+          "error_frames": [],
+          "clock_elapsed_ms": 336,
+          "capture_count": 5
+        },
+        {
+          "phase": "clean-back",
+          "frames_observed": 18,
+          "target_frame": 1,
+          "error_frames": [],
+          "clock_elapsed_ms": 304,
+          "capture_count": 5
+        },
+        {
+          "phase": "discard-back",
+          "frames_observed": 18,
+          "target_frame": 1,
+          "error_frames": [],
+          "clock_elapsed_ms": 304,
+          "capture_count": 5
+        }
+      ],
+      "test_apk_sha256": "b040fc41f26dc86dd9953388cdf72647cce2acdf09a2332b7ad3f2af5465dbdf"
+    },
+    {
+      "suite": "transition-phone200-motion1",
+      "api": 24,
+      "serial": "emulator-5554",
+      "width_dp": 360,
+      "font_scale": 2.0,
+      "density": "Physical density: 480",
+      "size": "Physical size: 1080x1920",
+      "animations": {
+        "animator_duration_scale": "1.0",
+        "transition_animation_scale": "1.0",
+        "window_animation_scale": "1.0"
+      },
+      "passed": 8,
+      "skipped": 0,
+      "seconds": 79.101,
+      "cases": [
+        {
+          "test": "discardKeepsItsFormDuringExitAndTheNextDraftStartsEmpty",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "confirmedCreateDoesNotFlashALoadErrorWhileTheEditorExits",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "cleanBackKeepsItsFormUntilHomeReturns",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "darkConfirmedCreateKeepsItsFormDuringExit",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "confirmedEditKeepsItsFormUntilTheUpdatedReceiptAppears",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "lightEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest"
+        },
+        {
+          "test": "darkEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest"
+        },
+        {
+          "test": "dirtyBackCreateAndEditKeepExclusiveQuantityAndDoNotAddEditXp",
+          "class": "com.example.wastenot.ui.main.AppNavigationTest"
+        }
+      ],
+      "phases": [
+        {
+          "phase": "create",
+          "frames_observed": 20,
+          "target_frame": 3,
+          "error_frames": [],
+          "clock_elapsed_ms": 336,
+          "capture_count": 5
+        },
+        {
+          "phase": "create-dark",
+          "frames_observed": 20,
+          "target_frame": 3,
+          "error_frames": [],
+          "clock_elapsed_ms": 336,
+          "capture_count": 5
+        },
+        {
+          "phase": "edit",
+          "frames_observed": 19,
+          "target_frame": 2,
+          "error_frames": [],
+          "clock_elapsed_ms": 320,
+          "capture_count": 5
+        },
+        {
+          "phase": "clean-back",
+          "frames_observed": 18,
+          "target_frame": 1,
+          "error_frames": [],
+          "clock_elapsed_ms": 304,
+          "capture_count": 5
+        },
+        {
+          "phase": "discard-back",
+          "frames_observed": 18,
+          "target_frame": 1,
+          "error_frames": [],
+          "clock_elapsed_ms": 304,
+          "capture_count": 5
+        }
+      ],
+      "test_apk_sha256": "b040fc41f26dc86dd9953388cdf72647cce2acdf09a2332b7ad3f2af5465dbdf"
+    },
+    {
+      "suite": "transition-wide200-motion1",
+      "api": 24,
+      "serial": "emulator-5554",
+      "width_dp": 600,
+      "font_scale": 2.0,
+      "density": "Physical density: 480\nOverride density: 288",
+      "size": "Physical size: 1080x1920",
+      "animations": {
+        "animator_duration_scale": "1.0",
+        "transition_animation_scale": "1.0",
+        "window_animation_scale": "1.0"
+      },
+      "passed": 8,
+      "skipped": 0,
+      "seconds": 105.468,
+      "cases": [
+        {
+          "test": "discardKeepsItsFormDuringExitAndTheNextDraftStartsEmpty",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "confirmedCreateDoesNotFlashALoadErrorWhileTheEditorExits",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "cleanBackKeepsItsFormUntilHomeReturns",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "darkConfirmedCreateKeepsItsFormDuringExit",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "confirmedEditKeepsItsFormUntilTheUpdatedReceiptAppears",
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest"
+        },
+        {
+          "test": "railScrollsAndManualEditorFitsWideWindow",
+          "class": "com.example.wastenot.ui.main.WideNavigationTest"
+        },
+        {
+          "test": "confirmedCreateSurvivesRecreationAndEditNeverAnnouncesNewXp",
+          "class": "com.example.wastenot.ui.main.SaveConfirmationNavigationTest"
+        },
+        {
+          "test": "directDummyHomeDockAndManualFallbackRetainAllFiveStacks",
+          "class": "com.example.wastenot.ui.main.Iteration2DesignTest"
+        }
+      ],
+      "phases": [
+        {
+          "phase": "create",
+          "frames_observed": 20,
+          "target_frame": 3,
+          "error_frames": [],
+          "clock_elapsed_ms": 336,
+          "capture_count": 5
+        },
+        {
+          "phase": "create-dark",
+          "frames_observed": 20,
+          "target_frame": 3,
+          "error_frames": [],
+          "clock_elapsed_ms": 336,
+          "capture_count": 5
+        },
+        {
+          "phase": "edit",
+          "frames_observed": 20,
+          "target_frame": 3,
+          "error_frames": [],
+          "clock_elapsed_ms": 336,
+          "capture_count": 5
+        },
+        {
+          "phase": "clean-back",
+          "frames_observed": 18,
+          "target_frame": 1,
+          "error_frames": [],
+          "clock_elapsed_ms": 304,
+          "capture_count": 5
+        },
+        {
+          "phase": "discard-back",
+          "frames_observed": 18,
+          "target_frame": 1,
+          "error_frames": [],
+          "clock_elapsed_ms": 304,
+          "capture_count": 5
+        }
+      ],
+      "test_apk_sha256": "b040fc41f26dc86dd9953388cdf72647cce2acdf09a2332b7ad3f2af5465dbdf"
+    },
+    {
+      "suite": "transition-wide200-rotation",
+      "api": 24,
+      "serial": "emulator-5554",
+      "width_dp": 600,
+      "font_scale": 2.0,
+      "density": "Physical density: 480\nOverride density: 288",
+      "size": "Physical size: 1080x1920",
+      "animations": {
+        "animator_duration_scale": "1.0",
+        "transition_animation_scale": "1.0",
+        "window_animation_scale": "1.0"
+      },
+      "passed": 2,
+      "skipped": 0,
+      "seconds": 42.63,
+      "cases": [
+        {
+          "test": "lightEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest"
+        },
+        {
+          "test": "darkEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest"
+        }
+      ],
+      "phases": [],
+      "test_apk_sha256": "930725429595ac478c5725b5841e0cd16b123d9e875a5087838ded026c948486"
+    },
+    {
+      "suite": "transition-storage-recovery",
+      "api": 24,
+      "width_dp": 360,
+      "font_scale": 1.0,
+      "passed": 1,
+      "skipped": 0,
+      "seconds": 17.437,
+      "cases": [
+        {
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest",
+          "test": "storageFailureKeepsTheDraftAcrossRecreationAndAllowsCorrection"
+        }
+      ],
+      "phases": [],
+      "configuration_evidence": "Recorded setup command and subsequent API24 AVD restoration; no independent settings sample collected for this auxiliary test.",
+      "test_apk_sha256": "930725429595ac478c5725b5841e0cd16b123d9e875a5087838ded026c948486"
+    },
+    {
+      "suite": "motion-api36-final",
+      "api": 36,
+      "serial": "emulator-5556",
+      "width_dp": 360,
+      "font_scale": 2.0,
+      "density": "Physical density: 420\nOverride density: 480",
+      "size": "Physical size: 1080x2400",
+      "animations": {
+        "animator_duration_scale": "1.0",
+        "transition_animation_scale": "1.0",
+        "window_animation_scale": "1.0"
+      },
+      "passed": 10,
+      "skipped": 0,
+      "seconds": 157.281,
+      "cases": [
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "discardKeepsItsFormDuringExitAndTheNextDraftStartsEmpty"
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "confirmedCreateDoesNotFlashALoadErrorWhileTheEditorExits"
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "cleanBackKeepsItsFormUntilHomeReturns"
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "darkConfirmedCreateKeepsItsFormDuringExit"
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "confirmedEditKeepsItsFormUntilTheUpdatedReceiptAppears"
+        },
+        {
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest",
+          "test": "storageFailureKeepsTheDraftAcrossRecreationAndAllowsCorrection"
+        },
+        {
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest",
+          "test": "lightEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail"
+        },
+        {
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest",
+          "test": "darkEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail"
+        },
+        {
+          "class": "com.example.wastenot.ui.main.AppNavigationTest",
+          "test": "edgeBackGestureUsesDirtyDraftPolicy"
+        },
+        {
+          "class": "com.example.wastenot.ui.main.AppNavigationTest",
+          "test": "dirtyBackCreateAndEditKeepExclusiveQuantityAndDoNotAddEditXp"
+        }
+      ],
+      "phases": [
+        {
+          "phase": "create",
+          "frames_observed": 20,
+          "target_frame": 3,
+          "error_frames": [],
+          "clock_elapsed_ms": 336,
+          "capture_count": 5
+        },
+        {
+          "phase": "create-dark",
+          "frames_observed": 20,
+          "target_frame": 3,
+          "error_frames": [],
+          "clock_elapsed_ms": 336,
+          "capture_count": 5
+        },
+        {
+          "phase": "edit",
+          "frames_observed": 19,
+          "target_frame": 2,
+          "error_frames": [],
+          "clock_elapsed_ms": 320,
+          "capture_count": 5
+        },
+        {
+          "phase": "clean-back",
+          "frames_observed": 18,
+          "target_frame": 1,
+          "error_frames": [],
+          "clock_elapsed_ms": 304,
+          "capture_count": 5
+        },
+        {
+          "phase": "discard-back",
+          "frames_observed": 18,
+          "target_frame": 1,
+          "error_frames": [],
+          "clock_elapsed_ms": 304,
+          "capture_count": 5
+        }
+      ],
+      "test_apk_sha256": "ea6097a66efcc510f35eb9bf951ae28546b0bd7a0e48d558f7d647f35929f315"
+    }
+  ],
+  "representative_images_sha256": {
+    "motion-before-create-error.png": "ad2b6d3ccc2df21302417d9ec4d9719b66c9ce137db47811399c4df33924bccd",
+    "motion-before-create-blend.png": "055e115373975249f5bd8e25308606402c429d0ee08bc31062927c7ea00605e7",
+    "motion-after-create-start.png": "ddf4cfd985048cbe64e0281562080f490ceafbad37939d39d336353c960c2827",
+    "motion-after-create-blend.png": "4e4675e134c18ef26241603086147fea1f943ed45245f1966cb242ffd4e5cf61",
+    "motion-after-create-end.png": "258f202c25e49347c18c75faff20ccb7dde037ac3b185b2f7270aa1ad329e1c4",
+    "motion-after-dark-create.png": "ce92161748209cd4077598b0428175b4e09a623408cfa1e409b185ea34bd009d",
+    "motion-after-edit.png": "2e89507435bb0664092700475108edfb60b2f90a37fca6a3b6e0eaa71d7e9581",
+    "motion-after-discard.png": "b4ffe2005865403122529d44a0599bc6cafdfd215abf0af030e3c617ac310416",
+    "motion-after-phone200-create.png": "83754c610f9cdc6fdf1457515359546d1073e34cd92189d439b190116bd8cb44",
+    "motion-after-wide200-create.png": "556653905a97263b105f540f64a9ea0065a2685a79461b694c94d5df87577df2",
+    "motion-gesture-keyboard.png": "b5613da696d463585f84198be726042df0a958602177317055465b02603f1ccb",
+    "motion-gesture-ime-hidden.png": "c81c652da083c0c20e11dd9d5fc0fde3624e4ab7bca77219441c43ec6db68985",
+    "motion-gesture-dialog.png": "ec4e3a9f3e163306a44f8a8acd44eb53377d793be895203d3133a997e2b82fd4"
+  }
+}
