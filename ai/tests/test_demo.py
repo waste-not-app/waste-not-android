@@ -61,7 +61,7 @@ def rec_payload(detection_id=None,provider="gemini"):
             "object_id":"object-1" if detection_id else None,"confirmed_object":True,"provider":provider,
             "context":{"object_key":"pet_bottle","category":"PLASTIC",
                        "condition":{"cleanliness":"CLEAN","integrity":"INTACT","reusable":"UNKNOWN"},
-                       "reuse_intention":False,"risk_flag":False}}
+                       "reuse_intention":False,"risk_flag":False,"recycling_access":"YES"}}
 
 
 def test_demo_requires_local_host_origin_cookie_and_csrf_nonce():
@@ -142,15 +142,15 @@ def test_detected_sharp_object_cannot_bypass_policy_with_category_correction():
         headers = bootstrap(client)
         detection_id = detect(client,headers,image=b"knife").json()["data"]["detection_id"]
         result = client.post("/demo/api/recommend",json=rec_payload(detection_id),headers=headers).json()["data"]
-        assert result["status"] == "READY" and result["recommended_method"] == "REDUCE"
-        assert result["recommendation_scope"] == "PREVENTION" and result["special_handling"] is True
-        assert provider.calls == 1
+        assert result["status"] == "UNAVAILABLE" and result["recommended_method"] is None
+        assert result["recommendation_scope"] is None and result["special_handling"] is True
+        assert provider.calls == 0
 
 
 def test_expanded_catalog_and_guides_cover_every_item_without_claiming_manual_detection():
     catalog = load_catalog()
     guides = load_guides()
-    assert len(catalog["items"]) == 68 and len(guides) == 68
+    assert len(catalog["items"]) == 78 and len(guides) == 78
     assert len({x["baseline_class_id"] for x in catalog["items"] if x["baseline_class_id"] is not None}) == 58
     assert all(g.publication_status == "DRAFT" for g in guides)
     for key in ("battery","aluminium_can","cardboard"):

@@ -20,7 +20,9 @@ keystore/
 
 # Local AI experiments, credentials and downloaded artifacts
 /.venv-ai/
+/.venv-ai-train/
 /.cache-ai/
+/weights/
 /ai/.env
 /ai/.env.*
 !/ai/.env.example

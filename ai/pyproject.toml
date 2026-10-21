@@ -16,8 +16,8 @@ dependencies = [
 
 [project.optional-dependencies]
 yolo = ["ultralytics==8.4.183"]
-worker = ["fastapi==0.115.14", "uvicorn==0.35.0"]
-test = ["pytest==8.4.1"]
+worker = ["fastapi==0.115.14", "uvicorn==0.35.0", "python-multipart==0.0.32"]
+test = ["pytest==8.4.1", "jsonschema==4.26.0", "openapi-spec-validator==0.9.0"]
 
 [project.scripts]
 wastenot-ai = "wastenot_ai.cli:main"

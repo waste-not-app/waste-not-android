@@ -22,6 +22,8 @@ AI merupakan increment setelah alur core stabil. Jadwal empat minggu lama adalah
 
 ## 2. Alur dan batas tanggung jawab
 
+Keputusan integrasi 20 Oktober 2026: Python memiliki mapping, retrieval panduan, allowed methods, Gemini dan validasi evidence. Go memegang JWT, ownership, sesi/TTL, idempotensi/budget dan transaksi catatan. Interface privat terpisah untuk YOLO dan keputusan; Go tidak menyalin aturan AI. OpenAPI, mock dan contoh tersedia pada [kontrak HTTP v1](../../../ai/docs/AI_HTTP_CONTRACT.md). Endpoint Go/Android masih perlu diimplementasikan.
+
 ```mermaid
 flowchart TD
     A[Action Catat/Scan pada dock] --> B{Camera bottom sheet}
@@ -74,7 +76,7 @@ YOLO11n adalah kandidat baseline dari rencana, bukan model yang sudah dipilih/di
 | battery / electronic_waste | ELECTRONIC | battery / electronic_waste | Special handling; flag bukan kategori baru |
 | Label tak dikenal | null | null | Pilih manual; OTHER hanya pilihan eksplisit pengguna |
 
-Mapping adalah tabel versioned milik backend: model_version + class_id → object_key + category nullable + guide_key nullable + special_handling. Client tidak dapat memaksakan guide/category dengan payload deteksi buatan. Koreksi pengguna memakai katalog object_key server dan kategori enum; unknown/custom hanya menuju manual tanpa rekomendasi jika tidak ada panduan cocok.
+Mapping adalah tabel versioned milik modul Python: model_version + class_id → object_key + category nullable + guide_key nullable + special_handling. Go menyimpan snapshot hasil dan mengirim objek dari sesi miliknya ke interface keputusan privat. Client tidak dapat memaksakan snapshot/guide/confidence. Koreksi pengguna memakai katalog server; unknown/custom menuju manual bila tidak ada panduan cocok.
 
 Bbox memakai `[x_min,y_min,x_max,y_max]` normalized 0..1 terhadap gambar setelah orientasi dibetulkan; x_min < x_max dan y_min < y_max. Model adapter mengonversi output runtime ke kontrak ini. Android menghitung ulang posisi pada crop/letterbox preview. Pilihan daftar dan bbox merujuk detection_id yang sama.
 
@@ -92,6 +94,8 @@ Ambang adalah hipotesis pengujian, bukan akurasi terukur. Skor 0,94 ditulis “S
 
 Kondisi bukan satu pilihan yang saling meniadakan. Gunakan tiga field: cleanliness CLEAN/DIRTY/UNKNOWN, integrity INTACT/DAMAGED/UNKNOWN, reusable YES/NO/UNKNOWN. `reuse_intention` boolean nullable terpisah. Default UNKNOWN/null; kamera tidak mengisi kondisi sebagai fakta.
 
+Policy-04 menambahkan condition.cleanable=YES/NO/UNKNOWN dan condition.soiling=FOOD_DRINK/DUST/HAZARDOUS/UNKNOWN, serta risk_type=UNKNOWN/SHARP/CHEMICAL/BIOLOGICAL/ELECTRICAL/OTHER. Pada peralatan makan/minum, kotor biasa yang dikonfirmasi bisa dibersihkan dapat memenuhi REUSE dengan langkah mencuci dahulu, jika utuh, layak dan ingin dipakai kembali. DIRTY tidak otomatis diubah menjadi CLEAN. Centang risiko yang belum dijelaskan menghasilkan NEEDS_CONTEXT + missing_context sebelum memanggil Gemini. Metadata sumber tercatat pada registri, dengan penerbit, wilayah, tanggal pemeriksaan referensi dan batas cakupan; bukan persetujuan ahli lokal.
+
 Retrieval awal memakai lookup object_key/guide_key dan filter category + publication_status=PUBLISHED. Tidak perlu vector database atau embeddings. Panduan harus memiliki version, reviewed_at, sumber, metode yang diizinkan, syarat konteks, steps, cautions, special_handling. Artikel draft dalam HTML lama tidak boleh menjadi knowledge produksi. Jika kosong/kedaluwarsa menurut kebijakan editorial, tampilkan UNAVAILABLE dan pilihan manual; jangan mengisi kekosongan dengan pengetahuan bebas LLM.
 
 Rekomendasi mengacu pada snapshot panduan dan kondisi yang dikonfirmasi. Mengubah objek/kategori/kondisi membatalkan rekomendasi lama; request lama tidak boleh menimpa state baru. Perubahan metode manual tetap diperbolehkan dan dicatat sebagai koreksi pengguna.
@@ -102,9 +106,9 @@ Provider berada di backend. Kirim hanya object_key, kategori, konteks, metode ya
 
 Output internal Gemini mempunyai tepat satu recommended_method wajib (REDUCE/REUSE/RECYCLE/TRASH), reason, special_handling, caution, dan evidence_ids; tidak memiliki alternative_method. Respons READY menambahkan recommendation_scope, source_urls dan steps dari evidence/panduan yang tervalidasi. special_handling adalah flag peringatan dan tidak menghilangkan metode READY. Server memvalidasi JSON/schema, batas panjang (reason 500, caution 500 karakter), enum, referensi evidence, dan kesesuaian aturan panduan. Prototipe merender alasan dari evidence pilihan, bukan prosa bebas model. JSON yang valid saja belum membuktikan rekomendasi benar. Teks panduan diperlakukan sebagai data; instruksi tersembunyi di dalamnya tidak boleh mengubah kebijakan sistem. Tidak memakai OCR/teks gambar sebagai instruksi.
 
-Server menghitung allowed methods dari panduan dan konteks, lalu memeriksa satu hasil LLM terhadap subset itu. Evidence hanya boleh mendukung metode terpilih. recommendation_goal=AUTO/PREVENTION/HANDLING mengatur fokus; recycling_access=YES/NO/UNKNOWN mencatat pemeriksaan penerima. Default AUTO/UNKNOWN. Tidak ada akses daur ulang tidak otomatis membolehkan TRASH tanpa evidence spesifik. Evidence ID harus berasal dari retrieval request tersebut; URL sumber disediakan server dari evidence, bukan URL baru buatan LLM. COMPOST tidak otomatis menjadi enum baru atau diam-diam dipetakan ke RECYCLE tanpa aturan editorial.
+Server menghitung allowed methods dari panduan dan konteks, lalu memeriksa satu hasil LLM terhadap subset itu. Evidence hanya boleh mendukung metode terpilih. recommendation_goal=AUTO/PREVENTION/HANDLING mengatur fokus; AUTO/HANDLING memilih penanganan saat ini, REDUCE hanya untuk PREVENTION yang dipilih pengguna. Kekurangan evidence tidak diubah menjadi pencegahan. recycling_access=YES/NO/UNKNOWN mencatat pemeriksaan penerima. Default AUTO/UNKNOWN. Tidak ada akses daur ulang tidak otomatis membolehkan TRASH tanpa evidence spesifik. Evidence ID harus berasal dari retrieval request tersebut; URL sumber disediakan server dari evidence, bukan URL baru buatan LLM. COMPOST tidak otomatis menjadi enum baru atau diam-diam dipetakan ke RECYCLE tanpa aturan editorial.
 
-Prioritas validasi policy-03: tentukan risiko → ketersediaan panduan → evidence yang sesuai risiko/kondisi → allowed methods → schema/evidence → tampilkan satu label dan peringatan. Risiko tidak lagi menghentikan klasifikasi sebelum Gemini. Jika special_handling benar, hanya evidence risk_compatible=true yang boleh dipilih; model tidak boleh menghapus flag tersebut. Contoh: kaca pecah → TRASH dengan pengemasan pelindung, baterai/elektronik/pisau/gunting → RECYCLE melalui pengelola khusus. Instruksi dan sumber mengikuti metode terpilih. Penanganan khusus bukan label/status kelima. Risiko belum jelas dapat memperoleh REDUCE sebagai pencegahan berikutnya bila evidence mendukung dan fokus bukan HANDLING; tidak mengklaim pembuangan benda saat ini sudah ditentukan. Kelas tidak terdeteksi bukan bukti benda aman.
+Prioritas validasi policy-04: tentukan risiko → ketersediaan panduan → klarifikasi konteks yang kurang → evidence sesuai risiko/kondisi → allowed methods → schema/evidence → satu label dan peringatan. Risiko yang tercakup tidak menghilangkan klasifikasi. Jika special_handling benar, hanya evidence risk_compatible=true yang boleh dipilih; model tidak boleh menghapus flag tersebut. Contoh: kaca pecah → TRASH dengan pelindung, baterai/elektronik/pisau/gunting → RECYCLE melalui pengelola khusus. Kontaminasi kimia/biologis tidak mengikuti aturan cuci/residu umum. Instruksi dan sumber mengikuti metode terpilih. Kelas tidak terdeteksi bukan bukti benda aman. Lihat [mutu panduan dan kasus cangkir](../../../ai/docs/GUIDE_QUALITY.md).
 
 Jika timeout, JSON invalid, evidence palsu, atau aturan tidak cocok, respons UNAVAILABLE dengan method null. Boleh tampilkan tautan panduan yang valid. Tidak ada auto-save atau fallback saran acak. Pilihan manual tetap melewati validasi domain biasa; tampilkan pengingat bahwa metode adalah tindakan yang dilakukan, bukan sertifikasi penanganan aman.
 
@@ -154,3 +158,13 @@ Release AI hanya jika taxonomy tersedia, mapping diuji, panduan PUBLISHED nyata,
 - Rencana tim §20–23 → increment AI, optimasi ditunda, dan milestone setelah core.
 - [CameraX architecture](https://developer.android.com/media/camera/camerax/architecture) dan [Image capture](https://developer.android.com/media/camera/camerax/take-photo): lifecycle dan capture, diperiksa 28 September 2026.
 - [YOLO11](https://docs.ultralytics.com/models/yolo11/), [COCO](https://docs.ultralytics.com/datasets/detect/coco/), [lisensi](https://www.ultralytics.com/license): kandidat model, taksonomi pretrained, dan opsi lisensi; diperiksa 28 September 2026. Tidak mengunci versi runtime atau menjanjikan akurasi WasteNot.
+
+### Pembaruan kualitas pilot, 20 Oktober 2026
+
+Kontrak Python v1 menambahkan review_profile dan review_thresholds/review_reasons/ambiguous_with per kandidat, serta condition.former_contents=FOOD_DRINK/CHEMICAL/OTHER/UNKNOWN. Band server mengutamakan profil checkpoint; tabel threshold global adalah default COCO. Kandidat empat kelas SHA af1446f33338... memakai dw-val-01: can/HDPE OFFERED >=0,70; PET >=0,725; kaca selalu UNCERTAIN; beda kelas dengan overlap IoU>=0,65 tetap terlihat dan UNCERTAIN. Semua kandidat memerlukan konfirmasi pengguna.
+
+Go mengirim model_sha256 dari snapshot privat pada selection agar aturan bisa diperiksa ulang; tidak menerima provenance tersebut dari frontend. Pilot RECYCLE memerlukan recycling_access=YES; HDPE memerlukan former_contents=FOOD_DRINK. UNKNOWN meminta konteks; tidak ditebak menjadi Trash/Reduce. Semua 69 panduan masih DRAFT. Rincian, metrik val beserta tradeoff, evaluasi Gemini dan perintah reproduksi: [mutu deteksi](../../../ai/docs/DETECTION_QUALITY.md), [mutu rekomendasi](../../../ai/docs/RECOMMENDATION_EVALUATION.md). OpenAPI pada ai/contracts/v1 merupakan acuan DTO yang diregenerasi.
+
+### Saran bersyarat saat kondisi kosong, policy-06
+
+Konteks biasa yang belum diisi tetap UNKNOWN/null. allow_conditional default true mengizinkan READY dengan recommendation_basis=CONDITIONAL dan conditions_to_verify; false mempertahankan mode ketat NEEDS_CONTEXT. UI menampilkan saran sementara dan syarat, tanpa mengisi data kosong atau menyimpan otomatis. Risiko ambigu, kontaminasi berbahaya dan riwayat isi HDPE tetap dibatasi. Lihat [perilaku terbaru, reproduksi dan hasil pengujian](../../../ai/docs/CONDITIONAL_AND_BACKGROUND.md).

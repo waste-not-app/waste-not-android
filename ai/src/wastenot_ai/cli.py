@@ -16,7 +16,9 @@ from .catalog import load_catalog, preserve_detected_risk
 from .contracts import Context
 from .media import MAX_BYTES, MediaError
 from .providers import GEMINI_KEY_ENV_NAMES, FixtureProvider, GeminiProvider, load_gemini_api_keys
-from .recommendation import load_guides, recommend
+from .recommendation import load_guides
+from .decisions import Decisions
+from .wire import DecisionInput
 
 AI_DIR = Path(__file__).resolve().parents[2]
 ROOT = AI_DIR.parent
@@ -37,12 +39,12 @@ def read_image(path: Path) -> bytes:
 
 def detector_for(args):
     from .detector import YoloDetector
-    return YoloDetector(args.model, args.device)
+    return YoloDetector(args.model, args.device, args.input_shape)
 
 
 def recommendation_for(args, context):
     provider = FixtureProvider() if args.provider == "fixture" else GeminiProvider()
-    return recommend(context, provider, load_guides(args.guides), demo_guides=args.demo_guides)
+    return Decisions(provider, load_guides(args.guides), demo_guides=args.demo_guides).evaluate(DecisionInput(context=context))
 
 
 def run_pipeline(detector, data: bytes, context: Context, object_id: str, provider,
@@ -53,7 +55,7 @@ def run_pipeline(detector, data: bytes, context: Context, object_id: str, provid
         return {"detection": detection, "recommendation": None,
                 "next_action": "INPUT_MANUAL_OR_RESCAN", "saved_log": False}
     context = preserve_detected_risk(context, selected)
-    suggestion = recommend(context, provider, guides, demo_guides=demo_guides)
+    suggestion = Decisions(provider, guides, demo_guides=demo_guides).evaluate(DecisionInput(context=context))
     return {"detection": detection, "selected_object_id": object_id,
             "confirmed_context": context.model_dump(mode="json"),
             "recommendation": suggestion.model_dump(mode="json"),
@@ -91,13 +93,25 @@ def benchmark(args):
 
 
 def main():
-    load_dotenv(AI_DIR / ".env", override=False)
+    if len(sys.argv) < 2 or sys.argv[1] not in {"serve-mock", "export-contracts"}:
+        load_dotenv(AI_DIR / ".env", override=False)
     parser = argparse.ArgumentParser(description="WasteNot YOLO + Gemini: prototipe lokal, tanpa penyimpanan waste log.")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("catalog")
     sub.add_parser("doctor")
     sub.add_parser("list-gemini-models")
     sub.add_parser("fetch-assets")
+    export = sub.add_parser("export-contracts", help="Generate/check versioned OpenAPI and examples offline")
+    export.add_argument("--check", action="store_true")
+    export.add_argument("--output", type=Path, default=AI_DIR / "contracts/v1")
+    mock = sub.add_parser("serve-mock", help="Public Go contract mock; no real JWT, YOLO or Gemini")
+    mock.add_argument("--port", type=int, default=8094)
+    mock.add_argument("--scenario", choices=["normal", "uncertain", "no-detections", "provider-unavailable", "rate-limited", "timeout"], default="normal")
+    recommendation_worker = sub.add_parser("serve-recommendations", help="Private Python policy and Gemini HTTP adapter")
+    recommendation_worker.add_argument("--port", type=int, default=8093)
+    recommendation_worker.add_argument("--guides", type=Path)
+    recommendation_worker.add_argument("--demo-guides", action="store_true")
+    recommendation_worker.add_argument("--provider", choices=["gemini", "fixture"], default="gemini")
     detect = sub.add_parser("detect")
     detect.add_argument("image", type=Path)
     bench = sub.add_parser("benchmark")
@@ -114,21 +128,45 @@ def main():
         command.add_argument("--provider", choices=["gemini", "fixture"], default="gemini")
         command.add_argument("--guides", type=Path)
         command.add_argument("--demo-guides", action="store_true", help="Izinkan draf hanya untuk demonstrasi berlabel.")
-    for command in (detect, bench, pipe):
-        command.add_argument("--model", type=Path, default=AI_DIR / "artifacts/models/yolo11n.pt")
-        command.add_argument("--device", default=os.getenv("AI_DEVICE", "cpu"))
-    for command in (detect, bench, rec, pipe):
-        command.add_argument("--output", type=Path)
     worker = sub.add_parser("serve-worker")
     worker.add_argument("--port", type=int, default=8091)
     demo = sub.add_parser("demo", help="Buka demo kamera lokal dengan pemilihan objek dan Gemini.")
+    for command in (detect, bench, pipe, demo, worker):
+        command.add_argument("--model", type=Path, default=AI_DIR / "artifacts/models/yolo11n.pt")
+        command.add_argument("--device", default=os.getenv("AI_DEVICE", "cpu"))
+        command.add_argument("--input-shape", choices=["adaptive", "square"], default=os.getenv("AI_INPUT_SHAPE", "adaptive"))
+    for command in (detect, bench, rec, pipe):
+        command.add_argument("--output", type=Path)
     demo.add_argument("--port",type=int,default=8092)
     demo.add_argument("--no-browser",action="store_true")
     demo.add_argument("--demo-guides",action="store_true",help="Izinkan draf dengan label demo.")
     demo.add_argument("--guides",type=Path)
     args = parser.parse_args()
+    if args.command in {"demo", "serve-worker"}:
+        # Explicit flags and env-based launchers select the same checkpoint.
+        if any(arg == "--model" or arg.startswith("--model=") for arg in sys.argv):
+            os.environ["AI_MODEL_PATH"] = str(args.model.resolve())
+        os.environ["AI_DEVICE"] = args.device
+        os.environ["AI_INPUT_SHAPE"] = args.input_shape
     try:
-        if args.command == "catalog":
+        if args.command == "export-contracts":
+            from .openapi_export import export_contracts
+            export_contracts(args.output, check=args.check)
+        elif args.command == "serve-mock":
+            for name in (*GEMINI_KEY_ENV_NAMES, "AI_SERVICE_TOKEN", "AI_RECOMMENDATION_TOKEN"):
+                os.environ.pop(name, None)
+            import uvicorn
+            from .mock_api import create_mock_app
+            print("PUBLIC CONTRACT MOCK: mock-user-a / mock-user-b; no YOLO/Gemini/DB.", flush=True)
+            uvicorn.run(create_mock_app(scenario=args.scenario), host="127.0.0.1", port=args.port, access_log=False)
+        elif args.command == "serve-recommendations":
+            import uvicorn
+            from .recommendation_worker import create_recommendation_app
+            os.environ.pop("AI_SERVICE_TOKEN", None)
+            provider = FixtureProvider() if args.provider == "fixture" else GeminiProvider()
+            uvicorn.run(create_recommendation_app(provider=provider, guides=load_guides(args.guides),
+                        demo_guides=args.demo_guides), host="127.0.0.1", port=args.port, access_log=False)
+        elif args.command == "catalog":
             emit(load_catalog())
         elif args.command == "doctor":
             import importlib.metadata
@@ -188,6 +226,7 @@ def main():
             # The inference worker must not inherit the CLI's recommendation secret.
             for name in GEMINI_KEY_ENV_NAMES:
                 os.environ.pop(name, None)
+            os.environ.pop("AI_RECOMMENDATION_TOKEN", None)
             import uvicorn
             from .worker import create_app
             uvicorn.run(create_app(), host="127.0.0.1", port=args.port, access_log=False)

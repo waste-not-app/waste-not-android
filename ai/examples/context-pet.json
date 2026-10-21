@@ -1,7 +1,12 @@
 {
   "object_key": "pet_bottle",
   "category": "PLASTIC",
-  "condition": {"cleanliness": "CLEAN", "integrity": "INTACT", "reusable": "UNKNOWN"},
+  "condition": {
+    "cleanliness": "CLEAN",
+    "integrity": "INTACT",
+    "reusable": "UNKNOWN"
+  },
   "reuse_intention": false,
-  "risk_flag": false
+  "risk_flag": false,
+  "recycling_access": "YES"
 }

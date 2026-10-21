@@ -8,6 +8,8 @@ trash_url = "https://www.cornwall.gov.uk/rubbish-recycling-and-waste/recycling/r
 glass_url = "https://www.cornwall.gov.uk/rubbish-recycling-and-waste/recycling/recycling-items/broken-glass/"
 sharp_url = "https://www.wandsworth.gov.uk/rubbish-and-recycling/recycle-and-reuse/waste-and-recycling-a-z/kitchen-knives/"
 ceramic_url = "https://www.islington.gov.uk/recycling-and-rubbish/recycling/what-we-pick-up-as-household-rubbish"
+wash_url = "https://www.epa.gov/greenerproducts/identifying-sustainable-food-service-and-food-service-ware"
+local_reuse_url = "https://banjarnegarakab.go.id/2026/06/11/banjarnegara-terapkan-aturan-baru-kelola-sampah-wajib-dari-hulu/"
 
 
 def prevention(identifier, food=False):
@@ -59,7 +61,26 @@ def broken_glass(identifier):
 
 
 tableware = templates["tableware"]
-tableware["evidence"] = [e for e in tableware["evidence"] if not e["id"].endswith("-v3")]
+tableware["evidence"] = [e for e in tableware["evidence"] if not e["id"].endswith(("-v3","-v4"))]
+tableware["source_urls"] = [wash_url,local_reuse_url]
+tableware["caution"] = "Cuci dahulu sebelum dipakai kembali. Jangan gunakan aturan cuci biasa untuk kontaminasi kimia/biologis. Kaca/keramik retak atau pecah tidak dipakai ulang."
+tableware["evidence"][0].update(
+    text="Peralatan makan/minum guna ulang yang bersih, utuh dan masih layak dapat dipakai kembali sesuai fungsinya. Pengguna sudah menyatakan ingin menggunakannya kembali.",
+    source_urls=[wash_url,local_reuse_url],
+    steps=["Periksa kembali kebersihan serta tidak adanya retak atau tepi tajam.",
+           "Gunakan kembali sesuai fungsi dan petunjuk bahan/produk; jangan menambah sampah dengan mengganti peralatan yang masih layak."],
+)
+for soil,label in [("FOOD_DRINK","sisa makanan/minuman"),("DUST","debu biasa")]:
+    tableware["evidence"].append({
+        "id":f"tableware-wash-{soil.lower()}-reuse-v4", "method":"REUSE", "risk_compatible":False,
+        "requires":{"cleanliness":"DIRTY","integrity":"INTACT","reusable":"YES",
+                    "reuse_intention":True,"cleanable":"YES","soiling":soil},
+        "text":f"Peralatan ini masih utuh dan layak; kotorannya berupa {label} yang kamu konfirmasi bisa dibersihkan. Gunakan kembali setelah dicuci dan diperiksa kebersihannya.",
+        "source_urls":[wash_url,local_reuse_url],
+        "steps":["Bersihkan kotoran, cuci dan bilas sesuai petunjuk bahan/produk, lalu keringkan sebelum digunakan kembali.",
+                 "Periksa kembali kondisi setelah dicuci. Bila ada retak, kerusakan atau dugaan kontaminasi berbahaya, hentikan dan perbarui kondisi objek.",
+                 "Gunakan kembali sesuai fungsinya setelah bersih dan kering."],
+    })
 tableware["evidence"].append(broken_glass("broken-glass-trash-v3"))
 for state, requirements in [("damaged", {"integrity":"DAMAGED"}), ("unusable", {"integrity":"INTACT","reusable":"NO"})]:
     tableware["evidence"].append({
@@ -97,7 +118,9 @@ templates["sharp"]["evidence"].append({
 
 guides = json.loads((root / "guides.json").read_text("utf-8"))
 for guide in guides:
-    guide["version"] = 3
+    if guide["version"] >= 5:
+        continue  # Pilot rules are maintained in guides.json after the policy-05 review.
+    guide["version"] = 4
     guide["evidence"] = [e for e in guide["evidence"] if e["method"] != "REDUCE"]
     guide["evidence"].append(prevention(guide["object_key"] + "-prevent-waste-v2"))
     if guide["object_key"] == "glass_bottle":

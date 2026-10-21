@@ -53,6 +53,7 @@
         <form id="context-form">
           <label class="field">Jenis benda / material<select id="object-key" required><option value="">Pilih objek terlebih dahulu</option></select></label>
           <p id="material-note" class="field-help">Bentuk benda belum memastikan bahannya. Konfirmasikan material yang kamu ketahui.</p>
+          <label id="former-contents-field" class="field" hidden>Isi sebelumnya<select id="former-contents"><option value="UNKNOWN">Belum diketahui</option><option value="FOOD_DRINK">Pangan / minuman</option><option value="CHEMICAL">Bahan kimia berbahaya</option><option value="OTHER">Lainnya di luar cakupan panduan pangan</option></select></label>
           <div class="field-grid">
             <label class="field">Kebersihan<select id="cleanliness"><option value="UNKNOWN">Belum tahu</option><option value="CLEAN">Bersih</option><option value="DIRTY">Kotor</option></select></label>
             <label class="field">Keutuhan<select id="integrity"><option value="UNKNOWN">Belum tahu</option><option value="INTACT">Utuh</option><option value="DAMAGED">Rusak / pecah</option></select></label>
@@ -63,9 +64,17 @@
             <label class="field">Fokus saran<select id="recommendation-goal"><option value="AUTO">Otomatis sesuai objek</option><option value="PREVENTION">Pencegahan berikutnya (Reduce)</option><option value="HANDLING">Penanganan benda saat ini</option></select></label>
             <label class="field">Akses daur ulang untuk benda ini?<select id="recycling-access"><option value="UNKNOWN">Belum diperiksa</option><option value="YES">Ada yang menerima</option><option value="NO">Sudah diperiksa, tidak ada</option></select></label>
           </div>
-          <p class="field-help">Hasil memilih satu: Reduce, Reuse, Recycle, atau Trash, beserta alasan dan sumber. Reduce berlaku untuk pencegahan penggunaan berikutnya.</p>
-          <label class="check-field"><input id="risk" type="checkbox"><span>Ada risiko khusus, bagian tajam, atau bahan berbahaya.</span></label>
-          <label class="check-field confirmation"><input id="confirmed" type="checkbox" required><span>Saya sudah memeriksa jenis benda dan kondisi yang diisi.</span></label>
+          <p class="field-help">Hasil memilih satu: Reduce, Reuse, Recycle, atau Trash, beserta alasan dan sumber. Reduce hanya untuk fokus pencegahan yang kamu pilih; boleh biarkan kondisi belum tahu untuk mendapat saran bersyarat. Risiko berbahaya tetap memerlukan penjelasan.</p>
+          <div id="cleaning-details" hidden>
+            <div class="field-grid">
+              <label class="field">Jenis kotoran<select id="soiling"><option value="UNKNOWN">Belum diketahui</option><option value="FOOD_DRINK">Sisa makanan / minuman biasa</option><option value="DUST">Debu biasa</option><option value="HAZARDOUS">Bahan berbahaya / riwayat kimia</option></select></label>
+              <label class="field">Bisa dibersihkan dengan cara biasa?<select id="cleanable"><option value="UNKNOWN">Belum diperiksa</option><option value="YES">Ya, sesuai petunjuk bahan / produk</option><option value="NO">Tidak</option></select></label>
+            </div>
+            <p class="field-help">Kotor biasa tidak otomatis berarti harus dibuang. Saran Reuse dapat mencakup langkah mencuci terlebih dahulu.</p>
+          </div>
+          <label class="check-field"><input id="risk" type="checkbox"><span>Ada risiko selain kotor biasa: pecahan, tepi tajam, listrik/baterai, atau kontaminasi berbahaya.</span></label>
+          <label id="risk-details" class="field" hidden>Jenis risiko yang diketahui<select id="risk-type"><option value="UNKNOWN">Belum jelas</option><option value="SHARP">Pecahan / tepi tajam</option><option value="CHEMICAL">Bahan kimia berbahaya</option><option value="BIOLOGICAL">Kontaminasi biologis / limbah medis</option><option value="ELECTRICAL">Listrik / baterai</option><option value="OTHER">Risiko lain</option></select></label>
+          <label class="check-field confirmation"><input id="confirmed" type="checkbox" required><span>Saya sudah memilih jenis benda yang benar. Isian yang kosong berarti belum diketahui.</span></label>
           <div class="provider-row"><label class="field">Sumber rekomendasi<select id="provider"><option value="gemini">Gemini · API langsung</option><option value="fixture">Simulasi · tanpa API</option></select></label><span id="draft-label" class="pill warning">Memuat panduan…</span></div>
           <p id="provider-note" class="field-help"></p>
           <button id="recommend" class="button primary full" type="submit" disabled>Minta rekomendasi <span aria-hidden="true">↗</span></button>
@@ -74,7 +83,7 @@
       <section id="recommendation" class="panel recommendation-card" aria-labelledby="recommendation-title" aria-live="polite">
         <p class="eyebrow">03 / LANGKAH BERIKUTNYA</p><h2 id="recommendation-title">Saran penangananmu</h2>
         <div id="recommendation-empty" class="empty-recommendation"><span>✳</span><p>Setelah objek dan kondisi dikonfirmasi, saran akan muncul di sini.</p></div>
-        <div id="recommendation-result" hidden><div class="recommendation-heading"><span id="method" class="method"></span><span id="recommendation-source" class="pill"></span></div><p id="recommendation-scope" class="field-help" hidden></p><p id="reason"></p><p id="reason-code" class="field-help" hidden></p><ol id="handling-steps" class="handling-steps"></ol><p id="caution" class="caution" hidden></p><details id="sources" open><summary>Dasar panduan</summary><ul id="source-list"></ul><p id="evidence-note" class="field-help"></p></details><p class="demo-footnote">Demo ini menampilkan saran untuk ditinjau. Belum ada aktivitas atau XP yang disimpan.</p></div>
+        <div id="recommendation-result" hidden><div class="recommendation-heading"><span id="method" class="method"></span><span id="recommendation-source" class="pill"></span></div><p id="recommendation-scope" class="field-help" hidden></p><p id="recommendation-basis" class="field-help" hidden></p><p id="reason"></p><p id="reason-code" class="field-help" hidden></p><ol id="handling-steps" class="handling-steps"></ol><p id="caution" class="caution" hidden></p><details id="sources" open><summary>Dasar panduan</summary><ul id="source-list"></ul><p id="evidence-note" class="field-help"></p></details><p class="demo-footnote">Demo ini menampilkan saran untuk ditinjau. Belum ada aktivitas atau XP yang disimpan.</p></div>
       </section>
     </aside>
   </div>

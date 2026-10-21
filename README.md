@@ -4,6 +4,8 @@ WasteNot membantu pengguna mencatat aktivitas Reduce, Reuse, Recycle dan Trash, 
 
 Prototipe lokal **YOLO + Gemini**, katalog objek pilot, baseline inference, pengujian policy dan worker privat tersedia di [panduan AI](ai/README.md). Panduan tersebut mencakup cara mencoba YOLO/LLM, konfigurasi Gemini, dan langkah integrasi backend Go serta frontend Android. Integrasi AI ke aplikasi masih mengikuti backlog; mode fixture dan panduan draf diberi label khusus.
 
+[Kontrak HTTP AI v1](ai/docs/AI_HTTP_CONTRACT.md) menyediakan OpenAPI publik/privat, contoh dan mock server untuk tim. Python menjadi pemilik tunggal aturan AI/Gemini; Go menangani akun, sesi, idempotensi dan penyimpanan. Coba mock tanpa key/model: `.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli serve-mock`, lalu buka `http://127.0.0.1:8094/docs` dengan token contoh `mock-user-a`.
+
 ## Menggunakan YOLO dan Gemini
 
 **Demo kamera interaktif:** setelah environment AI siap, jalankan dari root repo:
@@ -16,7 +18,19 @@ Browser terbuka di `http://127.0.0.1:8092` dan meminta izin kamera. Izinkan kame
 
 Gemini memilih **satu** label **Reduce, Reuse, Recycle, atau Trash**, disertai alasan, langkah dan tautan sumber panduan. Reduce ditandai sebagai pencegahan penggunaan berikutnya. **Penanganan khusus menjadi peringatan tambahan**, bukan pengganti label: kaca pecah → Trash dengan pengemasan pelindung; baterai → Recycle melalui pengelola khusus. Contoh keempat label dan kontrak backend/frontend ada di [kontrak rekomendasi](ai/docs/RECOMMENDATION_CONTRACT.md). Saat layanan/panduan tidak tersedia, demo menampilkan kegagalan dengan jelas.
 
-Demo memakai katalog 68 pilihan benda/material yang terhubung ke 58 kelas visual checkpoint COCO; jenis yang belum memiliki kelas, misalnya kaleng/kardus/baterai, tetap dipilih manual. Semua panduan perlu review lokal; launcher ini mengaktifkan mode draf berlabel khusus demonstrasi. Langkah, cakupan dan batasnya ada di [demo kamera](ai/README.md#demo-kamera-di-browser).
+Pembaruan mutu panduan: cangkir utuh dan layak dengan kotoran biasa yang dikonfirmasi bisa dibersihkan mendapat **Reuse setelah dicuci**. Demo menanyakan jenis kotoran dan rincian risiko; kondisi biasa yang belum diketahui dapat menghasilkan saran bersyarat, sedangkan rincian risiko tetap ditanyakan. Reduce hanya untuk fokus pencegahan yang dipilih pengguna. Sumber kini menampilkan penerbit dan wilayah. Lihat [mutu panduan dan contoh cangkir](ai/docs/GUIDE_QUALITY.md).
+
+Untuk eksperimen model botol/kaleng, lihat [fine-tuning YOLO](ai/docs/FINE_TUNING.md): dataset publik dan lisensinya, audit/split, setup GPU terpisah, training, evaluasi, dan cara menjalankan checkpoint hasil training pada kamera maupun worker backend. Kandidat khusus dipilih dengan `--model`; demo default tetap memakai model COCO dengan cakupan objek luas.
+
+Eksperimen variasi objek lebih luas: [Broad Waste YOLO](ai/docs/BROAD_WASTE_TRAINING.md), dengan data tambahan TACO/COCO, 10 kelas visual, evaluasi per kelas, dan launcher `.\ai\demo-camera-broad.bat --port 8095`. Pilihan bahan tetap dikonfirmasi pengguna; kandidat ini tidak otomatis mengganti model default.
+
+Kondisi boleh dibiarkan belum tahu: Gemini kini memberi saran bersyarat dengan alasan, sumber, dan hal yang perlu diperiksa. Cara mencoba serta audit/training ulang YOLO dijelaskan di [saran kondisi kosong dan background](ai/docs/CONDITIONAL_AND_BACKGROUND.md).
+
+Peningkatan poin 3-4 sudah tersedia: [threshold per kelas dan prediksi bertumpuk](ai/docs/DETECTION_QUALITY.md), [panduan pilot HDPE dan evaluasi Gemini](ai/docs/RECOMMENDATION_EVALUATION.md). Jalankan `.\ai\demo-camera-trained.bat` untuk mencoba. HDPE meminta isi sebelumnya; Recycle yang terkonfirmasi memerlukan penerima; jika belum tahu, sarannya tetap bersyarat. Panduan integrasi dan perintah evaluasi ada di [README AI](ai/README.md).
+
+Fine-tuning pertama sudah selesai pada 30 epoch. Coba checkpoint botol/kaleng dengan `.\ai\demo-camera-trained.bat`; [hasil test dan batas penggunaannya](ai/docs/FINETUNING_RESULTS.md) dicatat terpisah dari baseline COCO.
+
+Demo memakai katalog 78 pilihan benda/material; sebagian pilihan terhubung ke 58 kelas visual checkpoint COCO; jenis yang belum memiliki kelas, misalnya kaleng/HDPE/kardus/baterai, tetap dipilih manual. Semua panduan perlu review lokal; launcher ini mengaktifkan mode draf berlabel khusus demonstrasi. Langkah, cakupan dan batasnya ada di [demo kamera](ai/README.md#demo-kamera-di-browser).
 
 Semua perintah berikut dijalankan dari root repository melalui PowerShell. Prototipe Python dapat dicoba tanpa menjalankan Android atau backend Go.
 

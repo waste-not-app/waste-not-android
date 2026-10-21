@@ -2,5 +2,6 @@
   "object_key": "battery",
   "category": "ELECTRONIC",
   "condition": {},
-  "recommendation_goal": "AUTO"
+  "recommendation_goal": "AUTO",
+  "recycling_access": "YES"
 }

@@ -15,7 +15,7 @@ from wastenot_ai.recommendation import ProviderError, load_guides, recommend
 
 
 def context(key="pet_bottle", category="PLASTIC", **changes):
-    values = {"object_key": key, "category": category,
+    values = {"object_key": key, "category": category, "recycling_access": "YES",
               "condition": {"cleanliness": "CLEAN", "integrity": "INTACT", "reusable": "UNKNOWN"}}
     values.update(changes)
     return Context.model_validate_json(json.dumps(values))
@@ -102,11 +102,11 @@ def test_missing_guides_do_not_invent_classification_and_preserve_risk_warning(c
 def test_unknown_condition_does_not_get_guessed():
     provider = SpyProvider()
     result = recommend(context(condition={}), provider, load_guides(), demo_guides=True)
-    assert result.recommended_method == "REDUCE" and result.recommendation_scope == "PREVENTION"
-    assert provider.calls[0]["condition"] == {"cleanliness":"UNKNOWN","integrity":"UNKNOWN","reusable":"UNKNOWN"}
-    assert provider.calls[0]["allowed_methods"] == ["REDUCE"]
+    assert result.status == "READY" and result.recommendation_basis == "CONDITIONAL"
+    assert result.conditions_to_verify == ["condition.cleanliness","condition.integrity"]
+    assert len(provider.calls) == 1
     result = recommend(context(condition={}, recommendation_goal="HANDLING"), provider, load_guides(), demo_guides=True)
-    assert result.reason_code == "NO_ALLOWED_METHOD"
+    assert result.status == "READY" and result.recommendation_basis == "CONDITIONAL"
 
 
 @pytest.mark.parametrize("change", [
@@ -133,8 +133,8 @@ def test_public_text_is_grounded_not_free_model_prose():
     assert result.status == "READY" and not result.prototype_only
     assert "INVENTED" not in result.reason and "Invented" not in result.caution
     payload = provider.calls[0]
-    assert set(payload) == {"object_key","category","condition","reuse_intention","recommendation_goal","recycling_access","special_handling","allowed_methods","guide"}
-    assert payload["allowed_methods"] == ["RECYCLE","REDUCE"]
+    assert set(payload) == {"object_key","category","condition","reuse_intention","recommendation_goal","recycling_access","special_handling","risk_type","allowed_methods","guide"}
+    assert payload["allowed_methods"] == ["RECYCLE"]
     assert result.source_urls == ["https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"]
     assert "alternative_method" not in result.model_dump()
 
@@ -174,10 +174,12 @@ def test_prevention_uses_reduce_sources_and_steps_instead_of_disposal_guidance()
 
 def test_trash_requires_specific_residue_guide_and_confirmed_lack_of_recycling():
     values = {"condition":{"reusable":"NO"},"recommendation_goal":"HANDLING"}
+    values["allow_conditional"] = False
     for access in ("UNKNOWN","YES"):
         result = recommend(context("toothbrush","OTHER",recycling_access=access,**values),
                            SpyProvider(),load_guides(),demo_guides=True)
-        assert result.reason_code == "NO_ALLOWED_METHOD"
+        assert result.reason_code == ("CONTEXT_REQUIRED" if access == "UNKNOWN" else "NO_ALLOWED_METHOD")
+        if access == "UNKNOWN": assert result.missing_context == ["recycling_access"]
     provider = SpyProvider()
     result = recommend(context("toothbrush","OTHER",recycling_access="NO",**values),
                        provider,load_guides(),demo_guides=True)
@@ -186,7 +188,7 @@ def test_trash_requires_specific_residue_guide_and_confirmed_lack_of_recycling()
     assert "cornwall.gov.uk" in result.source_urls[0]
     blocked = recommend(context("toothbrush","OTHER",recycling_access="NO",risk_flag=True,**values),
                         SpyProvider(),load_guides(),demo_guides=True)
-    assert blocked.status == "UNAVAILABLE" and blocked.recommended_method is None
+    assert blocked.status == "NEEDS_CONTEXT" and blocked.recommended_method is None
 
 
 @pytest.mark.parametrize("key,category,condition,method", [
@@ -217,18 +219,19 @@ def test_model_cannot_remove_risk_warning_or_recycle_broken_glass_as_regular_bot
         assert result.special_handling is True
 
 
-def test_unknown_risk_is_not_guessed_as_trash_but_can_get_prevention_label():
+def test_unknown_risk_requires_clarification_instead_of_prevention_substitution():
     provider = SpyProvider()
     result = recommend(context(risk_flag=True),provider,load_guides(),demo_guides=True)
-    assert result.status == "READY" and result.recommended_method == "REDUCE"
-    assert result.recommendation_scope == "PREVENTION" and result.special_handling
-    assert provider.calls[0]["allowed_methods"] == ["REDUCE"]
+    assert result.status == "NEEDS_CONTEXT" and result.recommended_method is None
+    assert result.special_handling and result.missing_context == ["risk_type"]
+    assert provider.calls == []
 
 
 def test_no_recycling_access_never_offers_recycle_or_guesses_trash_for_bottle():
     provider = SpyProvider()
     result = recommend(context(recycling_access="NO"),provider,load_guides(),demo_guides=True)
-    assert result.recommended_method == "REDUCE" and provider.calls[0]["allowed_methods"] == ["REDUCE"]
+    assert result.recommended_method is None and result.status == "UNAVAILABLE"
+    assert provider.calls == []
 
 
 def test_fixture_is_always_labelled_and_timeout_returns_no_method():
@@ -338,6 +341,7 @@ def test_cli_pipeline_preserves_detected_risk_after_correction(class_id,raw_clas
                           load_guides(),demo_guides=True)
     assert result["confirmed_context"]["risk_flag"] is True
     assert result["recommendation"]["special_handling"] is True
-    assert result["recommendation"]["recommended_method"] == "REDUCE"
-    assert result["recommendation"]["recommendation_scope"] == "PREVENTION"
+    assert result["recommendation"]["recommended_method"] is None
+    assert result["recommendation"]["recommendation_scope"] is None
+    assert result["confirmed_context"]["risk_type"] in {"SHARP","ELECTRICAL"}
     assert "Kosongkan botol" not in " ".join(result["recommendation"]["steps"])

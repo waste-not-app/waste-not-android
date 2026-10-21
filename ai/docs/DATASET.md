@@ -1,5 +1,9 @@
 # Dataset dan evaluasi pilot
 
+Eksperimen publik botol/kaleng sudah disiapkan terpisah dari taksonomi usulan lima kelas berikut. Lihat [fine-tuning](FINE_TUNING.md), [sumber dataset](DATASET_RESEARCH.md), dan [atribusi](DATASET_NOTICES.md). Empat kelas checkpoint Drinking Waste mempunyai ID sendiri; evaluasinya eksploratif karena sumber tidak menyediakan identitas benda/sesi yang terverifikasi.
+
+Run pertama selesai pada epoch 30, checkpoint terbaik epoch 18. [Hasil evaluasi](FINETUNING_RESULTS.md) mencatat metrik tiap kelas serta perubahan recall dan precision dibanding baseline.
+
 Taksonomi usulan untuk fine-tuning berikutnya:
 
 | ID target | Label | Catatan anotasi |
@@ -22,4 +26,4 @@ Laporan akhir: jumlah gambar/instance tiap split dan kelas, precision/recall per
 
 Evaluasi LLM terpisah: objek/kondisi × panduan/versi × expected allowed method/status/evidence. Sertakan UNKNOWN, tanpa panduan, expired, special handling, keempat label valid REDUCE/REUSE/RECYCLE/TRASH, scope PREVENTION/HANDLING, akses daur ulang UNKNOWN/NO, output COMPOST, dua metode sekaligus/field alternatif, evidence palsu, sumber salah, duplikat, timeout, truncation dan injection dalam teks panduan. Fixture transport menguji integrasi HTTP; panggilan Gemini nyata diperlukan untuk menilai kualitas model. Kontrak mengikuti [pembaruan empat metode](RECOMMENDATION_CONTRACT.md).
 
-Semua ukuran kualitas pilot saat ini **BELUM DIUKUR**. Tidak ada training, tuning threshold atau klaim akurasi yang dibuat oleh prototipe ini.
+Ukuran kualitas **pilot lokal Indonesia** saat ini **BELUM DIUKUR**. Eksperimen fine-tuning publik dilaporkan terpisah pada panduan di atas; hasilnya tidak menggantikan holdout pilot. Threshold demo belum dikalibrasi untuk kandidat baru.

@@ -1,6 +1,7 @@
 from enum import StrEnum
 import math
 from typing import Literal
+from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -26,6 +27,9 @@ class Condition(Contract):
     cleanliness: Literal["CLEAN", "DIRTY", "UNKNOWN"] = "UNKNOWN"
     integrity: Literal["INTACT", "DAMAGED", "UNKNOWN"] = "UNKNOWN"
     reusable: Literal["YES", "NO", "UNKNOWN"] = "UNKNOWN"
+    cleanable: Literal["YES", "NO", "UNKNOWN"] = "UNKNOWN"
+    soiling: Literal["FOOD_DRINK", "DUST", "HAZARDOUS", "UNKNOWN"] = "UNKNOWN"
+    former_contents: Literal["FOOD_DRINK", "CHEMICAL", "OTHER", "UNKNOWN"] = "UNKNOWN"
 
 
 class Context(Contract):
@@ -34,15 +38,20 @@ class Context(Contract):
     condition: Condition = Condition()
     reuse_intention: bool | None = None
     risk_flag: bool = False
+    risk_type: Literal["UNKNOWN", "SHARP", "CHEMICAL", "BIOLOGICAL", "ELECTRICAL", "OTHER"] = "UNKNOWN"
     recommendation_goal: Literal["AUTO", "PREVENTION", "HANDLING"] = "AUTO"
     recycling_access: Literal["YES", "NO", "UNKNOWN"] = "UNKNOWN"
+    allow_conditional: bool = True
+
+
+Coordinate = Annotated[float, Field(ge=0, le=1, allow_inf_nan=False)]
 
 
 class RawDetection(Contract):
     class_id: int = Field(ge=0)
     raw_class: str = Field(min_length=1, max_length=100)
     confidence: float = Field(ge=0, le=1, allow_inf_nan=False)
-    bbox: tuple[float, float, float, float]
+    bbox: tuple[Coordinate, Coordinate, Coordinate, Coordinate]
 
     @model_validator(mode="after")
     def check_box(self):
@@ -90,7 +99,7 @@ class Guide(Contract):
 
 
 class Recommendation(Contract):
-    status: Literal["READY", "UNAVAILABLE"]
+    status: Literal["READY", "NEEDS_CONTEXT", "UNAVAILABLE"]
     recommended_method: Method | None = None
     recommendation_scope: Literal["PREVENTION", "HANDLING"] | None = None
     reason: str
@@ -99,14 +108,20 @@ class Recommendation(Contract):
     evidence_ids: list[str] = Field(default_factory=list)
     guide_refs: list[dict] = Field(default_factory=list)
     source_urls: list[str] = Field(default_factory=list)
+    source_details: list[dict] = Field(default_factory=list)
     steps: list[str] = Field(default_factory=list)
     reason_code: str | None = None
-    recommendation_version: str = "pilot-policy-03"
+    missing_context: list[str] = Field(default_factory=list)
+    recommendation_basis: Literal["CONFIRMED", "CONDITIONAL"] | None = None
+    conditions_to_verify: list[str] = Field(default_factory=list)
+    recommendation_version: str = "pilot-policy-06"
     provider: str
     prototype_only: bool
 
     @model_validator(mode="after")
     def check_status(self):
+        if (self.status == "NEEDS_CONTEXT") != bool(self.missing_context):
+            raise ValueError("NEEDS_CONTEXT wajib menyebut isian yang kurang; status lain tidak memilikinya.")
         if self.status != "READY" and (self.recommended_method or self.recommendation_scope):
             raise ValueError("Fallback harus method dan scope null.")
         if self.status == "READY" and not self.recommended_method:
@@ -115,4 +130,10 @@ class Recommendation(Contract):
             expected = "PREVENTION" if self.recommended_method == "REDUCE" else "HANDLING"
             if self.recommendation_scope != expected or not self.evidence_ids or not self.source_urls:
                 raise ValueError("READY membutuhkan scope, evidence dan sumber panduan yang sesuai.")
+            if self.recommendation_basis not in {"CONFIRMED", "CONDITIONAL"}:
+                raise ValueError("READY membutuhkan basis rekomendasi.")
+            if (self.recommendation_basis == "CONDITIONAL") != bool(self.conditions_to_verify):
+                raise ValueError("Saran bersyarat wajib menyebut hal yang perlu diperiksa.")
+        elif self.recommendation_basis is not None or self.conditions_to_verify:
+            raise ValueError("Fallback tidak memiliki basis/metode bersyarat.")
         return self

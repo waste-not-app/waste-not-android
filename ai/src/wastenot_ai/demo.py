@@ -19,11 +19,13 @@ from fastapi.responses import HTMLResponse, JSONResponse, Response
 from pydantic import ValidationError
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from .catalog import confirm_context, load_catalog, preserve_detected_risk
+from .catalog import confirm_context, detection_capabilities, load_catalog, preserve_detected_risk
 from .contracts import Context, Contract
 from .media import MAX_BYTES, MediaError
 from .providers import FixtureProvider, GeminiProvider
-from .recommendation import is_reviewed, load_guides, recommend
+from .recommendation import is_reviewed, load_guides
+from .decisions import Decisions
+from .wire import DecisionInput
 
 TTL = 15 * 60
 COOKIE = "wastenot_demo_session"
@@ -87,7 +89,7 @@ def create_demo_app(detector=None, *, demo_guides=False, guides_path: Path | Non
         if app.state.detector is None:
             from .detector import YoloDetector
             app.state.detector = YoloDetector(Path(os.getenv("AI_MODEL_PATH", "ai/artifacts/models/yolo11n.pt")),
-                                              os.getenv("AI_DEVICE", "cpu"))
+                                              os.getenv("AI_DEVICE", "cpu"), os.getenv("AI_INPUT_SHAPE", "adaptive"))
         task = asyncio.create_task(scavenger())
         if on_ready:
             on_ready()
@@ -187,6 +189,8 @@ def create_demo_app(detector=None, *, demo_guides=False, guides_path: Path | Non
         detector = app.state.detector
         catalog = load_catalog()
         return {"catalog":catalog,"model_labels":detector.labels,
+                **detection_capabilities(detector.labels, model_version=detector.artifact["model_version"],
+                                         model_sha256=detector.artifact.get("sha256")),
                 "model_version":detector.artifact["model_version"],"demo_guides":demo_guides,
                 "gemini_configured":bool(getattr(providers["gemini"],"api_key",None) and
                                            getattr(providers["gemini"],"model",None)),
@@ -269,7 +273,7 @@ def create_demo_app(detector=None, *, demo_guides=False, guides_path: Path | Non
             rate_calls.append(monotonic())
             def generate():
                 try:
-                    return recommend(value.context,providers[value.provider],guides,demo_guides=demo_guides)
+                    return Decisions(providers[value.provider],guides,demo_guides=demo_guides).evaluate(DecisionInput(context=value.context))
                 finally:
                     provider_lock.release()
             result = await asyncio.to_thread(generate)

@@ -1,5 +1,5 @@
 {
-  "catalog_version": "demo-catalog-03",
+  "catalog_version": "demo-catalog-05",
   "mapping_version": "coco-reviewed-objects-03",
   "thresholds": {
     "lower": 0.5,
@@ -14,6 +14,16 @@
       "special_handling": false,
       "baseline_raw_class": "bottle",
       "baseline_class_id": 39,
+      "requires_material_confirmation": true
+    },
+    {
+      "object_key": "hdpe_bottle",
+      "label": "Botol HDPE bekas pangan/minuman (konfirmasi pengguna)",
+      "category": "PLASTIC",
+      "guide_key": "hdpe_bottle",
+      "special_handling": false,
+      "baseline_raw_class": null,
+      "baseline_class_id": null,
       "requires_material_confirmation": true
     },
     {
@@ -748,6 +758,105 @@
       "baseline_class_id": 79,
       "requires_material_confirmation": true,
       "guide_template": "toothbrush"
+    },
+    {
+      "object_key": "steel_can",
+      "label": "Kaleng baja/tinplate bekas pangan (konfirmasi pengguna)",
+      "category": "METAL",
+      "guide_key": "steel_can",
+      "special_handling": false,
+      "baseline_raw_class": null,
+      "baseline_class_id": null,
+      "requires_material_confirmation": true,
+      "guide_template": "broad_food_container"
+    },
+    {
+      "object_key": "paper_cup",
+      "label": "Gelas kertas berlapis (konfirmasi pengguna)",
+      "category": "PAPER",
+      "guide_key": "paper_cup",
+      "special_handling": false,
+      "baseline_raw_class": null,
+      "baseline_class_id": null,
+      "requires_material_confirmation": true,
+      "guide_template": "mixed"
+    },
+    {
+      "object_key": "plastic_bag",
+      "label": "Kantong plastik",
+      "category": "PLASTIC",
+      "guide_key": "plastic_bag",
+      "special_handling": false,
+      "baseline_raw_class": null,
+      "baseline_class_id": null,
+      "requires_material_confirmation": true,
+      "guide_template": "broad_recyclable"
+    },
+    {
+      "object_key": "paper",
+      "label": "Kertas lembaran / majalah",
+      "category": "PAPER",
+      "guide_key": "paper",
+      "special_handling": false,
+      "baseline_raw_class": null,
+      "baseline_class_id": null,
+      "requires_material_confirmation": true,
+      "guide_template": "broad_paper"
+    },
+    {
+      "object_key": "drink_carton",
+      "label": "Karton minuman berlapis",
+      "category": "PAPER",
+      "guide_key": "drink_carton",
+      "special_handling": false,
+      "baseline_raw_class": null,
+      "baseline_class_id": null,
+      "requires_material_confirmation": true,
+      "guide_template": "mixed"
+    },
+    {
+      "object_key": "plastic_wrapper",
+      "label": "Pembungkus / film plastik",
+      "category": "PLASTIC",
+      "guide_key": "plastic_wrapper",
+      "special_handling": false,
+      "baseline_raw_class": null,
+      "baseline_class_id": null,
+      "requires_material_confirmation": true,
+      "guide_template": "broad_recyclable"
+    },
+    {
+      "object_key": "plastic_food_container",
+      "label": "Wadah makanan plastik / foam (konfirmasi pengguna)",
+      "category": "PLASTIC",
+      "guide_key": "plastic_food_container",
+      "special_handling": false,
+      "baseline_raw_class": null,
+      "baseline_class_id": null,
+      "requires_material_confirmation": true,
+      "guide_template": "broad_food_container"
+    },
+    {
+      "object_key": "plastic_bottle_cap",
+      "label": "Tutup botol plastik",
+      "category": "PLASTIC",
+      "guide_key": "plastic_bottle_cap",
+      "special_handling": false,
+      "baseline_raw_class": null,
+      "baseline_class_id": null,
+      "requires_material_confirmation": true,
+      "guide_template": "broad_recyclable"
+    },
+    {
+      "object_key": "metal_bottle_cap",
+      "label": "Tutup botol logam",
+      "category": "METAL",
+      "guide_key": "metal_bottle_cap",
+      "special_handling": false,
+      "baseline_raw_class": null,
+      "baseline_class_id": null,
+      "requires_material_confirmation": true,
+      "guide_template": "broad_recyclable"
     }
   ]
 }

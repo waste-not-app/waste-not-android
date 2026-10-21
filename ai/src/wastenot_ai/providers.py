@@ -20,7 +20,14 @@ Pilih tepat SATU recommended_method: REDUCE, REUSE, RECYCLE, atau TRASH dari all
 REDUCE adalah pencegahan untuk penggunaan/pembelian berikutnya, bukan pembuangan benda saat ini.
 Untuk recommendation_goal AUTO, utamakan penanganan saat ini yang didukung evidence:
 REUSE bila layak dan ingin dipakai ulang; selain itu RECYCLE; TRASH hanya jika evidence residu cocok.
-Pilih REDUCE jika fokus PREVENTION atau belum ada penanganan saat ini yang didukung evidence.
+REDUCE hanya untuk fokus PREVENTION yang dipilih pengguna, bukan pengganti penanganan yang belum diketahui.
+Kotor sisa makanan/minuman atau debu yang dikonfirmasi bisa dibersihkan tidak otomatis menjadi sampah:
+pilih REUSE setelah dicuci jika evidence sesuai, benda utuh, layak, dan ingin dipakai ulang.
+Jangan menyamakan kotor biasa dengan kontaminasi kimia/biologis atau mengubah UNKNOWN menjadi fakta.
+Jika advice_basis=CONDITIONAL, syarat dalam unknown_requirements adalah hal yang BELUM dipastikan.
+Pilih satu metode bersyarat yang didukung evidence tanpa menyatakan kondisi kosong sebagai fakta.
+REUSE boleh menjadi saran bersyarat bila tidak ada penolakan/kerusakan/risiko yang bertentangan;
+niat pakai ulang yang kosong tidak berarti pengguna sudah setuju. RECYCLE tidak berarti penerima sudah tersedia.
 Jangan menciptakan metode, evidence, URL atau aturan fasilitas.
 Jangan menyatakan material pasti aman atau diterima fasilitas lokal.
 Jangan memberi instruksi membongkar, membakar, atau menangani limbah berbahaya.

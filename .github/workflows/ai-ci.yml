@@ -30,6 +30,10 @@ jobs:
         env:
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
         run: python -m pytest ai/tests -q
+      - name: Check versioned HTTP contracts and fixture drift
+        run: python -m wastenot_ai.cli export-contracts --check
+      - name: Evaluate fixed recommendation scenarios without API keys
+        run: python ai/scripts/evaluate_recommendations.py --provider fixture --output /tmp/wastenot-recommendation-evaluation.json
       - name: Verify distributable assets
         run: |
           python -m pip wheel ./ai --no-deps --wheel-dir /tmp/wastenot-ai-wheel

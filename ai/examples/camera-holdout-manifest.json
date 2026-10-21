@@ -1,0 +1,6 @@
+{
+  "usage": "EVALUATION_ONLY",
+  "dataset_id": "replace-with-reviewed-camera-session",
+  "note": "Template only, no images or measurements. Copy under ai/data/local/camera-holdout/manifest.json and follow ai/docs/DETECTION_QUALITY.md. Never use this holdout for threshold selection.",
+  "records": []
+}

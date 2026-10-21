@@ -1,0 +1,431 @@
+{
+  "kind": "validation_comparison_not_independent_field_accuracy",
+  "images": 681,
+  "models": {
+    "baseline": {
+      "identity": {
+        "model_sha256": "af1446f3333806b0aba3b4618846fe8f95cf5ab3269e2730629b090702498bcf",
+        "manifest_sha256": "a2c498641f51cbeebded1fc147a3d7b93d171eac5b534fc2554833e4a666e602",
+        "split": "val",
+        "prediction": {
+          "imgsz": 640,
+          "conf": 0.25,
+          "iou": 0.7,
+          "max_det": 50,
+          "agnostic_nms": false,
+          "rect": false
+        }
+      },
+      "fixed_confidence_050": {
+        "overall": {
+          "tp": 559,
+          "fp": 135,
+          "fn": 122,
+          "precision": 0.8054755043227666,
+          "recall": 0.8208516886930984
+        },
+        "per_class": {
+          "aluminium_can": {
+            "tp": 100,
+            "fp": 10,
+            "fn": 69,
+            "precision": 0.9090909090909091,
+            "recall": 0.591715976331361
+          },
+          "glass_bottle": {
+            "tp": 140,
+            "fp": 98,
+            "fn": 8,
+            "precision": 0.5882352941176471,
+            "recall": 0.9459459459459459
+          },
+          "hdpe_bottle": {
+            "tp": 150,
+            "fp": 3,
+            "fn": 35,
+            "precision": 0.9803921568627451,
+            "recall": 0.8108108108108109
+          },
+          "plastic_bottle": {
+            "tp": 169,
+            "fp": 24,
+            "fn": 10,
+            "precision": 0.8756476683937824,
+            "recall": 0.9441340782122905
+          }
+        },
+        "ambiguous_images": 6
+      },
+      "fixed_confidence_070": {
+        "overall": {
+          "tp": 546,
+          "fp": 87,
+          "fn": 135,
+          "precision": 0.8625592417061612,
+          "recall": 0.801762114537445
+        },
+        "per_class": {
+          "aluminium_can": {
+            "tp": 98,
+            "fp": 5,
+            "fn": 71,
+            "precision": 0.9514563106796117,
+            "recall": 0.5798816568047337
+          },
+          "glass_bottle": {
+            "tp": 134,
+            "fp": 72,
+            "fn": 14,
+            "precision": 0.6504854368932039,
+            "recall": 0.9054054054054054
+          },
+          "hdpe_bottle": {
+            "tp": 147,
+            "fp": 1,
+            "fn": 38,
+            "precision": 0.9932432432432432,
+            "recall": 0.7945945945945946
+          },
+          "plastic_bottle": {
+            "tp": 167,
+            "fp": 9,
+            "fn": 12,
+            "precision": 0.9488636363636364,
+            "recall": 0.9329608938547486
+          }
+        },
+        "ambiguous_images": 1
+      },
+      "confusion_025": {
+        "rows": [
+          "aluminium_can",
+          "glass_bottle",
+          "hdpe_bottle",
+          "plastic_bottle",
+          "background"
+        ],
+        "columns": [
+          "aluminium_can",
+          "glass_bottle",
+          "hdpe_bottle",
+          "plastic_bottle",
+          "background"
+        ],
+        "orientation": "rows=predicted, columns=true; background column=unmatched predictions, row=missed objects",
+        "confidence": 0.25,
+        "match_iou": 0.45,
+        "matrix": [
+          [
+            99,
+            1,
+            7,
+            0,
+            12
+          ],
+          [
+            61,
+            140,
+            19,
+            0,
+            47
+          ],
+          [
+            0,
+            1,
+            148,
+            0,
+            7
+          ],
+          [
+            9,
+            6,
+            7,
+            169,
+            22
+          ],
+          [
+            0,
+            0,
+            4,
+            10,
+            0
+          ]
+        ]
+      },
+      "confusion_050": {
+        "rows": [
+          "aluminium_can",
+          "glass_bottle",
+          "hdpe_bottle",
+          "plastic_bottle",
+          "background"
+        ],
+        "columns": [
+          "aluminium_can",
+          "glass_bottle",
+          "hdpe_bottle",
+          "plastic_bottle",
+          "background"
+        ],
+        "orientation": "rows=predicted, columns=true; background column=unmatched predictions, row=missed objects",
+        "confidence": 0.5,
+        "match_iou": 0.45,
+        "matrix": [
+          [
+            100,
+            0,
+            5,
+            0,
+            5
+          ],
+          [
+            60,
+            140,
+            16,
+            0,
+            22
+          ],
+          [
+            0,
+            1,
+            149,
+            0,
+            3
+          ],
+          [
+            8,
+            6,
+            6,
+            169,
+            4
+          ],
+          [
+            1,
+            1,
+            9,
+            10,
+            0
+          ]
+        ]
+      }
+    },
+    "candidate": {
+      "identity": {
+        "model_sha256": "ad60782371076dac4df09a02ed26cbd7ecf4d5431b0c5b8dc934c95a29803fc7",
+        "manifest_sha256": "a2c498641f51cbeebded1fc147a3d7b93d171eac5b534fc2554833e4a666e602",
+        "split": "val",
+        "prediction": {
+          "imgsz": 640,
+          "conf": 0.25,
+          "iou": 0.7,
+          "max_det": 50,
+          "agnostic_nms": false,
+          "rect": false
+        }
+      },
+      "fixed_confidence_050": {
+        "overall": {
+          "tp": 552,
+          "fp": 119,
+          "fn": 129,
+          "precision": 0.8226527570789866,
+          "recall": 0.8105726872246696
+        },
+        "per_class": {
+          "aluminium_can": {
+            "tp": 96,
+            "fp": 0,
+            "fn": 73,
+            "precision": 1.0,
+            "recall": 0.5680473372781065
+          },
+          "glass_bottle": {
+            "tp": 136,
+            "fp": 89,
+            "fn": 12,
+            "precision": 0.6044444444444445,
+            "recall": 0.918918918918919
+          },
+          "hdpe_bottle": {
+            "tp": 155,
+            "fp": 0,
+            "fn": 30,
+            "precision": 1.0,
+            "recall": 0.8378378378378378
+          },
+          "plastic_bottle": {
+            "tp": 165,
+            "fp": 30,
+            "fn": 14,
+            "precision": 0.8461538461538461,
+            "recall": 0.9217877094972067
+          }
+        },
+        "ambiguous_images": 5
+      },
+      "fixed_confidence_070": {
+        "overall": {
+          "tp": 535,
+          "fp": 85,
+          "fn": 146,
+          "precision": 0.8629032258064516,
+          "recall": 0.7856093979441997
+        },
+        "per_class": {
+          "aluminium_can": {
+            "tp": 93,
+            "fp": 0,
+            "fn": 76,
+            "precision": 1.0,
+            "recall": 0.5502958579881657
+          },
+          "glass_bottle": {
+            "tp": 125,
+            "fp": 65,
+            "fn": 23,
+            "precision": 0.6578947368421053,
+            "recall": 0.8445945945945946
+          },
+          "hdpe_bottle": {
+            "tp": 155,
+            "fp": 0,
+            "fn": 30,
+            "precision": 1.0,
+            "recall": 0.8378378378378378
+          },
+          "plastic_bottle": {
+            "tp": 162,
+            "fp": 20,
+            "fn": 17,
+            "precision": 0.8901098901098901,
+            "recall": 0.9050279329608939
+          }
+        },
+        "ambiguous_images": 1
+      },
+      "confusion_025": {
+        "rows": [
+          "aluminium_can",
+          "glass_bottle",
+          "hdpe_bottle",
+          "plastic_bottle",
+          "background"
+        ],
+        "columns": [
+          "aluminium_can",
+          "glass_bottle",
+          "hdpe_bottle",
+          "plastic_bottle",
+          "background"
+        ],
+        "orientation": "rows=predicted, columns=true; background column=unmatched predictions, row=missed objects",
+        "confidence": 0.25,
+        "match_iou": 0.45,
+        "matrix": [
+          [
+            97,
+            1,
+            0,
+            0,
+            2
+          ],
+          [
+            60,
+            137,
+            16,
+            2,
+            27
+          ],
+          [
+            0,
+            0,
+            154,
+            0,
+            1
+          ],
+          [
+            12,
+            10,
+            4,
+            166,
+            13
+          ],
+          [
+            0,
+            0,
+            11,
+            11,
+            0
+          ]
+        ]
+      },
+      "confusion_050": {
+        "rows": [
+          "aluminium_can",
+          "glass_bottle",
+          "hdpe_bottle",
+          "plastic_bottle",
+          "background"
+        ],
+        "columns": [
+          "aluminium_can",
+          "glass_bottle",
+          "hdpe_bottle",
+          "plastic_bottle",
+          "background"
+        ],
+        "orientation": "rows=predicted, columns=true; background column=unmatched predictions, row=missed objects",
+        "confidence": 0.5,
+        "match_iou": 0.45,
+        "matrix": [
+          [
+            96,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            60,
+            137,
+            13,
+            2,
+            13
+          ],
+          [
+            0,
+            0,
+            154,
+            0,
+            1
+          ],
+          [
+            12,
+            8,
+            4,
+            165,
+            6
+          ],
+          [
+            1,
+            3,
+            14,
+            12,
+            0
+          ]
+        ]
+      }
+    }
+  },
+  "promotion_gate": {
+    "fp_reduction_at_least_25_percent": false,
+    "recall_loss_at_most_3_percentage_points": true
+  },
+  "fixed_threshold_gate_passed": false,
+  "test_used": false,
+  "limitations": [
+    "Both model and review thresholds were selected using this validation split",
+    "Negative crops used for training cannot serve as evidence of held-out negative/OOD performance",
+    "Training schedule also changed; this comparison is not a controlled negative-data-only ablation"
+  ]
+}

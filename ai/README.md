@@ -1,8 +1,45 @@
 # WasteNot AI: pilot YOLO + Gemini
 
+Pembaruan `pilot-policy-06`: kebersihan, keutuhan, kelayakan, niat pakai ulang, fokus dan akses boleh dibiarkan belum tahu. Gemini memberi **saran sementara bersyarat**, tanpa mengisi kondisi sebagai fakta. [Cara mencoba dan hasil audit/training background](docs/CONDITIONAL_AND_BACKGROUND.md).
+
+Kontrak integrasi tim tersedia pada [HTTP AI v1](docs/AI_HTTP_CONTRACT.md): [OpenAPI publik](contracts/v1/public.openapi.json), dua OpenAPI privat, contoh request/response, daftar error dan mock server. **Python memiliki aturan AI/Gemini; Go memiliki JWT, sesi, dedup dan penyimpanan.**
+
+Poin 3-4: [mutu keputusan YOLO](docs/DETECTION_QUALITY.md) dan [panduan/evaluasi rekomendasi](docs/RECOMMENDATION_EVALUATION.md). Profil kandidat `dw-val-01` memakai threshold per kelas dan menandai hipotesis bertumpuk; botol kaca tetap UNCERTAIN. Katalog kini 78 pilihan, dengan panduan HDPE tersendiri. Semua panduan masih DRAFT.
+
+```powershell
+# Demo checkpoint yang sudah ditrain, membuka kamera browser:
+.\ai\demo-camera-trained.bat
+# Evaluasi 44 skenario tanpa API:
+.\.venv-ai\Scripts\python.exe ai/scripts/evaluate_recommendations.py
+# Evaluasi Gemini sungguhan: 16 panggilan logis untuk satu putaran:
+.\.venv-ai\Scripts\python.exe ai/scripts/evaluate_recommendations.py --provider gemini --max-calls 16
+```
+
+Untuk HDPE, konfirmasi material, pilih isi sebelumnya Pangan/minuman, kondisi bersih/utuh, dan akses daur ulang yang benar-benar menerima. Riwayat isi HDPE UNKNOWN tetap meminta konteks; akses UNKNOWN dapat menghasilkan saran bersyarat. Bekas kimia tidak memakai panduan kemasan pangan; tidak ada Reuse otomatis dari kode 2. Lihat [contoh context HDPE](examples/context-hdpe.json). Contoh JSON dengan akses YES adalah asumsi demo, bukan verifikasi fasilitas.
+
+Backend/frontend menggunakan field baru `condition.former_contents`, `review_profile`, `review_thresholds`, `review_reasons`, `ambiguous_with`; Go mengirim `model_sha256` pada selection privat dari snapshot tersimpan. Gunakan band Python dan regenerasi DTO dari [OpenAPI](contracts/v1/public.openapi.json), jangan menghitung cutoff ulang di UI.
+
+```powershell
+# Kontrak publik untuk mengembangkan frontend/backend, tanpa YOLO/key:
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli serve-mock --port 8094
+# Buka http://127.0.0.1:8094/docs; Authorize: mock-user-a atau mock-user-b.
+# Pastikan file OpenAPI/contoh tetap sesuai implementasi:
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli export-contracts --check
+```
+
+Mock berlabel simulasi dan tidak menyimpan waste log; bukan backend produksi. Adapter rekomendasi privat dapat dijalankan dengan `serve-recommendations --port 8093 --demo-guides`, memakai `AI_RECOMMENDATION_TOKEN` yang berbeda dari token YOLO. Panduan lengkap setup, state frontend dan kewajiban adapter Go ada pada tautan di atas.
+
 Prototipe lokal untuk pekerjaan AI-01, baseline AI-03, dan eksperimen AI-06. Foto → YOLO nyata → pilih satu objek dan konfirmasi material → kondisi → panduan → Gemini structured output → validasi. Hasil berhenti pada konfirmasi metode dan input jumlah; tidak membuat waste log/XP.
 
 Pembaruan 20 Oktober 2026: Gemini memilih **tepat satu** dari **Reduce / Reuse / Recycle / Trash**, disertai alasan dan sumber panduan. [Kontrak empat metode](docs/RECOMMENDATION_CONTRACT.md) menggantikan pembatasan scan tiga metode/alternatif pada rancangan lama, dan menjelaskan perubahan DTO backend/frontend. Reduce adalah pencegahan penggunaan berikutnya.
+
+Eksperimen fine-tuning botol/kaleng menggunakan dataset publik beranotasi tersedia pada [panduan fine-tuning](docs/FINE_TUNING.md): sumber dan lisensi, audit/split, setup CUDA terpisah, training/resume, evaluasi, serta perintah mencoba checkpoint pada demo kamera dan worker backend. Model khusus empat kelas dipilih eksplisit dengan `--model`; demo biasa tetap memakai cakupan COCO yang luas.
+
+Kandidat dengan data lebih bervariasi tersedia melalui [training Broad Waste](docs/BROAD_WASTE_TRAINING.md): 10 kelas visual, data/split aktual, batas kelas langka, hasil evaluasi, integrasi worker dan `.\ai\demo-camera-broad.bat --port 8095`. Semua hasil kandidat broad perlu ditinjau; model default tetap COCO.
+
+Setelah training selesai, `ai/demo-camera-trained.bat` membuka demo checkpoint botol/kaleng melalui environment demo awal (CPU). Perintah GPU tersedia pada panduan tersebut.
+
+Run pertama sudah selesai pada 30 epoch (early stopping). [Laporan hasil](docs/FINETUNING_RESULTS.md) memuat evaluasi per kelas, perbandingan dengan baseline, batas dataset, dan uji checkpoint final dengan Gemini langsung.
 
 ## Demo kamera di browser
 
@@ -24,7 +61,7 @@ Browser terbuka otomatis ke `http://127.0.0.1:8092`. Izinkan kamera ketika brows
 2. Tinjau foto dan tekan **Kirim untuk deteksi**. YOLO memproses satu foto di server lokal, tidak mengunggah video terus-menerus.
 3. Klik bingkai objek atau pilih dari daftar. Kandidat ≥0,50 dapat ditinjau; skor rendah/kelas nonkatalog diarahkan ke pilihan manual.
 4. Konfirmasikan jenis/material. Label `bottle`, `cup` atau `bowl` belum memastikan bahan pembuatnya.
-5. Isi kebersihan, keutuhan, kelayakan dan niat pakai ulang; centang konfirmasi. Untuk menguji saran REUSE pada cangkir/tas/peralatan, semua kondisi harus sesuai kenyataan: bersih, utuh, masih layak, dan ingin dipakai ulang. UNKNOWN tidak ditebak otomatis.
+5. Isi kebersihan, keutuhan, kelayakan dan niat pakai ulang; centang konfirmasi. Pada peralatan makan/minum yang kotor, isi jenis kotoran dan apakah bisa dibersihkan. Sisa makanan/minuman atau debu biasa yang dikonfirmasi bisa dibersihkan dapat menghasilkan **Reuse setelah dicuci** jika benda utuh, layak dan ingin dipakai lagi. Jika menandai risiko, jelaskan jenisnya; kotor biasa berbeda dari kontaminasi berbahaya. UNKNOWN tidak ditebak otomatis.
 6. Pilih **Gemini · API langsung** lalu **Minta rekomendasi**. Key/model dibaca server dari `ai/.env`; tidak dikirim ke browser. Untuk mencoba tanpa request berbayar, pilih **Simulasi · tanpa API**, yang diberi label eksplisit.
 7. Periksa satu label Reduce/Reuse/Recycle/Trash, alasan, langkah, caution dan sumber panduan yang langsung terbuka. Fokus **Otomatis sesuai objek** meminta Gemini mengutamakan penanganan saat ini yang didukung panduan. Pilih **Pencegahan berikutnya (Reduce)** untuk mencoba saran pencegahan. Isi akses daur ulang sesuai yang sudah diperiksa. Tidak ada aktivitas/XP yang disimpan. Ubah kondisi untuk membatalkan saran lama atau **Bersihkan** untuk menghapus foto/hasil sementara.
 
@@ -47,7 +84,7 @@ Untuk membuka halaman tanpa meminta kamera otomatis, tambahkan `?camera=off`, mi
 
 ### Cakupan demo yang diperluas
 
-Katalog versi `demo-catalog-03` mempunyai **68 pilihan benda/material**, terhubung ke **58 kelas visual** yang memang terdapat pada checkpoint COCO. YOLO tetap memiliki 80 kelas; orang, hewan dan sebagian kendaraan tidak dipaksakan menjadi sampah.
+Katalog versi `demo-catalog-05` mempunyai **78 pilihan benda/material**; sebagian pilihannya terhubung ke **58 kelas visual** yang memang terdapat pada checkpoint COCO. YOLO tetap memiliki 80 kelas; orang, hewan dan sebagian kendaraan tidak dipaksakan menjadi sampah.
 
 | Kelompok | Contoh yang dapat dikenali YOLO | Perilaku panduan |
 |---|---|---|
@@ -57,12 +94,12 @@ Katalog versi `demo-catalog-03` mempunyai **68 pilihan benda/material**, terhubu
 | Buku | Book | Pilihan reuse/recycle sesuai kondisi dan panduan |
 | Elektronik | Laptop, ponsel, TV, mouse, keyboard, remote, jam, kulkas, oven, microwave, toaster, pengering rambut | RECYCLE melalui pengelola e-waste, dengan peringatan; jangan membongkar sendiri |
 | Benda tajam | Pisau, gunting | RECYCLE melalui pengelola yang menerima benda tajam; peringatan tetap muncul |
-| Makanan | Pisang, apel, jeruk, brokoli, wortel, roti isi, pizza, hot dog, kue, donat | REDUCE untuk pencegahan sisa berikutnya; penanganan sisa saat ini perlu layanan organik lokal |
+| Makanan | Pisang, apel, jeruk, brokoli, wortel, roti isi, pizza, hot dog, kue, donat | Pilih fokus PREVENTION untuk REDUCE; penanganan sisa saat ini memerlukan panduan layanan organik lokal |
 | Barang campuran | Tanaman beserta pot, sink, toilet | REDUCE untuk pencegahan; penanganan material campuran perlu panduan tambahan |
 | Sikat gigi | Toothbrush | Konfirmasi plastik manual tanpa listrik/baterai; TRASH hanya saat tidak layak dan akses daur ulang khusus sudah diperiksa tidak ada |
-| Katalog manual | Kaleng aluminium, kardus, baterai | Belum punya kelas khusus pada checkpoint ini; bukan klaim kemampuan deteksi baru |
+| Katalog manual | Kaleng aluminium, botol HDPE, kardus, baterai | Belum punya kelas khusus pada checkpoint ini; bukan klaim kemampuan deteksi baru |
 
-Semua 68 panduan merupakan **draf demo**, sebagian dibuat dari template bersama. Kelas baru memanfaatkan label pretrained yang sudah ada; belum fine-tuning atau evaluasi akurasi per kelas. Perluasan katalog tidak menambah kelas visual baru pada bobot. Template tersedia pada [guide_templates.json](src/wastenot_ai/data/guide_templates.json); katalog pada [catalog.json](src/wastenot_ai/data/catalog.json). Script `ai/scripts/expand_demo_catalog.py` memperbarui data extension secara idempotent jika tabel sumber diubah.
+Semua 78 panduan merupakan **draf demo**, sebagian dibuat dari template bersama. Perluasan COCO memanfaatkan label pretrained yang sudah ada. Kandidat botol/kaleng telah difine-tune dan dievaluasi terpisah; ia tidak mengenali semua kelas COCO. Perluasan katalog tidak menambah kelas visual baru pada bobot. Template tersedia pada [guide_templates.json](src/wastenot_ai/data/guide_templates.json); katalog pada [catalog.json](src/wastenot_ai/data/catalog.json). Script `ai/scripts/expand_demo_catalog.py` memperbarui data extension secara idempotent jika tabel sumber diubah.
 
 ### Batas layanan demo
 
@@ -152,7 +189,7 @@ Jangan tempel key ke chat, commit, argumen CLI, atau laporan. `doctor` hanya men
 .\.venv-ai\Scripts\python.exe -m wastenot_ai.cli pipeline ai/data/local/smoke/bottle.jpg --object-id object-3 --confirm-object --context ai/examples/context-glass.json --provider gemini --demo-guides --output ai/artifacts/pipeline-gemini.json
 ```
 
-Endpoint Google HTTPS tetap; key pada header `x-goog-api-key`, bukan query URL. Failover key hanya untuk penolakan 429/401/403 seperti di atas, tanpa retry loop tak terbatas. Foto, nama, email, lokasi, token dan catatan pribadi tidak dikirim. Payload terbatas objek, kategori, tiga kondisi, niat reuse, fokus saran, akses daur ulang, allowed methods dan evidence panduan. `generationConfig` memakai `responseMimeType=application/json` dan `responseJsonSchema`; refusal/truncation, error HTTP yang tidak dipulihkan, timeout dan schema invalid menjadi fallback tanpa metode.
+Endpoint Google HTTPS tetap; key pada header `x-goog-api-key`, bukan query URL. Failover key hanya untuk penolakan 429/401/403 seperti di atas, tanpa retry loop tak terbatas. Foto, nama, email, lokasi, token dan catatan pribadi tidak dikirim. Payload terbatas objek, kategori, kondisi termasuk cleanable/soiling, jenis risiko, niat reuse, fokus saran, akses daur ulang, allowed methods dan evidence panduan. `generationConfig` memakai `responseMimeType=application/json` dan `responseJsonSchema`; refusal/truncation, error HTTP yang tidak dipulihkan, timeout dan schema invalid menjadi fallback tanpa metode.
 
 Tidak ada raw provider response/prompt dalam output CLI. Alasan dan caution yang ditampilkan dirender dari evidence/teks panduan yang dipilih setelah validasi, sehingga prosa bebas LLM tidak menjadi instruksi penanganan. Ini pemeriksaan konsistensi deterministik; belum merupakan evaluasi kualitas atau keselamatan model pada semua kasus.
 
@@ -164,9 +201,9 @@ Untuk percobaan setelah review konten, buat salinan JSON, lakukan pemeriksaan lo
 
 Evidence mendukung empat label: RECYCLE sesuai panduan, termasuk rute pengelola khusus untuk baterai/elektronik/pisau/gunting; REUSE dengan kelayakan/niat yang dikonfirmasi; REDUCE untuk pencegahan berikutnya; TRASH pada kaca/keramik rusak dan sikat gigi plastik manual sesuai syarat. TRASH bukan fallback untuk semua benda. Panduan/syarat yang tidak cocok menghasilkan `NO_ALLOWED_METHOD`; model tidak mengarang metode.
 
-**Risiko tidak lagi menghentikan klasifikasi.** Untuk kaca pecah, hasil utama tetap **Trash**, lalu peringatan penanganan khusus, langkah melindungi pecahan dan sumber. Untuk baterai/elektronik, hasil utama **Recycle** melalui layanan khusus, bukan tong daur ulang biasa. Evidence untuk konteks berisiko harus memiliki `risk_compatible=true`; REUSE umum tidak ditawarkan pada objek berisiko. Jika pengguna menandai risiko yang belum jelas dan belum ada evidence penanganan yang cocok, fokus AUTO dapat menghasilkan **Reduce** dengan scope PREVENTION untuk penggunaan berikutnya, disertai peringatan; ini tidak mengklaim telah menyelesaikan pembuangan benda berbahaya saat ini. Lihat [contoh empat hasil dan sumber](docs/RECOMMENDATION_CONTRACT.md#mencoba-keempat-hasil).
+**Risiko yang tercakup panduan tetap mendapat satu label.** Untuk kaca pecah, hasil utama tetap **Trash**, lalu peringatan, langkah melindungi pecahan dan sumber. Untuk baterai/elektronik, hasil utama **Recycle** melalui layanan khusus. Evidence berisiko harus memiliki `risk_compatible=true`. Risiko dicentang tetapi belum jelas menghasilkan `NEEDS_CONTEXT` tanpa memanggil Gemini. Kontaminasi kimia/biologis tidak diproses memakai aturan cuci/residu umum. AUTO/HANDLING hanya menawarkan penanganan saat ini; **REDUCE hanya saat pengguna memilih PREVENTION**. Lihat [mutu panduan dan kasus uji](docs/GUIDE_QUALITY.md).
 
-Policy REUSE bersifat konservatif: kondisi bersih, utuh, reusable=YES, reuse_intention=true, serta evidence panduan yang cocok semuanya wajib. Jangan mengubah UNKNOWN menjadi YES secara otomatis.
+Policy REUSE: utuh, reusable=YES, reuse_intention=true dan evidence yang sesuai wajib. Untuk peralatan makan/minum, DIRTY dapat memenuhi panduan cuci dahulu jika cleanable=YES dan soiling=FOOD_DRINK/DUST; kondisi tidak otomatis diubah menjadi CLEAN. Barang/material lain tetap mengikuti evidence spesifiknya. Sumber ditampilkan dengan judul, penerbit, wilayah dan batas cakupan dari [registri sumber](src/wastenot_ai/data/source_registry.json). Metadata referensi tidak berarti panduan sudah mendapat review lokal.
 
 ## Worker privat untuk backend Go
 
@@ -175,7 +212,7 @@ Policy REUSE bersifat konservatif: kondisi bersih, utuh, reusable=YES, reuse_int
 .\.venv-ai\Scripts\python.exe -m wastenot_ai.cli serve-worker --port 8091
 ```
 
-Worker bind ke `127.0.0.1`, tanpa docs/access log, tanpa DB atau akses Gemini. `GET /health/ready` dan `POST /internal/detect` memerlukan `Authorization: Bearer <AI_SERVICE_TOKEN>`. Body deteksi adalah byte JPEG/PNG dengan Content-Type yang sesuai, bukan URL/base64/multipart. Respons `{data: ...}` berisi deteksi dan metadata artifact. Ini kontrak internal; endpoint publik `/v1/ai/detections` tetap milik Go sesuai [handoff](docs/HANDOFF.md).
+Worker bind ke `127.0.0.1`, tanpa docs/access log, tanpa DB atau akses Gemini. `GET /health/ready` dan `POST /internal/v1/detect` memerlukan `Authorization: Bearer <AI_SERVICE_TOKEN>`. Body deteksi adalah byte JPEG/PNG, bukan URL/base64/multipart. Route versioned memakai envelope api_version/request_id/data; `/internal/detect` lama tetap kompatibel. Endpoint publik `/v1/ai/detections` tetap milik Go; mock hanya untuk pengujian kontrak.
 
 Satu job aktif; overload langsung 503 + Retry-After. Batas gambar 5 MiB, 12 MP, sisi 4096; orientasi dibetulkan dan EXIF dibuang. Gambar hanya di memori worker; tidak ditulis ke disk. Deadline 10 detik termasuk membaca body. Jika native inference melewati deadline, caller menerima 504 tetapi worker tetap sibuk hingga job selesai: tidak membuat antrean thread tak terbatas. Restart proses adalah batas pemulihan jika runtime native macet permanen.
 
@@ -201,27 +238,32 @@ Sesudah instalasi dan `fetch-assets`, alur berikut dapat dijalankan terpisah dar
 
 Output `READY` memuat tepat satu `recommended_method`, `recommendation_scope` (PREVENTION untuk REDUCE, HANDLING untuk lainnya), `reason`, `source_urls`, `steps`, caution, evidence dan versi panduan. Tidak ada alternatif atau status klasifikasi SPECIAL_HANDLING. `special_handling=true` boleh menyertai READY sebagai peringatan tambahan; bukan alasan mengosongkan metode. `UNAVAILABLE` menyediakan `reason_code` ketika layanan/panduan/output tidak siap. Periksa juga `provider` dan `prototype_only`: request Gemini dengan panduan draf tetap merupakan demo. `saved_log=false` dan `next_action` menunjukkan bahwa pengguna masih perlu mengonfirmasi tindakan dan mengisi jumlah. Contoh context tersedia untuk [Reduce](examples/context-reduce.json), [Reuse](examples/context-reuse.json), [Recycle](examples/context-glass.json), [Trash](examples/context-trash.json), [kaca pecah](examples/context-broken-glass.json), dan [baterai](examples/context-battery.json).
 
+Untuk kasus cangkir kotor, gunakan [context-dirty-mug.json](examples/context-dirty-mug.json): DIRTY, INTACT, reusable=YES, cleanable=YES, soiling=FOOD_DRINK dan reuse_intention=true. Hasilnya Reuse setelah dicuci. `NEEDS_CONTEXT` memuat `missing_context` saat isian relevan masih kurang dan belum memanggil Gemini; UI menampilkan nama isian tersebut. `source_details` memuat judul/penerbit/wilayah/batas cakupan sumber. Proses peninjauan isi dan pengujian dijelaskan pada [mutu panduan](docs/GUIDE_QUALITY.md).
+
 Untuk memakai panduan yang sudah ditinjau, tambahkan `--guides path/to/reviewed-guides.json` dan hilangkan `--demo-guides`. Langkah review ada di [Status panduan](#status-panduan).
 
 ## Integrasi backend Go
 
-**Yang sudah berjalan:** CLI eksperimen dan worker deteksi Python. **Yang harus ditambahkan di backend:** endpoint publik AI, sesi, mapping authoritative, retrieval, pemanggilan Gemini, validasi dan integrasi waste log. CLI `pipeline` bukan endpoint publik yang dapat langsung dipanggil aplikasi.
+**Yang sudah berjalan:** worker YOLO privat, modul keputusan Python privat, CLI/demo, OpenAPI dan mock publik. **Yang harus ditambahkan di Go:** endpoint publik AI, JWT, sesi/ownership, dedup/budget, adapter HTTP dan transaksi waste log. Aturan mapping, retrieval, Gemini dan evidence tetap satu implementasi Python.
 
 ```mermaid
 sequenceDiagram
     participant App as Android
     participant Go as Go API
     participant Worker as YOLO privat
+    participant Policy as Python keputusan
     participant Gemini as Gemini API
     App->>Go: POST /v1/ai/detections (multipart, JWT)
-    Go->>Worker: POST /internal/detect (byte gambar, service token)
+    Go->>Worker: POST /internal/v1/detect (byte gambar, service token)
     Worker-->>Go: Deteksi + bbox + artifact version
     Go-->>App: Sesi deteksi + daftar objek
     App->>Go: POST /v1/ai/recommendations (objek/kondisi dikonfirmasi)
-    Go->>Go: Lookup panduan PUBLISHED + allowed methods
-    Go->>Gemini: Metadata dan evidence, tanpa foto
-    Gemini-->>Go: Structured JSON
-    Go->>Go: Validasi schema, evidence dan special handling
+    Go->>Policy: POST /internal/v1/recommendations (snapshot sesi + konteks)
+    Policy->>Policy: PUBLISHED guide + risiko + allowed methods
+    Policy->>Gemini: Metadata dan evidence, tanpa foto
+    Gemini-->>Policy: Structured JSON
+    Policy->>Policy: Validasi schema, evidence dan special handling
+    Policy-->>Go: Keputusan tervalidasi
     Go-->>App: Rekomendasi tervalidasi
     App->>Go: POST /v1/waste-logs setelah konfirmasi + jumlah
 ```
@@ -240,11 +282,10 @@ Konfigurasi proses Go secara terpisah melalui environment/secret configuration:
 |---|---|
 | `AI_INFERENCE_URL` | `http://127.0.0.1:8091`, base URL worker pada host yang sama |
 | `AI_SERVICE_TOKEN` | Nilai yang sama dengan konfigurasi worker |
-| `GEMINI_API_KEY_1` … `GEMINI_API_KEY_5` | Pool secret Gemini, dirotasi backend; abaikan slot kosong/duplikat |
-| `GEMINI_API_KEY` | Kompatibilitas satu key, hanya jika seluruh slot bernomor kosong |
-| `GEMINI_MODEL` | ID model dengan akses dan structured output yang sudah diuji |
+| `AI_RECOMMENDATION_URL` | `http://127.0.0.1:8093`, base URL modul keputusan |
+| `AI_RECOMMENDATION_TOKEN` | Token berbeda dari YOLO, sama dengan konfigurasi modul keputusan |
 
-Pembacaan `ai/.env` oleh CLI Python tidak otomatis mengisi environment terminal, proses Go atau Android. Worker menghapus `GEMINI_API_KEY` serta kelima variabel bernomor dari environment prosesnya saat diluncurkan lewat CLI. Hanya proses rekomendasi/backend yang memerlukannya.
+Pembacaan `ai/.env` oleh CLI Python tidak otomatis mengisi environment terminal, Go atau Android. Worker YOLO menghapus seluruh key Gemini dan token rekomendasi saat diluncurkan lewat CLI. Key Gemini hanya dibutuhkan proses Python keputusan, tidak oleh Go.
 
 CLI worker saat ini bind ke `127.0.0.1`; contoh ini memakai Go dan worker pada host yang sama. `127.0.0.1` di container berbeda menunjuk container itu sendiri. Deployment lintas container/host perlu penyesuaian bind dan jaringan privat oleh tim backend; jangan menganggap perintah lokal ini sudah menyediakan deployment Docker.
 
@@ -269,7 +310,7 @@ func callYOLO(ctx context.Context, photo []byte, contentType string) (json.RawMe
     // URL dan token berasal dari konfigurasi server, bukan request Android.
     baseURL := strings.TrimRight(os.Getenv("AI_INFERENCE_URL"), "/")
     req, err := http.NewRequestWithContext(ctx, http.MethodPost,
-        baseURL+"/internal/detect", bytes.NewReader(photo))
+        baseURL+"/internal/v1/detect", bytes.NewReader(photo))
     if err != nil {
         return nil, err
     }
@@ -304,18 +345,18 @@ Validasi konfigurasi saat startup. Gunakan HTTP client bersama pada implementasi
 |---|---|
 | `GET /v1/ai/objects` | Katalog object_key, kategori, special_handling dan versi mapping |
 | `POST /v1/ai/detections` | Multipart `image` dan UUID `client_request_id`; JWT, rate limit, validasi media, dedup, worker dan sesi user-scoped |
-| `POST /v1/ai/recommendations` | ID sesi/objek, objek/kategori dikonfirmasi, kondisi, reuse_intention, recommendation_goal, recycling_access, UUID request; retrieval dan Gemini tervalidasi |
+| `POST /v1/ai/recommendations` | Ownership/dedup/TTL; snapshot sesi dan konteks dikirim ke Python keputusan; bungkus hasil dengan ID/revision/expiry |
 | `DELETE /v1/ai/detections/{id}` | Buang sesi/rekomendasi sementara milik user; idempotent |
 
 Go mengambil kelas/confidence/versi model dari sesi yang dimilikinya. Client hanya mengirim pilihan/koreksi yang diverifikasi terhadap katalog. Replay request identik tidak mengulang inference/provider; ID sama dengan payload berbeda menghasilkan conflict. TTL, ownership dan capability mengikuti [API §10](../docs/WasteNot-Product-Design-Kit%20update/WasteNot/API.md).
 
-### 4. Integrasikan Gemini dan policy di Go
+### 4. Hubungkan Go ke modul keputusan Python
 
-Gunakan [providers.py](src/wastenot_ai/providers.py) sebagai referensi request `generateContent`, header key, prompt dan response JSON schema. Gunakan [recommendation.py](src/wastenot_ai/recommendation.py) sebagai referensi urutan policy: special handling → guide yang ditinjau → allowed methods dari kondisi → validasi schema/evidence → hasil.
+Jalankan `serve-recommendations` dengan `AI_RECOMMENDATION_TOKEN`, terpisah dari worker YOLO. Go memanggil `POST /internal/v1/recommendations` mengikuti [OpenAPI privat](contracts/v1/private-recommendation.openapi.json), dengan context dan selection yang dibangun dari sesi tersimpan. [Contoh request](contracts/v1/examples/internal-recommendation-request.json) tersedia; untuk manual, selection=null.
 
-Port atau implementasikan ulang perilaku tersebut pada modul rekomendasi Go. Worker Python yang tersedia hanya melayani deteksi; belum ada endpoint HTTP rekomendasi Python. Menjalankan subprocess CLI untuk setiap request bukan mekanisme integrasi produksi yang disediakan prototipe ini. Hasil tes Python menjadi kasus acuan untuk tes backend Go.
+Python menggunakan [decisions.py](src/wastenot_ai/decisions.py), policy dan provider yang sama dengan CLI/demo. Go memvalidasi bentuk hasil lalu menyimpan ID, revision, expiry dan provenance. Tidak ada port ulang prompt, evidence filter atau aturan penanganan. Go tidak memanggil subprocess CLI per request.
 
-Pertahankan satu instance pool key selama proses backend hidup, dengan pemilihan bergiliran yang aman untuk request bersamaan, cooldown dan batas percobaan yang sama. Jangan membuat pool baru untuk setiap request. Deployment dengan beberapa worker/replica membutuhkan koordinasi limit pada tingkat proyek; state in-memory prototipe tidak mengoordinasikan proses lain. Rotasi tidak mengubah respons frontend atau memindahkan key ke Android.
+Pool key dipertahankan oleh proses Python keputusan. Go memiliki dedup/in-flight dan budget akun; jangan melakukan retry generation otomatis setelah timeout yang hasilnya tidak diketahui. Perilaku replay/FAILED_UNCERTAIN dijelaskan pada [kontrak HTTP](docs/AI_HTTP_CONTRACT.md). Gemini key tidak ditempatkan pada Go atau Android.
 
 Jangan mengirim foto/data pribadi ke Gemini. Simpan snapshot versi panduan dan policy. Pasang deadline, rate limit dan budget pada Go. Mode fixture/draft hanya untuk lingkungan eksperimen; capability produksi memerlukan panduan PUBLISHED yang ditinjau. Setelah user mengonfirmasi metode dan mengisi berat/jumlah, buat waste log melalui endpoint existing dengan provenance sesuai kontrak; statistik/XP hanya berubah setelah transaksi berhasil.
 
@@ -345,7 +386,7 @@ suspend fun recommend(
 
 Path relatif di atas mengikuti base URL Go yang sudah berakhiran `/v1/`; jika konfigurasi berbeda, sesuaikan sekali di network layer. Ikuti pola `ApiExecutor`/credential yang sudah ada untuk bearer dan refresh sesi. File multipart memakai nama field `image`, MIME JPEG/PNG dan UUID request yang dipertahankan saat retry. Jangan mengirim URL lokal Android sebagai isi foto.
 
-`DetectionDto` perlu memuat detection_id, status, model/mapping version, expires_at, dimensi gambar dan objek (object_id, raw_class, confidence, bbox, confidence_band, object_key/category nullable, requires_material_confirmation). `RecommendationRequestDto` memakai ID sesi/objek, confirmed_object_key/category, condition, reuse_intention, recommendation_goal, recycling_access dan client_request_id. `RecommendationDto` memuat recommendation_id, status, satu recommended_method nullable, recommendation_scope, reason, source_urls, steps, caution, guide_refs, policy version dan expires_at. Sesuaikan API.md §10 dengan [kontrak empat metode](docs/RECOMMENDATION_CONTRACT.md); jangan menyalin seluruh output CLI.
+`DetectionDto` perlu memuat detection_id, status, model/mapping version, expires_at, dimensi gambar dan objek (object_id, raw_class, confidence, bbox, confidence_band, object_key/category nullable, requires_material_confirmation). `RecommendationRequestDto` memakai ID sesi/objek, confirmed_object_key/category, condition (termasuk cleanable/soiling), reuse_intention, risk_flag/risk_type, recommendation_goal, recycling_access dan client_request_id. `RecommendationDto` memuat recommendation_id, status, satu recommended_method nullable, recommendation_scope, reason, source_urls/source_details, missing_context, steps, caution, guide_refs, policy version dan expires_at. Sesuaikan API.md §10 dengan [kontrak empat metode](docs/RECOMMENDATION_CONTRACT.md); jangan menyalin seluruh output CLI.
 
 ### 2. Hubungkan repository, ViewModel dan sheet
 
@@ -353,7 +394,7 @@ Path relatif di atas mengikuti base URL Go yang sudah berakhiran `/v1/`; jika ko
 2. CameraX mengambil foto sementara. Tampilkan preview/ambil ulang dan minta aksi kirim sebelum upload. Normalisasi orientasi dan buang EXIF; backend tetap memvalidasi ulang.
 3. Repository mengirim multipart ke Go. ViewModel menampilkan bbox + daftar objek; pengguna memilih satu, mengonfirmasi material dan mengisi kondisi. `bottle` tidak otomatis menjadi PLASTIC.
 4. Kirim request rekomendasi dengan ID baru saat objek/kondisi berubah. Abaikan hasil request yang berasal dari konteks lama. State dan draf tetap bertahan saat error; ViewModel tidak menyimpan Context/Activity atau byte bitmap besar.
-5. Tampilkan READY dengan satu label + alasan + sumber. Jika special_handling=true, tampilkan peringatan di bawah metode tanpa menghilangkan label. UNAVAILABLE menunjukkan layanan/panduan/output yang belum siap, dengan metode null. Simpan hanya setelah pengguna mengonfirmasi metode, mengisi gram/jumlah/tanggal, lalu menekan simpan.
+5. Tampilkan READY dengan satu label + alasan + sumber. Jika special_handling=true, tampilkan peringatan di bawah metode tanpa menghilangkan label. NEEDS_CONTEXT menampilkan missing_context untuk isian yang kurang, tanpa mengarang metode atau memanggil Gemini. UNAVAILABLE menunjukkan layanan/panduan/output yang belum siap. Simpan hanya setelah pengguna mengonfirmasi metode, mengisi gram/jumlah/tanggal, lalu menekan simpan.
 6. `POST /v1/waste-logs` menggunakan request ID draf dan `ai_provenance` sesuai kontrak. Refresh riwayat/ringkasan setelah server sukses; hapus foto sementara/sesi pada keluar sesuai aturan retensi.
 
 Capability `ai_scan`/`ai_recommendation` dari metadata menentukan ketersediaan layanan; tombol Catat tetap mendukung manual ketika AI mati. Alur ini masih pekerjaan integrasi Android, bukan fitur kamera yang sudah otomatis terpasang setelah menginstal package Python.
@@ -396,7 +437,7 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD = '1'
 .\.venv-ai\Scripts\python.exe -m playwright install chromium
 # Dengan demo server aktif; menggunakan kamera palsu, YOLO nyata dan rekomendasi fixture:
 .\.venv-ai\Scripts\python.exe ai/scripts/verify_camera_demo.py
-# Tambahkan --live-gemini untuk enam request Gemini: empat label serta baterai dan kaca pecah.
+# Tambahkan --live-gemini untuk tujuh request: empat label, baterai, kaca pecah dan cangkir kotor yang bisa dicuci.
 ```
 
 Tes memakai transport Gemini palsu dan detector fixture secara eksplisit; tidak memerlukan key, internet, atau unduhan YOLO. Uji inference nyata dilakukan terpisah melalui detect/benchmark. Perintah benchmark adalah pengukuran latency eksploratif; bukan precision/recall/mAP atau bukti akurasi material. Lihat [rencana dataset](docs/DATASET.md) dan [laporan verifikasi](docs/BASELINE.md).

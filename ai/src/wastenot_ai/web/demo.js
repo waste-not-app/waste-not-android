@@ -30,12 +30,21 @@ const messages = {
   NO_REVIEWED_GUIDE: 'Belum ada panduan yang ditinjau untuk konteks ini. Untuk eksperimen draf, jalankan demo dengan --demo-guides.',
   NO_ALLOWED_METHOD: 'Kondisi ini belum memiliki metode otomatis dalam panduan. Lengkapi kondisi yang memang diketahui atau pilih penanganan manual.',
   INVALID_MODEL_OUTPUT: 'Saran model gagal validasi. Metode otomatis tidak digunakan.',
-  INVALID_EVIDENCE: 'Saran tidak didukung evidence panduan yang cocok. Pilih penanganan manual.'
+  INVALID_EVIDENCE: 'Saran tidak didukung evidence panduan yang cocok. Pilih penanganan manual.',
+  RISK_DETAILS_REQUIRED: 'Jelaskan jenis risiko yang dicentang. Sisa minuman biasa berbeda dari bahan berbahaya.',
+  CONTEXT_REQUIRED: 'Lengkapi kondisi, jenis kotoran atau kemampuan dibersihkan yang belum diketahui. Reduce tidak digunakan sebagai pengganti jawaban.',
+  RISK_NOT_COVERED: 'Panduan saat ini belum mencakup kontaminasi ini. Minta arahan pengelola limbah yang sesuai.'
 };
 const rawNames = {'bottle':'Botol','cup':'Gelas / cangkir','bowl':'Mangkuk','wine glass':'Gelas berkaki',
+  'aluminium_can':'Kaleng aluminium','glass_bottle':'Botol kaca','hdpe_bottle':'Botol HDPE · konfirmasi isi','plastic_bottle':'Botol plastik · konfirmasi PET',
   'fork':'Garpu','spoon':'Sendok','knife':'Pisau','vase':'Vas','person':'Orang','dining table':'Meja makan',
   'cell phone':'Ponsel','book':'Buku','pizza':'Piza','chair':'Kursi','laptop':'Laptop','tv':'Televisi / monitor'};
 function rawLabel(raw) {
+  const broad = {'can':'Kaleng · konfirmasi bahan','plastic_bag':'Kantong plastik',
+    'paper':'Kertas','cardboard':'Kardus','drink_carton':'Karton minuman',
+    'plastic_wrapper':'Pembungkus / film plastik','food_container':'Wadah makanan · konfirmasi bahan',
+    'bottle_cap':'Tutup botol · konfirmasi bahan'};
+  if (broad[raw]) return broad[raw];
   return rawNames[raw] || config?.catalog.items.find(x => x.baseline_raw_class === raw)?.label || raw;
 }
 function message(text, kind = '') {
@@ -124,12 +133,21 @@ function clearRecommendation() {
   updateForm();
 }
 function resetConditions() {
-  ['cleanliness','integrity','reusable'].forEach(id => { $(id).value = 'UNKNOWN'; });
+  ['cleanliness','integrity','reusable','cleanable','soiling','risk-type','former-contents'].forEach(id => { $(id).value = 'UNKNOWN'; });
   $('reuse-intention').value = '';
   $('recommendation-goal').value = 'AUTO';
   $('recycling-access').value = 'UNKNOWN';
   $('confirmed').checked = false;
   $('risk').checked = false;
+  updateConditionDetails();
+  $('former-contents-field').hidden = true;
+}
+function updateConditionDetails() {
+  const dirty = $('cleanliness').value === 'DIRTY';
+  $('cleaning-details').hidden = !dirty;
+  if (!dirty) { $('cleanable').value = 'UNKNOWN'; $('soiling').value = 'UNKNOWN'; }
+  $('risk-details').hidden = !$('risk').checked;
+  if (!$('risk').checked) $('risk-type').value = 'UNKNOWN';
 }
 function updateForm() {
   $('recommend').disabled = !config || !$('object-key').value || !$('confirmed').checked || recommending || detecting;
@@ -243,7 +261,7 @@ function renderDetections() {
     const item = document.createElement('button'); item.type = 'button'; item.className = `object-choice ${selected?.object_id === object.object_id ? 'selected' : ''}`;
     item.disabled = !object.supported_for_review; item.setAttribute('aria-pressed',String(selected?.object_id === object.object_id));
     const title = document.createElement('strong'); title.textContent = label;
-    const detail = document.createElement('span'); detail.textContent = `${score}% · ${object.confidence_band === 'UNCERTAIN' ? 'Belum yakin' : object.supported_for_review ? 'Pilih objek' : 'Pilih manual'}`;
+    const detail = document.createElement('span'); detail.textContent = `${score}% · ${object.ambiguous_with?.length ? 'Kelas bertumpuk · periksa' : object.confidence_band === 'UNCERTAIN' ? 'Perlu ditinjau' : object.supported_for_review ? 'Pilih objek' : 'Pilih manual'}`;
     item.append(title,detail); item.addEventListener('click',() => selectObject(object)); $('object-list').append(item);
   }
 }
@@ -263,7 +281,7 @@ function selectObject(object) {
   selected = object; manualMode = false; resetConditions(); clearRecommendation();
   fillObjectOptions(object.suggested_object_keys || []);
   $('selected-label').textContent = rawLabel(object.raw_class);
-  $('context-help').textContent = object.confidence_band === 'UNCERTAIN' ? 'Model belum yakin. Periksa objek dan pilih jenis/material yang benar.' : 'Objek dipilih. Konfirmasikan jenis/material dan kondisi yang kamu ketahui.';
+  $('context-help').textContent = object.ambiguous_with?.length ? 'Ada beberapa tebakan kelas pada area yang sama. Bandingkan lewat daftar objek, lalu konfirmasikan material yang benar.' : object.confidence_band === 'UNCERTAIN' ? 'Prediksi ini perlu ditinjau. Skor tinggi belum membuktikan jenis/material benar.' : 'Objek dipilih. Konfirmasikan jenis/material dan kondisi yang kamu ketahui.';
   renderDetections(); setStep(3); updateForm();
 }
 function chooseManual(key = '') {
@@ -280,10 +298,14 @@ function chooseManual(key = '') {
 }
 function updateMaterialNote() {
   const item = config?.catalog.items.find(x => x.object_key === $('object-key').value);
+  $('former-contents-field').hidden = !(item?.object_key === 'hdpe_bottle' || item?.guide_template === 'broad_food_container');
   $('material-note').textContent = item?.special_handling ? 'Saran tetap memilih satu metode. Ikuti peringatan dan rute pengelola khusus untuk benda ini.' :
+    item?.object_key === 'hdpe_bottle' ? 'Konfirmasi HDPE/kode 2 dan isi sebelumnya. Kode resin tidak menjamin aman dipakai ulang. Panduan ini hanya mencakup bekas pangan/minuman.' :
+    item?.guide_template === 'broad_food_container' ? 'Konfirmasikan isi sebelumnya. Panduan ini hanya mencakup bekas pangan/minuman; kemasan bekas bahan kimia memerlukan pengelola khusus.' :
     item?.guide_template === 'food' ? 'Saran Reduce membantu mencegah sisa makanan berikutnya. Foto tidak memastikan makanan aman dikonsumsi.' :
     item?.guide_template === 'toothbrush' ? 'Konfirmasikan sikat gigi plastik manual, tanpa baterai/listrik. Sikat elektrik harus mengikuti panduan elektronik khusus.' :
-    item && ['tableware','reuse'].includes(item.guide_template) ? 'Untuk saran pakai ulang, konfirmasikan bersih, utuh, masih layak, dan ingin digunakan kembali.' :
+    item?.guide_template === 'tableware' ? 'Utuh dan masih layak? Peralatan kotor biasa bisa disarankan Reuse setelah dicuci; isi jenis kotoran dan kemampuan dibersihkan.' :
+    item?.guide_template === 'reuse' ? 'Untuk saran pakai ulang, konfirmasikan kebersihan, keutuhan, kelayakan dan niat penggunaan kembali.' :
     'Bentuk benda belum memastikan bahannya. Konfirmasikan material yang kamu ketahui.';
 }
 function providerNote() {
@@ -294,14 +316,25 @@ function providerNote() {
 function renderRecommendation(result) {
   $('recommendation-empty').hidden = true; $('recommendation-result').hidden = false;
   const methodNames = {REDUCE:'Reduce',REUSE:'Reuse',RECYCLE:'Recycle',TRASH:'Trash'};
-  $('method').textContent = result.status === 'READY' ? methodNames[result.recommended_method] : 'Saran belum tersedia';
+  $('method').textContent = result.status === 'READY' ? methodNames[result.recommended_method] : result.status === 'NEEDS_CONTEXT' ? 'Lengkapi kondisi' : 'Saran belum tersedia';
   $('recommendation-source').textContent = result.status === 'READY' ? (result.provider === 'fixture' ? 'Simulasi' : 'Gemini langsung') : 'Panduan & kebijakan';
   $('reason').textContent = result.reason;
+  $('recommendation-basis').hidden = result.status !== 'READY';
+  $('recommendation-basis').textContent = result.recommendation_basis === 'CONDITIONAL' ?
+    'Saran sementara · periksa syarat sebelum bertindak' : 'Berdasarkan kondisi yang kamu isi';
   $('reason-code').hidden = !result.reason_code;
   $('reason-code').textContent = messages[result.reason_code] || result.reason_code || '';
+  if (result.missing_context?.length) {
+    const names = {'risk_type':'jenis risiko','condition.cleanliness':'kebersihan','condition.integrity':'keutuhan',
+      'condition.reusable':'kelayakan pakai','condition.cleanable':'kemampuan dibersihkan','condition.soiling':'jenis kotoran',
+      'condition.former_contents':'isi sebelumnya',
+      'reuse_intention':'niat pakai ulang','recycling_access':'akses daur ulang','object_key':'jenis benda/material'};
+    $('reason-code').textContent += ' Isian: '+result.missing_context.map(field => names[field] || field).join(', ')+'.';
+  }
   $('recommendation-scope').hidden = !result.recommendation_scope;
   $('recommendation-scope').textContent = result.recommendation_scope === 'PREVENTION' ?
-    'Pencegahan untuk penggunaan berikutnya. Ini bukan instruksi pembuangan benda saat ini.' : 'Penanganan untuk benda yang dikonfirmasi.';
+    'Pencegahan untuk penggunaan berikutnya. Ini bukan instruksi pembuangan benda saat ini.' :
+    result.recommendation_basis === 'CONDITIONAL' ? 'Rencana penanganan bersyarat. Kondisi yang kosong tetap belum diketahui.' : 'Penanganan untuk benda yang dikonfirmasi.';
   $('handling-steps').replaceChildren();
   for (const step of result.steps) { const li = document.createElement('li'); li.textContent = step; $('handling-steps').append(li); }
   $('caution').hidden = !result.caution;
@@ -310,8 +343,15 @@ function renderRecommendation(result) {
   for (const url of result.source_urls) {
     if (!url.startsWith('https://')) continue;
     const li = document.createElement('li'), link = document.createElement('a');
-    link.href = url; link.textContent = new URL(url).hostname + new URL(url).pathname; link.target = '_blank'; link.rel = 'noopener noreferrer';
-    li.append(link); $('source-list').append(li);
+    const reference = result.source_details?.find(source => source.url === url);
+    link.href = url; link.textContent = reference?.title || new URL(url).hostname + new URL(url).pathname; link.target = '_blank'; link.rel = 'noopener noreferrer';
+    li.append(link);
+    if (reference) {
+      const note = document.createElement('p'); note.className = 'field-help';
+      note.textContent = `${reference.publisher} · ${reference.region}${reference.checked_at ? ' · diperiksa '+reference.checked_at : ''}. ${reference.scope_note}`;
+      li.append(note);
+    }
+    $('source-list').append(li);
   }
   $('evidence-note').textContent = `${result.guide_status === 'DRAFT' ? 'Panduan draf untuk demo; belum review lokal. ' : ''}${result.evidence_ids.length ? 'Evidence: '+result.evidence_ids.join(', ') : 'Tidak ada metode otomatis yang dipilih.'}`;
   setStep(4);
@@ -328,13 +368,14 @@ async function requestRecommendation(event) {
   const input = {client_request_id:recRequestId,detection_id:manualMode ? null : detection.detection_id,
     object_id:manualMode ? null : selected.object_id,manual:manualMode,confirmed_object:true,provider:$('provider').value,
     context:{object_key:item.object_key,category:item.category,condition:{cleanliness:$('cleanliness').value,
-      integrity:$('integrity').value,reusable:$('reusable').value},reuse_intention:intention === '' ? null : intention === 'true',risk_flag:$('risk').checked,
+      integrity:$('integrity').value,reusable:$('reusable').value,cleanable:$('cleanable').value,soiling:$('soiling').value,former_contents:$('former-contents').value},reuse_intention:intention === '' ? null : intention === 'true',risk_flag:$('risk').checked,
+      risk_type:$('risk-type').value,
       recommendation_goal:$('recommendation-goal').value,recycling_access:$('recycling-access').value}};
   try {
     const response = await api('recommend',{method:'POST',signal:recController.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify(input)});
     if (version !== recVersion) return;
     renderRecommendation(response.data);
-    if (response.data.status === 'UNAVAILABLE') recRequestId = null;
+    if (response.data.status !== 'READY') recRequestId = null;
     message(response.data.status === 'READY' ? 'Saran siap ditinjau. Periksa sumber dan pastikan sesuai dengan tindakan yang akan kamu lakukan.' :
       (messages[response.data.reason_code] || 'Saran otomatis belum tersedia. Kamu tetap bisa melihat panduan dan melanjutkan manual.'),response.data.status === 'READY' ? '' : 'warning');
   } catch (error) { if (version === recVersion && error.name !== 'AbortError') message(error.message,'error'); }
@@ -343,12 +384,13 @@ async function requestRecommendation(event) {
 function renderCatalog() {
   const query = $('catalog-search').value.trim().toLocaleLowerCase('id'); $('catalog').replaceChildren();
   for (const item of config.catalog.items) {
-    const supported = item.baseline_class_id !== null;
+    const modelLabel = config.supported_object_labels[item.object_key];
+    const supported = Boolean(modelLabel);
     if (catalogFilter === 'detected' && !supported || catalogFilter === 'manual' && supported || catalogFilter === 'special' && !item.special_handling) continue;
     if (query && !`${item.label} ${item.object_key} ${item.baseline_raw_class || ''} ${item.category}`.toLocaleLowerCase('id').includes(query)) continue;
     const button = document.createElement('button'); button.type = 'button'; button.className = 'catalog-item';
     const title = document.createElement('strong'), note = document.createElement('small'); title.textContent = item.label;
-    note.textContent = item.special_handling ? 'Penanganan khusus' : !supported ? 'Pilih manual · belum ada kelas YOLO' : `${rawLabel(item.baseline_raw_class)} · konfirmasi material`;
+    note.textContent = item.special_handling ? 'Penanganan khusus' : !supported ? 'Pilih manual · belum didukung model aktif' : `${rawLabel(modelLabel)} · konfirmasi material`;
     button.append(title,note); button.addEventListener('click',() => chooseManual(item.object_key)); $('catalog').append(button);
   }
   if (!$('catalog').children.length) { const p = document.createElement('p'); p.textContent = 'Tidak ada objek yang cocok dengan pencarian.'; $('catalog').append(p); }
@@ -356,9 +398,9 @@ function renderCatalog() {
 async function initialize() {
   try {
     config = await api('config');
-    const supported = new Set(config.catalog.items.filter(x => x.baseline_class_id !== null).map(x => x.baseline_class_id)).size;
+    const supported = config.supported_visual_classes;
     $('engine-status').textContent = 'YOLO siap · '+(config.gemini_configured ? 'Gemini dikonfigurasi' : 'Gemini perlu konfigurasi');
-    $('catalog-summary').textContent = `${supported} kelas visual terhubung ke ${config.catalog.items.length} pilihan benda/material. Jelajahi contoh di bawah, atau cari objek yang ingin kamu coba.`;
+    $('catalog-summary').textContent = `${supported} kelas visual aktif mendukung ${Object.keys(config.supported_object_labels).length} dari ${config.catalog.items.length} pilihan benda/material. Pilihan lainnya tersedia secara manual.`;
     $('draft-label').textContent = config.demo_guides ? 'Panduan draf · demo' : 'Panduan ditinjau saja';
     fillObjectOptions([]); renderCatalog(); providerNote(); updateForm();
     // Running the demo opens the camera permission flow; upload still needs a click.
@@ -375,7 +417,11 @@ $('file').addEventListener('change',() => filePhoto($('file').files[0]));
 $('manual').addEventListener('click',() => chooseManual());
 $('context-form').addEventListener('submit',requestRecommendation);
 $('object-key').addEventListener('change',() => { resetConditions(); clearRecommendation(); updateMaterialNote(); setStep(3); });
-['cleanliness','integrity','reusable','reuse-intention','recommendation-goal','recycling-access','risk','confirmed','provider'].forEach(id => $(id).addEventListener('change',() => { clearRecommendation(); providerNote(); setStep(3); }));
+['cleanliness','integrity','reusable','cleanable','soiling','former-contents','reuse-intention','recommendation-goal','recycling-access','risk','risk-type','confirmed','provider'].forEach(id => $(id).addEventListener('change',() => {
+  if (id === 'soiling' && $('soiling').value === 'HAZARDOUS') { $('risk').checked = true; $('risk-type').value = 'CHEMICAL'; }
+  if (id === 'former-contents' && $('former-contents').value === 'CHEMICAL') { $('risk').checked = true; $('risk-type').value = 'CHEMICAL'; }
+  updateConditionDetails(); clearRecommendation(); providerNote(); setStep(3);
+}));
 $('catalog-search').addEventListener('input',renderCatalog);
 $('catalog-filters').addEventListener('click',event => { const button = event.target.closest('button[data-filter]'); if (!button) return; catalogFilter = button.dataset.filter; for (const b of $('catalog-filters').children) b.classList.toggle('active',b === button); renderCatalog(); });
 document.addEventListener('visibilitychange',() => { if (document.hidden) stopCamera(); });

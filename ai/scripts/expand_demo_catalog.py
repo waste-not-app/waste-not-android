@@ -76,6 +76,6 @@ for key,label,category,class_id,raw,template in rows:
                   "special_handling":template in {"electronics","sharp"},
                   "baseline_raw_class":raw,"baseline_class_id":class_id,
                   "requires_material_confirmation":True,"guide_template":template}
-catalog.update(catalog_version="demo-catalog-03", mapping_version="coco-reviewed-objects-03",items=list(items.values()))
+catalog.update(catalog_version="demo-catalog-05", mapping_version="coco-reviewed-objects-03",items=list(items.values()))
 (root / "catalog.json").write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"catalog_items":len(items),"supported_raw_classes":len({x['baseline_raw_class'] for x in items.values() if x['baseline_raw_class']})}))

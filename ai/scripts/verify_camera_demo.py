@@ -10,16 +10,18 @@ from playwright.sync_api import expect, sync_playwright
 parser = argparse.ArgumentParser()
 parser.add_argument("--url",default="http://127.0.0.1:8092")
 parser.add_argument("--live-gemini",action="store_true")
+parser.add_argument("--artifact-dir",type=Path)
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
-(root / "artifacts").mkdir(exist_ok=True)
+artifacts = args.artifact_dir.resolve() if args.artifact_dir else root / "artifacts"
+(artifacts).mkdir(parents=True,exist_ok=True)
 # Chromium subprocesses may write debug.log relative to cwd even with --log-file.
-os.chdir(root / "artifacts")
+os.chdir(artifacts)
 errors = []
 checks = []
 with sync_playwright() as playwright:
     browser = playwright.chromium.launch(headless=True,args=["--use-fake-ui-for-media-stream","--use-fake-device-for-media-stream",
-                                                           "--log-file="+str(root / "artifacts/chromium-debug.log")])
+                                                           "--log-file="+str(artifacts / "chromium-debug.log")])
     context = browser.new_context(viewport={"width":1440,"height":1100},permissions=["camera"])
     page = context.new_page()
     page.on("pageerror",lambda error:errors.append(str(error)))
@@ -41,13 +43,14 @@ with sync_playwright() as playwright:
     page.locator("#cleanliness").select_option("CLEAN")
     page.locator("#integrity").select_option("INTACT")
     page.locator("#reuse-intention").select_option("false")
+    page.locator("#recycling-access").select_option("YES")
     page.locator("#provider").select_option("fixture")
     page.locator("#confirmed").check()
     page.locator("#recommend").click()
     expect(page.locator("#method")).to_have_text("Recycle")
     assert page.locator("#recommendation-source").inner_text() == "Simulasi"
     checks.append("real_yolo_selectable_bbox_fixture_recommendation")
-    page.screenshot(path=str(root / "artifacts/camera-demo-desktop.png"),full_page=True)
+    page.screenshot(path=str(artifacts / "camera-demo-desktop.png"),full_page=True)
     # Controlled delayed response: changing context must discard an old answer,
     # even if a transport ignores AbortSignal. This makes no provider request.
     page.evaluate("""() => {
@@ -82,7 +85,7 @@ with sync_playwright() as playwright:
         assert page.locator("#method").inner_text() == "Recycle",page.locator("#global-message").inner_text()
         assert page.locator("#recommendation-source").inner_text() == "Gemini langsung"
         checks.append("live_gemini_browser_recommendation")
-        page.screenshot(path=str(root / "artifacts/camera-demo-gemini.png"),full_page=True)
+        page.screenshot(path=str(artifacts / "camera-demo-gemini.png"),full_page=True)
     page.locator("#integrity").select_option("INTACT")
     page.locator("#recommendation-goal").select_option("PREVENTION")
     page.locator("#recommend").click()
@@ -115,6 +118,7 @@ with sync_playwright() as playwright:
     page.locator("#catalog-search").fill("baterai")
     page.locator(".catalog-item").click()
     assert page.locator("#selected-label").inner_text() == "Pilihan manual"
+    page.locator("#recycling-access").select_option("YES")
     page.locator("#confirmed").check()
     page.locator("#recommend").click()
     expect(page.locator("#method")).to_have_text("Recycle",timeout=30000)
@@ -133,12 +137,80 @@ with sync_playwright() as playwright:
     if args.live_gemini:
         expect(page.locator("#recommendation-source")).to_have_text("Gemini langsung")
     checks.append("broken_drinking_glass_has_trash_reason_sources_and_no_reuse_steps")
-    page.screenshot(path=str(root / "artifacts/camera-demo-special-classification.png"),full_page=True)
+    page.screenshot(path=str(artifacts / "camera-demo-special-classification.png"),full_page=True)
+    page.locator("#catalog-search").fill("Cangkir keramik")
+    page.locator(".catalog-item").click()
+    page.locator("#cleanliness").select_option("DIRTY")
+    expect(page.locator("#cleaning-details")).to_be_visible()
+    page.locator("#integrity").select_option("INTACT")
+    page.locator("#reusable").select_option("YES")
+    page.locator("#reuse-intention").select_option("true")
+    page.locator("#soiling").select_option("FOOD_DRINK")
+    page.locator("#cleanable").select_option("YES")
+    page.locator("#risk").check()
+    expect(page.locator("#risk-details")).to_be_visible()
+    page.locator("#confirmed").check()
+    page.locator("#recommend").click()
+    expect(page.locator("#method")).to_have_text("Lengkapi kondisi")
+    expect(page.locator("#reason")).to_contain_text("jenisnya belum dijelaskan")
+    checks.append("unknown_risk_asks_for_context_instead_of_reduce")
+    page.locator("#risk").uncheck()
+    page.locator("#recommend").click()
+    expect(page.locator("#method")).to_have_text("Reuse",timeout=30000)
+    expect(page.locator("#reason")).to_contain_text("setelah dicuci")
+    expect(page.locator("#handling-steps")).to_contain_text("cuci")
+    assert page.locator("#cleanliness").input_value() == "DIRTY"
+    expect(page.locator("#source-list")).to_contain_text("Pemerintah Kabupaten Banjarnegara")
+    expect(page.locator("#source-list")).to_contain_text("Amerika Serikat")
+    checks.append("washable_dirty_ceramic_mug_is_reuse_with_scoped_sources")
+    page.screenshot(path=str(artifacts / "camera-demo-washable-mug.png"),full_page=True)
+    page.locator("#soiling").select_option("HAZARDOUS")
+    expect(page.locator("#risk")).to_be_checked()
+    page.locator("#recommend").click()
+    expect(page.locator("#method")).to_have_text("Saran belum tersedia")
+    expect(page.locator("#reason-code")).to_contain_text("kontaminasi")
+    assert "Reduce" not in page.locator("#method").inner_text()
+    checks.append("hazardous_contamination_does_not_get_ordinary_washing_or_reduce")
+    page.locator("#catalog-search").fill("Cangkir keramik")
+    page.locator(".catalog-item").click()
+    page.locator("#provider").select_option("fixture")
+    page.locator("#confirmed").check()
+    page.locator("#recommend").click()
+    expect(page.locator("#method")).to_have_text("Reuse", timeout=30000)
+    expect(page.locator("#recommendation-basis")).to_contain_text("Saran sementara")
+    expect(page.locator("#reason")).to_contain_text("belum lengkap")
+    assert page.locator("#cleanliness").input_value() == "UNKNOWN"
+    assert page.locator("#integrity").input_value() == "UNKNOWN"
+    assert page.locator("#reuse-intention").input_value() == ""
+    page.screenshot(path=str(artifacts / "camera-demo-conditional.png"), full_page=True)
+    checks.append("empty_optional_context_returns_conditional_advice_without_filling_unknowns")
+    page.locator("#reusable").select_option("NO")
+    expect(page.locator("#recommendation-result")).to_be_hidden()
+    checks.append("conditional_advice_cleared_when_known_condition_changes")
+    for label in ("Kaleng baja/tinplate", "Wadah makanan plastik / foam"):
+        page.locator("#catalog-search").fill(label)
+        page.locator(".catalog-item").click()
+        expect(page.locator("#former-contents-field")).to_be_visible()
+        assert page.locator("#former-contents").input_value() == "UNKNOWN"
+        page.locator("#cleanliness").select_option("CLEAN")
+        page.locator("#recycling-access").select_option("YES")
+        page.locator("#confirmed").check()
+        page.locator("#recommend").click()
+        expect(page.locator("#method")).to_have_text("Lengkapi kondisi")
+        expect(page.locator("#reason-code")).to_contain_text("isi sebelumnya")
+        page.locator("#former-contents").select_option("FOOD_DRINK")
+        expect(page.locator("#recommendation-result")).to_be_hidden()
+        page.locator("#recommend").click()
+        expect(page.locator("#method")).to_have_text("Recycle")
+        page.locator("#former-contents").select_option("CHEMICAL")
+        page.locator("#recommend").click()
+        expect(page.locator("#method")).to_have_text("Saran belum tersedia")
+        checks.append("prior_contents_reachable_and_hazard_blocked_" + label)
     page.set_viewport_size({"width":390,"height":844})
     page.locator("#clear").click()
     expect(page.locator("#photo-stage")).to_be_hidden()
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
-    page.screenshot(path=str(root / "artifacts/camera-demo-mobile.png"),full_page=True)
+    page.screenshot(path=str(artifacts / "camera-demo-mobile.png"),full_page=True)
     checks.append("mobile_layout_and_photo_cleanup")
     # Denial is exercised with a fresh browser context and a controlled API rejection.
     denied = browser.new_context(viewport={"width":390,"height":844})
@@ -151,6 +223,6 @@ with sync_playwright() as playwright:
     assert not errors,errors
     report = {"checks":checks,"browser_errors":errors,"camera":"fake Chromium device; physical camera not accessed",
               "real_yolo":True,"live_gemini":args.live_gemini}
-    (root / "artifacts/camera-demo-browser.json").write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
+    (artifacts / "camera-demo-browser.json").write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
     print(json.dumps(report,indent=2))
     browser.close()

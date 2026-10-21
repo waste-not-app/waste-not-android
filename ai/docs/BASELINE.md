@@ -2,13 +2,19 @@
 
 Tanggal: 20 Oktober 2026. Status: eksperimen lokal, belum release pilot.
 
+## Fine-tuning publik setelah baseline
+
+YOLO11n sudah dilatih pada 4.572 gambar beranotasi Drinking Waste v2 untuk kaleng, botol kaca, HDPE dan PET. Training berhenti pada epoch 30, terbaik epoch 18. Test eksploratif: mAP50=0,926; mAP50:95=0,735. Recall lokalisasi botol meningkat, precision menurun; cakupan hanya empat kelas dan split tidak membuktikan identitas benda fisik yang berbeda. Default COCO tetap tersedia. [Hasil lengkap, hash dan bukti Gemini langsung](FINETUNING_RESULTS.md). Pemeriksaan terbaru: 127 tes Python, 14 pemeriksaan browser baseline fixture, tiga pemeriksaan browser model final + Gemini langsung, dan verifikasi wheel lulus.
+
 ## Pembaruan demo kamera
 
 Demo kamera browser ditambahkan setelah baseline awal di bawah. Katalog versi `demo-catalog-03` / mapping `coco-reviewed-objects-03` kini mempunyai 68 pilihan benda/material dan 58 kelas visual COCO yang relevan. Angka/hasil baseline lama tetap menunjukkan cakupan awal; label seperti meja dan piza sekarang dapat dipilih, dengan panduan pencegahan atau penanganan sesuai evidence.
 
 Gemini kini **sudah diuji langsung** memakai konfigurasi lokal pengguna: adapter CLI menghasilkan READY/RECYCLE pada konteks botol kaca. Pengujian browser juga berhasil melalui YOLO nyata → bbox botol → konfirmasi → Gemini langsung → rekomendasi tervalidasi. Pembaruan empat metode juga diuji live di browser: botol kaca → RECYCLE, botol dengan fokus pencegahan → REDUCE, buku layak pakai ulang → REUSE, dan sikat gigi plastik manual tidak layak tanpa akses daur ulang khusus → TRASH. Tiap hasil memiliki satu label, alasan dan tautan sumber yang sesuai. API key tidak dicatat dalam laporan atau dikirim ke browser.
 
-Pengujian Python terbaru: **93 tes lulus** untuk policy, mapping, worker serta API demo lokal, termasuk rotasi key, klasifikasi risiko, koreksi objek berisiko pada CLI dan deadline Gemini. Pengujian browser: **12 pemeriksaan lulus, tanpa error JavaScript**, menggunakan kamera palsu Chromium, termasuk capture yang menghentikan track, file JPEG untuk YOLO nyata, bbox bertumpuk, pilihan objek, empat label Gemini live, perubahan kondisi, peringatan risiko, katalog manual, foto dibersihkan, viewport 390 px dan kamera ditolak. Kamera fisik tetap perlu dicoba oleh pengguna.
+Pengujian Python terbaru: **114 tes lulus** untuk policy, mapping, worker serta API demo lokal, termasuk rotasi key, klasifikasi risiko, koreksi objek berisiko, deadline Gemini dan mutu panduan. Pengujian browser: **15 pemeriksaan lulus, tanpa error JavaScript**, menggunakan kamera palsu Chromium, YOLO nyata, empat label Gemini live, konteks pencucian, risiko ambigu/berbahaya, sumber berwilayah, perubahan kondisi, viewport 390 px dan kamera ditolak. Kamera fisik tetap perlu dicoba oleh pengguna.
+
+Policy-04 memperbaiki kasus pengguna: cangkir keramik DIRTY/INTACT/YES dengan niat reuse=true, cleanable=YES dan soiling=FOOD_DRINK berhasil mendapat **READY/REUSE setelah dicuci** melalui Gemini di browser. Input tetap DIRTY. Checkbox risiko tanpa jenis menghasilkan NEEDS_CONTEXT tanpa Gemini; kontaminasi kimia tidak menghasilkan Reuse/Trash/Reduce otomatis. Screenshot lokal: `ai/artifacts/camera-demo-washable-mug.png`. Registri sumber kini meliputi penerbit, wilayah dan batas cakupan, termasuk rujukan Pemkab Banjarnegara. Rincian dan batas evaluasi: [GUIDE_QUALITY](GUIDE_QUALITY.md).
 
 Review sebelum publikasi menemukan dan memperbaiki dua masalah: CLI sekarang mempertahankan risiko dari objek deteksi meskipun material/jenis dikoreksi; Gemini kini memiliki deadline keseluruhan yang dapat membatalkan request, dan menolak respons terlambat. Kedua jalur mendapat tes regresi. Smoke worker dengan YOLO nyata, browser dengan Gemini live, dan build wheel beserta resource/exclusion verifier kembali lulus. Workflow AI CI menjalankan tes offline tanpa key/model/foto pengguna.
 
@@ -60,7 +66,7 @@ YOLO nyata → object-3/bottle → konteks uji glass_bottle/CLEAN/INTACT → pan
 ## Yang belum dibuktikan
 
 - Evaluasi kualitas Gemini pada kumpulan kasus pilot: belum dilakukan. Smoke live berhasil sebagaimana pembaruan di atas; satu hasil sukses tidak membuktikan kualitas pada seluruh kelas.
-- Lima kelas target: belum ada dataset pilot berlisensi dan holdout, belum fine-tuning.
+- Lima kelas target pilot: belum lengkap. Fine-tuning publik empat kelas sudah selesai sebagaimana pembaruan di atas; kardus/baterai dan holdout pilot lokal belum tersedia.
 - Konten: seluruh 68 panduan masih DRAFT, belum review penanggung jawab lokal.
 - Integrasi produksi: auth/sesi/idempotensi/budget/retensi Go, kamera Android dan AT-AI-01–18 belum diuji oleh prototipe CLI ini.
 
