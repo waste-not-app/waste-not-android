@@ -221,7 +221,7 @@ private fun ActivityQuantity(log: WasteLog, modifier: Modifier = Modifier) {
     }
 }
 
-private val WasteCategory.iconResource: Int get() = when (this) {
+internal val WasteCategory.iconResource: Int get() = when (this) {
     WasteCategory.ORGANIC -> R.drawable.ic_leaf
     WasteCategory.PLASTIC -> R.drawable.ic_bottle
     WasteCategory.PAPER -> R.drawable.ic_paper
@@ -261,14 +261,6 @@ fun ProfileScreen(user: User, data: WorkspaceUiState, demo: Boolean, theme: Them
         TextButton(onClick = onTheme, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.theme_setting, stringResource(theme.label))) }
         Text(stringResource(R.string.app_version, com.example.wastenot.BuildConfig.VERSION_NAME), style = MaterialTheme.typography.bodySmall)
         ActionButton(stringResource(R.string.logout_action), onLogout, Modifier.fillMaxWidth(), destructive = true)
-    }
-}
-
-@Composable
-fun GuidePlaceholderScreen(demo: Boolean, padding: PaddingValues, modifier: Modifier = Modifier) {
-    ScrollPage(padding, modifier) {
-        Text(stringResource(R.string.guide_pending_title), style = MaterialTheme.typography.headlineSmall)
-        Text(stringResource(R.string.guide_pending_message))
     }
 }
 

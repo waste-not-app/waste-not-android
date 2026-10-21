@@ -1,6 +1,6 @@
 # Checkpoint dock, Beranda dan dummy
 
-Kelanjutan S07/S10 tersedia pada [bukti Riwayat dan filter](HISTORY.md), S08/D01 pada [bukti Detail dan hapus](DETAIL.md), S06 pada [bukti feedback simpan](SAVE.md), S05/S09 pada [bukti editor Catat/Ubah](EDITOR.md), serta retry/hasil simpan belum pasti pada [bukti submission](SUBMISSION.md), serta transisi editor dan gestur keyboard pada [bukti navigasi](NAVIGATION_MOTION.md), serta gradasi/label tombol utama pada [bukti C03](ACTIONS.md). Angka tes pada halaman ini merujuk checkpoint awal `1693e7c`, bukan total source terbaru.
+Kelanjutan S07/S10 tersedia pada [bukti Riwayat dan filter](HISTORY.md), S08/D01 pada [bukti Detail dan hapus](DETAIL.md), S06 pada [bukti feedback simpan](SAVE.md), S05/S09 pada [bukti editor Catat/Ubah](EDITOR.md), serta retry/hasil simpan belum pasti pada [bukti submission](SUBMISSION.md), serta transisi editor dan gestur keyboard pada [bukti navigasi](NAVIGATION_MOTION.md), serta gradasi/label tombol utama pada [bukti C03](ACTIONS.md), dan S11/S12 serta viewport selama transisi pada [bukti Panduan](GUIDE.md). Angka tes pada halaman ini merujuk checkpoint awal `1693e7c`, bukan total source terbaru.
 
 19 Oktober 2026. Branch `codex/android-iteration-2-design`, dasar `ceb8707`. Ini bukti untuk perubahan checkpoint, **bukan penerimaan seluruh layar WasteNot**. Matriks pekerjaan lengkap ada di [Iteration 2](../../tasks/ITERATION_2_DESIGN.md).
 
@@ -46,4 +46,4 @@ Pada teks 200%, konten Beranda dapat digulir dan label tab membungkus. Screensho
 
 ## Pekerjaan berikutnya
 
-Lengkapi komposisi/form/detail/feedback, Riwayat dan filter sheet, Panduan/detail, Statistik/grafik, Profil/achievement/pengaturan, lalu alur foto/AI sesuai matriks Iteration 2. Audit state kosong/error dan proses mati setelah masing-masing alur tersedia. Backend HTTP diintegrasikan setelah layanan ada; stub kamera dan placeholder Panduan masih terlihat dan belum siap sebagai hasil akhir.
+Lanjutkan kriteria editor/konflik/draf, cursor Riwayat, penerimaan Panduan, Statistik/grafik, Profil/achievement/pengaturan, serta alur foto/AI sesuai matriks Iteration 2. Audit state kosong/error dan proses mati setelah masing-masing alur tersedia. Placeholder Panduan sudah diganti daftar/detail dengan fixture editorial kit. Backend HTTP diintegrasikan setelah layanan ada; kamera masih berupa stub dan seluruh UI belum siap sebagai hasil akhir.

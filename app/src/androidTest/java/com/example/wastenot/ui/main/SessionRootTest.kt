@@ -26,7 +26,7 @@ class SessionRootTest {
     private val tabs = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)
     private fun start(source: FixtureSession) {
         compose.setContent { WasteNotTheme(darkTheme = false) {
-            MainNavigation(source, CoreRepository(null), ThemeMode.LIGHT, {}, Modifier.fillMaxSize())
+            MainNavigation(source, CoreRepository(null), com.example.wastenot.data.dummy.DummyGuideStore(), ThemeMode.LIGHT, {}, Modifier.fillMaxSize())
         } }
         compose.waitForIdle()
     }
@@ -43,7 +43,8 @@ class SessionRootTest {
         source.bootstrapTarget = SessionState.SignedOut(SignOutReason.EXPIRED)
         compose.onNodeWithText("Coba lagi").performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Lihat data contoh").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Masuk").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Lihat data contoh").assertDoesNotExist()
         assertEquals(2, source.bootstrapCalls)
         compose.onNodeWithText("Fixture A").assertDoesNotExist()
         compose.runOnIdle { source.state.value = SessionState.Authenticated(source.user.copy(
@@ -88,7 +89,7 @@ class SessionRootTest {
         val source = FixtureSession(demo = true)
         start(source)
         compose.onNodeWithText("Belum punya akun? Daftar").performScrollTo().performClick()
-        compose.onNodeWithText("Buat akun contoh").performScrollTo().performClick()
+        compose.onNodeWithText("Buat akun").performScrollTo().performClick()
         compose.onNode(hasText("Nama") and hasSetTextAction()).assertIsFocused()
         assertEquals(0, source.registerCalls)
         compose.onNode(hasText("Nama") and hasSetTextAction()).performTextReplacement("Sam Demo")
@@ -96,7 +97,7 @@ class SessionRootTest {
         compose.onNode(hasText("Kata sandi") and hasSetTextAction()).performTextReplacement(" fixture-password-12 ")
         val confirmation = compose.onNode(hasText("Konfirmasi kata sandi") and hasSetTextAction())
         confirmation.performTextReplacement("fixture-password-12")
-        compose.onNodeWithText("Buat akun contoh").performScrollTo().performClick()
+        compose.onNodeWithText("Buat akun").performScrollTo().performClick()
         compose.onNodeWithText("Konfirmasi kata sandi belum sama.").assertExists()
         assertEquals(0, source.registerCalls)
         confirmation.performTextReplacement(" fixture-password-12 ")
@@ -109,6 +110,21 @@ class SessionRootTest {
         compose.onNodeWithText("Zona waktu: ${source.receivedTimezone!!.id}").assertIsDisplayed()
         assertEquals(1, source.registerCalls)
         compose.onNodeWithText("Buat akun contoh").assertDoesNotExist()
+    }
+
+    @Test fun aNewAccountLifetimeDoesNotRestoreThePreviousGuideQuery() {
+        val source = FixtureSession(demo = true).apply { state.value = SessionState.Authenticated(user, 1) }
+        start(source)
+        compose.onNode(tabs and hasText("Panduan")).performClick()
+        compose.onNodeWithContentDescription("Cari panduan").performTextReplacement("karton")
+        compose.onNodeWithContentDescription("Cari panduan").performImeAction()
+        compose.runOnIdle { source.state.value = SessionState.SignedOut() }
+        compose.waitUntil(5_000) { compose.onAllNodes(hasText("Masuk") and hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
+        compose.onAllNodes(tabs).assertCountEquals(0)
+        compose.runOnIdle { source.state.value = SessionState.Authenticated(source.user, 2) }
+        compose.waitUntil(5_000) { compose.onAllNodes(tabs and hasText("Panduan")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNode(tabs and hasText("Panduan")).performClick()
+        assertEquals("", compose.onNodeWithContentDescription("Cari panduan").fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
     }
 
     private class FixtureSession(private val demo: Boolean = false) : AccountSession {

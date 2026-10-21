@@ -1,5 +1,7 @@
 # A10: Dock lima tujuan dan action Catat
 
+Checkpoint lanjutan: [QA Panduan dan frame navigasi](../qa/iteration-2/GUIDE.md). Fungsi dock/rail tetap diuji pada 360/600 dp dan teks 200%, tetapi screenshot detail gelap API 24/SwiftShader memperlihatkan bidang Catat/Scan tanpa ikon/teks. Temuan visual ini belum ditutup oleh tes semantics/tap; bukti asli dan batas reproduksinya dicatat pada QA. A10 tetap dalam pengerjaan untuk penerimaan visual.
+
 Issue [#33](https://github.com/waste-not-app/waste-not-android/issues/33), branch `codex/android-auth-navigation`, Siap review client.
 
 ## Implementasi

@@ -18,12 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -35,8 +39,8 @@ import com.example.wastenot.data.dummy.DummyActivityStore
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.data.repository.RemoteActivityStore
+import com.example.wastenot.data.repository.GuideStore
 import com.example.wastenot.model.User
-import com.example.wastenot.theme.Accent
 import com.example.wastenot.theme.OnAccent
 import com.example.wastenot.theme.ThemeMode
 import com.example.wastenot.theme.LocalWasteNotGradients
@@ -59,6 +63,7 @@ fun AccountNavigation(
     user: User,
     demo: Boolean,
     core: CoreRepository,
+    guideStore: GuideStore,
     theme: ThemeMode,
     onTheme: () -> Unit,
     onLogout: () -> Unit,
@@ -72,6 +77,14 @@ fun AccountNavigation(
     } } }
     val model: WorkspaceViewModel = viewModel(factory = factory)
     val data by model.state.collectAsStateWithLifecycle()
+    val guideFactory = remember(guideStore) { viewModelFactory { initializer {
+        GuideViewModel(guideStore, createSavedStateHandle())
+    } } }
+    val guides: GuideViewModel = viewModel(factory = guideFactory)
+    val guideData by guides.state.collectAsStateWithLifecycle()
+    val uriHandler = LocalUriHandler.current
+    val focus = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
     LaunchedEffect(model) { model.load() }
     var selected by rememberSaveable { mutableStateOf(MainTab.HOME) }
     val stacks = MainTab.entries.associateWith { rememberNavBackStack(it.key) }
@@ -90,6 +103,12 @@ fun AccountNavigation(
     var deletedNotice by rememberSaveable { mutableStateOf(false) }
     var savedNoticeId by rememberSaveable { mutableStateOf<String?>(null) }
     var savedWasCreated by rememberSaveable { mutableStateOf(false) }
+    fun selectTab(tab: MainTab) { focus.clearFocus(); keyboard?.hide(); selected = tab }
+    fun guideList() {
+        val guideStack = stacks.getValue(MainTab.GUIDE)
+        while (guideStack.size > 1) guideStack.removeLastOrNull()
+        selectTab(MainTab.GUIDE)
+    }
     fun history() {
         savedNoticeId = null
         if (stack.lastOrNull() is LogDetail) stack.removeLastOrNull()
@@ -110,13 +129,11 @@ fun AccountNavigation(
         if (current is LogDetail && current.id == savedNoticeId) savedNoticeId = null
         if (stack.size > 1) stack.removeLastOrNull() else if (selected != MainTab.HOME) selected = MainTab.HOME
     }
+    val latestBack by rememberUpdatedState({ back() })
     fun detail(id: String) {
         if ((stack.lastOrNull() as? LogDetail)?.id != id) stack.add(LogDetail(id))
     }
     val visibleDetail = current as? LogDetail
-    val visibleRead = data.detail?.takeIf { it.id == visibleDetail?.id }
-    val visibleLog = if (visibleRead != null) visibleRead.log else data.records.find { it.id == visibleDetail?.id }
-    val showingConfirmation = visibleDetail != null && visibleDetail.id == savedNoticeId && visibleLog != null
     LaunchedEffect(visibleDetail) { visibleDetail?.let { model.loadDetail(it.id) } }
     fun edit(id: String? = null) {
         if (stack.lastOrNull() !is LogEditor) stack.add(LogEditor(id, UUID.randomUUID().toString()))
@@ -172,76 +189,147 @@ fun AccountNavigation(
     BoxWithConstraints(modifier) {
         val rail = maxWidth >= 600.dp
         val railWidth = if (LocalDensity.current.fontScale >= 1.5f) 144.dp else 112.dp
-        Row(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas)) {
-            if (rail && editor == null) TabRail(selected, { selected = it }, { capture = true }, Modifier.width(railWidth).fillMaxHeight())
-            Scaffold(
-                modifier = Modifier.weight(1f).fillMaxHeight(),
-                containerColor = Color.Transparent,
-                topBar = { if (current != Home) TopAppBar(title = { Text(stringResource(when (current) {
-                    is LogDetail -> if (showingConfirmation) R.string.save_confirm_title else R.string.log_detail
-                    is LogEditor -> if (current.logId == null) R.string.log_create else R.string.log_edit
-                    else -> selected.label
-                }), style = MaterialTheme.typography.headlineMedium) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent), navigationIcon = {
-                    if (stack.size > 1 && !showingConfirmation) FilledIconButton(onClick = ::back, shape = MaterialTheme.shapes.small,
-                        colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                        modifier = Modifier.padding(start = 16.dp).size(48.dp)) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
-                }, actions = {
-                    if (current == History) FilledIconButton(onClick = { historyFilterOpen = true }, shape = MaterialTheme.shapes.medium,
-                        colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                        modifier = Modifier.padding(end = 12.dp).size(48.dp)) {
-                        Icon(painterResource(R.drawable.ic_filter), stringResource(R.string.filter_history))
-                    }
-                }) },
-                bottomBar = { if (!rail && current == selected.key) TabDock(selected, { selected = it }, { capture = true }) },
-            ) { padding ->
-                val pageInsets = PaddingValues(0.dp)
-                val provider = entryProvider {
-                    entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, ::history, ::detail, { model.load(true) }, Modifier.fillMaxSize(), onProfile = { selected = MainTab.PROFILE }) }
-                    entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
-                        today = date, filterOpen = historyFilterOpen, onOpenFilter = { historyFilterOpen = true }, onDismissFilter = { historyFilterOpen = false },
-                        deletedNotice = deletedNotice, onDismissNotice = { deletedNotice = false }) }
-                    entry<Guide> { GuidePlaceholderScreen(demo, pageInsets, Modifier.fillMaxSize()) }
-                    entry<Statistics> { StatisticsScreen(data, demo, date, pageInsets, { model.load(true) }, Modifier.fillMaxSize()) }
-                    entry<Profile> { ProfileScreen(user, data, demo, theme, pageInsets, onTheme, { leaving = true }, Modifier.fillMaxSize()) }
-                    entry<LogDetail> { key ->
-                        val read = data.detail?.takeIf { it.id == key.id }
-                        val log = if (read != null) read.log else data.records.find { it.id == key.id }
-                        val missing = read?.error == ApiFailureKind.NOT_FOUND || read?.error == ApiFailureKind.DELETED
-                        if (current == key && savedNoticeId == key.id && log != null) SaveConfirmationScreen(log, savedWasCreated, pageInsets,
-                            onView = { savedNoticeId = null }, onHome = ::home, modifier = Modifier.fillMaxSize())
-                        else LogDetailScreen(log, read == null || read.loading, read?.error != null && !missing, pageInsets,
-                            onEdit = { edit(key.id) },
-                            onDelete = { if (log != null && log.version > 0) { deletingId = log.id; deleteVersion = log.version } },
-                            onHistory = ::history, onRetry = { model.loadDetail(key.id) }, modifier = Modifier.fillMaxSize())
-                    }
-                    entry<LogEditor> { key ->
-                        val initial = data.detail?.takeIf { it.id == key.logId }?.log ?: data.records.find { it.id == key.logId }
-                        if (key.logId == null || initial != null) {
-                            val entryDraft = rememberSaveable(key.requestId, saver = EditorDraft.Saver) { EditorDraft.from(initial, date) }
-                            DisposableEffect(key.requestId, entryDraft) {
-                                activeEditorDraft = EditorEntryDraft(key.requestId, entryDraft)
-                                onDispose { if (activeEditorDraft?.requestId == key.requestId) activeEditorDraft = null }
-                            }
-                            val leavingAfterSave = current != key && entryDraft.locked && entryDraft.submissionError == null
-                            LogEditorScreen(entryDraft, date, user.timezone.id, demo, data.saving || leavingAfterSave, pageInsets,
-                                { model.save(it, key.logId, entryDraft.values.version, key.requestId) },
-                                { stack.removeLastOrNull(); history(); model.load(true) }, Modifier.fillMaxSize())
-                        } else WorkspaceLoading(data, { model.load(true) }, pageInsets, Modifier.fillMaxSize())
-                    }
-                }
-                val decorated = stacks.mapValues { (_, value) ->
-                    rememberDecoratedNavEntries(value, listOf(rememberSaveableStateHolderNavEntryDecorator()), provider)
-                }
-                val entries = if (selected == MainTab.HOME) decorated.getValue(MainTab.HOME)
-                    else decorated.getValue(MainTab.HOME) + decorated.getValue(selected)
-                NavDisplay(entries = entries, onBack = ::back,
-                    transitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
-                    popTransitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
-                    modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .consumeWindowInsets(padding))
+        val pageInsets = PaddingValues(0.dp)
+        val provider = entryProvider {
+            entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, ::history, ::detail, { model.load(true) }, Modifier.fillMaxSize(), onProfile = { selected = MainTab.PROFILE }) }
+            entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
+                today = date, filterOpen = historyFilterOpen, onOpenFilter = { historyFilterOpen = true }, onDismissFilter = { historyFilterOpen = false },
+                deletedNotice = deletedNotice, onDismissNotice = { deletedNotice = false }) }
+            entry<Guide> {
+                LaunchedEffect(guides) { guides.load() }
+                GuideListScreen(guideData, pageInsets, guides::query, guides::category,
+                    onSearch = { guides.search() }, onMore = { guides.search(more = true) },
+                    onDetail = { if (selected == MainTab.GUIDE && stack.lastOrNull() == Guide) stack.add(GuideDetail(it)) }, modifier = Modifier.fillMaxSize())
             }
+            entry<GuideDetail> { key ->
+                LaunchedEffect(key.id) { guides.detail(key.id, retry = true) }
+                var sourceError by rememberSaveable(key.id) { mutableStateOf(false) }
+                GuideDetailScreen(guideData.detail?.takeIf { it.id == key.id }, pageInsets,
+                    onRetry = { guides.detail(key.id, retry = true) },
+                    onList = { if (selected == MainTab.GUIDE && stack.lastOrNull() == key) guideList() },
+                    onRecord = { if (selected == MainTab.GUIDE && stack.lastOrNull() == key) stack.add(LogEditor(null, UUID.randomUUID().toString(), key.id)) },
+                    onSource = { url ->
+                        try { uriHandler.openUri(url); sourceError = false }
+                        catch (_: IllegalArgumentException) { sourceError = true }
+                    }, modifier = Modifier.fillMaxSize(), sourceUnavailable = sourceError)
+            }
+            entry<Statistics> { StatisticsScreen(data, demo, date, pageInsets, { model.load(true) }, Modifier.fillMaxSize()) }
+            entry<Profile> { ProfileScreen(user, data, demo, theme, pageInsets, onTheme, { leaving = true }, Modifier.fillMaxSize()) }
+            entry<LogDetail> { key ->
+                val read = data.detail?.takeIf { it.id == key.id }
+                val log = if (read != null) read.log else data.records.find { it.id == key.id }
+                val missing = read?.error == ApiFailureKind.NOT_FOUND || read?.error == ApiFailureKind.DELETED
+                if (current == key && savedNoticeId == key.id && log != null) SaveConfirmationScreen(log, savedWasCreated, pageInsets,
+                    onView = { savedNoticeId = null }, onHome = ::home, modifier = Modifier.fillMaxSize())
+                else LogDetailScreen(log, read == null || read.loading, read?.error != null && !missing, pageInsets,
+                    onEdit = { edit(key.id) },
+                    onDelete = { if (log != null && log.version > 0) { deletingId = log.id; deleteVersion = log.version } },
+                    onHistory = ::history, onRetry = { model.loadDetail(key.id) }, modifier = Modifier.fillMaxSize())
+            }
+            entry<LogEditor> { key ->
+                val initial = data.detail?.takeIf { it.id == key.logId }?.log ?: data.records.find { it.id == key.logId }
+                val article = guideData.detail?.takeIf { it.id == key.guideId && !it.loading && it.error == null }?.article
+                if (key.guideId != null) LaunchedEffect(key.guideId) { guides.detail(key.guideId) }
+                val canStart = (key.logId == null || initial != null) && (key.guideId == null || article != null)
+                var entryDraft by rememberSaveable(key.requestId, stateSaver = EditorDraft.NullableSaver) {
+                    mutableStateOf(if (canStart) {
+                        if (article != null) EditorDraft.forGuide(article, date) else EditorDraft.from(initial, date)
+                    } else null)
+                }
+                LaunchedEffect(key.requestId, initial, article, date) {
+                    if (entryDraft == null && canStart) {
+                        entryDraft = if (article != null) EditorDraft.forGuide(article, date) else EditorDraft.from(initial, date)
+                    }
+                }
+                val form = entryDraft
+                if (form != null) {
+                    DisposableEffect(key.requestId, form) {
+                        activeEditorDraft = EditorEntryDraft(key.requestId, form)
+                        onDispose { if (activeEditorDraft?.requestId == key.requestId) activeEditorDraft = null }
+                    }
+                    val leavingAfterSave = current != key && form.locked && form.submissionError == null
+                    LogEditorScreen(form, date, user.timezone.id, demo, data.saving || leavingAfterSave, pageInsets,
+                        { model.save(it, key.logId, form.values.version, key.requestId) },
+                        { stack.removeLastOrNull(); history(); model.load(true) }, Modifier.fillMaxSize())
+                } else if (canStart) {
+                    ScrollPage(pageInsets, Modifier.fillMaxSize()) {
+                        LinearProgressIndicator(Modifier.fillMaxWidth())
+                        Text(stringResource(R.string.editor_preparing))
+                    }
+                } else if (key.guideId != null) {
+                    GuideDetailScreen(guideData.detail?.takeIf { it.id == key.guideId }, pageInsets,
+                        onRetry = { guides.detail(key.guideId, retry = true) }, onList = { if (selected == MainTab.GUIDE && stack.lastOrNull() == key) guideList() },
+                        onRecord = {}, onSource = {}, modifier = Modifier.fillMaxSize())
+                } else {
+                    WorkspaceLoading(data, { model.load(true) }, pageInsets, Modifier.fillMaxSize())
+                }
+            }
+        }
+        val decorated = stacks.mapValues { (tab, value) ->
+            val framedProvider: (NavKey) -> NavEntry<NavKey> = { key ->
+                val entry = provider(key)
+                NavEntry(navEntry = entry) {
+                    val read = data.detail?.takeIf { it.id == (key as? LogDetail)?.id }
+                    val log = if (read != null) read.log else data.records.find { it.id == (key as? LogDetail)?.id }
+                    AccountPage(key, tab, rail, railWidth,
+                        confirmation = key is LogDetail && key.id == savedNoticeId && log != null,
+                        onBack = { if (selected == tab && stacks.getValue(selected).lastOrNull() == key) latestBack() },
+                        onSelect = ::selectTab, onRecord = { capture = true },
+                        onFilter = { if (selected == tab && stacks.getValue(selected).lastOrNull() == History) historyFilterOpen = true }) {
+                        entry.Content()
+                    }
+                }
+            }
+            rememberDecoratedNavEntries(value, listOf(rememberSaveableStateHolderNavEntryDecorator()), framedProvider)
+        }
+        val entries = if (selected == MainTab.HOME) decorated.getValue(MainTab.HOME)
+            else decorated.getValue(MainTab.HOME) + decorated.getValue(selected)
+        NavDisplay(entries = entries, onBack = ::back,
+            transitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
+            popTransitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
+            modifier = Modifier.fillMaxSize())
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AccountPage(
+    route: NavKey,
+    tab: MainTab,
+    rail: Boolean,
+    railWidth: androidx.compose.ui.unit.Dp,
+    confirmation: Boolean,
+    onBack: () -> Unit,
+    onSelect: (MainTab) -> Unit,
+    onRecord: () -> Unit,
+    onFilter: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    // Each fading entry keeps its own chrome so the outgoing list cannot resize and clamp its scroll.
+    Row(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas)) {
+        if (rail && route !is LogEditor) TabRail(tab, onSelect, onRecord, Modifier.width(railWidth).fillMaxHeight())
+        Scaffold(
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            containerColor = Color.Transparent,
+            topBar = { if (route != Home) TopAppBar(title = { Text(stringResource(when (route) {
+                is LogDetail -> if (confirmation) R.string.save_confirm_title else R.string.log_detail
+                is LogEditor -> if (route.logId == null) R.string.log_create else R.string.log_edit
+                is GuideDetail -> R.string.guide_detail
+                else -> tab.label
+            }), style = MaterialTheme.typography.headlineMedium) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent), navigationIcon = {
+                if (route != tab.key && !confirmation) FilledIconButton(onClick = onBack, shape = MaterialTheme.shapes.small,
+                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                    modifier = Modifier.padding(start = 16.dp).size(48.dp)) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
+            }, actions = {
+                if (route == History) FilledIconButton(onClick = onFilter, shape = MaterialTheme.shapes.medium,
+                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                    modifier = Modifier.padding(end = 12.dp).size(48.dp)) {
+                    Icon(painterResource(R.drawable.ic_filter), stringResource(R.string.filter_history))
+                }
+            }) },
+            bottomBar = { if (!rail && route == tab.key) TabDock(tab, onSelect, onRecord) },
+        ) { padding ->
+            Box(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)) { content() }
         }
     }
 }

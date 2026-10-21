@@ -46,6 +46,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.wastenot.data.repository.AccountSession
 import com.example.wastenot.data.repository.CoreRepository
+import com.example.wastenot.data.repository.GuideStore
 import com.example.wastenot.data.repository.SessionState
 import com.example.wastenot.theme.ThemeMode
 import com.example.wastenot.theme.ThemePicker
@@ -60,6 +61,7 @@ import com.github.skydoves.navgraph.annotations.NavGraphRoot
 fun MainNavigation(
     accountSession: AccountSession,
     coreRepository: CoreRepository,
+    guideStore: GuideStore,
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit,
     modifier: Modifier = Modifier,
@@ -98,7 +100,7 @@ fun MainNavigation(
             entry<AccountRoot> { key ->
                 val phase = session.phase as? SessionState.Authenticated
                 if (phase != null && key == AccountRoot(phase.user.id, phase.epoch, session.isDemo)) {
-                    AccountNavigation(phase.user, session.isDemo, coreRepository, themeMode,
+                    AccountNavigation(phase.user, session.isDemo, coreRepository, guideStore, themeMode,
                         { choosingTheme = true }, model::logout, Modifier.fillMaxSize())
                 }
             }

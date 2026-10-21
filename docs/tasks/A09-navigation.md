@@ -35,3 +35,9 @@ Draf dipindahkan ke lifetime entry Navigation 3 agar form yang sedang keluar tid
 [Bukti native dan screenshot](../qa/iteration-2/NAVIGATION_MOTION.md) mencakup lima alur transisi, 40 eksekusi dari 14 kasus unik pada API 24/36, ponsel/rail dan teks normal/200%, tanpa skip. Regresi meliputi failure STORAGE/Activity recreate/koreksi, filter dan gestur Android 36: Back pertama menutup keyboard, berikutnya membuka D03, Batal mempertahankan isian. Probe awal dengan APK tes identik berubah dari 14 sampel fallback error menjadi nol. Durasi fade tetap 180/120 ms.
 
 Ini penerimaan checkpoint yang diuji, bukan audit motion seluruh aplikasi atau predictive seek per frame. Layar dan komponen lain mengikuti [matriks Iteration 2](ITERATION_2_DESIGN.md).
+
+## Checkpoint Panduan dan viewport entry
+
+S11/S12 memakai ID artikel primitive dan optional guideId pada editor. GuideViewModel berada pada lifetime akun; query/kategori tidak ikut pulih ke epoch akun lain. Draf yang sudah dimulai tidak ditimpa saat artikel dimuat ulang.
+
+Scaffold/dock/rail sekarang dimiliki setiap entry agar daftar yang sedang keluar tidak membesar lalu membatasi scroll ketika dock detail disembunyikan. Callback app bar membaca stack dan handler Back terbaru, sehingga D03 dan filter tetap berfungsi. Aksi Cari dan pemilihan artikel memindahkan fokus ke kontrol yang dipilih agar field tidak membuka IME dan menarik scroll kembali. [Bukti per frame dan perjalanan ponsel/rail](../qa/iteration-2/GUIDE.md) mencatat 45 eksekusi pada APK final, satu skip, serta batas audit API 36/keyboard/spoken feedback yang masih terbuka.

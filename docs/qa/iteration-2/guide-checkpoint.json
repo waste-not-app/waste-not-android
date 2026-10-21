@@ -1,0 +1,472 @@
+{
+  "apk_sha256": "00eaf114b69bc79de90350037ca311c8f5831628d04718c92efb6c5870e757f9",
+  "test_apk_sha256": "028c7b43571d46938edcb7722f28b665e5d8e84cbbd3a76f814b0342f04b98e1",
+  "unit_tests": {
+    "tests": 131,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native_runs": [
+    {
+      "runner_cases": 8,
+      "passed": 8,
+      "skipped": 0,
+      "seconds": 90.22,
+      "density": 480,
+      "font_scale": 1,
+      "cases": [
+        {
+          "class": "com.example.wastenot.ui.main.GuideNavigationTest",
+          "test": "darkGuideSearchBackAndPrefillKeepInputExplicit",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideNavigationTest",
+          "test": "lightGuideSearchBackAndPrefillKeepInputExplicit",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideNavigationTest",
+          "test": "searchBackAndPrefillWithTheNaturalAnimationClock",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "suppliedReviewMetadataShowsItsHostAndAPlatformFailureRemainsRecoverable",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "missingArticleCannotPrefillAnEditorAndOffersTheList",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "refreshErrorKeepsExistingRowsAndOffersAnExplicitRetry",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "initialSearchErrorKeepsTheQueryAndRetryHasARealAction",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "imeSearchCallsItsActionAndReleasesTheFieldFocus",
+          "code": 0
+        }
+      ]
+    },
+    {
+      "runner_cases": 14,
+      "passed": 14,
+      "skipped": 0,
+      "seconds": 92.351,
+      "density": 480,
+      "font_scale": 2,
+      "cases": [
+        {
+          "class": "com.example.wastenot.ui.main.GuideNavigationTest",
+          "test": "darkGuideSearchBackAndPrefillKeepInputExplicit",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideNavigationTest",
+          "test": "lightGuideSearchBackAndPrefillKeepInputExplicit",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideNavigationTest",
+          "test": "searchBackAndPrefillWithTheNaturalAnimationClock",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "suppliedReviewMetadataShowsItsHostAndAPlatformFailureRemainsRecoverable",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "missingArticleCannotPrefillAnEditorAndOffersTheList",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "refreshErrorKeepsExistingRowsAndOffersAnExplicitRetry",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "initialSearchErrorKeepsTheQueryAndRetryHasARealAction",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "imeSearchCallsItsActionAndReleasesTheFieldFocus",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "discardKeepsItsFormDuringExitAndTheNextDraftStartsEmpty",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "confirmedCreateDoesNotFlashALoadErrorWhileTheEditorExits",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "cleanBackKeepsItsFormUntilHomeReturns",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "darkConfirmedCreateKeepsItsFormDuringExit",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "dirtyEditorHeaderBackUsesTheCurrentDraft",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "confirmedEditKeepsItsFormUntilTheUpdatedReceiptAppears",
+          "code": 0
+        }
+      ]
+    },
+    {
+      "runner_cases": 24,
+      "passed": 23,
+      "skipped": 1,
+      "seconds": 267.917,
+      "density": 288,
+      "font_scale": 2,
+      "cases": [
+        {
+          "class": "com.example.wastenot.ui.main.GuideNavigationTest",
+          "test": "darkGuideSearchBackAndPrefillKeepInputExplicit",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideNavigationTest",
+          "test": "lightGuideSearchBackAndPrefillKeepInputExplicit",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideNavigationTest",
+          "test": "searchBackAndPrefillWithTheNaturalAnimationClock",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "suppliedReviewMetadataShowsItsHostAndAPlatformFailureRemainsRecoverable",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "missingArticleCannotPrefillAnEditorAndOffersTheList",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "refreshErrorKeepsExistingRowsAndOffersAnExplicitRetry",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "initialSearchErrorKeepsTheQueryAndRetryHasARealAction",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.GuideStateDesignTest",
+          "test": "imeSearchCallsItsActionAndReleasesTheFieldFocus",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "discardKeepsItsFormDuringExitAndTheNextDraftStartsEmpty",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "confirmedCreateDoesNotFlashALoadErrorWhileTheEditorExits",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "cleanBackKeepsItsFormUntilHomeReturns",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "darkConfirmedCreateKeepsItsFormDuringExit",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "dirtyEditorHeaderBackUsesTheCurrentDraft",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.NavigationTransitionTest",
+          "test": "confirmedEditKeepsItsFormUntilTheUpdatedReceiptAppears",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.AppNavigationTest",
+          "test": "datasetFiveTabsManualActionAndThemeWorkTogether",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.AppNavigationTest",
+          "test": "invalidPasswordStaysFocusedAboveKeyboardWithoutCallingAccountService",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.AppNavigationTest",
+          "test": "edgeBackGestureUsesDirtyDraftPolicy",
+          "code": -4
+        },
+        {
+          "class": "com.example.wastenot.ui.main.AppNavigationTest",
+          "test": "dirtyBackCreateAndEditKeepExclusiveQuantityAndDoNotAddEditXp",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.AppNavigationTest",
+          "test": "historyFilterAndRangeSurviveDetailTabsAndRotation",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.AppNavigationTest",
+          "test": "backAtHomeExitsWithoutOpeningAuth",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.LogDetailNavigationTest",
+          "test": "sameRecordAcrossTwoTabStacksAndDoubleTapKeepBackNavigationCorrect",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.LogDetailNavigationTest",
+          "test": "darkDetailAndDeleteCancelKeepTheRecordAvailable",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.LogDetailNavigationTest",
+          "test": "wideDeleteReturnsToHistoryListWhenHistoryRetainsAnotherDetail",
+          "code": 0
+        },
+        {
+          "class": "com.example.wastenot.ui.main.LogDetailNavigationTest",
+          "test": "cancelThenConfirmedDeleteRefreshesHistoryTotalsAndXpAcrossRecreation",
+          "code": 0
+        }
+      ]
+    }
+  ],
+  "native_passed_executions": 45,
+  "native_skipped": 1,
+  "known_visual_findings": [
+    "API24 SwiftShader: one rail screenshot has a blank Catat/Scan button; cause and physical-device scope unverified.",
+    "Existing S06 confirmation glyph finding remains open."
+  ],
+  "images": {
+    "guide-reference-s11-light.png": "2ff5a453722de39cb456821ae4984601e734cbaad5f1a232cc9447932a7dc495",
+    "guide-prefill-wide200.png": "0f2c81789394eb74326abd6728a5c0f89b516c331172979809504e8a7a48c192",
+    "guide-empty-dark.png": "2ae76a191c0daf15c0e925a1e20eaf158a3783ab186937c67c1c5ee88ecb85dc",
+    "guide-list-wide200.png": "f599604458a2a3a6cf50f0bcbff4353a04fc3cec5a34b11a54bac07f07a724d4",
+    "guide-detail-end-light.png": "7aab77bf20e4c249becf87385a2c8fc1d6ca689bff9c77d7a53e45810cb8bb56",
+    "guide-reference-s11-dark.png": "575bf1c7500fb364da35786f0db031a26f23b2a1a5e97bb869333ced2767209e",
+    "guide-prefill-initial-light.png": "b97aacee533d73b4b881a7863a7068cbf16b722e416d631004debca9b6e5f379",
+    "guide-return-font200-before.png": "ba01b99481321eaa5ebb8d724d372d4b8bbf30a443dd66bf3e55976afd11e934",
+    "guide-reference-s12-light.png": "3d3f479b7c4f554077bb6e952a111aac084f242b927dbb5c5601607e3fd970f5",
+    "guide-refresh-error.png": "3fa67492b258ff0dd781a2ef8deff1a1f3317a7140f8096b8cb5a71fbb3fcf95",
+    "guide-source-error.png": "28936f2063224ac9a856179f254516e8585f9e42a336903bf7df6ad00e28ce94",
+    "guide-detail-wide200.png": "4e2839a9b880590f0c1775b592157c3b4606c538f0d6e193e55abeb24efe6f23",
+    "guide-removed.png": "64c97d6b29994d4583cb18da8f077ff4127cc62e736384a59ea7f25be4abbd0c",
+    "guide-detail-light.png": "f5d206bb3b4c155c8807eade7195b1cd80f88e7e67d1d1f33ec439d9d9ed3b80",
+    "guide-return-font200-after.png": "52483171471d07e726faab5f1327c0955e6f57ab4c1d847dfbca2abcd8d8bfa6",
+    "guide-reference-s12-dark.png": "c008ee2d27b6c05858f2dea698435837bd486d80c2fb05b1d466cc238b9d02f8",
+    "guide-list-dark.png": "af7499ddf4f01439b72390416b137d057e83ba52a4f59511bc1979253f677871",
+    "guide-list-light.png": "df3c571fe483dcb1b1bc0a8b5edaaf9d26d395b4df32fa73a6c3809c76d4d384",
+    "guide-prefill-phone200.png": "3784b6936841fe13a7c19dbd7edff7c2e709c2523f8a1ab421598de3d7ffcf1c",
+    "guide-detail-dark.png": "9d1e4f7372777da64f3ff27a3df21395a80de1874729fa7cd9b0e31dc5982eab"
+  },
+  "native_unique_passed_cases": 23,
+  "sources_sha256": {
+    "app/src/main/AndroidManifest.xml": "6ac61442faec5ffba752c99c309a72605b6ff2096f12c4a4e71eeb6e3d08fd31",
+    "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp": "5faf033745c8c882c43bb1b372d4e4a5890caec63d9892a2e756c954108b85dc",
+    "app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp": "f98fef5bc3bfe5b65692c40ad1cbae2bec4faf9f1b249c397626740db71b62d8",
+    "app/src/main/res/drawable/ic_profile.xml": "aebbb473f283ebb29f42d54ed943833860b813e281dd349cb77d73e583874092",
+    "app/src/main/res/drawable/ic_statistics.xml": "d0787c82c499aa3341a55daac306bd9aa91b813c908a5f42f110015c14edbebe",
+    "app/src/main/res/drawable/ic_check.xml": "3ad5c2afb6903097cf48d33f02ac3cc534b64700acd5549765cb7e84a68c2af6",
+    "app/src/main/res/drawable/ic_guide.xml": "2a654683d7d6a37616c72739cca20d7a6320a326cb6634dd7d008219741819e0",
+    "app/src/main/res/drawable/ic_visibility_off.xml": "e0fafadb4cadb0131037b26912945f4ea60c7d859341a2931a191c6c1f204be4",
+    "app/src/main/res/drawable/ic_leaf.xml": "30411588904db28e64ab89529e54a317117095b1375f9a08ea574d96e5e204ad",
+    "app/src/main/res/drawable/ic_history.xml": "995e1b62fe89fcfdf400f84372fb10551bae116c59554b9a5dddce88981e3b29",
+    "app/src/main/res/drawable/ic_delete.xml": "1d6d194aad32588de57a568c3fc289a912ac62f27fcde588e4ee80a6e2de2104",
+    "app/src/main/res/drawable/ic_launcher_background.xml": "ed423c73a6f40a4d2909f0901e60527b3a807cd59e1b5593bcaae1808b1c6321",
+    "app/src/main/res/drawable/ic_jar.xml": "5e484ea397e03430b17fabb18bcfc572b037bbf788f4a7b877c86d2d78123436",
+    "app/src/main/res/drawable/ic_device.xml": "5f85b5577b7276b0d80ca15ce7725974596910c945b70e5f98dcb287664d6c3e",
+    "app/src/main/res/drawable/ic_launcher_foreground.xml": "01d1a6a6c1234eb7fe270d097eb283d72b9c95ae5118886f1b6573aad280f1f7",
+    "app/src/main/res/drawable/ic_back.xml": "9e4eba406e6e99dc160eebe3fe4fabe73db264c90eac1111a1cd4109ed8f01dd",
+    "app/src/main/res/drawable/ic_clear.xml": "52da6968f0885400e1bdac646601913d102e30963bebd0ab1e827f00960bf3e3",
+    "app/src/main/res/drawable/ic_next.xml": "2b0c152ef581aedc6e313a69b941e04c7a857ee0f2a08d9abe96a03d918590e2",
+    "app/src/main/res/drawable/ic_add.xml": "a987343b290f8da70040047b09dc1dd5e4948a3a4acc8a4860bb7f71d4976c68",
+    "app/src/main/res/drawable/ic_bottle.xml": "d36a4a53bf94a4b16ac12e475b1209e7c39c26e351a26bbdc0256a0729d240ac",
+    "app/src/main/res/drawable/ic_camera.xml": "b29bc380e51e10c06c1fd990c4c7d2f081fe459f7d2ab5e119390aa190934aca",
+    "app/src/main/res/drawable/ic_metal.xml": "83394fa6e2f882a3fd1579de0f1dc59a3f1d65b58f757e24c01dad067e71bbf4",
+    "app/src/main/res/drawable/ic_filter.xml": "2808d18a41bad3cd3f009fdc89317efc3c6ef92316928e84b034d7678d7dd7bd",
+    "app/src/main/res/drawable/ic_calendar.xml": "33c8345456bf29b5d788eaf2407de837d08633c75db80459b69a32db65a5aff7",
+    "app/src/main/res/drawable/ic_home.xml": "c953cd03a39f1d5de1c9fe40b3a6440a08627b8e8a8b861e9e3ec89cff2b6e38",
+    "app/src/main/res/drawable/ic_search.xml": "8b734c6ece02589178aa8201b23193e7b3b4d563023a3900f2941d8c4b64a7c7",
+    "app/src/main/res/drawable/ic_paper.xml": "1e2f929e97cb63f1c80b6d336c76c5bcd163ddf8fe85686a86c373d91d1baaa9",
+    "app/src/main/res/drawable/ic_visibility.xml": "884d76b5f81264fb6762ee7534713c2e757134248362c376e8195fe021683f54",
+    "app/src/main/res/drawable/ic_more.xml": "336e96bcf8b310badd4bb588f43b87bd867ac288a7494a9f137d78c7b935d60c",
+    "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml": "88f7653499ef524126ea5018a99baf9cc3269e7e584d6205dfdd76db39f39cc0",
+    "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml": "88f7653499ef524126ea5018a99baf9cc3269e7e584d6205dfdd76db39f39cc0",
+    "app/src/main/res/values/history.xml": "8f2b1e0274a1b10cfcb0aa77d07c0db06ea36fbb733cea63ebbd8980a7076d39",
+    "app/src/main/res/values/strings.xml": "3e2ef21412aef1f1a212edd1e7d934ac4ab597b2657ffb1a1688d14faad452b0",
+    "app/src/main/res/values/forms.xml": "0fa938d4caae0ce8c33b886bc907c3db26a0046a073c7d629bf4b2ce3314f972",
+    "app/src/main/res/values/navigation.xml": "2c74fbbb4dc60867f4a0b7f437c8181a6e1f1b4f8febd82e9af9cdabc074d374",
+    "app/src/main/res/values/log_detail.xml": "26f1853e52680df21335fbb5dbe62fdaee40c48387f0fa9b1229b3d3c5b2e79e",
+    "app/src/main/res/values/iteration2.xml": "429276794b90268d224fd29f72891e6ffbc8c45e5d4fd891bcc43e52c0864df8",
+    "app/src/main/res/values/save_confirmation.xml": "2d807b242d570ed98aa4aea9fccd0ed5d61897011c0b24db7646b9b447ec34fa",
+    "app/src/main/res/values/editor_submission.xml": "218469a46e85ded5233f09ee3bf97de56a47965b7982264d6bfeee3b53dd545d",
+    "app/src/main/res/values/themes.xml": "8d8bfa4afd4bf90108f5ed865c79b6268d382232c8534fb889272c49b20fa9c8",
+    "app/src/main/res/values/auth.xml": "601ea4f45afdedc3dbd21c95443b284d94afd1e2f4f546950ccb1af98b3696da",
+    "app/src/main/res/xml/backup_rules.xml": "2c5c697984f4c52b526337ab61113f5843e0bfc6af4722374916ffe6da38dd9a",
+    "app/src/main/res/xml/data_extraction_rules.xml": "eda9dddce1e895de1efd716fe75e244187bf8f91a3bb7444c6ea1731e51c74a8",
+    "app/src/main/res/xml/network_security_config.xml": "dea35ebed76536c24c13f74036f02dc874f944147cb3a49c2ad0550f71e3e0c7",
+    "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp": "1ed73f5341a69d3b41c7e02e126803f50cc8c3284adf4bbb737f0c93577aef07",
+    "app/src/main/res/mipmap-hdpi/ic_launcher.webp": "dd00996198640ed28fbc09cdcd7a3807cf8707f3eb255b659634da3ca6a6ff01",
+    "app/src/main/res/mipmap-mdpi/ic_launcher_round.webp": "4e2c58b91de01130e6479e00cbbaaf6e77cd961dd2c8e303cf13cd077fa92632",
+    "app/src/main/res/mipmap-mdpi/ic_launcher.webp": "846219e6f72fe9a6c104ca8919cbee36a101e7d2ff8da9da67b689a5888f060d",
+    "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp": "3009fad079f5772f30ecd767f98924367fbe0f81c30048d672d4fda2d5ca7d12",
+    "app/src/main/res/mipmap-xxhdpi/ic_launcher.webp": "58ae87fa0c5b5d1562d27fd648d2c061553fe20e3ed570bde588162d01ea7a27",
+    "app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp": "91b490aef86574901137f0a252272e1f1add99c1ad709e0696ed68929b88d261",
+    "app/src/main/res/mipmap-xhdpi/ic_launcher.webp": "398340dad816fc9a6338cb151a8cf1e45b926f9bfb70628b24c4bd2523cc94d4",
+    "app/src/main/res/font/plus_jakarta_sans_semibold.ttf": "295fad3e9c809e0e7b49da0bfe900762188b91128a25d144966363911d65b794",
+    "app/src/main/res/font/plus_jakarta_sans_regular.ttf": "18ce6145b17f13511c983125f469307e6a03df21c95c809be301cb5006f7a1b9",
+    "app/src/main/res/font/plus_jakarta_sans_medium.ttf": "b57f57c8a66edf7aecf9ff820731d1b17cf316732dfba41d001c34c87ff492ce",
+    "app/src/main/res/font/plus_jakarta_sans_extrabold.ttf": "431b0d8e3b53c814b11c022f8063d89ffea42af1b57417935859ed15aa5cc4a3",
+    "app/src/main/res/font/plus_jakarta_sans_bold.ttf": "ec91d7241d4580fdf5c1f606549114cb903d2e088d2e5564a16afd84a8842307",
+    "app/src/main/java/com/example/wastenot/WasteNotApplication.kt": "aa0d468d1c4ae5820b5a70b82968a7f9f39592f0a096a51d4f7709401b563e06",
+    "app/src/main/java/com/example/wastenot/MainActivity.kt": "5c90c7e3a2c7936f42d36007ee7c1430eb75ff203a3ccca7887cac253b1271d2",
+    "app/src/main/java/com/example/wastenot/Navigation.kt": "ab7bfc4590b16c8649aa225b4dc15abf563b962fe26bf237a3c88bd091291abc",
+    "app/src/main/java/com/example/wastenot/NavigationKeys.kt": "14dd5e1561b99ce79ad89a7a3449b771e675daeed8b40f2901997f5e317d0d81",
+    "app/src/main/java/com/example/wastenot/AppContainer.kt": "528b415c851fc331cd0c18f23c8221843a23317e134798957f0f4f6ae09ced60",
+    "app/src/main/java/com/example/wastenot/theme/Theme.kt": "8981d31415a3e7b6cb41201b1d580274107d6e7f6bffa15fcd0fa3d649d5ac9e",
+    "app/src/main/java/com/example/wastenot/theme/ThemePreview.kt": "e522ff52df25547d2518bbf3361286ed0423e40a6e1cd2013d5df1683099a535",
+    "app/src/main/java/com/example/wastenot/theme/Tokens.kt": "5a2f5e4c539f7ec3f89e4114c6b38cf47b1bd4f7344184e45857e5b65aa6fb9f",
+    "app/src/main/java/com/example/wastenot/theme/ThemePicker.kt": "e2e04bc71d3cfe2e9e0246e789c3478eba11e99678b3671b706e80f2250ef466",
+    "app/src/main/java/com/example/wastenot/theme/Color.kt": "fbd19b7162a996b8ff3aaca2271cb5cc0487c1db9967886fb1688d796182deb5",
+    "app/src/main/java/com/example/wastenot/theme/Typography.kt": "432a6f1fc39e238448e1c34edac9edcf07003038e7a07ee3741862fbe03b1eab",
+    "app/src/main/java/com/example/wastenot/theme/ThemeMode.kt": "3ef2335e70a70e4980a0b708e83233f0a761493b9552e6d21b00d303475c52da",
+    "app/src/main/java/com/example/wastenot/model/ActivityDates.kt": "e55775c94fe655f247b5ef3fa6f02fec155949b6c3892038308360eb2c14834b",
+    "app/src/main/java/com/example/wastenot/model/WasteGuide.kt": "7acf3d8a025dc2f91161abebc880d20179ab1d833e66fa58393bc952d0e841da",
+    "app/src/main/java/com/example/wastenot/model/QuantityInput.kt": "f3636daccfa817cca0d6954344209915c17dcee3274769e3e9f75785ee3b7706",
+    "app/src/main/java/com/example/wastenot/model/WasteLog.kt": "f727cd286a9f2d7d77c0255f41e3ba4a6868cea1c489f8b03e94ddb2004d9eca",
+    "app/src/main/java/com/example/wastenot/model/Metadata.kt": "8b330b028856c77f413029c7d2d573fdf05a694de0efdb16113950f39fb21471",
+    "app/src/main/java/com/example/wastenot/model/WasteSummary.kt": "3bb8c6c2e8dd79aef35b895be2521cf02e9bb362de97edac58829eafa494a862",
+    "app/src/main/java/com/example/wastenot/model/AccountInput.kt": "8d5a100a1dfdf51a00e205e99e5e2df4503499747c0e084df7f004b6ca6847b6",
+    "app/src/main/java/com/example/wastenot/model/User.kt": "b872b33c1c510f8fa9b4dddd3d4e8bc593e2ac947608c1dbdf1544d599343d34",
+    "app/src/main/java/com/example/wastenot/model/WasteFormat.kt": "9277ea14fe8f8176383f475e21b8e7013b6f0b42795cedb96caa0de19a18440a",
+    "app/src/main/java/com/example/wastenot/ui/main/LogDetailScreen.kt": "a146a47e20da8d18074701b061b96df624cfcea10e649737e7326d42e08afa41",
+    "app/src/main/java/com/example/wastenot/ui/main/HistoryFilter.kt": "f2019b050fcede882f1cd2493d121bffd7f7e32fcdfd4614e1bda98a9faa455a",
+    "app/src/main/java/com/example/wastenot/ui/main/LogEditorScreen.kt": "bd7dbab954ac73435c0124b7547d1f0430d679d589318899945c2e7ca7db4958",
+    "app/src/main/java/com/example/wastenot/ui/main/WorkspaceViewModel.kt": "d95e3f3341c49994490c46ba3b3082bbccdcaf4c61b4021a43b2f81cbc4256b9",
+    "app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt": "515b0bbc54589991a22aa199d617babc2086af1fd65ffd67e614bb5657bb028d",
+    "app/src/main/java/com/example/wastenot/ui/main/GuideScreens.kt": "24534334cd71bf53a7c226be490e946d08c120833c48e3f7bb247b53d8b61441",
+    "app/src/main/java/com/example/wastenot/ui/main/GuideViewModel.kt": "963f6d155756384585196d14696aca0b7979415f73c5483b1d75d87ca462870f",
+    "app/src/main/java/com/example/wastenot/ui/main/DeleteLogDialog.kt": "12b7ce44af8de0996a059c4dfd0cd136464fcf34aa761953fcf400faf50f1bbf",
+    "app/src/main/java/com/example/wastenot/ui/main/EditorDraft.kt": "6a118ef815e45ebed2994e881dbfc16d22809fcecdd85f87c26438b9a662cc97",
+    "app/src/main/java/com/example/wastenot/ui/main/HistoryScreen.kt": "5c84ecce199246987468cac9837f55962ecee10410fcab94141778c721be0996",
+    "app/src/main/java/com/example/wastenot/ui/main/SaveConfirmationScreen.kt": "7789fbe1cb6d3102c4c4f614a35aa8bde555fb219db2188bf39e644d0c9cf534",
+    "app/src/main/java/com/example/wastenot/ui/main/CaptureSheet.kt": "47ce1b3be221f59d48dba5586baa3d86079f3a3f851b919c0449076f36fad5e9",
+    "app/src/main/java/com/example/wastenot/ui/main/WorkspaceScreens.kt": "f70bd9a88979fe14970a0ba106b30087011443542e688f84210603885b63a513",
+    "app/src/main/java/com/example/wastenot/ui/auth/AuthScreen.kt": "9d6728de8e68068a71e86effdc39b5947051c95673285d203ce87c9b71a8321b",
+    "app/src/main/java/com/example/wastenot/ui/auth/SessionViewModel.kt": "35cf4735dc73be4cd0b758f7c08ea0ea952026cd81b462f3835a3ad5a3908fa8",
+    "app/src/main/java/com/example/wastenot/ui/components/QuantityField.kt": "4c1f2741c66d23f112b3b5fca2cca85575c41c428398e32edd7f310a84140a2d",
+    "app/src/main/java/com/example/wastenot/ui/components/FormControls.kt": "4522f58e10d9228dc47c774e0889c7442fc1bf34d1232762e040aed4b768f1bf",
+    "app/src/main/java/com/example/wastenot/ui/components/FormPreview.kt": "d614bb6deaa4313e50d7bc646d7290ef44598fd99fb6795cca120d29c4059106",
+    "app/src/main/java/com/example/wastenot/ui/components/ChoiceControls.kt": "ba28e59bfeeafb857460ee3ad7b91cac86a7796e90f75a7c8b767af71f9f4ffa",
+    "app/src/main/java/com/example/wastenot/ui/components/DateField.kt": "57d2777539da98e9731d415952ce064445c25aeb981da8b01fca2d65c45c43d1",
+    "app/src/main/java/com/example/wastenot/data/local/RefreshTokenStore.kt": "75886c2dab103da15a49fd1391f0c3db58766d7ded3e946d72815675c588fc60",
+    "app/src/main/java/com/example/wastenot/data/local/KeystoreRefreshTokenStore.kt": "56cfc1bac71bd93cde519606459856f9a22ed176ef495c8cf72cccb2f9b5d614",
+    "app/src/main/java/com/example/wastenot/data/network/WasteNotNetwork.kt": "7c3f0457344dd0dfe5e5d2d9bb77fdc307dbbacde2e8334d43c8297b3cc53f89",
+    "app/src/main/java/com/example/wastenot/data/network/WasteNotApi.kt": "073c7335bdef650dd01e67e0ac997bc678980eca238c5b678ec48d269643f78d",
+    "app/src/main/java/com/example/wastenot/data/network/ApiExecutor.kt": "d338fbf597bbc9e65a4f176f0fa2169a3afd77f1e3abc2cd95f1b6b343eb1588",
+    "app/src/main/java/com/example/wastenot/data/network/ApiResult.kt": "c8ce5b85aac17b993c518309f9ffbbc0e3b4489e5c9c104b81cb170cba8ad690",
+    "app/src/main/java/com/example/wastenot/data/demo/DemoAccountSession.kt": "162f63b63f87d1e9d47db12e91c37576d3f304f5f9e383ae3dd939b4f02f81c2",
+    "app/src/main/java/com/example/wastenot/data/demo/DemoActivityStore.kt": "3730edb978a23ef189fc164d21b4471a2a730f5e3c686dac8e3702ef5a319af7",
+    "app/src/main/java/com/example/wastenot/data/repository/CoreRepository.kt": "d59fccfc4fc7d446e95108446f5f35e69a0f8aa51149328e895e8262ace1a223",
+    "app/src/main/java/com/example/wastenot/data/repository/GuideStore.kt": "8f61607bbe8da7dc10f2301819fc0b1f55dc301e24f52d800c378dbc0f127a22",
+    "app/src/main/java/com/example/wastenot/data/repository/ActivityStore.kt": "d751732e94b809c3adc9f822b567324d69075ec14368d7b41596074e847803dc",
+    "app/src/main/java/com/example/wastenot/data/repository/AccountSession.kt": "657ecaca5c2f7895d507ff170476732872ee896f2d338d997d0a8f4342bd9b38",
+    "app/src/main/java/com/example/wastenot/data/repository/SessionState.kt": "56b901c190c448722f25698d2b065bfcba9c71a27bbfc0f85939d74e2a836cab",
+    "app/src/main/java/com/example/wastenot/data/repository/SessionRepository.kt": "8c8302eb369c8a84ea7b5afbc725b79b88cc9cb763495d4519840efe432c70a8",
+    "app/src/main/java/com/example/wastenot/data/dummy/DummyGuideStore.kt": "a1474c724c29ea9f98f6add58fee3429f04e136cddda395126d308b1f54e9fcf",
+    "app/src/main/java/com/example/wastenot/data/dummy/DummyActivityStore.kt": "8453519c2d07ad044b63e6c1e4e386520367d283bafc181889ddd08cfacc977c",
+    "app/src/main/java/com/example/wastenot/data/dummy/DummyAccountSession.kt": "d7f79ae3ef630460fe932a76a77348f0d3efa37ee1d860882cfc2d9cf4258f4b",
+    "app/src/main/java/com/example/wastenot/data/network/dto/AuthDtos.kt": "6e538163c69d17542c9ddcab99e0459d47d17055c7918814503e408f1038a8ab",
+    "app/src/main/java/com/example/wastenot/data/network/dto/QuantityRequestFields.kt": "ce29c9b4f5a91d9d0cc192fe32f83ad94836595c435ab315417dcc800eefe286",
+    "app/src/main/java/com/example/wastenot/data/network/dto/CoreDtos.kt": "cf05143fa132a294fc2b97bedad806d57e7a2ed31b31fdd439470624d52582e6",
+    "app/src/main/assets/licenses/OFL-PlusJakartaSans.txt": "995c7199cab65954f545996326755daee7b63cc6b42b06c13da1f9502ab08a99",
+    "app/src/test/java/com/example/wastenot/model/QuantityTest.kt": "ea9e958b90becfb8b917c6c657952fd923b8879793b7ebebd364a63e7905c3d4",
+    "app/src/test/java/com/example/wastenot/model/AccountInputTest.kt": "91df558f19243549661e506232bb390ae1115076b95af610f4c08161d7de0386",
+    "app/src/test/java/com/example/wastenot/model/WasteFormatTest.kt": "91d629fb86ee50f3497c7709b92b5bf04c56322efb7532415bd59368de242a84",
+    "app/src/test/java/com/example/wastenot/model/ActivityDatesTest.kt": "789fa75e7463f434095419ffc774f67db5cf03412c7f0d2c6b527871e2dff3d7",
+    "app/src/test/java/com/example/wastenot/ui/main/GuideViewModelTest.kt": "5e64582c4a81d9563f5acaf657744ee1996892fa8b3e95aeaaca9092275952d1",
+    "app/src/test/java/com/example/wastenot/ui/main/WorkspaceViewModelTest.kt": "1206c7fad17e72c7d3cb883630c09f57936d41622bbff011ee3eda07586f17e8",
+    "app/src/test/java/com/example/wastenot/ui/main/EditorDraftTest.kt": "b272d6493c37edd0d3846c59ed40ebffdb92a01188ad0803c04e177686fe934e",
+    "app/src/test/java/com/example/wastenot/ui/main/HistoryFilterTest.kt": "b374f9aba6975208e36416cbb25f3bf6055f5666b0c37b8300fdd9db08ac4a4c",
+    "app/src/test/java/com/example/wastenot/ui/auth/SessionViewModelTest.kt": "f9776b73974055b070ec282bd0bfe3b7a4f80ec8fee72328f3d1b54ef63d3ca6",
+    "app/src/test/java/com/example/wastenot/data/network/QuantityRequestFieldsTest.kt": "90fc772ebefc096299b30485650d3a93a2e7db413153fde0a59489462d9c0666",
+    "app/src/test/java/com/example/wastenot/data/network/CoreNetworkTest.kt": "b594c4162717dfb0d96dd08cadfcb6f935c05a59d8ca698688a9e19d48f03e0b",
+    "app/src/test/java/com/example/wastenot/data/demo/DemoActivityStoreTest.kt": "e0cc2be536d7bf715a3c18dda53f07b368c87e4f860c7476e835c1d1d158a30b",
+    "app/src/test/java/com/example/wastenot/data/repository/SessionRepositoryTest.kt": "dc7a5c35a3a38c95ae22d69db656395234006d2448eacdf44514246e1fea460e",
+    "app/src/test/resources/contracts/validation-error.json": "b6375e663d7ca462a3faa0bd046cbd23524026cdba72beb8c9e1a98500471cb1",
+    "app/src/test/resources/contracts/auth-session.json": "57a472a4ee54f10c83e1719cf260ed3d5d0a4d2ca0bdb7f3af1b93f92a38df4c",
+    "app/src/test/resources/contracts/auth-refresh.json": "2c2007ab4b8226680e1876ed0fa7cfaec8aa00d157e2c98e6f4ac8c9c26f96b6",
+    "app/src/test/resources/contracts/me.json": "80c48b407cd6366caec059e8eba15cd3a0cfa9009ef548745822106bf5312e4f",
+    "app/src/test/resources/contracts/metadata.json": "aa853efed8bc49ee2bdeb3cf99a074d5ae00e19973a42dc397f3d09295bba2d5",
+    "app/src/test/resources/contracts/waste-logs-page.json": "319bf0a63a37f38c53df3dd3599534ec2ae8227978062d3747b2f51c4c03ddd3",
+    "app/src/androidTest/java/com/example/wastenot/theme/ThemeTest.kt": "97032d0d482519cdd0f0934871fa7f0a48e1a8aa74dac49ad3605ec5a5def334",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/EditorDesignNavigationTest.kt": "1321bd4624b13b572416926834e9f925109cbb550a1a69b2ff5cfaac47bb4a02",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/SessionRootTest.kt": "020f4bb13b779e7473e72796fa0237c8ad063ea96772627829ea1abf2d910465",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/AppNavigationTest.kt": "eaae89a6d5b50f694c1955559a26fd759009737cb944e22195fecfd24bb5f3e1",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/Iteration2DesignTest.kt": "932198db5741d4ad1a388c4d0ea575fb72bebba8ba720beaa819632583554c12",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/SaveConfirmationNavigationTest.kt": "a276131286ff79f14d821a7d96cd7599f1c5405a558fc237d0b257f5da069824",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/EditorSubmissionTest.kt": "d219a6253df5a59815342ad06ddf1a24ede4240532c912d4ea463b9e6ade3fec",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/TalkBackNavigationTest.kt": "5d4a3a3eca661b0292032e68064f30c1501979cfc08acb7d41d97afff254d0ce",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/WideNavigationTest.kt": "484a6d22790d5649cab987c8367ef21d661f8a8475e7e9cc5992c72961191d11",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/NavigationTransitionTest.kt": "4b6019b333a3ccfc087782f6c49ccb990dc5e1f84bd88b9248141a647313d7bb",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/SummaryPrecisionTest.kt": "95cb761a75cfbf4b0730b752daef541318deb7810af9b82b7275715a79e31045",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/GuideStateDesignTest.kt": "30d2cfbf4ea336279b9453518e5935d934466cba827db900fbde5d543b0f872f",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/LogDetailDesignTest.kt": "a868a9c4a466d1efa4caf6a8010bc010a68dde76bd8d4cfe3728cacdd2a39087",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/LogDetailNavigationTest.kt": "9db4073402f5222f0e8bbc981a1823e9b16b31a3686a40fd8b2fbb7d7512b173",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/HistoryDesignTest.kt": "33532871665c50fad2eb0600951179a24d4f207d1f99b18cc5229cca7156a372",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/GuideNavigationTest.kt": "fa510562e3f717e620da2cc1ca21fd800632a39d74c8440fef5d355d661d41e2",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/SaveConfirmationDesignTest.kt": "e767a33316ce301fdca9e2f13db2fec2438a923b6deaed58df420f06dc4d4000",
+    "app/src/androidTest/java/com/example/wastenot/ui/components/FormControlsTest.kt": "94376009649e4b8ea154e768cf82d756cdde5a365cd3198430bd845c838b1772",
+    "app/src/androidTest/java/com/example/wastenot/ui/components/ActionButtonDesignTest.kt": "bffc549cffa1092ec8de586afea7ba1f203461bf02abdc9f0ba4c05f27d970c0",
+    "app/src/androidTest/java/com/example/wastenot/data/local/KeystoreRefreshTokenStoreTest.kt": "85c462415ed2fe52d7bac7ca1fc761f9697ac0a5fd0750b185157adcbec8afd1",
+    "app/src/androidTest/java/com/example/wastenot/data/local/ApplicationContainerTest.kt": "68fd585141b7faf8b09b45e67e2885c9c6c40f7ffd77344c88c8b5a4f57f401c",
+    "app/src/androidTest/java/com/example/wastenot/data/dummy/DummyDataTest.kt": "21e4bebbdd4f1309810bc2b5de6fc22a89361edb787ce0eefcdd466eadd7848f"
+  },
+  "state_capture_validation": {
+    "passed": 5,
+    "skipped": 0,
+    "seconds": 35.748,
+    "window_animation_scale": 0,
+    "transition_animation_scale": 0,
+    "animator_duration_scale": 1,
+    "note": "Component screenshots retaken without platform window transitions; separate from the 45 regression executions."
+  }
+}

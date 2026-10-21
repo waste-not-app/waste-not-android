@@ -65,6 +65,13 @@ class NavigationTransitionTest {
         traceExit("clean-back", "650 g") { compose.onNodeWithContentDescription("Kembali").performClick() }
     }
 
+    @Test fun dirtyEditorHeaderBackUsesTheCurrentDraft() {
+        openEditor()
+        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Draf belum disimpan")
+        compose.onNodeWithContentDescription("Kembali").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick) { it() }
+        compose.onNodeWithText("Buang perubahan?").assertIsDisplayed()
+    }
+
     @Test fun discardKeepsItsFormDuringExitAndTheNextDraftStartsEmpty() {
         openEditor()
         compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Draf belum disimpan")

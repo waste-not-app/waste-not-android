@@ -12,7 +12,8 @@ import java.util.UUID
 @Serializable data object Home : NavKey
 @Serializable data object History : NavKey
 @Serializable data object Guide : NavKey
+@Serializable data class GuideDetail(val id: String) : NavKey
 @Serializable data object Statistics : NavKey
 @Serializable data object Profile : NavKey
 @Serializable data class LogDetail(val id: String, val instanceId: String = UUID.randomUUID().toString()) : NavKey
-@Serializable data class LogEditor(val logId: String?, val requestId: String) : NavKey
+@Serializable data class LogEditor(val logId: String?, val requestId: String, val guideId: String? = null) : NavKey

@@ -15,6 +15,7 @@ import com.example.wastenot.model.QuantityParseResult
 import com.example.wastenot.model.QuantityUnit
 import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteLog
+import com.example.wastenot.model.WasteGuide
 import com.example.wastenot.model.parseQuantity
 import java.time.LocalDate
 
@@ -94,6 +95,10 @@ class EditorDraft(val original: EditorValues) {
     }
 
     companion object {
+        fun forGuide(guide: WasteGuide, date: LocalDate) = EditorDraft(EditorValues(
+            guide.category, guide.method, QuantityInput(), date, "", null,
+        ))
+
         private fun input(value: EditorValues) = ActivityInput(checkNotNull(value.category), checkNotNull(value.method),
             (parseQuantity(value.quantity.rawText, value.quantity.unit) as QuantityParseResult.Valid).quantity, value.date, value.notes.trim())
 
@@ -118,6 +123,10 @@ class EditorDraft(val original: EditorValues) {
                 submissionError = it.getOrNull(21)?.takeIf(String::isNotEmpty)?.let(ApiFailureKind::valueOf)
                     ?: ApiFailureKind.TIMEOUT.takeIf { submittedValues != null }
             } },
+        )
+        val NullableSaver = androidx.compose.runtime.saveable.Saver<EditorDraft?, Any>(
+            save = { draft -> draft?.let { with(Saver) { save(it) } } },
+            restore = { Saver.restore(it) },
         )
     }
 }
