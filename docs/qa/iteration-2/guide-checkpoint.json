@@ -271,10 +271,7 @@
   ],
   "native_passed_executions": 45,
   "native_skipped": 1,
-  "known_visual_findings": [
-    "API24 SwiftShader: one rail screenshot has a blank Catat/Scan button; cause and physical-device scope unverified.",
-    "Existing S06 confirmation glyph finding remains open."
-  ],
+  "known_visual_findings": [],
   "images": {
     "guide-reference-s11-light.png": "2ff5a453722de39cb456821ae4984601e734cbaad5f1a232cc9447932a7dc495",
     "guide-prefill-wide200.png": "0f2c81789394eb74326abd6728a5c0f89b516c331172979809504e8a7a48c192",
@@ -468,5 +465,6 @@
     "transition_animation_scale": 0,
     "animator_duration_scale": 1,
     "note": "Component screenshots retaken without platform window transitions; separate from the 45 regression executions."
-  }
+  },
+  "visual_evidence_correction": "2026-10-22: original rail and S06 PNGs show the claimed missing glyphs. Prior missing-glyph interpretations are withdrawn; see VISUAL_RECHECK.md. No source rendering fix is claimed."
 }

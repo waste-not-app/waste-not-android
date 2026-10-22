@@ -24,7 +24,7 @@ Acuan gradasi/action terdapat pada [render kit terang](reference-save-light.png)
 | Terang | ![Kit terang](reference-save-light.png) | ![Konfirmasi simpan](actions-save-light.png) |
 | Gelap | ![Kit gelap](reference-save-dark.png) | ![Konfirmasi edit](actions-save-dark.png) |
 
-Pemeriksaan langsung pada APK ini menemukan temuan S06 tambahan: pada API 24/SwiftShader, ikon centang kadang tidak tergambar. [Frame sentuhan nyata setelah layar tenang](actions-confirmation-icon-missing-api24.png) memperlihatkan bidang lime tanpa centang; [frame setelah Activity recreate](actions-confirmation-restored-api24.png) memperlihatkan centang kembali. Frame terang pada tabel juga tidak menampilkan bidang ikon. Penyebab dan cakupan pada perangkat fisik belum diketahui; ini pekerjaan S06 yang masih terbuka, bukan dianggap sesuai hanya karena tes C03 lulus.
+[Koreksi pembacaan screenshot 22 Oktober](VISUAL_RECHECK.md): ikon/teks Catat/Scan dan centang S06 terlihat pada PNG asli. Klaim glyph hilang sebelumnya dicabut; tidak ada perbaikan source rendering yang dibutuhkan berdasarkan bukti tersebut.
 
 Frame kit memiliki lebar dan system bar dokumentasi; native memakai system bar API 24 dan konten fixture berbeda. Perbandingan ini memeriksa material tombol yang diubah. Highlight inset/bayangan kecil pada CTA kit, seluruh secondary/text/icon controls, dan kesesuaian semua layar tetap bagian audit material berikutnya.
 
