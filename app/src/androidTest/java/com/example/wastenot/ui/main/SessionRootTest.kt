@@ -107,7 +107,7 @@ class SessionRootTest {
         compose.onNode(tabs and hasText("Profil")).performClick()
         compose.onNodeWithText("Sam Demo").assertIsDisplayed()
         assertNotNull(source.receivedTimezone)
-        compose.onNodeWithText("Zona waktu: ${source.receivedTimezone!!.id}").assertIsDisplayed()
+        compose.onNodeWithText(source.receivedTimezone!!.id).assertIsDisplayed()
         assertEquals(1, source.registerCalls)
         compose.onNodeWithText("Buat akun contoh").assertDoesNotExist()
     }

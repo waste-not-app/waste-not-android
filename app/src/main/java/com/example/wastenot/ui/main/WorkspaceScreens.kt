@@ -26,6 +26,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import com.example.wastenot.R
+import com.example.wastenot.data.dummy.dummyProgress
 import com.example.wastenot.data.demo.demoSummary
 import com.example.wastenot.model.*
 import com.example.wastenot.theme.*
@@ -87,7 +88,7 @@ fun OverviewScreen(user: User, data: WorkspaceUiState, demo: Boolean, date: Loca
                     colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.onSurface),
                     modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(stringResource(R.string.manual_input)) }
             }, personal = true)
-            DemoProgress(data.records.size)
+            ProgressMeter(dummyProgress(data.records, date))
         } else MessageBanner(stringResource(R.string.summary_pending))
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.recent_activities), style = MaterialTheme.typography.titleLarge,
@@ -166,17 +167,18 @@ internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifi
 }
 
 @Composable
-private fun DemoProgress(count: Int, modifier: Modifier = Modifier) {
-    val xp = count * 10
+internal fun ProgressMeter(progress: UserProgress, modifier: Modifier = Modifier) {
+    val xp = progress.xp
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(stringResource(R.string.level_title, 1 + xp / 100), style = MaterialTheme.typography.titleSmall)
-            Text(stringResource(R.string.xp_total, xp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.level_title, progress.level), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.xp_total, xp), Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        LinearProgressIndicator(progress = { (xp % 100) / 100f }, modifier = Modifier.fillMaxWidth().height(7.dp),
+        LinearProgressIndicator(progress = { progress.xpIntoLevel / 100f }, modifier = Modifier.fillMaxWidth().height(7.dp),
             color = MaterialTheme.colorScheme.primary, trackColor = MaterialTheme.colorScheme.outlineVariant,
             drawStopIndicator = {})
-        Text(stringResource(R.string.xp_next, 100 - xp % 100, 2 + xp / 100), style = MaterialTheme.typography.bodySmall,
+        Text(stringResource(R.string.xp_next, progress.xpToNextLevel, progress.level + 1), style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
@@ -232,24 +234,6 @@ internal val WasteCategory.iconResource: Int get() = when (this) {
     WasteCategory.METAL -> R.drawable.ic_metal
     WasteCategory.ELECTRONIC -> R.drawable.ic_device
     WasteCategory.OTHER -> R.drawable.ic_more
-}
-
-@Composable
-fun ProfileScreen(user: User, data: WorkspaceUiState, demo: Boolean, theme: ThemeMode, padding: PaddingValues,
-    onTheme: () -> Unit, onLogout: () -> Unit, modifier: Modifier = Modifier) {
-    ScrollPage(padding, modifier) {
-        Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.primaryContainer) {
-            Text(user.name.split(' ').filter(String::isNotBlank).take(2).mapNotNull { it.firstOrNull()?.uppercaseChar() }.joinToString(""),
-                Modifier.padding(20.dp), style = MaterialTheme.typography.headlineMedium)
-        }
-        Text(user.name, style = MaterialTheme.typography.headlineSmall)
-        Text(user.email)
-        Text(stringResource(R.string.account_timezone, user.timezone.id))
-        if (demo) DemoProgress(data.records.size) else user.progress?.let { Text(stringResource(R.string.progress_summary, it.level, it.xpIntoLevel)) }
-        TextButton(onClick = onTheme, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.theme_setting, stringResource(theme.label))) }
-        Text(stringResource(R.string.app_version, com.example.wastenot.BuildConfig.VERSION_NAME), style = MaterialTheme.typography.bodySmall)
-        ActionButton(stringResource(R.string.logout_action), onLogout, Modifier.fillMaxWidth(), destructive = true)
-    }
 }
 
 @Composable

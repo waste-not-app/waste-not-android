@@ -38,9 +38,11 @@ class GuideNavigationTest {
     private fun journey(dark: Boolean, trace: Boolean = true) {
         waitFor("650 g")
         compose.onNode(tabs and hasText("Profil")).performClick()
-        compose.onNodeWithText("Tampilan:", substring = true).performScrollTo().performClick()
-        compose.onNodeWithText(if (dark) "Gelap" else "Terang").performClick()
+        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
+        compose.onNode(hasText(if (dark) "Gelap" else "Terang") and hasAnyAncestor(isDialog())).performClick()
         compose.onNodeWithText("Tutup").performClick()
+        compose.onNodeWithContentDescription("Kembali").performClick()
         compose.onNode(tabs and hasText("Panduan")).performClick()
         waitFor("Kenali materialnya, tentukan langkah berikutnya.")
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Botol plastik"))

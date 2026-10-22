@@ -35,6 +35,7 @@ import androidx.navigation3.runtime.*
 import androidx.navigation3.ui.NavDisplay
 import com.example.wastenot.*
 import com.example.wastenot.R
+import com.example.wastenot.data.dummy.dummyProgress
 import com.example.wastenot.data.dummy.DummyActivityStore
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.CoreRepository
@@ -73,6 +74,7 @@ fun AccountNavigation(
     val factory = remember(user.id, demo, core) { viewModelFactory { initializer {
         WorkspaceViewModel(if (demo) DummyActivityStore(
             context.getSharedPreferences("dummy_logs_${user.id}", android.content.Context.MODE_PRIVATE), user.timezone,
+            seedInitialRecords = user.id == "dummy-owner",
         ) else RemoteActivityStore(core))
     } } }
     val model: WorkspaceViewModel = viewModel(factory = factory)
@@ -82,6 +84,12 @@ fun AccountNavigation(
     } } }
     val guides: GuideViewModel = viewModel(factory = guideFactory)
     val guideData by guides.state.collectAsStateWithLifecycle()
+    val date = model.referenceDate ?: LocalDate.now(user.timezone)
+    val profileProgress = remember(data.records, data.loading, data.error, demo, user.progress, date) {
+        if (!demo) user.progress
+        else if (data.records.isEmpty() && (data.loading || data.error != null)) null
+        else dummyProgress(data.records, date)
+    }
     val uriHandler = LocalUriHandler.current
     val focus = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
@@ -91,7 +99,6 @@ fun AccountNavigation(
     val stack = stacks.getValue(selected)
     val current = stack.last()
     val editor = current as? LogEditor
-    val date = model.referenceDate ?: LocalDate.now(user.timezone)
     var activeEditorDraft by remember { mutableStateOf<EditorEntryDraft?>(null) }
     val draft = activeEditorDraft?.takeIf { it.requestId == editor?.requestId }?.draft
     var discard by remember { mutableStateOf(false) }
@@ -214,7 +221,10 @@ fun AccountNavigation(
                     }, modifier = Modifier.fillMaxSize(), sourceUnavailable = sourceError)
             }
             entry<Statistics> { StatisticsScreen(data, demo, date, pageInsets, { model.load(true) }, { edit() }, Modifier.fillMaxSize()) }
-            entry<Profile> { ProfileScreen(user, data, demo, theme, pageInsets, onTheme, { leaving = true }, Modifier.fillMaxSize()) }
+            entry<Profile> { ProfileScreen(user, profileProgress, data.loading, data.error, pageInsets,
+                { model.load(true) }, { edit() }, { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Settings) },
+                { leaving = true }, Modifier.fillMaxSize()) }
+            entry<Settings> { SettingsScreen(user, theme, pageInsets, onTheme, Modifier.fillMaxSize()) }
             entry<LogDetail> { key ->
                 val read = data.detail?.takeIf { it.id == key.id }
                 val log = if (read != null) read.log else data.records.find { it.id == key.id }
@@ -315,6 +325,7 @@ private fun AccountPage(
                 is LogDetail -> if (confirmation) R.string.save_confirm_title else R.string.log_detail
                 is LogEditor -> if (route.logId == null) R.string.log_create else R.string.log_edit
                 is GuideDetail -> R.string.guide_detail
+                Settings -> R.string.settings_title
                 else -> tab.label
             }), style = MaterialTheme.typography.headlineMedium) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent), navigationIcon = {
                 if (route != tab.key && !confirmation) FilledIconButton(onClick = onBack, shape = MaterialTheme.shapes.small,

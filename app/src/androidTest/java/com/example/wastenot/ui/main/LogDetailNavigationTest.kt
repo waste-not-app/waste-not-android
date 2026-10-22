@@ -69,9 +69,11 @@ class LogDetailNavigationTest {
 
     @Test fun darkDetailAndDeleteCancelKeepTheRecordAvailable() {
         ready(); tab("Profil")
-        compose.onNodeWithText("Tampilan:", substring = true).performScrollTo().performClick()
-        compose.onNodeWithText("Gelap").performClick()
+        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
+        compose.onNode(hasText("Gelap") and hasAnyAncestor(isDialog())).performClick()
         compose.onNodeWithText("Tutup").performClick()
+        compose.onNodeWithContentDescription("Kembali").performClick()
         tab("Beranda"); open()
         capture("detail-dark")
         delete(); capture("delete-dark")

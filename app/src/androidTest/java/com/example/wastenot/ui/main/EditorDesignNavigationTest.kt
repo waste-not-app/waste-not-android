@@ -74,9 +74,11 @@ class EditorDesignNavigationTest {
     private fun journey(dark: Boolean) {
         waitFor("650 g")
         compose.onNode(tabs and hasText("Profil")).performClick()
-        compose.onNodeWithText("Tampilan:", substring = true).performScrollTo().performClick()
-        compose.onNodeWithText(if (dark) "Gelap" else "Terang").performClick()
+        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
+        compose.onNode(hasText(if (dark) "Gelap" else "Terang") and hasAnyAncestor(isDialog())).performClick()
         compose.onNodeWithText("Tutup").performClick()
+        compose.onNodeWithContentDescription("Kembali").performClick()
         compose.onNode(tabs and hasText("Beranda")).performClick()
         compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
         compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).performScrollTo().performClick()

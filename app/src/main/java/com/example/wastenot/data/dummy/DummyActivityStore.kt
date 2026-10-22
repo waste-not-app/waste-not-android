@@ -21,6 +21,7 @@ import org.json.JSONObject
 class DummyActivityStore(
     private val preferences: SharedPreferences,
     private val zone: ZoneId,
+    private val seedInitialRecords: Boolean = true,
     private val today: () -> LocalDate = { LocalDate.now(zone) },
 ) : ActivityStore {
     override val isDemo = true
@@ -91,7 +92,7 @@ class DummyActivityStore(
                     if (raw == null && (requestSnapshot != null || deletedSnapshot != null)) {
                         failure(ApiFailureKind.STORAGE)
                     } else try {
-                        val records = if (raw == null) seed() else JSONArray(raw).let { array ->
+                        val records = if (raw == null) { if (seedInitialRecords) seed() else emptyList() } else JSONArray(raw).let { array ->
                             (0 until array.length()).map { decode(array.getJSONObject(it)) }
                         }
                         if (raw == null) commit(preferences.edit().putString("records", encode(records)))

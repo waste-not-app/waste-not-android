@@ -97,9 +97,11 @@ class NavigationTransitionTest {
         if (dark) {
             val tab = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)
             compose.onNode(tab and hasText("Profil")).performClick()
-            compose.onNodeWithText("Tampilan:", substring = true).performScrollTo().performClick()
-            compose.onNodeWithText("Gelap").performClick()
+            compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
+            compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
+            compose.onNode(hasText("Gelap") and hasAnyAncestor(isDialog())).performClick()
             compose.onNodeWithText("Tutup").performClick()
+            compose.onNodeWithContentDescription("Kembali").performClick()
             compose.onNode(tab and hasText("Beranda")).performClick()
         }
         compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
