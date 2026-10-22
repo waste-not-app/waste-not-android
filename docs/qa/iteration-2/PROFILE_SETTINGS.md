@@ -41,3 +41,5 @@ Satu run rail kehilangan koneksi UiAutomation, proses instrumen berakhir, kemudi
 ## Batas checkpoint
 
 Integrasi progres HTTP/refresh profil dan capability metadata, S15/streak/pengingat/foto, dokumen privasi resmi, perangkat fisik, spoken TalkBack, API 36 pada perubahan ini serta audit seluruh kontrol tetap terbuka. Login dummy baseline masih memakai nama Pengguna dan zona Asia/Jakarta; pemulihan nama/zona hasil registrasi setelah logout belum selesai. Matriks Iteration 2 mempertahankan pekerjaan tersebut; PR tetap draft.
+
+Perbaikan berikutnya: [registry nama/zona akun dummy dan pembatalan sesi](ACCOUNT_IDENTITY.md). Batas login ulang di atas berlaku pada APK checkpoint profil, sebelum perbaikan tersebut.

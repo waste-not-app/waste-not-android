@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-23",
+  "base_commit": "ca141455871ba43c27fe71e3f1c3f7cd949df19a",
+  "app_sha256": "03089a78829f54bc5352998d6d80275a0abc87d2b514b7bbf7b5c3c1f244d3b3",
+  "test_sha256": "6cf7b1e067dbd3025eed68f8ffcab81c59445d4dfc3a6674888ea7d5d9754bca",
+  "unit": {
+    "tests": 137,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native": {
+    "runner_cases": 36,
+    "passed": 35,
+    "skipped": 1,
+    "seconds": 116.727,
+    "profile": "API24, 360dp, font100%",
+    "log_sha256": "54ff77bb6f9d07bd301c410becfe95d755810082c27265682815d40229082bd8"
+  },
+  "regressions": {
+    "identity_before": "account-identity-before.log",
+    "identity_after": "account-identity-after.log",
+    "cancellation_before": "account-cancellation-before.log",
+    "cancellation_after": "account-cancellation-after.log",
+    "cancellation_cases": 2
+  },
+  "sources": {
+    "app/src/androidTest/java/com/example/wastenot/data/dummy/DummyAccountIdentityTest.kt": "0fd2ad418507262c78d09cc8f930386aacec43a29c6058074036d9bf710d7973",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/ProfileNavigationTest.kt": "7d0ffb3f06b5c05d0b51074974661485195be21b01455500638d52b11f425568",
+    "app/src/main/java/com/example/wastenot/data/dummy/DummyAccountSession.kt": "363d05e18a60f1f3e2bb34b98df4bdae931b3df24b31deb6f155472b98ba1277"
+  },
+  "screenshot_sha256": "5e21eb585a2cab328e33d9dc1a229b1a3793b0b7407afaa3b496cab034f2eda8"
+}

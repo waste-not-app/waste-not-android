@@ -54,6 +54,16 @@ class ProfileNavigationTest {
         compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
         compose.onNode(tabs and hasText("Profil")).performClick()
         compose.onNodeWithText("50 XP dari 5 catatan aktif").assertExists()
+        logout()
+        compose.onNode(hasText("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("profile.zero@example.invalid")
+        compose.onNode(hasText("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        compose.onNodeWithText("Masuk").performScrollTo().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
+        compose.onNode(tabs and hasText("Profil")).performClick()
+        compose.onNodeWithText("Wulan Wijaya").assertIsDisplayed()
+        compose.onNodeWithText("Asia/Jakarta").assertExists()
+        compose.onNodeWithText("0 XP total").assertExists()
+        capture("profile-returning-account")
     }
 
     @Test fun settingsBackThemePersistenceAndLogoutCancelKeepTheAccount() {
