@@ -11,6 +11,7 @@ import java.io.File
 import java.util.UUID
 import org.junit.Rule
 import org.junit.Test
+import org.junit.Assert.assertEquals
 import org.junit.rules.ExternalResource
 
 class ProfileNavigationTest {
@@ -30,12 +31,35 @@ class ProfileNavigationTest {
         compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
         compose.onNode(tabs and hasText("Profil")).performClick()
         logout()
+        capture("auth-login-light")
+        compose.onNodeWithText("Masuk").performScrollTo()
+        capture("auth-login-form-light")
+        chooseTheme("Gelap")
+        capture("auth-login-dark")
+        chooseTheme("Terang")
         compose.onNodeWithText("Belum punya akun? Daftar").performScrollTo().performClick()
-        compose.onNode(hasText("Nama") and hasSetTextAction()).performScrollTo().performTextReplacement("Wulan Wijaya")
-        compose.onNode(hasText("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("profile.zero@example.invalid")
-        compose.onNode(hasText("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
-        compose.onNode(hasText("Konfirmasi kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        capture("auth-register-light")
+        chooseTheme("Gelap")
+        capture("auth-register-dark")
+        chooseTheme("Terang")
+        compose.onNodeWithText("Buat akun").performScrollTo()
+        capture("auth-register-form-light")
+        compose.onNode(hasContentDescription("Nama") and hasSetTextAction()).performScrollTo().performTextReplacement("Wulan Wijaya")
+        compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("profile.zero@example.invalid")
+        compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        compose.onNode(hasContentDescription("Konfirmasi kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        compose.onNode(hasContentDescription("Nama") and hasSetTextAction()).assertTextContains("Wulan Wijaya")
+        compose.onNode(hasContentDescription("Email") and hasSetTextAction()).assertTextContains("profile.zero@example.invalid")
+        listOf("Kata sandi", "Konfirmasi kata sandi").forEach { label ->
+            val rendered = compose.onNode(hasContentDescription(label) and hasSetTextAction()).fetchSemanticsNode()
+                .config[SemanticsProperties.EditableText].text
+            assertEquals("Masked password length for $label", 19, rendered.length)
+        }
         compose.onNodeWithText("Buat akun").performScrollTo().performClick()
+        capture("auth-register-submitted-light")
+        listOf("Nama perlu", "Masukkan alamat email", "Kata sandi perlu", "Konfirmasi kata sandi belum sama", "Email ini sudah digunakan", "Permintaan belum berhasil").forEach {
+            compose.onNodeWithText(it, substring = true).assertDoesNotExist()
+        }
         compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
         compose.onNode(tabs and hasText("Profil")).performClick()
         compose.waitUntil(10_000) {
@@ -48,15 +72,15 @@ class ProfileNavigationTest {
         compose.onNodeWithContentDescription("Kembali").performClick()
         compose.onNodeWithText("0 XP total").assertExists()
         logout()
-        compose.onNode(hasText("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("pengguna@example.invalid")
-        compose.onNode(hasText("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("pengguna@example.invalid")
+        compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
         compose.onNodeWithText("Masuk").performScrollTo().performClick()
         compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
         compose.onNode(tabs and hasText("Profil")).performClick()
         compose.onNodeWithText("50 XP dari 5 catatan aktif").assertExists()
         logout()
-        compose.onNode(hasText("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("profile.zero@example.invalid")
-        compose.onNode(hasText("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("profile.zero@example.invalid")
+        compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
         compose.onNodeWithText("Masuk").performScrollTo().performClick()
         compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
         compose.onNode(tabs and hasText("Profil")).performClick()
@@ -106,6 +130,12 @@ class ProfileNavigationTest {
         val bitmap = instrumentation.uiAutomation.takeScreenshot()
         File(directory, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
         bitmap.recycle()
+    }
+
+    private fun chooseTheme(label: String) {
+        compose.onNodeWithContentDescription("Tampilan").performScrollTo().performClick()
+        compose.onNode(hasText(label) and hasAnyAncestor(isDialog())).performClick()
+        compose.onNodeWithText("Tutup").performClick()
     }
 
     private fun logout() {

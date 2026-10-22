@@ -1,6 +1,10 @@
 package com.example.wastenot
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,13 +20,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,7 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,6 +51,7 @@ import com.example.wastenot.data.repository.GuideStore
 import com.example.wastenot.data.repository.SessionState
 import com.example.wastenot.theme.ThemeMode
 import com.example.wastenot.theme.ThemePicker
+import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.ui.auth.AuthScreen
 import com.example.wastenot.ui.auth.SessionViewModel
 import com.example.wastenot.ui.components.ActionButton
@@ -119,16 +121,16 @@ private fun AuthNavigation(model: SessionViewModel, demo: Boolean, phase: Sessio
     val logout by model.logoutState.collectAsStateWithLifecycle()
     fun back() { model.cancelSubmission(); if (stack.size > 1) stack.removeLastOrNull() }
     Scaffold(
+        modifier = Modifier.background(LocalWasteNotGradients.current.canvas),
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.onSurface,
         contentWindowInsets = WindowInsets.safeDrawing,
-        topBar = {
-            TopAppBar(title = {}, navigationIcon = {
-                if (stack.size > 1) IconButton(onClick = ::back) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
-            }, actions = { TextButton(onClick = onTheme) { Text(stringResource(R.string.theme_title)) } })
-        },
     ) { padding ->
         NavDisplay(
             backStack = stack,
             onBack = ::back,
+            transitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
+            popTransitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
@@ -137,11 +139,11 @@ private fun AuthNavigation(model: SessionViewModel, demo: Boolean, phase: Sessio
                 entry<Login> {
                     AuthScreen(false, form, demo, phase.reason, model::change, { model.submit(false) },
                         { model.clearPasswords(); if (stack.last() != Register) stack.add(Register) },
-                        Modifier.fillMaxSize(), logout, model::logout)
+                        onTheme, Modifier.fillMaxSize(), logout, model::logout)
                 }
                 entry<Register> {
                     AuthScreen(true, form, demo, phase.reason, model::change, { model.submit(true) }, ::back,
-                        Modifier.fillMaxSize(), logout, model::logout)
+                        onTheme, Modifier.fillMaxSize(), logout, model::logout, onBack = ::back)
                 }
             },
         )

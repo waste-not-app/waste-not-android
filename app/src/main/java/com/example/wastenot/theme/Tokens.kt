@@ -4,6 +4,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 object WasteNotSpacing {
@@ -40,3 +41,4 @@ internal val DarkGradients = LightGradients.copy(
 )
 
 val LocalWasteNotGradients = staticCompositionLocalOf { LightGradients }
+val LocalWasteNotDockEdge = staticCompositionLocalOf<Color> { DockEdge }

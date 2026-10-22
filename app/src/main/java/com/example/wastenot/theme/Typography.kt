@@ -27,6 +27,9 @@ private fun role(size: Int, height: Int, weight: FontWeight, tracking: Float = 0
     fontFeatureSettings = "tnum",
 )
 
+val WasteNotWordmark = role(29, 36, FontWeight.ExtraBold, -1.3f)
+val WasteNotAuthHeading = role(30, 36, FontWeight.Bold, -0.5f)
+
 val Typography = Typography(
     displayLarge = role(48, 56, FontWeight.ExtraBold, -1f),
     displayMedium = role(36, 44, FontWeight.ExtraBold, -0.5f),

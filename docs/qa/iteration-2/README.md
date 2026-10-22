@@ -51,3 +51,5 @@ Lanjutkan kriteria editor/konflik/draf, cursor Riwayat, penerimaan Panduan, Stat
 Checkpoint S13: [Statistik 7/30 hari, chart dan alternatif teks](STATISTICS.md). Koreksi pembacaan glyph pada bukti sebelumnya: [pemeriksaan ulang](VISUAL_RECHECK.md).
 
 Checkpoint S14/S16: [Profil, Pengaturan dan akun baru kosong](PROFILE_SETTINGS.md).
+
+Checkpoint S02/S03/C24/C25/C35: [form akun, proporsi dock dan label utuh pada teks besar](NAV_AUTH.md).

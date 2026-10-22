@@ -2,6 +2,7 @@ package com.example.wastenot.ui.main
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -58,8 +59,10 @@ class SessionRootTest {
     @Test fun imeSubmitsOnceAndCredentialFailureKeepsInputWithoutPrivateRoot() {
         val source = FixtureSession().apply { loginGate = CompletableDeferred() }
         start(source)
-        val email = compose.onNode(hasText("Email") and hasSetTextAction())
-        val password = compose.onNode(hasText("Kata sandi") and hasSetTextAction())
+        val email = compose.onNode(hasContentDescription("Email") and hasSetTextAction())
+        val password = compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction())
+        email.assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentType, ContentType.EmailAddress))
+        password.assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentType, ContentType.Password))
         email.performTextReplacement("fixture@example.invalid")
         password.performTextReplacement(" fixture-password-12 ")
         password.performImeAction()
@@ -90,12 +93,13 @@ class SessionRootTest {
         start(source)
         compose.onNodeWithText("Belum punya akun? Daftar").performScrollTo().performClick()
         compose.onNodeWithText("Buat akun").performScrollTo().performClick()
-        compose.onNode(hasText("Nama") and hasSetTextAction()).assertIsFocused()
+        compose.onNode(hasContentDescription("Nama") and hasSetTextAction()).assertIsFocused()
         assertEquals(0, source.registerCalls)
-        compose.onNode(hasText("Nama") and hasSetTextAction()).performTextReplacement("Sam Demo")
-        compose.onNode(hasText("Email") and hasSetTextAction()).performTextReplacement("sam@example.invalid")
-        compose.onNode(hasText("Kata sandi") and hasSetTextAction()).performTextReplacement(" fixture-password-12 ")
-        val confirmation = compose.onNode(hasText("Konfirmasi kata sandi") and hasSetTextAction())
+        compose.onNode(hasContentDescription("Nama") and hasSetTextAction()).performTextReplacement("Sam Demo")
+        compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performTextReplacement("sam@example.invalid")
+        compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction()).performTextReplacement(" fixture-password-12 ")
+        val confirmation = compose.onNode(hasContentDescription("Konfirmasi kata sandi") and hasSetTextAction())
+        confirmation.assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentType, ContentType.NewPassword))
         confirmation.performTextReplacement("fixture-password-12")
         compose.onNodeWithText("Buat akun").performScrollTo().performClick()
         compose.onNodeWithText("Konfirmasi kata sandi belum sama.").assertExists()

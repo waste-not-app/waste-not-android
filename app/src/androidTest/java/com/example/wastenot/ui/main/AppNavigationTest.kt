@@ -152,8 +152,8 @@ class AppNavigationTest {
         compose.onNodeWithText("Keluar").performScrollTo().performClick()
         compose.onNode(hasText("Keluar") and hasAnyAncestor(isDialog())).performClick()
         compose.waitUntil(10_000) { compose.onAllNodesWithText("Belum punya akun? Daftar").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNode(hasText("Email") and hasSetTextAction()).performClick().performTextReplacement("fixture@example.invalid")
-        val password = compose.onNode(hasText("Kata sandi") and hasSetTextAction())
+        compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performScrollTo().performClick().performTextReplacement("fixture@example.invalid")
+        val password = compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction())
         password.performScrollTo().performClick().performTextReplacement("short")
         compose.waitUntil(8_000) { compose.runOnUiThread {
             ViewCompat.getRootWindowInsets(compose.activity.window.decorView)?.isVisible(WindowInsetsCompat.Type.ime()) == true

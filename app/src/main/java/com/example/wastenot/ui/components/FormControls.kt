@@ -26,11 +26,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -90,6 +92,7 @@ fun WasteTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     labelAbove: Boolean = false,
     placeholder: String? = null,
+    autofillType: ContentType? = null,
 ) {
     var visible by rememberSaveable { mutableStateOf(false) }
     val support = errorText ?: helper
@@ -103,6 +106,7 @@ fun WasteTextField(
                 .heightIn(min = 56.dp)
                 .semantics {
                     if (labelAbove) contentDescription = label
+                    if (autofillType != null) contentType = autofillType
                     if (errorText != null) error(errorText)
                 },
             shape = MaterialTheme.shapes.small,

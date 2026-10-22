@@ -86,7 +86,10 @@ fun WasteNotTheme(
     content: @Composable () -> Unit,
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-    CompositionLocalProvider(LocalWasteNotGradients provides if (darkTheme) DarkGradients else LightGradients) {
+    CompositionLocalProvider(
+        LocalWasteNotGradients provides if (darkTheme) DarkGradients else LightGradients,
+        LocalWasteNotDockEdge provides if (darkTheme) DockEdgeDark else DockEdge,
+    ) {
         MaterialTheme(colorScheme = colorScheme, typography = Typography, shapes = WasteNotShapes, content = content)
     }
 }

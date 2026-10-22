@@ -3,15 +3,25 @@ package com.example.wastenot.ui.auth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,8 +36,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -42,6 +52,10 @@ import com.example.wastenot.model.AccountField
 import com.example.wastenot.model.AccountInputError
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.WasteTextField
+import com.example.wastenot.theme.LocalWasteNotGradients
+import com.example.wastenot.theme.OnAccent
+import com.example.wastenot.theme.WasteNotAuthHeading
+import com.example.wastenot.theme.WasteNotWordmark
 
 @Composable
 fun AuthScreen(
@@ -52,9 +66,11 @@ fun AuthScreen(
     onChange: (AccountField, String) -> Unit,
     onSubmit: () -> Unit,
     onSwitchForm: () -> Unit,
+    onTheme: () -> Unit,
     modifier: Modifier = Modifier,
     logoutState: LogoutUiState = LogoutUiState.None,
     onRetryCleanup: () -> Unit = {},
+    onBack: (() -> Unit)? = null,
 ) {
     val focus = LocalFocusManager.current
     val requesters = remember { AccountField.entries.associateWith { FocusRequester() } }
@@ -70,15 +86,46 @@ fun AuthScreen(
                 .widthIn(max = 560.dp)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(horizontal = 20.dp, vertical = 18.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
-            Text(
-                stringResource(if (register) R.string.register_heading else R.string.login_heading),
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.semantics { heading() },
-            )
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Text(stringResource(R.string.app_name), style = WasteNotWordmark)
+                    Box(Modifier.padding(bottom = 7.dp).size(8.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
+                }
+                Row {
+                    if (onBack != null) FilledIconButton(
+                        onClick = onBack,
+                        shape = MaterialTheme.shapes.small,
+                        colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                        modifier = Modifier.size(48.dp),
+                    ) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
+                    IconButton(onClick = onTheme, modifier = Modifier.size(48.dp)) {
+                        Icon(painterResource(R.drawable.ic_device), stringResource(R.string.theme_title))
+                    }
+                }
+            }
+            Box(
+                Modifier.padding(vertical = 10.dp).size(64.dp)
+                    .background(LocalWasteNotGradients.current.accent, RoundedCornerShape(20.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(painterResource(if (register) R.drawable.ic_leaf else R.drawable.ic_recycle), null, Modifier.size(32.dp), tint = OnAccent)
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    stringResource(if (register) R.string.register_heading else R.string.login_heading),
+                    style = WasteNotAuthHeading,
+                    modifier = Modifier.semantics { heading() },
+                )
+                Text(stringResource(if (register) R.string.register_description else R.string.login_description),
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             if (logoutState == LogoutUiState.None && state.failure == null && reason !in setOf(SignOutReason.NONE, SignOutReason.LOGOUT_CONFIRMED, SignOutReason.LOGOUT_LOCAL_ONLY)) {
                 MessageBanner(stringResource(R.string.session_expired_message))
             }
@@ -96,37 +143,40 @@ fun AuthScreen(
                     else -> Unit
                 }
             }
-            if (register) AuthField(
-                AccountField.NAME, state, requesters.getValue(AccountField.NAME), onChange,
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
-                keyboardActions = next, contentType = ContentType.PersonFullName, modifier = Modifier.fillMaxWidth(),
-            )
-            AuthField(
-                AccountField.EMAIL, state, requesters.getValue(AccountField.EMAIL), onChange,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-                keyboardActions = next, contentType = ContentType.EmailAddress, modifier = Modifier.fillMaxWidth(),
-            )
-            AuthField(
-                AccountField.PASSWORD, state, requesters.getValue(AccountField.PASSWORD), onChange,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = if (register) ImeAction.Next else ImeAction.Done),
-                keyboardActions = next, contentType = if (register) ContentType.NewPassword else ContentType.Password, modifier = Modifier.fillMaxWidth(),
-            )
-            if (register) {
-                AuthField(
-                    AccountField.PASSWORD_CONFIRMATION, state, requesters.getValue(AccountField.PASSWORD_CONFIRMATION), onChange,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                    keyboardActions = next, contentType = ContentType.NewPassword, modifier = Modifier.fillMaxWidth(),
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                if (register) AuthField(
+                    AccountField.NAME, state, requesters.getValue(AccountField.NAME), onChange,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
+                    keyboardActions = next, contentType = ContentType.PersonFullName, modifier = Modifier.fillMaxWidth(),
                 )
-                Text(stringResource(R.string.account_timezone, state.timezone.id), style = MaterialTheme.typography.bodyMedium)
+                AuthField(
+                    AccountField.EMAIL, state, requesters.getValue(AccountField.EMAIL), onChange,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                    keyboardActions = next, contentType = ContentType.EmailAddress, modifier = Modifier.fillMaxWidth(),
+                )
+                AuthField(
+                    AccountField.PASSWORD, state, requesters.getValue(AccountField.PASSWORD), onChange,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = if (register) ImeAction.Next else ImeAction.Done),
+                    keyboardActions = next, contentType = if (register) ContentType.NewPassword else ContentType.Password, modifier = Modifier.fillMaxWidth(),
+                    passwordHint = register,
+                )
+                if (register) {
+                    AuthField(
+                        AccountField.PASSWORD_CONFIRMATION, state, requesters.getValue(AccountField.PASSWORD_CONFIRMATION), onChange,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                        keyboardActions = next, contentType = ContentType.NewPassword, modifier = Modifier.fillMaxWidth(),
+                    )
+                    Text(stringResource(R.string.account_timezone, state.timezone.id), style = MaterialTheme.typography.bodyMedium)
+                }
+                state.failure?.let { MessageBanner(stringResource(it.messageResource), isError = true) }
+                ActionButton(
+                    label = stringResource(if (register) R.string.register_action else R.string.login_action),
+                    onClick = onSubmit,
+                    loading = state.submitting,
+                    loadingLabel = stringResource(if (register) R.string.register_loading else R.string.login_loading),
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
-            state.failure?.let { MessageBanner(stringResource(it.messageResource), isError = true) }
-            ActionButton(
-                label = stringResource(if (register) R.string.register_action else R.string.login_action),
-                onClick = onSubmit,
-                loading = state.submitting,
-                loadingLabel = stringResource(if (register) R.string.register_loading else R.string.login_loading),
-                modifier = Modifier.fillMaxWidth(),
-            )
             TextButton(onClick = onSwitchForm, enabled = !state.submitting, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                 Text(stringResource(if (register) R.string.go_to_login else R.string.go_to_register))
             }
@@ -144,6 +194,7 @@ private fun AuthField(
     keyboardActions: KeyboardActions,
     contentType: ContentType,
     modifier: Modifier = Modifier,
+    passwordHint: Boolean = false,
 ) {
     val value = when (field) {
         AccountField.NAME -> state.name
@@ -164,14 +215,21 @@ private fun AuthField(
         onValueChange = { onChange(field, it) },
         label = stringResource(label),
         errorText = error?.let { stringResource(it) },
-        helper = if (field == AccountField.PASSWORD) stringResource(R.string.password_helper) else null,
+        helper = if (passwordHint) stringResource(R.string.password_helper) else null,
+        labelAbove = true,
+        placeholder = stringResource(when (field) {
+            AccountField.NAME -> R.string.account_name_placeholder
+            AccountField.EMAIL -> R.string.account_email_placeholder
+            AccountField.PASSWORD -> R.string.account_password_placeholder
+            AccountField.PASSWORD_CONFIRMATION -> R.string.account_confirmation_placeholder
+        }),
+        autofillType = contentType,
         password = field == AccountField.PASSWORD || field == AccountField.PASSWORD_CONFIRMATION,
         enabled = !state.submitting,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         modifier = modifier
-            .focusRequester(requester)
-            .semantics { this.contentType = contentType },
+            .focusRequester(requester),
     )
 }
 

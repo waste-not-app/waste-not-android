@@ -61,6 +61,15 @@ class Iteration2DesignTest {
             compose.onAllNodes(tabs).fetchSemanticsNodes().forEach { node ->
                 val text = node.config[SemanticsProperties.Text].joinToString { it.text }
                 compose.onNode(tabs and hasText(text)).assertHeightIsAtLeast(48.dp).assertWidthIsAtLeast(48.dp)
+                val labelLayouts = mutableListOf<TextLayoutResult>()
+                compose.onNode(hasText(text) and hasAnyAncestor(tabs), useUnmergedTree = true)
+                    .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(labelLayouts) }
+                val labelLayout = labelLayouts.single()
+                assertTrue("Navigation label must remain whole and visible: $text; lines=${labelLayout.lineCount}, " +
+                    "size=${labelLayout.size}, paragraph=${labelLayout.multiParagraph.width}x${labelLayout.multiParagraph.height}, " +
+                    "overflowWidth=${labelLayout.didOverflowWidth}, overflowHeight=${labelLayout.didOverflowHeight}, " +
+                    "constraints=${labelLayout.layoutInput.constraints}",
+                    labelLayout.lineCount == 1 && !labelLayout.hasVisualOverflow)
             }
             compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
             compose.onNodeWithText("Catat sampahmu").assertIsDisplayed()

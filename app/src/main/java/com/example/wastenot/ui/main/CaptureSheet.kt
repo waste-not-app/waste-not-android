@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -50,12 +51,13 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
             }
         } else {
             Row(
-                modifier = Modifier.background(LocalWasteNotGradients.current.accent).padding(horizontal = 18.dp, vertical = 14.dp),
+                modifier = Modifier.background(LocalWasteNotGradients.current.accent).padding(horizontal = 16.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
             ) {
                 Icon(painterResource(R.drawable.ic_camera), null, Modifier.size(24.dp), tint = OnAccent)
-                Text(stringResource(R.string.scan_action), color = OnAccent, style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.scan_action), color = OnAccent,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.ExtraBold))
             }
         }
     }

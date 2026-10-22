@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -25,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.createSavedStateHandle
@@ -45,6 +47,7 @@ import com.example.wastenot.model.User
 import com.example.wastenot.theme.OnAccent
 import com.example.wastenot.theme.ThemeMode
 import com.example.wastenot.theme.LocalWasteNotGradients
+import com.example.wastenot.theme.LocalWasteNotDockEdge
 import java.time.LocalDate
 import java.util.UUID
 
@@ -347,15 +350,30 @@ private fun AccountPage(
 
 @Composable
 private fun TabDock(selected: MainTab, onSelect: (MainTab) -> Unit, onRecord: () -> Unit, modifier: Modifier = Modifier) {
-    Box(modifier.navigationBarsPadding().padding(start = 7.dp, end = 7.dp, bottom = 9.dp)) {
+    BoxWithConstraints(modifier.navigationBarsPadding().padding(start = 7.dp, end = 7.dp, bottom = 9.dp)) {
+        val measurer = rememberTextMeasurer()
+        val style = MaterialTheme.typography.labelMedium
+        val labels = MainTab.entries.map { stringResource(it.label) }
+        val widest = with(LocalDensity.current) {
+            labels.maxOf { measurer.measure(it, style = style, softWrap = false).size.width }.toDp()
+        }
+        // Reflow whole labels when larger text needs more room than five columns provide.
+        val columns = listOf(5, 3, 2, 1).firstOrNull {
+            val cellWidth = (maxWidth - 4.dp) / it
+            cellWidth >= 48.dp && widest + 8.dp <= cellWidth
+        } ?: 1
         Surface(
             modifier = Modifier.fillMaxWidth().padding(top = 27.dp),
             color = MaterialTheme.colorScheme.surface,
             shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            border = androidx.compose.foundation.BorderStroke(1.dp, LocalWasteNotDockEdge.current),
             shadowElevation = 2.dp,
         ) {
-            Row(Modifier.padding(top = 32.dp, bottom = 7.dp, start = 2.dp, end = 2.dp).selectableGroup()) {
+            FlowRow(
+                modifier = Modifier.padding(top = 32.dp, bottom = 7.dp, start = 2.dp, end = 2.dp).selectableGroup(),
+                maxItemsInEachRow = columns,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 MainTab.entries.forEach { tab -> TabItem(tab, tab == selected, { onSelect(tab) }, Modifier.weight(1f)) }
             }
         }
@@ -384,17 +402,19 @@ private fun TabRail(selected: MainTab, onSelect: (MainTab) -> Unit, onRecord: ()
 private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .heightIn(min = 64.dp)
+            .heightIn(min = 54.dp)
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(19.dp))
             .selectable(selected, role = Role.Tab, onClick = onClick)
             .padding(horizontal = 2.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Box(Modifier.size(width = 44.dp, height = 28.dp).then(if (selected) Modifier.background(LocalWasteNotGradients.current.accent,
-            androidx.compose.foundation.shape.RoundedCornerShape(10.dp)) else Modifier), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(width = 46.dp, height = 28.dp).then(if (selected) Modifier.background(LocalWasteNotGradients.current.accent,
+            androidx.compose.foundation.shape.RoundedCornerShape(9.dp)) else Modifier), contentAlignment = Alignment.Center) {
             Icon(painterResource(tab.icon), null, Modifier.size(20.dp), tint = if (selected) OnAccent else MaterialTheme.colorScheme.onSurface)
         }
-        Text(stringResource(tab.label), style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center,
-            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(stringResource(tab.label), modifier = Modifier.fillMaxWidth(),
+            style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center, maxLines = 1,
+            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
     }
 }

@@ -1,0 +1,239 @@
+{
+  "date": "2026-10-23",
+  "base_commit": "30cad7c7a665f67f25e6367e4d983b4551f6aaab",
+  "app_sha256": "c71887660bce189ab2825d1d768cec9e0aad14e07ef93a70012eb3782e8082e1",
+  "test_sha256": "3c8dbc9c83209da3a70e375e3afcce5fbb9dd24245ebe0b31afa93c892d47db6",
+  "unit": {
+    "tests": 137,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native": [
+    {
+      "profile": "normal",
+      "cases": 29,
+      "passed": 28,
+      "skipped": 1,
+      "seconds": 367.552,
+      "log_sha256": "cc90d557af5b8e7594abc2a92641cdd165acf418b79717d738e8d850e9e0bdc2",
+      "images": {
+        "auth-login-dark.png": "b2cdd92820c29e405321576b5312e78d3f2b29bde83903ce44a6d045a2b47cbb",
+        "auth-login-form-light.png": "d2133dc4e0288a4ede7854794b66c1b4e49ff6d848eb04d6277475749a38c926",
+        "auth-login-light.png": "d2133dc4e0288a4ede7854794b66c1b4e49ff6d848eb04d6277475749a38c926",
+        "auth-register-dark.png": "32c0fd9ecfe9382c6243c61643693f4b734886ac9e21648706960c1938c7fd63",
+        "auth-register-form-light.png": "555bb9798006a6720c7c1f5dacb91fd172444474df26886d13ccbd825529c4c7",
+        "auth-register-light.png": "5acab220f10d089316c73a3040c37f23a1962884d4a092df3bf9951797814148",
+        "auth-register-submitted-light.png": "090f6f7510b58831dcca58cfdba4d87e037af85c415fcf3cee993959d9273dd2",
+        "capture-sheet.png": "03aa0768f6b333056edf97b23be6a738dfdeddefd8f1d1b9da1bfde2f1adde21",
+        "home-dark.png": "4d25742f0d349e37c5e8da4f80148bd92262404a1a824add2dc091f330530d90",
+        "home-light.png": "b16b2543f47cb16f4fb31e2b2541a596e04d6f6b853adc773d41eb3db268573c",
+        "profile-returning-account.png": "7accf9b905307ab34a0f0e33fdecbc6566303d70ee20bd5ddad488c2c83eec1b"
+      }
+    },
+    {
+      "profile": "phone200",
+      "cases": 10,
+      "passed": 10,
+      "skipped": 0,
+      "seconds": 152.249,
+      "log_sha256": "4a299df1f8a54a6a9e399cad1800cfda5057e304d3c6c8fa237e90a323eef77d",
+      "images": {
+        "auth-login-dark.png": "c06a2267fd5cad797749c42ab9191e1450a02301805d6387de555771b14be0b3",
+        "auth-login-form-light.png": "1bbfe7bc44ca48c8711da97ef0436f04a286e2390ada3b9bb8f85b962e42bd75",
+        "auth-login-light.png": "7898bbba1089dcdfe0709bec44139a62ef8feff8be720db024ce99e3a331b983",
+        "auth-register-dark.png": "d6a67ecf2e2bf162e452238fafafc7edbd1ac1743424e8de0b935f16ae207f97",
+        "auth-register-form-light.png": "cdde90a88ecb62e2c4eb42201d3dd2ef8168af896ef8871bbca37e6c2d836de8",
+        "auth-register-light.png": "5012c9268188203d9db9e184369b528d12e98e422db2b76c05a21ab8b3f561a3",
+        "auth-register-submitted-light.png": "27ba63ca7fdb28c14e60d7e7100eeddecffb55f2b2fb6aa51df0a3c26df977c5",
+        "capture-sheet.png": "cbd0044d96861390c93f9bbbaad0aa415bb23b512a8ac79baf9b96fb6382f169",
+        "home-dark.png": "ccc2684ab675b5d10271a343e229481977a9efcee831a8c04096d855bc1f87e3",
+        "home-light.png": "932b89ae54600e21861cd6bf4f593d1e6ffe35b08ff672457b8c19bc03184788",
+        "profile-returning-account.png": "cc9a7a9d12aaef8ad88c7c113e938872a17909e3ee68b725edec082478c91e30"
+      }
+    },
+    {
+      "profile": "wide200",
+      "cases": 10,
+      "passed": 10,
+      "skipped": 0,
+      "seconds": 143.842,
+      "log_sha256": "ff07e3d74cf73ca4156aff0a0eee6dc6baa88e6722460fea04383a730b73f746",
+      "images": {
+        "auth-login-dark.png": "e01865c7a11f03a6b540a42514a635331219e9ff48f239e959270f431d2cfd2c",
+        "auth-login-form-light.png": "7156404ed2a05c9f2468772113e54696934d9965712958c8d1397c13ee7434f3",
+        "auth-login-light.png": "7156404ed2a05c9f2468772113e54696934d9965712958c8d1397c13ee7434f3",
+        "auth-register-dark.png": "97d29d35fa5b817869f562b5af18fa13fe974f50697f1749d022c88d8464aaa6",
+        "auth-register-form-light.png": "b3a9a27487eec46740804ec7520c9de31958fc67c28b4411632ea70210b7efb9",
+        "auth-register-light.png": "9535b870aac997ce87cd642da2935606c68a2a9348ad9e619c036bfcdbf53ae7",
+        "auth-register-submitted-light.png": "be90deaeddd36ca52b5e6472c82a5082f9bb2856a9f26c0c431780254eb9ac72",
+        "capture-sheet.png": "18112b8fb971fd1890578af14779778568e1ee540b74e8a7de905c8634040f39",
+        "home-dark.png": "14e2abbabb46588237a24aa7c08218c149cdcfe74be314a6d363a9d142aca8ca",
+        "home-light.png": "f9f4886c4a99a4441036842594e59e61ca2936383db3ac5323a9d430a5a980c6",
+        "profile-returning-account.png": "d38ac2b36598624cf6763e676e696caedfe2fc200a9bc0b3434260ab1ad2bd6b"
+      }
+    }
+  ],
+  "cases": {
+    "normal": {
+      "passed": [
+        "com.example.wastenot.ui.main.SessionRootTest#registrationValidatesFirstThenUsesVisibleTimezoneAndClearsAuthRoot",
+        "com.example.wastenot.ui.main.SessionRootTest#startupRetryAndLoginAgainRemainReachableInShortWindows",
+        "com.example.wastenot.ui.main.SessionRootTest#aNewAccountLifetimeDoesNotRestoreThePreviousGuideQuery",
+        "com.example.wastenot.ui.main.SessionRootTest#imeSubmitsOnceAndCredentialFailureKeepsInputWithoutPrivateRoot",
+        "com.example.wastenot.ui.main.SessionRootTest#unverifiedIdentityHidesOldProfileAndRetryReplacesRootOnce",
+        "com.example.wastenot.ui.main.ProfileNavigationTest#registeredAccountStartsAtZeroAndTheOriginalAccountsLogsStayAvailable",
+        "com.example.wastenot.ui.main.ProfileNavigationTest#settingsBackThemePersistenceAndLogoutCancelKeepTheAccount",
+        "com.example.wastenot.ui.main.Iteration2DesignTest#directDummyHomeDockAndManualFallbackRetainAllFiveStacks",
+        "com.example.wastenot.ui.main.AppNavigationTest#datasetFiveTabsManualActionAndThemeWorkTogether",
+        "com.example.wastenot.ui.main.AppNavigationTest#invalidPasswordStaysFocusedAboveKeyboardWithoutCallingAccountService",
+        "com.example.wastenot.ui.main.AppNavigationTest#dirtyBackCreateAndEditKeepExclusiveQuantityAndDoNotAddEditXp",
+        "com.example.wastenot.ui.main.AppNavigationTest#historyFilterAndRangeSurviveDetailTabsAndRotation",
+        "com.example.wastenot.ui.main.AppNavigationTest#backAtHomeExitsWithoutOpeningAuth",
+        "com.example.wastenot.ui.components.FormControlsTest#staleCreateDateCanBeReviewedWithoutAllowingItOutsideTheWindow",
+        "com.example.wastenot.ui.components.FormControlsTest#methodChoiceSelectsOneWithoutFillingAnInitialChoice",
+        "com.example.wastenot.ui.components.FormControlsTest#editCalendarAllowsOnlyOriginalOldDateOutsideCreateWindow",
+        "com.example.wastenot.ui.components.FormControlsTest#visibilityToggleChangesRenderedTextAndLoadingDisablesSubmit",
+        "com.example.wastenot.ui.components.FormControlsTest#unitChangesUseExactParserAndClearOtherQuantityKind",
+        "com.example.wastenot.ui.components.FormControlsTest#calendarAppliesLocalDateAndRejectsFutureDay",
+        "com.example.wastenot.ui.main.GuideNavigationTest#darkGuideSearchBackAndPrefillKeepInputExplicit",
+        "com.example.wastenot.ui.main.GuideNavigationTest#lightGuideSearchBackAndPrefillKeepInputExplicit",
+        "com.example.wastenot.ui.main.GuideNavigationTest#searchBackAndPrefillWithTheNaturalAnimationClock",
+        "com.example.wastenot.ui.main.NavigationTransitionTest#discardKeepsItsFormDuringExitAndTheNextDraftStartsEmpty",
+        "com.example.wastenot.ui.main.NavigationTransitionTest#confirmedCreateDoesNotFlashALoadErrorWhileTheEditorExits",
+        "com.example.wastenot.ui.main.NavigationTransitionTest#cleanBackKeepsItsFormUntilHomeReturns",
+        "com.example.wastenot.ui.main.NavigationTransitionTest#darkConfirmedCreateKeepsItsFormDuringExit",
+        "com.example.wastenot.ui.main.NavigationTransitionTest#dirtyEditorHeaderBackUsesTheCurrentDraft",
+        "com.example.wastenot.ui.main.NavigationTransitionTest#confirmedEditKeepsItsFormUntilTheUpdatedReceiptAppears"
+      ],
+      "skipped": [
+        "com.example.wastenot.ui.main.AppNavigationTest#edgeBackGestureUsesDirtyDraftPolicy"
+      ]
+    },
+    "phone200": {
+      "passed": [
+        "com.example.wastenot.ui.main.Iteration2DesignTest#directDummyHomeDockAndManualFallbackRetainAllFiveStacks",
+        "com.example.wastenot.ui.main.SessionRootTest#registrationValidatesFirstThenUsesVisibleTimezoneAndClearsAuthRoot",
+        "com.example.wastenot.ui.main.SessionRootTest#startupRetryAndLoginAgainRemainReachableInShortWindows",
+        "com.example.wastenot.ui.main.SessionRootTest#aNewAccountLifetimeDoesNotRestoreThePreviousGuideQuery",
+        "com.example.wastenot.ui.main.SessionRootTest#imeSubmitsOnceAndCredentialFailureKeepsInputWithoutPrivateRoot",
+        "com.example.wastenot.ui.main.SessionRootTest#unverifiedIdentityHidesOldProfileAndRetryReplacesRootOnce",
+        "com.example.wastenot.ui.main.ProfileNavigationTest#registeredAccountStartsAtZeroAndTheOriginalAccountsLogsStayAvailable",
+        "com.example.wastenot.ui.main.ProfileNavigationTest#settingsBackThemePersistenceAndLogoutCancelKeepTheAccount",
+        "com.example.wastenot.ui.main.AppNavigationTest#invalidPasswordStaysFocusedAboveKeyboardWithoutCallingAccountService",
+        "com.example.wastenot.ui.main.GuideNavigationTest#searchBackAndPrefillWithTheNaturalAnimationClock"
+      ],
+      "skipped": []
+    },
+    "wide200": {
+      "passed": [
+        "com.example.wastenot.ui.main.Iteration2DesignTest#directDummyHomeDockAndManualFallbackRetainAllFiveStacks",
+        "com.example.wastenot.ui.main.SessionRootTest#registrationValidatesFirstThenUsesVisibleTimezoneAndClearsAuthRoot",
+        "com.example.wastenot.ui.main.SessionRootTest#startupRetryAndLoginAgainRemainReachableInShortWindows",
+        "com.example.wastenot.ui.main.SessionRootTest#aNewAccountLifetimeDoesNotRestoreThePreviousGuideQuery",
+        "com.example.wastenot.ui.main.SessionRootTest#imeSubmitsOnceAndCredentialFailureKeepsInputWithoutPrivateRoot",
+        "com.example.wastenot.ui.main.SessionRootTest#unverifiedIdentityHidesOldProfileAndRetryReplacesRootOnce",
+        "com.example.wastenot.ui.main.ProfileNavigationTest#registeredAccountStartsAtZeroAndTheOriginalAccountsLogsStayAvailable",
+        "com.example.wastenot.ui.main.ProfileNavigationTest#settingsBackThemePersistenceAndLogoutCancelKeepTheAccount",
+        "com.example.wastenot.ui.main.AppNavigationTest#invalidPasswordStaysFocusedAboveKeyboardWithoutCallingAccountService",
+        "com.example.wastenot.ui.main.GuideNavigationTest#searchBackAndPrefillWithTheNaturalAnimationClock"
+      ],
+      "skipped": []
+    }
+  },
+  "unique_passed": 28,
+  "sources": {
+    "app/src/androidTest/java/com/example/wastenot/ui/main/AppNavigationTest.kt": "02843f98c4fceb3776963dfc55aa9cbd197bddd1ec8b2fc03c6354c76f467552",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/Iteration2DesignTest.kt": "543717d3b6d4b08424f9b6728fa448b1056815973dff4954f23ceba108064dff",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/ProfileNavigationTest.kt": "ce4d72d63a2112d8e35a8d98d02f832a0d33a16cd045c1a0510a342f44b1781a",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/SessionRootTest.kt": "dae2e524d917ee371dd6ee57735fc2d1d5e75d075b609e3b66ce5c4451cb72c8",
+    "app/src/main/java/com/example/wastenot/Navigation.kt": "6d4e74b767a3621503b72c9117d42200d6592460cf85b8b05479174b591c7a8b",
+    "app/src/main/java/com/example/wastenot/theme/Color.kt": "cf534ed929e83867bfd9befbf8eb15de63b67faac6998404e5b34e044b8ccbcf",
+    "app/src/main/java/com/example/wastenot/theme/Theme.kt": "c29892af961c1e402788c4a8e0367bc2ce62dbe8f9e6266ba420e28ac1db6f3f",
+    "app/src/main/java/com/example/wastenot/theme/Tokens.kt": "e420426d2df17b98c84099f018b0ec3c755ac49fe484d092ef21f1e25760a4ad",
+    "app/src/main/java/com/example/wastenot/theme/Typography.kt": "e50e1fe55967c08f77688268f54cab5ac4f7b56ac0bdafdd96a239546f7bff7f",
+    "app/src/main/java/com/example/wastenot/ui/auth/AuthScreen.kt": "3a4622f41ffa86ab44f8ddc078f698113c8928379abe9e504b7d30032d0ba96d",
+    "app/src/main/java/com/example/wastenot/ui/components/FormControls.kt": "2434309aa8dfe821e3eff2dc6a4cfad7869d3f9b4f1258c236221e31a36277f9",
+    "app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt": "bf427d038ea48f0edf5bb4033519d5c224345151880a295c784baabbdf8e8d8b",
+    "app/src/main/java/com/example/wastenot/ui/main/CaptureSheet.kt": "a3db820939a45a812e847e7c77787fef1ec9629cb2098d177570de43c96797a5",
+    "app/src/main/res/drawable/ic_recycle.xml": "d782ed28a0a3eba34a99b742efbf1020d8ddd9ec46c3b7cf0957af53648606ec",
+    "app/src/main/res/values/auth.xml": "e4b380495318b751ec37ed96ecc3074e5306e4e2306f77ffd1f462a06360855c"
+  },
+  "manual_header_back": {
+    "passed": true,
+    "steps": [
+      {
+        "action": "Buka profil",
+        "observed_ui": 1,
+        "center": [
+          948,
+          206
+        ]
+      },
+      {
+        "action": "Keluar",
+        "observed_ui": 3,
+        "center": [
+          582,
+          1089
+        ]
+      },
+      {
+        "action": "Keluar",
+        "observed_ui": 5,
+        "center": [
+          847,
+          1092
+        ]
+      },
+      {
+        "action": "Belum punya akun? Daftar",
+        "observed_ui": 7,
+        "center": [
+          540,
+          1650
+        ]
+      },
+      {
+        "action": "Kembali",
+        "observed_ui": 9,
+        "center": [
+          804,
+          198
+        ]
+      }
+    ],
+    "final_ui": 10
+  },
+  "kit": {
+    "docs/design-kit/DESIGN.md": "895310baca095e74517b0105e36f4b3d007bac43945c8593b6d6e86e3dfd62b0",
+    "docs/design-kit/SCREEN_SPEC.md": "fa98a8225ff4ab253adab248dc4c12d84d88a320695871b971e542edcd2f1a19",
+    "docs/design-kit/design-system.css": "47d308dcf92184508acd03be400976901a7a753fd4c406d0f6fa26c19cb5efc3",
+    "docs/design-kit/design-system.js": "fea2a56bf2306ca9c538472f52b02d05bc9944cf8d94f2b445e102f1d8cb412e"
+  },
+  "pngs": {
+    "nav-auth-dock-before.png": "0d002645fa1c660a689ef05c95df6decd3a6a759905807d91b2db0f779393f88",
+    "nav-auth-dock-normal.png": "4e61c90d6db8eb31dc4a2194687c662ee4b3d42587015793545236cdc887633c",
+    "nav-auth-dock-phone200.png": "503e29d2fed81c5294acc6d469efb030636647a26d475de1ce2e7b4c9677b6ab",
+    "nav-auth-dock-reference.png": "61468a77f8b4dc7d357b421f5b4b08d06b4032212823d144fdd877e98e4334ae",
+    "nav-auth-header-back.png": "de2cc76f7b974c804003481dd103fa3203a9f18aef3783b4d39300686fe2c5b2",
+    "nav-auth-home-normal.png": "b16b2543f47cb16f4fb31e2b2541a596e04d6f6b853adc773d41eb3db268573c",
+    "nav-auth-home-phone200.png": "ccc2684ab675b5d10271a343e229481977a9efcee831a8c04096d855bc1f87e3",
+    "nav-auth-home-wide200.png": "f9f4886c4a99a4441036842594e59e61ca2936383db3ac5323a9d430a5a980c6",
+    "nav-auth-login-before.png": "3a903c08e2179e19de687ac97647a1a3e54ae940c760ec4c6dedca8ddf1aa4f5",
+    "nav-auth-login-dark.png": "b2cdd92820c29e405321576b5312e78d3f2b29bde83903ce44a6d045a2b47cbb",
+    "nav-auth-login-light.png": "d2133dc4e0288a4ede7854794b66c1b4e49ff6d848eb04d6277475749a38c926",
+    "nav-auth-login-phone200.png": "7898bbba1089dcdfe0709bec44139a62ef8feff8be720db024ce99e3a331b983",
+    "nav-auth-reference-login.png": "cf2df1d4a35943089df484f205f6170d0cb7cad925961404720a92b606070ca8",
+    "nav-auth-reference-register.png": "8e0355101b22344257cfec33934294d92c0fd2eaa4ecd96292552226e747c7b3",
+    "nav-auth-register-dark.png": "32c0fd9ecfe9382c6243c61643693f4b734886ac9e21648706960c1938c7fd63",
+    "nav-auth-register-form-phone200.png": "cdde90a88ecb62e2c4eb42201d3dd2ef8168af896ef8871bbca37e6c2d836de8",
+    "nav-auth-register-form.png": "555bb9798006a6720c7c1f5dacb91fd172444474df26886d13ccbd825529c4c7",
+    "nav-auth-register-light.png": "5acab220f10d089316c73a3040c37f23a1962884d4a092df3bf9951797814148"
+  },
+  "excluded": [
+    "nav-auth-first-render.log: candidate before final refinement, registration did not reach Home; cause not established",
+    "dock-reflow-phone200.log: expected label overflow failure before width correction",
+    "nav-auth-final-phone200-interrupted.log: host exit 143, UiAutomation disconnected, no terminal accepted result"
+  ]
+}
