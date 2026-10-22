@@ -47,3 +47,5 @@ Pada teks 200%, konten Beranda dapat digulir dan label tab membungkus. Screensho
 ## Pekerjaan berikutnya
 
 Lanjutkan kriteria editor/konflik/draf, cursor Riwayat, penerimaan Panduan, Statistik/grafik, Profil/achievement/pengaturan, serta alur foto/AI sesuai matriks Iteration 2. Audit state kosong/error dan proses mati setelah masing-masing alur tersedia. Placeholder Panduan sudah diganti daftar/detail dengan fixture editorial kit. Backend HTTP diintegrasikan setelah layanan ada; kamera masih berupa stub dan seluruh UI belum siap sebagai hasil akhir.
+
+Checkpoint S13: [Statistik 7/30 hari, chart dan alternatif teks](STATISTICS.md). Koreksi pembacaan glyph pada bukti sebelumnya: [pemeriksaan ulang](VISUAL_RECHECK.md).

@@ -1,0 +1,112 @@
+package com.example.wastenot.ui.main
+
+import android.graphics.Bitmap
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.test.platform.app.InstrumentationRegistry
+import com.example.wastenot.data.demo.DemoActivityStore
+import com.example.wastenot.data.network.ApiFailureKind
+import com.example.wastenot.model.*
+import com.example.wastenot.theme.WasteNotTheme
+import java.io.File
+import java.time.ZoneId
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Rule
+import org.junit.Test
+
+class StatisticsDesignTest {
+    @get:Rule val compose = createComposeRule()
+    private val store = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
+    private val today = store.referenceDate
+
+    private fun show(data: () -> WorkspaceUiState, onRetry: () -> Unit = {}, onRecord: () -> Unit = {}) {
+        val dark = InstrumentationRegistry.getArguments().getString("statisticsDark") == "true"
+        compose.setContent { WasteNotTheme(dark) {
+            Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                StatisticsScreen(data(), true, today, PaddingValues(), onRetry, onRecord, Modifier.fillMaxSize())
+            }
+        } }
+    }
+
+    @Test fun canonicalWeekHasAChartAndZeroFilledTextAlternative() = runTest {
+        val records = store.load().value
+        show({ WorkspaceUiState(records = records, loading = false) })
+        compose.onNodeWithText("1,4 kg").assertExists()
+        compose.onNodeWithText("2 benda dihindari").assertExists()
+        compose.onNodeWithTag("daily-weight-chart").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("daily-count-chart").assertDoesNotExist()
+        capture("statistics-chart")
+        compose.onNodeWithText("Lihat angka harian").performScrollTo().performClick()
+        compose.onNodeWithText("15 Sep 2026 · 0 g · 0 benda").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("21 Sep 2026 · 650 g · 0 benda").performScrollTo().assertIsDisplayed()
+        capture("statistics-daily")
+        compose.onNodeWithText("2 dari 4 aktivitas penanganan").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Metode pengelolaan").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Trash").performScrollTo().assertIsDisplayed()
+        capture("statistics-methods")
+        compose.onNodeWithText("Menurut kategori").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Lainnya").performScrollTo().assertIsDisplayed()
+        capture("statistics-categories")
+    }
+
+    @Test fun countSeriesUsesItsOwnUnitAndUpdatesAfterDataChanges() = runTest {
+        val record = store.load().value.first { it.method == DisposalMethod.RECYCLE }
+        var records by mutableStateOf(listOf(record.copy(quantity = Quantity.Count.of(20))))
+        show({ WorkspaceUiState(records = records, loading = false) })
+        compose.onNodeWithTag("daily-count-chart").performScrollTo().assertIsDisplayed()
+        capture("statistics-count")
+        compose.onNodeWithText("Lihat angka harian").performScrollTo().performClick()
+        compose.onNodeWithText("21 Sep 2026 · 0 g · 20 benda").performScrollTo().assertIsDisplayed()
+        compose.runOnIdle { records = listOf(record.copy(method = DisposalMethod.REDUCE, quantity = Quantity.Count.of(20))) }
+        compose.onNodeWithTag("daily-count-chart").assertDoesNotExist()
+        compose.onNodeWithText("20 benda dihindari").assertExists()
+        compose.onNodeWithText("Belum ada aktivitas penanganan").performScrollTo().assertIsDisplayed()
+        capture("statistics-reduce-only")
+    }
+
+    @Test fun emptyRangeOffersAnActionAndThirtyDaysFindsOlderRecords() = runTest {
+        val records = store.load().value.take(1).map { it.copy(activityDate = today.minusDays(10)) }
+        var actions = 0
+        show({ WorkspaceUiState(records = records, loading = false) }, onRecord = { actions++ })
+        compose.onNodeWithText("Belum ada catatan pada periode ini").assertIsDisplayed()
+        compose.onNodeWithText("Catat aktivitas").performScrollTo().performClick()
+        compose.runOnIdle { assertEquals(1, actions) }
+        capture("statistics-empty")
+        compose.onNodeWithText("30 hari").performScrollTo().performClick().assertIsSelected()
+        compose.onNodeWithText("${WasteFormat.activityDate(today.minusDays(29))} – ${WasteFormat.activityDate(today)}").assertExists()
+        compose.onNodeWithText("Belum ada catatan pada periode ini").assertDoesNotExist()
+        compose.onNodeWithTag("daily-weight-chart").performScrollTo().assertIsDisplayed()
+        capture("statistics-month")
+        compose.onNodeWithText("Lihat angka harian").performScrollTo().performClick()
+        compose.onNodeWithTag("statistics-day-2026-08-23").assertExists()
+        compose.onNodeWithTag("statistics-day-2026-09-21").assertExists()
+    }
+
+    @Test fun refreshFailureRetainsTheLabeledPeriodAndRetryIsExplicit() = runTest {
+        val records = store.load().value
+        var retries = 0
+        show({ WorkspaceUiState(records = records, loading = false, error = ApiFailureKind.NETWORK) }, onRetry = { retries++ })
+        compose.onNodeWithText("1,4 kg").assertExists()
+        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        compose.runOnIdle { assertEquals(1, retries) }
+        compose.onNodeWithText("30 hari").performScrollTo().performClick()
+        compose.onNodeWithText("1,4 kg").assertExists()
+        capture("statistics-refresh-error")
+    }
+
+    private fun capture(name: String) {
+        compose.waitForIdle()
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val directory = File(instrumentation.targetContext.getExternalFilesDir(null), "statistics-qa").apply { mkdirs() }
+        val bitmap = instrumentation.uiAutomation.takeScreenshot()
+        File(directory, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        bitmap.recycle()
+    }
+}

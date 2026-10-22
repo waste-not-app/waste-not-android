@@ -12,7 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.DropdownMenuItem
@@ -20,7 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -151,13 +151,19 @@ fun MethodSelector(
 
 @Composable
 fun RangeSelector(days: Int, onChange: (Int) -> Unit, modifier: Modifier = Modifier) {
-    FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf(7, 30).forEach { range ->
-            FilterChip(
-                days == range, { onChange(range) },
-                label = { Text(stringResource(R.string.day_range, range)) },
-                modifier = Modifier.heightIn(min = 48.dp),
-            )
+    Surface(modifier, shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
+        Row(Modifier.height(IntrinsicSize.Min).selectableGroup()) {
+            listOf(7, 30).forEach { range ->
+                val selected = days == range
+                Box(Modifier.weight(1f).fillMaxHeight().heightIn(min = 48.dp)
+                    .background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
+                    .selectable(selected, role = Role.RadioButton, onClick = { onChange(range) })
+                    .padding(horizontal = 12.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
+                    Text(stringResource(R.string.day_range, range), style = MaterialTheme.typography.labelLarge,
+                        color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
         }
     }
 }

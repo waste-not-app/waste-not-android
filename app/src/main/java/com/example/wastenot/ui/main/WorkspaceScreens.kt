@@ -100,8 +100,8 @@ fun OverviewScreen(user: User, data: WorkspaceUiState, demo: Boolean, date: Loca
 }
 
 @Composable
-private fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifier = Modifier,
-    personal: Boolean = false, afterPrimary: @Composable () -> Unit = {}) {
+internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifier = Modifier,
+    personal: Boolean = false, afterPrimary: @Composable () -> Unit = {}, beforeRate: @Composable () -> Unit = {}) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(20.dp)) {
         Column(
             modifier = Modifier
@@ -146,6 +146,7 @@ private fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifie
                 Text(stringResource(R.string.reduce_separate), style = MaterialTheme.typography.bodyMedium, color = OnAccent)
             }
         }
+        beforeRate()
         val rate = WasteFormat.percentage(summary.recyclingRatePercent)
         Column {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -157,6 +158,8 @@ private fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifie
             }
             if (rate != null) Text(stringResource(R.string.rate_fraction, summary.recycledActivityCount, summary.handledActivityCount),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            else Text(stringResource(R.string.rate_no_handled), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
             HorizontalDivider(Modifier.padding(top = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
         }
     }
@@ -229,21 +232,6 @@ internal val WasteCategory.iconResource: Int get() = when (this) {
     WasteCategory.METAL -> R.drawable.ic_metal
     WasteCategory.ELECTRONIC -> R.drawable.ic_device
     WasteCategory.OTHER -> R.drawable.ic_more
-}
-
-@Composable
-fun StatisticsScreen(data: WorkspaceUiState, demo: Boolean, date: LocalDate, padding: PaddingValues, onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    var days by rememberSaveable { mutableIntStateOf(7) }
-    ScrollPage(padding, modifier) {
-        RangeSelector(days, { days = it })
-        Text(stringResource(R.string.date_range, WasteFormat.activityDate(date.minusDays(days - 1L)), WasteFormat.activityDate(date)))
-        if (demo) {
-            val records = data.records.filter { it.activityDate in ActivityDateRange.lastDays(date, days) }
-            SummaryBlock(demoSummary(records), stringResource(R.string.handled_period))
-            DisposalMethod.entries.forEach { method -> Text(stringResource(R.string.method_activity_count, stringResource(method.labelResource), records.count { it.method == method })) }
-        } else MessageBanner(stringResource(R.string.summary_pending))
-        if (data.error != null) { MessageBanner(stringResource(R.string.refresh_failed), isError = true); TextButton(onClick = onRetry) { Text(stringResource(R.string.retry)) } }
-    }
 }
 
 @Composable

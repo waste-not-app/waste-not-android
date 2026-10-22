@@ -213,7 +213,7 @@ fun AccountNavigation(
                         catch (_: IllegalArgumentException) { sourceError = true }
                     }, modifier = Modifier.fillMaxSize(), sourceUnavailable = sourceError)
             }
-            entry<Statistics> { StatisticsScreen(data, demo, date, pageInsets, { model.load(true) }, Modifier.fillMaxSize()) }
+            entry<Statistics> { StatisticsScreen(data, demo, date, pageInsets, { model.load(true) }, { edit() }, Modifier.fillMaxSize()) }
             entry<Profile> { ProfileScreen(user, data, demo, theme, pageInsets, onTheme, { leaving = true }, Modifier.fillMaxSize()) }
             entry<LogDetail> { key ->
                 val read = data.detail?.takeIf { it.id == key.id }
