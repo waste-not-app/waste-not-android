@@ -1,40 +1,27 @@
 package com.example.wastenot
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -54,7 +41,7 @@ import com.example.wastenot.theme.ThemePicker
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.ui.auth.AuthScreen
 import com.example.wastenot.ui.auth.SessionViewModel
-import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.auth.StartupScreen
 import com.example.wastenot.ui.main.AccountNavigation
 import com.github.skydoves.navgraph.annotations.NavGraphRoot
 
@@ -84,11 +71,13 @@ fun MainNavigation(
         if (root.size != 1 || root.last() != target) { root.clear(); root.add(target) }
     }
     if (choosingTheme) ThemePicker(themeMode, onThemeModeChange, onDismiss = { choosingTheme = false })
-    Box(modifier) {
+    Box(modifier.background(LocalWasteNotGradients.current.canvas)) {
       NavDisplay(
         backStack = root,
         modifier = Modifier.fillMaxSize(),
         onBack = {},
+        transitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
+        popTransitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
         entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator(), rememberViewModelStoreNavEntryDecorator()),
         entryProvider = entryProvider {
             entry<SessionRoot> {
@@ -109,7 +98,7 @@ fun MainNavigation(
         },
       )
       // Keep decorators mounted so removed account stores are cleared, while the entry guard and overlay protect identity changes.
-      if (root.lastOrNull() != target) StartupScreen(false, {}, {}, Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
+      if (root.lastOrNull() != target) StartupScreen(false, {}, {}, Modifier.fillMaxSize())
     }
 }
 
@@ -147,23 +136,5 @@ private fun AuthNavigation(model: SessionViewModel, demo: Boolean, phase: Sessio
                 }
             },
         )
-    }
-}
-
-@Composable
-private fun StartupScreen(error: Boolean, onRetry: () -> Unit, onLoginAgain: () -> Unit, modifier: Modifier = Modifier) {
-    Box(modifier.safeDrawingPadding(), contentAlignment = Alignment.Center) {
-        Column(Modifier.widthIn(max = 560.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(20.dp)) {
-            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.primary)
-            if (error) {
-                Text(stringResource(R.string.session_connection_required))
-                ActionButton(stringResource(R.string.retry), onRetry)
-                TextButton(onClick = onLoginAgain) { Text(stringResource(R.string.login_again)) }
-            } else {
-                CircularProgressIndicator()
-                Text(stringResource(R.string.session_preparing))
-            }
-        }
     }
 }

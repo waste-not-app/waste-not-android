@@ -1,5 +1,6 @@
 package com.example.wastenot.ui.main
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
@@ -8,6 +9,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.MainNavigation
 import com.example.wastenot.data.network.*
 import com.example.wastenot.data.repository.*
@@ -15,12 +17,15 @@ import com.example.wastenot.model.User
 import com.example.wastenot.theme.ThemeMode
 import com.example.wastenot.theme.WasteNotTheme
 import java.time.ZoneId
+import java.io.File
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
+import org.json.JSONArray
+import org.json.JSONObject
 
 class SessionRootTest {
     @get:Rule val compose = createComposeRule()
@@ -29,6 +34,58 @@ class SessionRootTest {
         compose.setContent { WasteNotTheme(darkTheme = false) {
             MainNavigation(source, CoreRepository(null), com.example.wastenot.data.dummy.DummyGuideStore(), ThemeMode.LIGHT, {}, Modifier.fillMaxSize())
         } }
+        compose.waitForIdle()
+    }
+
+    @Test fun checkingShowsNoPrivateRootAndResolutionNeedsNoOnboardingAction() {
+        val source = FixtureSession().apply {
+            state.value = SessionState.Checking
+            bootstrapGate = CompletableDeferred()
+            bootstrapTarget = SessionState.SignedOut()
+        }
+        start(source)
+        compose.onNodeWithText("Menyiapkan catatanmu…").performScrollTo().assertIsDisplayed()
+        compose.onAllNodes(tabs).assertCountEquals(0)
+        compose.onNodeWithText("Fixture A").assertDoesNotExist()
+        assertEquals(1, source.bootstrapCalls)
+        observeResolution { source.bootstrapGate!!.complete(Unit) }
+        compose.waitUntil(5_000) { compose.onAllNodes(hasText("Masuk") and hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
+        compose.waitForIdle()
+        compose.onNodeWithText("Menyiapkan catatanmu…").assertDoesNotExist()
+        compose.onNodeWithText("Simulasikan", substring = true).assertDoesNotExist()
+        compose.onAllNodes(tabs).assertCountEquals(0)
+        assertEquals(1, source.bootstrapCalls)
+    }
+
+    private fun observeResolution(resolve: () -> Unit) {
+        val directory = File(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null), "startup-qa").apply { mkdirs() }
+        val frames = JSONArray()
+        var destinationFrame: Int? = null
+        val start = compose.mainClock.currentTime
+        compose.mainClock.autoAdvance = false
+        try {
+            resolve()
+            for (frame in 0 until 60) {
+                compose.mainClock.advanceTimeByFrame()
+                compose.waitForIdle()
+                val login = compose.onAllNodes(hasText("Masuk") and hasClickAction()).fetchSemanticsNodes().isNotEmpty()
+                compose.onAllNodes(tabs).assertCountEquals(0)
+                compose.onNodeWithText("Fixture A").assertDoesNotExist()
+                if (destinationFrame == null && login) destinationFrame = frame
+                frames.put(JSONObject().put("frame", frame).put("login_entry", login))
+                if (destinationFrame != null && frame - destinationFrame in listOf(0, 4, 12, 16)) {
+                    val bitmap = checkNotNull(InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot())
+                    File(directory, "startup-to-login-$frame.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+                    bitmap.recycle()
+                }
+                if (destinationFrame != null && frame - destinationFrame >= 16) break
+            }
+            assertNotNull("Session resolution must replace the root without another user action", destinationFrame)
+        } finally {
+            File(directory, "startup-transition.json").writeText(JSONObject().put("destination_frame", destinationFrame)
+                .put("compose_clock_elapsed_ms", compose.mainClock.currentTime - start).put("frames", frames).toString(2))
+            compose.mainClock.autoAdvance = true
+        }
         compose.waitForIdle()
     }
 
@@ -137,12 +194,13 @@ class SessionRootTest {
         override val isDemo = demo
         var bootstrapCalls = 0
         var bootstrapTarget: SessionState? = null
+        var bootstrapGate: CompletableDeferred<Unit>? = null
         var loginCalls = 0
         var registerCalls = 0
         var receivedPassword: String? = null
         var receivedTimezone: ZoneId? = null
         var loginGate: CompletableDeferred<Unit>? = null
-        override suspend fun bootstrap() { bootstrapCalls++; bootstrapTarget?.let { state.value = it } }
+        override suspend fun bootstrap() { bootstrapCalls++; bootstrapGate?.await(); bootstrapTarget?.let { state.value = it } }
         override suspend fun login(email: String, password: String): ApiResult<User> {
             loginCalls++; receivedPassword = password
             loginGate?.await()

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -51,11 +50,11 @@ import com.example.wastenot.data.repository.SignOutReason
 import com.example.wastenot.model.AccountField
 import com.example.wastenot.model.AccountInputError
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.BrandWordmark
 import com.example.wastenot.ui.components.WasteTextField
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.OnAccent
 import com.example.wastenot.theme.WasteNotAuthHeading
-import com.example.wastenot.theme.WasteNotWordmark
 
 @Composable
 fun AuthScreen(
@@ -94,10 +93,7 @@ fun AuthScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Text(stringResource(R.string.app_name), style = WasteNotWordmark)
-                    Box(Modifier.padding(bottom = 7.dp).size(8.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
-                }
+                BrandWordmark()
                 Row {
                     if (onBack != null) FilledIconButton(
                         onClick = onBack,

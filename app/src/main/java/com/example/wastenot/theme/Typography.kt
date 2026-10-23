@@ -30,6 +30,7 @@ private fun role(size: Int, height: Int, weight: FontWeight, tracking: Float = 0
 val WasteNotWordmark = role(29, 36, FontWeight.ExtraBold, -1.3f)
 val WasteNotAuthHeading = role(30, 36, FontWeight.Bold, -0.5f)
 val WasteNotDialogHeading = role(24, 29, FontWeight.ExtraBold, -1.3f)
+val WasteNotStateHeading = role(19, 24, FontWeight.Bold, -0.35f)
 
 val Typography = Typography(
     displayLarge = role(48, 56, FontWeight.ExtraBold, -1f),

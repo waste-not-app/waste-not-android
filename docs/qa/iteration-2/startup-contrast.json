@@ -1,0 +1,178 @@
+[
+  {
+    "foreground": "OnSurface",
+    "background": "CanvasStart",
+    "foreground_hex": "#182B20",
+    "background_hex": "#FCFDF9",
+    "ratio": 14.629,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "OnSurfaceVariant",
+    "background": "CanvasStart",
+    "foreground_hex": "#526457",
+    "background_hex": "#FCFDF9",
+    "ratio": 6.193,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "Primary",
+    "background": "CanvasStart",
+    "foreground_hex": "#195B3D",
+    "background_hex": "#FCFDF9",
+    "ratio": 7.891,
+    "minimum": 3
+  },
+  {
+    "foreground": "Outline",
+    "background": "CanvasStart",
+    "foreground_hex": "#738477",
+    "background_hex": "#FCFDF9",
+    "ratio": 3.882,
+    "minimum": 3
+  },
+  {
+    "foreground": "OnSurface",
+    "background": "CanvasEnd",
+    "foreground_hex": "#182B20",
+    "background_hex": "#DFEEDB",
+    "ratio": 12.375,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "OnSurfaceVariant",
+    "background": "CanvasEnd",
+    "foreground_hex": "#526457",
+    "background_hex": "#DFEEDB",
+    "ratio": 5.239,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "Primary",
+    "background": "CanvasEnd",
+    "foreground_hex": "#195B3D",
+    "background_hex": "#DFEEDB",
+    "ratio": 6.675,
+    "minimum": 3
+  },
+  {
+    "foreground": "Outline",
+    "background": "CanvasEnd",
+    "foreground_hex": "#738477",
+    "background_hex": "#DFEEDB",
+    "ratio": 3.284,
+    "minimum": 3
+  },
+  {
+    "foreground": "Primary",
+    "background": "SurfaceVariant",
+    "foreground_hex": "#195B3D",
+    "background_hex": "#E8EFE7",
+    "ratio": 6.883,
+    "minimum": 3
+  },
+  {
+    "foreground": "OnPrimary",
+    "background": "ActionStart",
+    "foreground_hex": "#FFFFFF",
+    "background_hex": "#226948",
+    "ratio": 6.599,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "OnPrimary",
+    "background": "ActionEnd",
+    "foreground_hex": "#FFFFFF",
+    "background_hex": "#164B35",
+    "ratio": 10.038,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "OnSurfaceDark",
+    "background": "CanvasStartDark",
+    "foreground_hex": "#F0F5ED",
+    "background_hex": "#17261D",
+    "ratio": 14.262,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "OnSurfaceVariantDark",
+    "background": "CanvasStartDark",
+    "foreground_hex": "#B2C4B6",
+    "background_hex": "#17261D",
+    "ratio": 8.611,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "PrimaryDark",
+    "background": "CanvasStartDark",
+    "foreground_hex": "#B7DEB8",
+    "background_hex": "#17261D",
+    "ratio": 10.631,
+    "minimum": 3
+  },
+  {
+    "foreground": "OutlineDark",
+    "background": "CanvasStartDark",
+    "foreground_hex": "#7F9484",
+    "background_hex": "#17261D",
+    "ratio": 4.861,
+    "minimum": 3
+  },
+  {
+    "foreground": "OnSurfaceDark",
+    "background": "CanvasEndDark",
+    "foreground_hex": "#F0F5ED",
+    "background_hex": "#203D2B",
+    "ratio": 10.766,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "OnSurfaceVariantDark",
+    "background": "CanvasEndDark",
+    "foreground_hex": "#B2C4B6",
+    "background_hex": "#203D2B",
+    "ratio": 6.5,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "PrimaryDark",
+    "background": "CanvasEndDark",
+    "foreground_hex": "#B7DEB8",
+    "background_hex": "#203D2B",
+    "ratio": 8.025,
+    "minimum": 3
+  },
+  {
+    "foreground": "OutlineDark",
+    "background": "CanvasEndDark",
+    "foreground_hex": "#7F9484",
+    "background_hex": "#203D2B",
+    "ratio": 3.669,
+    "minimum": 3
+  },
+  {
+    "foreground": "PrimaryDark",
+    "background": "SurfaceVariantDark",
+    "foreground_hex": "#B7DEB8",
+    "background_hex": "#26392D",
+    "ratio": 8.299,
+    "minimum": 3
+  },
+  {
+    "foreground": "OnPrimaryDark",
+    "background": "ActionStartDark",
+    "foreground_hex": "#122C1C",
+    "background_hex": "#D0EBC1",
+    "ratio": 11.645,
+    "minimum": 4.5
+  },
+  {
+    "foreground": "OnPrimaryDark",
+    "background": "ActionEndDark",
+    "foreground_hex": "#122C1C",
+    "background_hex": "#ADD8B1",
+    "ratio": 9.434,
+    "minimum": 4.5
+  }
+]
