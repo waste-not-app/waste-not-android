@@ -27,7 +27,9 @@ data class EditorValues(
     val date: LocalDate, val notes: String, val version: Int?,
 )
 
-class EditorDraft(val original: EditorValues) {
+class EditorDraft(original: EditorValues) {
+    var original by mutableStateOf(original)
+        private set
     var values by mutableStateOf(original)
         private set
     var errors by mutableStateOf<Map<EditorField, Int>>(emptyMap())
@@ -41,6 +43,20 @@ class EditorDraft(val original: EditorValues) {
     val dirty: Boolean get() = values != original
     val locked: Boolean get() = submittedValues != null
     val retryBlocked: Boolean get() = submissionError == ApiFailureKind.IDEMPOTENCY_CONFLICT || submissionError == ApiFailureKind.DELETED
+    val needsConflictResolution: Boolean get() = original.version != null &&
+        submissionError in setOf(ApiFailureKind.VERSION_CONFLICT, ApiFailureKind.PRECONDITION_REQUIRED)
+
+    fun resolveConflict(latest: WasteLog, keepDraft: Boolean): Boolean {
+        if (!needsConflictResolution || locked || latest.version <= (original.version ?: 0)) return false
+        val mine = values
+        val fresh = valuesFrom(latest, mine.date)
+        original = fresh
+        values = if (keepDraft) mine.copy(version = latest.version) else fresh
+        errors = emptyMap()
+        submittedValues = null
+        submissionError = null
+        return true
+    }
 
     fun applyScan(key: LogEditor): EditorDraft {
         if (key.logId != null || key.guideId != null || key.scanCategory == null) return this
@@ -54,7 +70,7 @@ class EditorDraft(val original: EditorValues) {
         if (locked) return
         values = updated
         errors = errors - field
-        submissionError = null
+        if (!needsConflictResolution) submissionError = null
     }
 
     fun validateField(field: EditorField, referenceDate: LocalDate) {
@@ -63,7 +79,7 @@ class EditorDraft(val original: EditorValues) {
     }
 
     fun prepareSubmission(referenceDate: LocalDate): ActivityInput? {
-        if (retryBlocked) return null
+        if (retryBlocked || needsConflictResolution) return null
         val submitted = submittedValues
         if (submitted != null) return input(submitted)
         return validate(referenceDate)?.also {
@@ -111,12 +127,13 @@ class EditorDraft(val original: EditorValues) {
         private fun input(value: EditorValues) = ActivityInput(checkNotNull(value.category), checkNotNull(value.method),
             (parseQuantity(value.quantity.rawText, value.quantity.unit) as QuantityParseResult.Valid).quantity, value.date, value.notes.trim())
 
-        fun from(log: WasteLog?, date: LocalDate) = EditorDraft(EditorValues(log?.category, log?.method,
+        fun from(log: WasteLog?, date: LocalDate) = EditorDraft(valuesFrom(log, date))
+        private fun valuesFrom(log: WasteLog?, date: LocalDate) = EditorValues(log?.category, log?.method,
             when (val quantity = log?.quantity) {
                 is Quantity.Weight -> QuantityInput(quantity.grams.toString(), QuantityUnit.GRAM)
                 is Quantity.Count -> QuantityInput(quantity.items.toString(), QuantityUnit.ITEM)
                 null -> QuantityInput()
-            }, log?.activityDate ?: date, log?.notes.orEmpty(), log?.version))
+            }, log?.activityDate ?: date, log?.notes.orEmpty(), log?.version)
 
         private fun encode(value: EditorValues) = listOf(value.category?.name.orEmpty(), value.method?.name.orEmpty(),
             value.quantity.rawText, value.quantity.unit.name, value.date.toString(), value.notes, value.version?.toString().orEmpty())

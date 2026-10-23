@@ -55,3 +55,5 @@ Checkpoint S14/S16: [Profil, Pengaturan dan akun baru kosong](PROFILE_SETTINGS.m
 Checkpoint S02/S03/C24/C25/C35: [form akun, proporsi dock dan label utuh pada teks besar](NAV_AUTH.md).
 
 Checkpoint S21–S25/C36–C39: [kamera, objek, kondisi, saran dan fallback dalam satu sheet](SCAN.md).
+
+Checkpoint S09/D04/C27: [konflik edit, pilihan eksplisit dan dialog sesuai render kit](CONFLICT.md).

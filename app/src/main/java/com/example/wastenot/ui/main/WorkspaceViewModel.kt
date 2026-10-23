@@ -25,7 +25,11 @@ data class WorkspaceUiState(
     val deletingId: String? = null,
     val deletion: ActivityDeleteResult? = null,
     val detail: ActivityDetailState? = null,
+    val conflict: ConflictReadState? = null,
 )
+
+data class ConflictReadState(val requestId: String, val id: String, val loading: Boolean = false,
+    val latest: WasteLog? = null, val error: ApiFailureKind? = null)
 
 data class ActivityDetailState(val id: String, val log: WasteLog? = null, val loading: Boolean = false, val error: ApiFailureKind? = null)
 
@@ -46,8 +50,42 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
     private var loading: Job? = null
     private var writing: Job? = null
     private var detailLoading: Job? = null
+    private var conflictLoading: Job? = null
+    private var conflictGeneration = 0
     private var started = false
     private val unresolvedCreates = mutableMapOf<String, ActivityInput>()
+
+    fun loadConflict(requestId: String, id: String, version: Int) {
+        if (mutableState.value.conflict?.let { it.requestId == requestId && it.loading } == true) return
+        conflictGeneration++
+        val generation = conflictGeneration
+        conflictLoading?.cancel()
+        mutableState.update { it.copy(conflict = ConflictReadState(requestId, id, loading = true)) }
+        conflictLoading = viewModelScope.launch {
+            val result = store.get(id)
+            currentCoroutineContext().ensureActive()
+            if (generation != conflictGeneration) return@launch
+            val latest = (result as? ApiResult.Success)?.value
+            val failure = when {
+                latest == null -> (result as? ApiResult.Failure)?.error?.kind
+                latest.id != id -> ApiFailureKind.MALFORMED_RESPONSE
+                latest.version <= version -> ApiFailureKind.PRECONDITION_REQUIRED
+                else -> null
+            }
+            mutableState.update { it.copy(conflict = ConflictReadState(requestId, id,
+                latest = latest?.takeIf { failure == null }, error = failure)) }
+            if (latest != null && failure == null) {
+                loading?.cancel(); loading = null
+                load(true)
+            }
+        }
+    }
+
+    fun clearConflict(requestId: String) {
+        if (mutableState.value.conflict?.requestId != requestId) return
+        conflictGeneration++; conflictLoading?.cancel(); conflictLoading = null
+        mutableState.update { it.copy(conflict = null) }
+    }
 
     fun load(retry: Boolean = false) {
         if (writing?.isActive == true || loading?.isActive == true || (started && !retry)) return

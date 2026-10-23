@@ -55,7 +55,7 @@ class EditorSubmissionTest {
             current = rememberSaveable(saver = EditorDraft.Saver) { draft() }
             EditorHost(dark) {
                 LogEditorScreen(current, today, "Asia/Jakarta", true, busy.value, PaddingValues(),
-                    { received.add(it); busy.value = true }, { error("Unknown result must offer an explicit retry") }, Modifier.fillMaxSize())
+                    { received.add(it); busy.value = true }, { error("Unknown result must offer an explicit retry") }, {}, Modifier.fillMaxSize())
             }
         }
         compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
@@ -93,7 +93,7 @@ class EditorSubmissionTest {
         var history = 0
         compose.setContent { EditorHost(dark) {
             LogEditorScreen(draft, today, "Asia/Jakarta", true, false, PaddingValues(),
-                { fail("A rejected request must not be retried") }, { history++ }, Modifier.fillMaxSize())
+                { fail("A rejected request must not be retried") }, { history++ }, {}, Modifier.fillMaxSize())
         } }
         assertFrozen()
         compose.onNodeWithText(if (error == ApiFailureKind.DELETED) "Catatan dari permintaan ini sudah dihapus." else "Permintaan ini sudah dipakai untuk isian lain.",
@@ -110,7 +110,7 @@ class EditorSubmissionTest {
         draft.prepareSubmission(today)
         draft.submissionFailed(ApiFailureKind.VALIDATION)
         compose.setContent { EditorHost(false) {
-            LogEditorScreen(draft, today, "Asia/Jakarta", true, false, PaddingValues(), {}, {}, Modifier.fillMaxSize())
+            LogEditorScreen(draft, today, "Asia/Jakarta", true, false, PaddingValues(), {}, {}, {}, Modifier.fillMaxSize())
         } }
         compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().assertIsEnabled().performTextReplacement("Koreksi")
         compose.onNodeWithText("Simpan catatan").performScrollTo().assertIsEnabled()

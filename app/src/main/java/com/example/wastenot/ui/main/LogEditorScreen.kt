@@ -50,6 +50,7 @@ fun LogEditorScreen(
     padding: PaddingValues,
     onSave: (ActivityInput) -> Unit,
     onHistory: () -> Unit,
+    onResolveConflict: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focus = remember { EditorField.entries.associateWith { FocusRequester() } }
@@ -114,6 +115,7 @@ fun LogEditorScreen(
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             draft.submissionError?.let { error ->
                 MessageBanner(stringResource(when {
+                    draft.needsConflictResolution -> R.string.conflict_form_message
                     error.saveOutcomeUnknown() -> R.string.save_outcome_unknown
                     error == ApiFailureKind.IDEMPOTENCY_CONFLICT -> R.string.save_request_conflict
                     error == ApiFailureKind.DELETED -> R.string.save_record_deleted
@@ -125,16 +127,17 @@ fun LogEditorScreen(
             }
             ActionButton(
                 stringResource(when {
+                    draft.needsConflictResolution -> R.string.load_latest_log
                     draft.retryBlocked -> R.string.see_history
                     draft.locked && !saving -> R.string.retry
                     value.version != null -> R.string.save_changes
                     else -> R.string.save_activity
                 }),
-                { if (draft.retryBlocked) onHistory() else draft.prepareSubmission(referenceDate)?.let {
+                { if (draft.needsConflictResolution) onResolveConflict() else if (draft.retryBlocked) onHistory() else draft.prepareSubmission(referenceDate)?.let {
                     focusManager.clearFocus()
                     onSave(it)
                 } }, Modifier.fillMaxWidth(), loading = saving,
-                loadingLabel = stringResource(R.string.saving), enabled = draft.retryBlocked || draft.locked || value.version == null || draft.dirty,
+                loadingLabel = stringResource(R.string.saving), enabled = draft.needsConflictResolution || draft.retryBlocked || draft.locked || value.version == null || draft.dirty,
             )
         }
     }

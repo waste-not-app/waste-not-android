@@ -107,6 +107,7 @@ fun AccountNavigation(
     var discard by remember { mutableStateOf(false) }
     var leaving by remember { mutableStateOf(false) }
     var capture by rememberSaveable { mutableStateOf<String?>(null) }
+    var conflictRequest by rememberSaveable { mutableStateOf<String?>(null) }
     var historyFilterOpen by rememberSaveable { mutableStateOf(false) }
     var deletingId by rememberSaveable { mutableStateOf<String?>(null) }
     var deleteVersion by rememberSaveable { mutableIntStateOf(0) }
@@ -158,6 +159,7 @@ fun AccountNavigation(
             model.acknowledgeSave(saved.requestId)
         } else if (saved?.error != null && editor?.requestId == saved.requestId && draft != null) {
             draft.submissionFailed(saved.error)
+            if (draft.needsConflictResolution) conflictRequest = saved.requestId
             model.acknowledgeSave(saved.requestId)
         }
     }
@@ -262,12 +264,23 @@ fun AccountNavigation(
                 if (form != null) {
                     DisposableEffect(key.requestId, form) {
                         activeEditorDraft = EditorEntryDraft(key.requestId, form)
-                        onDispose { if (activeEditorDraft?.requestId == key.requestId) activeEditorDraft = null }
+                        onDispose {
+                            if (activeEditorDraft?.requestId == key.requestId) activeEditorDraft = null
+                            model.clearConflict(key.requestId)
+                        }
+                    }
+                    if (conflictRequest == key.requestId && form.needsConflictResolution && key.logId != null) {
+                        fun dismissConflict() { conflictRequest = null; model.clearConflict(key.requestId) }
+                        EditConflictDialog(form.values, data.conflict?.takeIf { it.requestId == key.requestId },
+                            onDismiss = ::dismissConflict,
+                            onLoad = { model.loadConflict(key.requestId, key.logId, checkNotNull(form.original.version)) },
+                            onUse = { latest, keepDraft -> if (form.resolveConflict(latest, keepDraft)) dismissConflict() })
                     }
                     val leavingAfterSave = current != key && form.locked && form.submissionError == null
                     LogEditorScreen(form, date, user.timezone.id, demo, data.saving || leavingAfterSave, pageInsets,
                         { model.save(it, key.logId, form.values.version, key.requestId) },
-                        { stack.removeLastOrNull(); history(); model.load(true) }, Modifier.fillMaxSize())
+                        { stack.removeLastOrNull(); history(); model.load(true) },
+                        { if (stack.lastOrNull() == key) conflictRequest = key.requestId }, Modifier.fillMaxSize())
                 } else if (canStart) {
                     ScrollPage(pageInsets, Modifier.fillMaxSize()) {
                         LinearProgressIndicator(Modifier.fillMaxWidth())
