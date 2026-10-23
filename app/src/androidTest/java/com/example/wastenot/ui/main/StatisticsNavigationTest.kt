@@ -53,7 +53,7 @@ class StatisticsNavigationTest {
         capture("statistics-app-chart-dark")
         val chartTop = compose.onNodeWithTag("daily-weight-chart").fetchSemanticsNode().boundsInRoot.top
         compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).performScrollTo().performClick()
+        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
         compose.onNodeWithText("Cara pengelolaan").assertExists()
         compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
         compose.onNode(tabs and hasText("Statistik")).assertIsSelected()

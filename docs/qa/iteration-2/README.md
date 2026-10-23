@@ -46,10 +46,12 @@ Pada teks 200%, konten Beranda dapat digulir dan label tab membungkus. Screensho
 
 ## Pekerjaan berikutnya
 
-Lanjutkan kriteria editor/konflik/draf, cursor Riwayat, penerimaan Panduan, Statistik/grafik, Profil/achievement/pengaturan, serta alur foto/AI sesuai matriks Iteration 2. Audit state kosong/error dan proses mati setelah masing-masing alur tersedia. Placeholder Panduan sudah diganti daftar/detail dengan fixture editorial kit. Backend HTTP diintegrasikan setelah layanan ada; kamera masih berupa stub dan seluruh UI belum siap sebagai hasil akhir.
+Lanjutkan kriteria editor/konflik/draf, cursor Riwayat, penerimaan Panduan, Statistik/grafik, Profil/achievement/pengaturan, serta alur foto/AI sesuai matriks Iteration 2. Audit state kosong/error dan proses mati setelah masing-masing alur tersedia. Placeholder Panduan sudah diganti daftar/detail dengan fixture editorial kit. Kelanjutan kamera/scan tersedia pada [checkpoint S21–S25](SCAN.md): CameraX, tinjau foto dan alur dummy sampai prefill editor. Backend HTTP diintegrasikan setelah layanan ada; penerimaan seluruh UI masih berjalan.
 
 Checkpoint S13: [Statistik 7/30 hari, chart dan alternatif teks](STATISTICS.md). Koreksi pembacaan glyph pada bukti sebelumnya: [pemeriksaan ulang](VISUAL_RECHECK.md).
 
 Checkpoint S14/S16: [Profil, Pengaturan dan akun baru kosong](PROFILE_SETTINGS.md).
 
 Checkpoint S02/S03/C24/C25/C35: [form akun, proporsi dock dan label utuh pada teks besar](NAV_AUTH.md).
+
+Checkpoint S21–S25/C36–C39: [kamera, objek, kondisi, saran dan fallback dalam satu sheet](SCAN.md).

@@ -126,6 +126,11 @@ kotlin {
 }
 
 dependencies {
+  implementation(libs.androidx.camera.core)
+  implementation(libs.androidx.camera.camera2)
+  implementation(libs.androidx.camera.lifecycle)
+  implementation(libs.androidx.camera.view)
+  implementation(libs.androidx.work.runtime)
   coreLibraryDesugaring(libs.desugar.jdk.libs)
   implementation(libs.retrofit)
   implementation(libs.retrofit.serialization)

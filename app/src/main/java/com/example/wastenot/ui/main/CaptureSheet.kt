@@ -7,8 +7,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.wastenot.data.local.ScanPhotoCache
+import com.example.wastenot.data.repository.DummyScanRepository
+import com.example.wastenot.data.repository.UnconfiguredScanRepository
+import com.example.wastenot.model.ScanPrefill
+import com.example.wastenot.ui.scan.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -65,31 +77,35 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CaptureSheet(onDismiss: () -> Unit, onManual: () -> Unit, modifier: Modifier = Modifier) {
-    ModalBottomSheet(onDismissRequest = onDismiss, modifier = modifier,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)) {
-        SheetSystemBar()
-        Column(
-            modifier = Modifier.fillMaxWidth().testTag("capture-sheet").verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-        ) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.scan_title), Modifier.weight(1f).semantics { heading() }, style = MaterialTheme.typography.headlineMedium)
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.close)) }
-            }
-            Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer) {
-                Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Icon(painterResource(R.drawable.ic_camera), null, Modifier.size(40.dp))
-                    Text(stringResource(R.string.scan_camera_title), style = MaterialTheme.typography.titleLarge)
-                    Text(stringResource(R.string.scan_camera_description))
-                    Text(stringResource(R.string.scan_camera_pending), style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            Text(stringResource(R.string.scan_manual_description), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            ActionButton(stringResource(R.string.manual_input), onManual, Modifier.fillMaxWidth())
-        }
+internal fun CaptureSheet(userId: String, dummy: Boolean, session: String, onDismiss: () -> Unit,
+    onPrefill: (ScanPrefill) -> Unit, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val cache = remember(userId) { ScanPhotoCache.create(context, userId) }
+    val factory = remember(cache, dummy) { viewModelFactory { initializer {
+        ScanViewModel(if (dummy) DummyScanRepository() else UnconfiguredScanRepository(), cache)
+    } } }
+    val model: ScanViewModel = viewModel(key = "scan-$userId", factory = factory)
+    val state by model.state.collectAsStateWithLifecycle()
+    var hadPhoto by rememberSaveable(session) { mutableStateOf(false) }
+    LaunchedEffect(session) {
+        model.start(session)
+        if (hadPhoto && model.state.value.photo == null) model.problem(session, ScanProblem.EXPIRED)
+        withContext(Dispatchers.IO) { cache.removeExpired() }
+    }
+    LaunchedEffect(state.photo) { if (state.session == session) hadPhoto = state.photo != null }
+    DisposableEffect(model, session) {
+        onDispose { if (context.activity()?.isChangingConfigurations != true) model.close(session) }
+    }
+    fun dismiss() { model.close(session); onDismiss() }
+    fun use(manual: Boolean) {
+        if (model.state.value.session != session) return
+        val prefill = model.prefill(confirmRecommendation = !manual)
+        model.close(session); onPrefill(prefill)
+    }
+    ScanSheet(state, ::dismiss, { use(true) }, model::retake, model::detect, model::select, model::category,
+        model::confirmObject, model::correctObject, model::context, model::recommend, model::method,
+        { use(false) }, model::retry, modifier) {
+        ScanCamera(session, cache, { model.photo(session, it) }, { model.problem(session, it) })
     }
 }
 

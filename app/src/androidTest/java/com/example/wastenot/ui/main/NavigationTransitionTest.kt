@@ -105,7 +105,7 @@ class NavigationTransitionTest {
             compose.onNode(tab and hasText("Beranda")).performClick()
         }
         compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).performScrollTo().performClick()
+        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
     }
 
     private fun traceExit(phase: String, target: String, action: () -> Unit) {

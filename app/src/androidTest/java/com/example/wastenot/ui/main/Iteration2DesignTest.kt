@@ -72,9 +72,9 @@ class Iteration2DesignTest {
                     labelLayout.lineCount == 1 && !labelLayout.hasVisualOverflow)
             }
             compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-            compose.onNodeWithText("Catat sampahmu").assertIsDisplayed()
+            compose.onNodeWithText("Scan sampah").assertIsDisplayed()
             if (label == "Beranda") capture("capture-sheet")
-            compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).performScrollTo().performClick()
+            compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
             compose.onAllNodes(tabs).assertCountEquals(0)
             compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
             compose.onNodeWithText("Simpan contoh").assertDoesNotExist()

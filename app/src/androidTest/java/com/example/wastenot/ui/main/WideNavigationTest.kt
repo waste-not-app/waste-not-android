@@ -57,7 +57,7 @@ class WideNavigationTest {
         listOf("Beranda", "Riwayat", "Panduan", "Statistik", "Profil").forEach { label ->
             compose.onNode(tabs and hasText(label)).reveal().performClick().assertIsSelected()
             compose.onNodeWithContentDescription("Catat atau scan sampah").reveal().performClick()
-            compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).reveal().performClick()
+            compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
             compose.onAllNodes(tabs).assertCountEquals(0)
             compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
             compose.onNodeWithContentDescription("Berat").reveal().assertIsDisplayed()

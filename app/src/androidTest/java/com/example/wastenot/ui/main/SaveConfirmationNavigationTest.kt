@@ -38,7 +38,7 @@ class SaveConfirmationNavigationTest {
         }
         tab("Riwayat")
         compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).performScrollTo().performClick()
+        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
         compose.onNodeWithText("Recycle").performScrollTo().performClick()
         compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
         compose.onNode(hasText("Logam") and hasAnyAncestor(isPopup())).performClick()

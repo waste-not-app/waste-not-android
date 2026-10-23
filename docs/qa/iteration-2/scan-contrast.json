@@ -1,0 +1,56 @@
+[
+  {
+    "pair": "camera-start",
+    "foreground": "FFFFFF",
+    "background": "13261D",
+    "ratio": 15.877
+  },
+  {
+    "pair": "camera-end",
+    "foreground": "FFFFFF",
+    "background": "294735",
+    "ratio": 10.259
+  },
+  {
+    "pair": "OnAccent / LimeEnd",
+    "foreground": "24390E",
+    "background": "C9EB72",
+    "ratio": 9.366
+  },
+  {
+    "pair": "OnSurface / SurfaceVariant",
+    "foreground": "182B20",
+    "background": "E8EFE7",
+    "ratio": 12.761
+  },
+  {
+    "pair": "OnSurfaceDark / SurfaceVariantDark",
+    "foreground": "F0F5ED",
+    "background": "26392D",
+    "ratio": 11.134
+  },
+  {
+    "pair": "OnSurfaceVariant / Surface",
+    "foreground": "526457",
+    "background": "FFFFFF",
+    "ratio": 6.327
+  },
+  {
+    "pair": "OnSurfaceVariantDark / SurfaceDark",
+    "foreground": "B2C4B6",
+    "background": "19281F",
+    "ratio": 8.401
+  },
+  {
+    "pair": "SummaryText / Pine900",
+    "foreground": "FFFFFF",
+    "background": "123F30",
+    "ratio": 11.802
+  },
+  {
+    "pair": "SummaryText / Pine700",
+    "foreground": "FFFFFF",
+    "background": "226948",
+    "ratio": 6.599
+  }
+]

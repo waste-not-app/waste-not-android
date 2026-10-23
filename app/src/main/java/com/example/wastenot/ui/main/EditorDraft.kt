@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.listSaver
 import com.example.wastenot.R
+import com.example.wastenot.LogEditor
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.ActivityInput
 import com.example.wastenot.model.ActivityDates
@@ -40,6 +41,14 @@ class EditorDraft(val original: EditorValues) {
     val dirty: Boolean get() = values != original
     val locked: Boolean get() = submittedValues != null
     val retryBlocked: Boolean get() = submissionError == ApiFailureKind.IDEMPOTENCY_CONFLICT || submissionError == ApiFailureKind.DELETED
+
+    fun applyScan(key: LogEditor): EditorDraft {
+        if (key.logId != null || key.guideId != null || key.scanCategory == null) return this
+        val category = WasteCategory.entries.find { it.name == key.scanCategory } ?: return this
+        val method = DisposalMethod.entries.find { it.name == key.scanMethod && it != DisposalMethod.REDUCE }
+        change(EditorField.CATEGORY, values.copy(category = category, method = method))
+        return this
+    }
 
     fun change(field: EditorField, updated: EditorValues) {
         if (locked) return

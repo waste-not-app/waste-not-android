@@ -106,7 +106,7 @@ fun AccountNavigation(
     val draft = activeEditorDraft?.takeIf { it.requestId == editor?.requestId }?.draft
     var discard by remember { mutableStateOf(false) }
     var leaving by remember { mutableStateOf(false) }
-    var capture by remember { mutableStateOf(false) }
+    var capture by rememberSaveable { mutableStateOf<String?>(null) }
     var historyFilterOpen by rememberSaveable { mutableStateOf(false) }
     var deletingId by rememberSaveable { mutableStateOf<String?>(null) }
     var deleteVersion by rememberSaveable { mutableIntStateOf(0) }
@@ -195,7 +195,11 @@ fun AccountNavigation(
         confirmButton = { TextButton(onClick = { leaving = false; onLogout() }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(stringResource(R.string.logout_action)) } },
         dismissButton = { TextButton(onClick = { leaving = false }) { Text(stringResource(R.string.cancel)) } },
     )
-    if (capture) CaptureSheet(onDismiss = { capture = false }, onManual = { capture = false; edit() })
+    capture?.let { session -> CaptureSheet(user.id, demo, session, onDismiss = { capture = null }, onPrefill = { prefill ->
+        capture = null
+        if (stack.lastOrNull() !is LogEditor) stack.add(LogEditor(null, UUID.randomUUID().toString(),
+            scanCategory = prefill.category?.name, scanMethod = prefill.method?.name))
+    }) }
     BoxWithConstraints(modifier) {
         val rail = maxWidth >= 600.dp
         val railWidth = if (LocalDensity.current.fontScale >= 1.5f) 144.dp else 112.dp
@@ -246,12 +250,12 @@ fun AccountNavigation(
                 val canStart = (key.logId == null || initial != null) && (key.guideId == null || article != null)
                 var entryDraft by rememberSaveable(key.requestId, stateSaver = EditorDraft.NullableSaver) {
                     mutableStateOf(if (canStart) {
-                        if (article != null) EditorDraft.forGuide(article, date) else EditorDraft.from(initial, date)
+                        if (article != null) EditorDraft.forGuide(article, date) else EditorDraft.from(initial, date).applyScan(key)
                     } else null)
                 }
                 LaunchedEffect(key.requestId, initial, article, date) {
                     if (entryDraft == null && canStart) {
-                        entryDraft = if (article != null) EditorDraft.forGuide(article, date) else EditorDraft.from(initial, date)
+                        entryDraft = if (article != null) EditorDraft.forGuide(article, date) else EditorDraft.from(initial, date).applyScan(key)
                     }
                 }
                 val form = entryDraft
@@ -287,7 +291,9 @@ fun AccountNavigation(
                     AccountPage(key, tab, rail, railWidth,
                         confirmation = key is LogDetail && key.id == savedNoticeId && log != null,
                         onBack = { if (selected == tab && stacks.getValue(selected).lastOrNull() == key) latestBack() },
-                        onSelect = ::selectTab, onRecord = { capture = true },
+                        onSelect = ::selectTab, onRecord = {
+                            if (selected == tab && stacks.getValue(selected).lastOrNull() == tab.key) capture = UUID.randomUUID().toString()
+                        },
                         onFilter = { if (selected == tab && stacks.getValue(selected).lastOrNull() == History) historyFilterOpen = true }) {
                         entry.Content()
                     }

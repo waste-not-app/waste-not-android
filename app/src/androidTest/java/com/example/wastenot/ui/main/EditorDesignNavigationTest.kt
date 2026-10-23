@@ -38,7 +38,7 @@ class EditorDesignNavigationTest {
     @Test fun storageFailureKeepsTheDraftAcrossRecreationAndAllowsCorrection() {
         waitFor("650 g")
         compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).performScrollTo().performClick()
+        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
         compose.onNodeWithText("Recycle").performScrollTo().performClick()
         compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
         compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
@@ -81,7 +81,7 @@ class EditorDesignNavigationTest {
         compose.onNodeWithContentDescription("Kembali").performClick()
         compose.onNode(tabs and hasText("Beranda")).performClick()
         compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).performScrollTo().performClick()
+        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
         val mode = if (dark) "dark" else "light"
         capture("editor-create-$mode")
         compose.onNodeWithText("Pilih satu metode.").assertDoesNotExist()

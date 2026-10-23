@@ -12,7 +12,7 @@
     <string name="level_title">Level %1$d</string>
     <string name="xp_total">%1$d XP total</string>
     <string name="xp_next">%1$d XP lagi ke level %2$d</string>
-    <string name="scan_title">Catat sampahmu</string>
+    <string name="scan_title">Scan sampah</string>
     <string name="scan_camera_title">Kenali lewat foto</string>
     <string name="scan_camera_description">Foto satu benda untuk meninjau kategori dan cara penanganannya.</string>
     <string name="scan_camera_pending">Alur foto sedang disiapkan</string>
