@@ -70,6 +70,9 @@ class NavigationTransitionTest {
         compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Draf belum disimpan")
         compose.onNodeWithContentDescription("Kembali").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick) { it() }
         compose.onNodeWithText("Buang perubahan?").assertIsDisplayed()
+        InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+        compose.onNodeWithText("Buang perubahan?").assertDoesNotExist()
+        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().assertTextContains("Draf belum disimpan")
     }
 
     @Test fun discardKeepsItsFormDuringExitAndTheNextDraftStartsEmpty() {

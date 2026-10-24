@@ -16,12 +16,11 @@
     <string name="log_edit">Ubah catatan</string>
     <string name="log_detail">Detail catatan</string>
     <string name="discard_title">Buang perubahan?</string>
-    <string name="discard_message">Isian yang belum disimpan akan hilang.</string>
+    <string name="discard_message">Perubahan belum disimpan. Kamu bisa kembali melanjutkan pengisian.</string>
     <string name="discard_action">Buang perubahan</string>
     <string name="keep_editing">Lanjut mengisi</string>
-    <string name="logout_title">Keluar?</string>
-    <string name="logout_message">Kamu perlu masuk lagi untuk membuka catatanmu.</string>
-    <string name="logout_demo_message">Catatan percobaan akan dihapus. Akun sebenarnya tidak berubah.</string>
+    <string name="logout_title">Keluar dari akun?</string>
+    <string name="logout_message">Kamu perlu masuk lagi untuk membuka catatanmu. Catatan yang sudah tersimpan tetap tersedia saat kamu masuk kembali.</string>
     <string name="logout_action">Keluar</string>
     <string name="demo_caption">Data contoh</string>
     <string name="demo_caption_date">Data contoh · %1$s</string>

@@ -108,7 +108,7 @@ class ProfileNavigationTest {
         compose.onNodeWithText("50 XP total").performScrollTo().assertIsDisplayed()
         capture("profile-app-dark")
         compose.onNodeWithText("Keluar").performScrollTo().performClick()
-        compose.onNodeWithText("Keluar?").assertIsDisplayed()
+        compose.onNodeWithText("Keluar dari akun?").assertIsDisplayed()
         compose.onNodeWithText("Batal").performClick()
         compose.onNodeWithText("50 XP total").assertExists()
         compose.onNode(tabs and hasText("Beranda")).performClick()

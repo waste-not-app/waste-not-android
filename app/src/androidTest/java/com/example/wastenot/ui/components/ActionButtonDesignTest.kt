@@ -71,7 +71,7 @@ class ActionButtonDesignTest {
             node.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
             val layout = layouts.single()
             val widestLine = (0 until layout.lineCount).maxOf { layout.getLineRight(it) - layout.getLineLeft(it) }
-            if (layout.didOverflowHeight || widestLine > layout.size.width + 1) {
+            if (layout.didOverflowWidth || layout.didOverflowHeight || widestLine > layout.size.width + 1) {
                 violations.add("$label layout overflow ${layout.size}, widest line $widestLine")
             }
             if (bounds.height < with(compose.density) { 52.dp.toPx() } - 1) violations.add("$label height below 52 dp: ${bounds.height}")

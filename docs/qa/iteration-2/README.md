@@ -59,3 +59,5 @@ Checkpoint S21–S25/C36–C39: [kamera, objek, kondisi, saran dan fallback dala
 Checkpoint S09/D04/C27: [konflik edit, pilihan eksplisit dan dialog sesuai render kit](CONFLICT.md).
 
 Checkpoint S01/C01/C29: [pemulihan sesi, wordmark bersama dan sampel transisi root](STARTUP.md).
+
+Checkpoint D02/D03/C27 dan lebar label C03: [Keluar, Buang perubahan, Tutup formulir dan keyboard](EXIT_DIALOGS.md).

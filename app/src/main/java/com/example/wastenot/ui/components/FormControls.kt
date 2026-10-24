@@ -3,10 +3,12 @@ package com.example.wastenot.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -72,7 +74,7 @@ fun ActionButton(
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
             if (loading) CircularProgressIndicator(Modifier.size(20.dp), color = LocalContentColor.current, strokeWidth = 2.dp)
             Text(if (loading) loadingLabel else label,
-                Modifier.weight(1f, fill = false).semantics { liveRegion = LiveRegionMode.Polite }, textAlign = TextAlign.Center)
+                Modifier.weight(1f, fill = false).width(IntrinsicSize.Max).semantics { liveRegion = LiveRegionMode.Polite }, textAlign = TextAlign.Center)
         }
     }
 }

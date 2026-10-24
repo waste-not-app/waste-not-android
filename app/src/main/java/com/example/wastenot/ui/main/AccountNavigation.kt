@@ -183,19 +183,14 @@ fun AccountNavigation(
         }
     }
     val pendingOutcome = draft?.submissionError?.saveOutcomeUnknown() == true
-    if (discard) AlertDialog(
-        onDismissRequest = { discard = false }, title = { Text(stringResource(if (pendingOutcome) R.string.close_editor_title else R.string.discard_title)) },
-        text = { Text(stringResource(if (pendingOutcome) R.string.discard_pending_message else R.string.discard_message)) },
-        confirmButton = { TextButton(onClick = { discard = false; stack.removeLastOrNull() }) {
-            Text(stringResource(if (pendingOutcome) R.string.close_editor else R.string.discard_action))
-        } },
-        dismissButton = { TextButton(onClick = { discard = false }) { Text(stringResource(R.string.keep_editing)) } },
+    if (discard) DiscardChangesDialog(
+        pendingOutcome = pendingOutcome,
+        onDismiss = { discard = false },
+        onConfirm = { discard = false; stack.removeLastOrNull() },
     )
-    if (leaving) AlertDialog(
-        onDismissRequest = { leaving = false }, title = { Text(stringResource(R.string.logout_title)) },
-        text = { Text(stringResource(R.string.logout_message)) },
-        confirmButton = { TextButton(onClick = { leaving = false; onLogout() }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(stringResource(R.string.logout_action)) } },
-        dismissButton = { TextButton(onClick = { leaving = false }) { Text(stringResource(R.string.cancel)) } },
+    if (leaving) LogoutDialog(
+        onDismiss = { leaving = false },
+        onConfirm = { leaving = false; onLogout() },
     )
     capture?.let { session -> CaptureSheet(user.id, demo, session, onDismiss = { capture = null }, onPrefill = { prefill ->
         capture = null
