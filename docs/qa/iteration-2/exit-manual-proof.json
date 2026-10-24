@@ -1,0 +1,29 @@
+{
+  "implementation_commit": "6add8eaf1bccd1d002ac51e7eb64a20e1fcbd2c5",
+  "installed_apk": {
+    "path": "/data/app/com.example.wastenot-2/base.apk",
+    "sha256": "402f733700a5c100f83e08f45f5610152d15ac8f65cd34a9f69b2bb05a50a4d2"
+  },
+  "profile": "API 24, 360 dp, font 1.0",
+  "checks": {
+    "logout_from_profile": true,
+    "cancel_keeps_profile": true,
+    "dirty_back_opens_discard": true,
+    "continue_keeps_recycle_selection": true
+  },
+  "checked_control_before_and_after": [
+    "[294,703]"
+  ],
+  "snapshots": {
+    "exit-app-home-live-layout.json": "804219eccfde6b01acabf97ed69ce96d042e32f106821b15c4b44128bfa4ad5b",
+    "exit-app-profile-live-layout.json": "aea8ba9507e240f8cbc46202a68e4b3846df33ea0190ca56aa36a009e89947b6",
+    "exit-app-profile-bottom-live.json": "aacc92917cfeddf81392e38c6c9d76f484506d92aab5e89640e4976e20a36223",
+    "exit-app-logout-layout.json": "c71243d8ac59dcda261e80e01094b3317f6a61587ddafa977ced507a37eb3a03",
+    "exit-app-after-logout-cancel.json": "aacc92917cfeddf81392e38c6c9d76f484506d92aab5e89640e4976e20a36223",
+    "exit-app-before-editor.json": "804219eccfde6b01acabf97ed69ce96d042e32f106821b15c4b44128bfa4ad5b",
+    "exit-app-editor-clean.json": "b9cdb3d2ddd349edc44b8d47ccfea49a2fe95696aafe7f62612799d6ee4a71b7",
+    "exit-app-editor-dirty.json": "8bbaaa5e951fbd98b5b74d5a7c2ea5bcce67c81170af7d35bbc0a0f89c955fe6",
+    "exit-app-discard-layout.json": "fed65fc12646be1d9f40bf4ef7bc8dfd10e5e9b4839bfbba8c4eb55cb131700b",
+    "exit-app-editor-kept.json": "8bbaaa5e951fbd98b5b74d5a7c2ea5bcce67c81170af7d35bbc0a0f89c955fe6"
+  }
+}

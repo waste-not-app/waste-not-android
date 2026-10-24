@@ -505,6 +505,16 @@
       "sha256": "c2acd0f6af0e824b76f6afeca8b0c46a8568e3d6b2cf3d5f1b66262c48c08980",
       "origin": "exit-final-normal/exit-1-confirm-focus.png",
       "kind": "native-screenshot"
+    },
+    "exit-app-logout.png": {
+      "sha256": "436b3e6a4372fd33180239b25cf17dd046c77b8513cd3cba1274cb1ae4551c45",
+      "origin": "exit-app-logout.png",
+      "kind": "native-screenshot"
+    },
+    "exit-app-discard.png": {
+      "sha256": "ca020976197894c9751eec5d698e98833f83323bea3f8ed54ee810e9c7238072",
+      "origin": "exit-app-discard.png",
+      "kind": "native-screenshot"
     }
   },
   "actions_metrics": {
@@ -533,5 +543,9 @@
       "origin": "exit-actions-wide200/dark.json"
     }
   },
-  "contrast_sha256": "2838c3d33673a7b626b3f971b8ae355cfec3b8aae33bb440827f3bc1f39b2f1b"
+  "contrast_sha256": "2838c3d33673a7b626b3f971b8ae355cfec3b8aae33bb440827f3bc1f39b2f1b",
+  "manual_main_activity": {
+    "proof_file": "exit-manual-proof.json",
+    "proof_sha256": "8c3561cb886b408b82032e6f3842db484cdbd0db47c5ec6a2ba5316a59e7e7e7"
+  }
 }

@@ -13,6 +13,8 @@
 
 [Sebelumnya](exit-before-logout.png), pada APK checkpoint `2969158`, D02 masih berupa AlertDialog Material dengan dua tombol teks mendatar. Referensi dirender dari HTML/font lokal kit yang diminta. Ukuran window Android, inset sistem dan line height berbeda; perbandingan menyatakan komposisi, bukan semua pixel identik. Screenshot dialog final memakai state terkontrol; regresi MainActivity menguji wiring produk secara terpisah.
 
+Pemeriksaan manual tambahan mengambil [Keluar dari Profil](exit-app-logout.png) dan [Buang perubahan dari editor](exit-app-discard.png) melalui MainActivity, pada API 24/360 dp/teks normal. APK terpasang dicocokkan byte-nya dengan artefak native teruji. Batal tetap di Profil; memilih Recycle lalu Back membuka D03, dan Lanjut mengisi mempertahankan pilihan yang tercentang. [Bukti snapshot dan identitas APK](exit-manual-proof.json) terpisah dari angka 42 eksekusi otomatis.
+
 Panel kini mengikuti C27 yang sudah dipakai D01/D04: surface opak maksimum 400 dp, radius 24, outline dan elevasi 6; padding 28 dan jarak 16; simbol 64/radius 20 dengan ikon 30 dari kit. Judul memakai Plus Jakarta Sans 24 sp/800; body 14. Dua aksi ditumpuk dengan jarak 10 dan tinggi minimum 52, radius 12. Gradasi Pinus menandai Keluar, sedangkan error menandai Buang perubahan. Panel opak menjaga isi keputusan terbaca di atas layar yang diredupkan; bayangan memisahkan modal dari pemicunya.
 
 ## Perilaku yang diperiksa
