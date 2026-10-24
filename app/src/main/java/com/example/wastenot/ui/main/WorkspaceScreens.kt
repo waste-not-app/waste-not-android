@@ -61,7 +61,7 @@ internal fun ScrollPage(padding: PaddingValues, modifier: Modifier = Modifier, m
 @Composable
 fun OverviewScreen(user: User, data: WorkspaceUiState, demo: Boolean, date: LocalDate, padding: PaddingValues,
     onRecord: () -> Unit, onHistory: () -> Unit, onDetail: (String) -> Unit, onRetry: () -> Unit, modifier: Modifier = Modifier,
-    onProfile: () -> Unit = {}) {
+    onProfile: () -> Unit = {}, onResumeDraft: (() -> Unit)? = null) {
     if (data.records.isEmpty() && (data.loading || data.error != null)) {
         WorkspaceLoading(data, onRetry, padding, modifier)
         return
@@ -80,6 +80,7 @@ fun OverviewScreen(user: User, data: WorkspaceUiState, demo: Boolean, date: Loca
             }
         }
         if (data.error != null) MessageBanner(stringResource(R.string.refresh_failed), isError = true)
+        if (onResumeDraft != null) PausedDraftNotice(onResumeDraft)
         if (demo) {
             val today = demoSummary(data.records.filter { it.activityDate == date })
             SummaryBlock(today, stringResource(R.string.handled_today), afterPrimary = {

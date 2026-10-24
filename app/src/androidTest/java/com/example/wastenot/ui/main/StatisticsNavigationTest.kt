@@ -20,6 +20,7 @@ class StatisticsNavigationTest {
     @get:Rule(order = 0) val fixtures = object : ExternalResource() {
         override fun before() {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
+            com.example.wastenot.clearEditorDraftFixtures(context)
             listOf("dummy_session", "dummy_logs_dummy-owner", "appearance").forEach {
                 context.getSharedPreferences(it, android.content.Context.MODE_PRIVATE).edit().clear().commit()
             }

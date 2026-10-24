@@ -39,6 +39,7 @@ import com.example.wastenot.*
 import com.example.wastenot.R
 import com.example.wastenot.data.dummy.dummyProgress
 import com.example.wastenot.data.dummy.DummyActivityStore
+import com.example.wastenot.data.local.LocalEditorDraftStore
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.data.repository.RemoteActivityStore
@@ -50,6 +51,7 @@ import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.LocalWasteNotDockEdge
 import java.time.LocalDate
 import java.util.UUID
+import kotlinx.coroutines.flow.collect
 
 enum class MainTab(val key: NavKey, val label: Int, val icon: Int) {
     HOME(Home, R.string.tab_home, R.drawable.ic_home),
@@ -82,6 +84,22 @@ fun AccountNavigation(
     } } }
     val model: WorkspaceViewModel = viewModel(factory = factory)
     val data by model.state.collectAsStateWithLifecycle()
+    val persistenceFactory = remember(user.id) { viewModelFactory { initializer {
+        EditorPersistenceViewModel(LocalEditorDraftStore.create(context, user.id))
+    } } }
+    val persistence: EditorPersistenceViewModel = viewModel(factory = persistenceFactory)
+    val disk by persistence.state.collectAsStateWithLifecycle()
+    LaunchedEffect(persistence) { persistence.load() }
+    var discardUnreadable by remember { mutableStateOf(false) }
+    if (disk.loading || !disk.ready) {
+        if (discardUnreadable) DiscardStoredDraftDialog(
+            { discardUnreadable = false }, { persistence.clear { discardUnreadable = false } },
+            busy = disk.busy, error = disk.failure == DraftFailure.FINISH,
+        )
+        DraftRestoreScreen(disk.loading, { persistence.load(retry = true) }, { discardUnreadable = true }, modifier)
+        return
+    }
+    val recovered = remember(persistence) { disk.active }
     val guideFactory = remember(guideStore) { viewModelFactory { initializer {
         GuideViewModel(guideStore, createSavedStateHandle())
     } } }
@@ -114,6 +132,27 @@ fun AccountNavigation(
     var deletedNotice by rememberSaveable { mutableStateOf(false) }
     var savedNoticeId by rememberSaveable { mutableStateOf<String?>(null) }
     var savedWasCreated by rememberSaveable { mutableStateOf(false) }
+    var navigationReady by remember { mutableStateOf(false) }
+    var resumingPrompt by remember { mutableStateOf(false) }
+    fun resumeDraft() {
+        val saved = persistence.resume() ?: return
+        val tab = MainTab.valueOf(saved.origin)
+        val target = stacks.getValue(tab)
+        if (target.none { it is LogEditor && it.requestId == saved.requestId }) {
+            saved.logId?.let { if ((target.lastOrNull() as? LogDetail)?.id != it) target.add(LogDetail(it)) }
+            saved.guideId?.let { if (target.lastOrNull() != GuideDetail(it)) target.add(GuideDetail(it)) }
+            target.add(saved.editorKey())
+        }
+        selected = tab
+        resumingPrompt = false
+    }
+    LaunchedEffect(persistence) {
+        stacks.values.forEach { savedStack ->
+            savedStack.removeAll { it is LogEditor && it.requestId != recovered?.requestId }
+        }
+        if (recovered != null && !recovered.paused) resumeDraft()
+        navigationReady = true
+    }
     fun selectTab(tab: MainTab) { focus.clearFocus(); keyboard?.hide(); selected = tab }
     fun guideList() {
         val guideStack = stacks.getValue(MainTab.GUIDE)
@@ -135,8 +174,16 @@ fun AccountNavigation(
         selected = MainTab.HOME
     }
     fun back() {
-        if (data.deletingId != null || (editor != null && data.saving)) return
+        if (data.deletingId != null || disk.busy || (editor != null && data.saving)) return
+        if (editor != null && draft == null && disk.active?.requestId == editor.requestId) return
+        if (editor != null && data.save?.let { it.requestId == editor.requestId && it.id != null } == true) return
         if (editor != null && (draft?.dirty == true || draft?.locked == true)) { discard = true; return }
+        if (editor != null && draft != null) {
+            persistence.leave(draft.stored(editor, selected)) {
+                if (stack.lastOrNull() == editor) stack.removeLastOrNull()
+            }
+            return
+        }
         if (current is LogDetail && current.id == savedNoticeId) savedNoticeId = null
         if (stack.size > 1) stack.removeLastOrNull() else if (selected != MainTab.HOME) selected = MainTab.HOME
     }
@@ -146,17 +193,35 @@ fun AccountNavigation(
     }
     val visibleDetail = current as? LogDetail
     LaunchedEffect(visibleDetail) { visibleDetail?.let { model.loadDetail(it.id) } }
-    fun edit(id: String? = null) {
-        if (stack.lastOrNull() !is LogEditor) stack.add(LogEditor(id, UUID.randomUUID().toString()))
+    fun openEditor(key: LogEditor) {
+        if (disk.busy) return
+        if (disk.active?.paused == true) { resumingPrompt = true; return }
+        if (stack.lastOrNull() !is LogEditor) stack.add(key)
+    }
+    fun edit(id: String? = null) { openEditor(LogEditor(id, UUID.randomUUID().toString())) }
+    fun openCapture() {
+        if (disk.active?.paused == true) resumingPrompt = true
+        else if (!disk.busy) capture = UUID.randomUUID().toString()
+    }
+    fun finishSave() {
+        val saved = data.save ?: return
+        val key = editor ?: return
+        val form = draft ?: return
+        if (saved.id == null || saved.requestId != key.requestId || stack.lastOrNull() != key) return
+        persistence.leave(form.stored(key, selected)) {
+            if (stack.lastOrNull() == key) {
+                savedNoticeId = saved.id
+                savedWasCreated = saved.created
+                stack.removeLastOrNull()
+                if ((stack.lastOrNull() as? LogDetail)?.id != saved.id) stack.add(LogDetail(saved.id))
+                model.acknowledgeSave(saved.requestId)
+            }
+        }
     }
     LaunchedEffect(data.save, editor?.requestId, draft) {
         val saved = data.save
         if (saved?.id != null && editor?.requestId == saved.requestId && stack.lastOrNull() == editor) {
-            savedNoticeId = saved.id
-            savedWasCreated = saved.created
-            stack.removeLastOrNull()
-            if ((stack.lastOrNull() as? LogDetail)?.id != saved.id) stack.add(LogDetail(saved.id))
-            model.acknowledgeSave(saved.requestId)
+            finishSave()
         } else if (saved?.error != null && editor?.requestId == saved.requestId && draft != null) {
             draft.submissionFailed(saved.error)
             if (draft.needsConflictResolution) conflictRequest = saved.requestId
@@ -186,23 +251,31 @@ fun AccountNavigation(
     if (discard) DiscardChangesDialog(
         pendingOutcome = pendingOutcome,
         onDismiss = { discard = false },
-        onConfirm = { discard = false; stack.removeLastOrNull() },
+        onConfirm = {
+            if (draft != null && editor != null) persistence.leave(draft.stored(editor, selected), keepForReview = pendingOutcome) {
+                discard = false
+                if (stack.lastOrNull() == editor) stack.removeLastOrNull()
+            }
+        },
+        busy = disk.busy, error = disk.failure == DraftFailure.FINISH,
     )
     if (leaving) LogoutDialog(
         onDismiss = { leaving = false },
-        onConfirm = { leaving = false; onLogout() },
+        onConfirm = { persistence.clear { leaving = false; onLogout() } },
+        busy = disk.busy, error = disk.failure == DraftFailure.FINISH, hasDraft = disk.active != null,
     )
+    if (resumingPrompt) ResumeDraftDialog({ resumingPrompt = false }, ::resumeDraft)
     capture?.let { session -> CaptureSheet(user.id, demo, session, onDismiss = { capture = null }, onPrefill = { prefill ->
         capture = null
-        if (stack.lastOrNull() !is LogEditor) stack.add(LogEditor(null, UUID.randomUUID().toString(),
-            scanCategory = prefill.category?.name, scanMethod = prefill.method?.name))
+        openEditor(LogEditor(null, UUID.randomUUID().toString(), scanCategory = prefill.category?.name, scanMethod = prefill.method?.name))
     }) }
     BoxWithConstraints(modifier) {
         val rail = maxWidth >= 600.dp
         val railWidth = if (LocalDensity.current.fontScale >= 1.5f) 144.dp else 112.dp
         val pageInsets = PaddingValues(0.dp)
         val provider = entryProvider {
-            entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, ::history, ::detail, { model.load(true) }, Modifier.fillMaxSize(), onProfile = { selected = MainTab.PROFILE }) }
+            entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, ::history, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
+                onProfile = { selected = MainTab.PROFILE }, onResumeDraft = if (disk.active?.paused == true) ::resumeDraft else null) }
             entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
                 today = date, filterOpen = historyFilterOpen, onOpenFilter = { historyFilterOpen = true }, onDismissFilter = { historyFilterOpen = false },
                 deletedNotice = deletedNotice, onDismissNotice = { deletedNotice = false }) }
@@ -218,7 +291,7 @@ fun AccountNavigation(
                 GuideDetailScreen(guideData.detail?.takeIf { it.id == key.id }, pageInsets,
                     onRetry = { guides.detail(key.id, retry = true) },
                     onList = { if (selected == MainTab.GUIDE && stack.lastOrNull() == key) guideList() },
-                    onRecord = { if (selected == MainTab.GUIDE && stack.lastOrNull() == key) stack.add(LogEditor(null, UUID.randomUUID().toString(), key.id)) },
+                    onRecord = { if (selected == MainTab.GUIDE && stack.lastOrNull() == key) openEditor(LogEditor(null, UUID.randomUUID().toString(), key.id)) },
                     onSource = { url ->
                         try { uriHandler.openUri(url); sourceError = false }
                         catch (_: IllegalArgumentException) { sourceError = true }
@@ -241,22 +314,27 @@ fun AccountNavigation(
                     onHistory = ::history, onRetry = { model.loadDetail(key.id) }, modifier = Modifier.fillMaxSize())
             }
             entry<LogEditor> { key ->
+                val cached = disk.active?.takeIf { it.requestId == key.requestId }
                 val initial = data.detail?.takeIf { it.id == key.logId }?.log ?: data.records.find { it.id == key.logId }
                 val article = guideData.detail?.takeIf { it.id == key.guideId && !it.loading && it.error == null }?.article
                 if (key.guideId != null) LaunchedEffect(key.guideId) { guides.detail(key.guideId) }
-                val canStart = (key.logId == null || initial != null) && (key.guideId == null || article != null)
+                val canStart = cached != null || ((key.logId == null || initial != null) && (key.guideId == null || article != null))
+                val wasRestored = rememberSaveable(key.requestId) { cached != null }
                 var entryDraft by rememberSaveable(key.requestId, stateSaver = EditorDraft.NullableSaver) {
                     mutableStateOf(if (canStart) {
-                        if (article != null) EditorDraft.forGuide(article, date) else EditorDraft.from(initial, date).applyScan(key)
+                        cached?.restoreForm() ?: if (article != null) EditorDraft.forGuide(article, date) else EditorDraft.from(initial, date).applyScan(key)
                     } else null)
                 }
                 LaunchedEffect(key.requestId, initial, article, date) {
                     if (entryDraft == null && canStart) {
-                        entryDraft = if (article != null) EditorDraft.forGuide(article, date) else EditorDraft.from(initial, date).applyScan(key)
+                        entryDraft = cached?.restoreForm() ?: if (article != null) EditorDraft.forGuide(article, date) else EditorDraft.from(initial, date).applyScan(key)
                     }
                 }
                 val form = entryDraft
                 if (form != null) {
+                    LaunchedEffect(key.requestId, form, current == key) {
+                        if (current == key) snapshotFlow { form.stored(key, selected) }.collect(persistence::update)
+                    }
                     DisposableEffect(key.requestId, form) {
                         activeEditorDraft = EditorEntryDraft(key.requestId, form)
                         onDispose {
@@ -272,10 +350,17 @@ fun AccountNavigation(
                             onUse = { latest, keepDraft -> if (form.resolveConflict(latest, keepDraft)) dismissConflict() })
                     }
                     val leavingAfterSave = current != key && form.locked && form.submissionError == null
-                    LogEditorScreen(form, date, user.timezone.id, demo, data.saving || leavingAfterSave, pageInsets,
-                        { model.save(it, key.logId, form.values.version, key.requestId) },
-                        { stack.removeLastOrNull(); history(); model.load(true) },
-                        { if (stack.lastOrNull() == key) conflictRequest = key.requestId }, Modifier.fillMaxSize())
+                    val confirmed = data.save?.let { it.requestId == key.requestId && it.id != null } == true
+                    LogEditorScreen(form, date, user.timezone.id, demo, data.saving || disk.busy || leavingAfterSave, pageInsets,
+                        { input -> persistence.checkpoint(form.stored(key, selected),
+                            { if (stack.lastOrNull() == key) model.save(input, key.logId, form.values.version, key.requestId) },
+                            { form.submissionFailed(ApiFailureKind.STORAGE) }) },
+                        { persistence.leave(form.stored(key, selected)) {
+                            if (stack.lastOrNull() == key) { stack.removeLastOrNull(); history(); model.load(true) }
+                        } },
+                        { if (stack.lastOrNull() == key) conflictRequest = key.requestId }, Modifier.fillMaxSize(),
+                        persistence = disk, restored = wasRestored, saveConfirmed = confirmed,
+                        onRetryPersistence = { if (confirmed) finishSave() else persistence.update(form.stored(key, selected)) })
                 } else if (canStart) {
                     ScrollPage(pageInsets, Modifier.fillMaxSize()) {
                         LinearProgressIndicator(Modifier.fillMaxWidth())
@@ -300,7 +385,7 @@ fun AccountNavigation(
                         confirmation = key is LogDetail && key.id == savedNoticeId && log != null,
                         onBack = { if (selected == tab && stacks.getValue(selected).lastOrNull() == key) latestBack() },
                         onSelect = ::selectTab, onRecord = {
-                            if (selected == tab && stacks.getValue(selected).lastOrNull() == tab.key) capture = UUID.randomUUID().toString()
+                            if (selected == tab && stacks.getValue(selected).lastOrNull() == tab.key) openCapture()
                         },
                         onFilter = { if (selected == tab && stacks.getValue(selected).lastOrNull() == History) historyFilterOpen = true }) {
                         entry.Content()
@@ -311,10 +396,11 @@ fun AccountNavigation(
         }
         val entries = if (selected == MainTab.HOME) decorated.getValue(MainTab.HOME)
             else decorated.getValue(MainTab.HOME) + decorated.getValue(selected)
-        NavDisplay(entries = entries, onBack = ::back,
+        if (navigationReady) NavDisplay(entries = entries, onBack = ::back,
             transitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
             popTransitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
             modifier = Modifier.fillMaxSize())
+        else DraftRestoreScreen(true, {}, {}, Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas))
     }
 }
 

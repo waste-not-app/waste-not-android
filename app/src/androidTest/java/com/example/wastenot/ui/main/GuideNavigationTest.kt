@@ -23,6 +23,7 @@ class GuideNavigationTest {
     @get:Rule(order = 0) val fixtures = object : ExternalResource() {
         override fun before() {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
+            com.example.wastenot.clearEditorDraftFixtures(context)
             listOf("dummy_session", "dummy_logs_dummy-owner", "appearance").forEach {
                 check(context.getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().commit())
             }

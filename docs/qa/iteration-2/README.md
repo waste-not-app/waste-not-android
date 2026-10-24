@@ -61,3 +61,5 @@ Checkpoint S09/D04/C27: [konflik edit, pilihan eksplisit dan dialog sesuai rende
 Checkpoint S01/C01/C29: [pemulihan sesi, wordmark bersama dan sampel transisi root](STARTUP.md).
 
 Checkpoint D02/D03/C27 dan lebar label C03: [Keluar, Buang perubahan, Tutup formulir dan keyboard](EXIT_DIALOGS.md).
+
+Checkpoint A05/S05/S09/D03/C27–C29: [draf per akun, pemulihan proses, retry idempotent dan pembersihan eksplisit](DRAFTS.md).

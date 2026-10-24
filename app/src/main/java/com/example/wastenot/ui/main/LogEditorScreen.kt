@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
@@ -19,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -52,12 +57,16 @@ fun LogEditorScreen(
     onHistory: () -> Unit,
     onResolveConflict: () -> Unit,
     modifier: Modifier = Modifier,
+    persistence: EditorPersistenceState? = null,
+    onRetryPersistence: () -> Unit = {},
+    saveConfirmed: Boolean = false,
+    restored: Boolean = false,
 ) {
     val focus = remember { EditorField.entries.associateWith { FocusRequester() } }
     val reveal = remember { EditorField.entries.associateWith { BringIntoViewRequester() } }
     val focused = remember(draft) { mutableSetOf<EditorField>() }
     val value = draft.values
-    val enabled = !saving && !draft.locked
+    val enabled = !saving && !draft.locked && !saveConfirmed
     val focusManager = LocalFocusManager.current
     val submissionReveal = remember(draft) { BringIntoViewRequester() }
     LaunchedEffect(draft.submissionError) {
@@ -93,6 +102,8 @@ fun LogEditorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             if (!demo) MessageBanner(stringResource(R.string.remote_write_message))
+            if (restored) Text(stringResource(R.string.draft_restored), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
             MethodSelector(value.method, { draft.change(EditorField.METHOD, value.copy(method = it)) }, fieldModifier(EditorField.METHOD),
                 draft.errors[EditorField.METHOD]?.let { stringResource(it) }, enabled = enabled,
                 initialFocusModifier = inputModifier(EditorField.METHOD))
@@ -125,8 +136,26 @@ fun LogEditorScreen(
                     else -> R.string.save_failed_message
                 }), Modifier.bringIntoViewRequester(submissionReveal), isError = true)
             }
+            if (persistence != null) {
+                if (persistence.failure == DraftFailure.WRITE || persistence.failure == DraftFailure.FINISH) {
+                    MessageBanner(stringResource(when {
+                        saveConfirmed -> R.string.draft_saved_cleanup_failed
+                        persistence.failure == DraftFailure.FINISH -> R.string.draft_cleanup_failed
+                        else -> R.string.draft_write_failed
+                    }), isError = true)
+                    OutlinedButton(onRetryPersistence, Modifier.fillMaxWidth().heightIn(min = 52.dp), enabled = !persistence.busy,
+                        shape = MaterialTheme.shapes.small, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
+                        Text(stringResource(R.string.retry), Modifier.width(IntrinsicSize.Max), color = MaterialTheme.colorScheme.onSurface)
+                    }
+                } else Text(stringResource(when {
+                    saveConfirmed -> R.string.draft_completing
+                    persistence.persisted?.fields == draft.snapshot() && !persistence.writing -> R.string.draft_saved
+                    else -> R.string.draft_saving
+                }), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             ActionButton(
                 stringResource(when {
+                    saveConfirmed -> R.string.draft_record_saved
                     draft.needsConflictResolution -> R.string.load_latest_log
                     draft.retryBlocked -> R.string.see_history
                     draft.locked && !saving -> R.string.retry
@@ -136,8 +165,9 @@ fun LogEditorScreen(
                 { if (draft.needsConflictResolution) onResolveConflict() else if (draft.retryBlocked) onHistory() else draft.prepareSubmission(referenceDate)?.let {
                     focusManager.clearFocus()
                     onSave(it)
-                } }, Modifier.fillMaxWidth(), loading = saving,
-                loadingLabel = stringResource(R.string.saving), enabled = draft.needsConflictResolution || draft.retryBlocked || draft.locked || value.version == null || draft.dirty,
+                } }, Modifier.fillMaxWidth(), loading = saving && !saveConfirmed,
+                loadingLabel = stringResource(R.string.saving), enabled = !saveConfirmed &&
+                    (draft.needsConflictResolution || draft.retryBlocked || draft.locked || value.version == null || draft.dirty),
             )
         }
     }

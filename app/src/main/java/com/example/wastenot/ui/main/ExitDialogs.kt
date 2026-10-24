@@ -29,21 +29,22 @@ import com.example.wastenot.theme.WasteNotDialogHeading
 import com.example.wastenot.ui.components.ActionButton
 
 @Composable
-internal fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+internal fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, busy: Boolean = false, error: Boolean = false, hasDraft: Boolean = false) {
     ExitConfirmationDialog(
         title = stringResource(R.string.logout_title),
-        message = stringResource(R.string.logout_message),
+        message = stringResource(if (hasDraft) R.string.draft_logout_message else R.string.logout_message),
         confirmLabel = stringResource(R.string.logout_action),
         dismissLabel = stringResource(R.string.cancel),
         icon = R.drawable.ic_logout,
         destructive = false,
         onDismiss = onDismiss,
         onConfirm = onConfirm,
+        busy = busy, error = error,
     )
 }
 
 @Composable
-internal fun DiscardChangesDialog(pendingOutcome: Boolean, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+internal fun DiscardChangesDialog(pendingOutcome: Boolean, onDismiss: () -> Unit, onConfirm: () -> Unit, busy: Boolean = false, error: Boolean = false) {
     ExitConfirmationDialog(
         title = stringResource(if (pendingOutcome) R.string.close_editor_title else R.string.discard_title),
         message = stringResource(if (pendingOutcome) R.string.discard_pending_message else R.string.discard_message),
@@ -53,23 +54,36 @@ internal fun DiscardChangesDialog(pendingOutcome: Boolean, onDismiss: () -> Unit
         destructive = !pendingOutcome,
         onDismiss = onDismiss,
         onConfirm = onConfirm,
+        busy = busy, error = error,
     )
+}
+
+@Composable
+internal fun ResumeDraftDialog(onDismiss: () -> Unit, onResume: () -> Unit) {
+    ExitConfirmationDialog(stringResource(R.string.draft_pending_title), stringResource(R.string.draft_pending_message),
+        stringResource(R.string.draft_resume), stringResource(R.string.cancel), R.drawable.ic_clock, false, onDismiss, onResume)
+}
+
+@Composable
+internal fun DiscardStoredDraftDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, busy: Boolean, error: Boolean) {
+    ExitConfirmationDialog(stringResource(R.string.draft_discard_title), stringResource(R.string.draft_discard_message),
+        stringResource(R.string.draft_discard_stored), stringResource(R.string.cancel), R.drawable.ic_alert, true, onDismiss, onConfirm, busy, error)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExitConfirmationDialog(title: String, message: String, confirmLabel: String, dismissLabel: String,
-    icon: Int, destructive: Boolean, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    icon: Int, destructive: Boolean, onDismiss: () -> Unit, onConfirm: () -> Unit, busy: Boolean = false, error: Boolean = false) {
     val cancel = remember { FocusRequester() }
-    BasicAlertDialog(onDismissRequest = onDismiss) {
+    BasicAlertDialog(onDismissRequest = { if (!busy) onDismiss() }) {
         val focused = LocalWindowInfo.current.isWindowFocused
         val inputMode = LocalInputModeManager.current.inputMode
-        LaunchedEffect(focused, inputMode) {
-            if (focused && inputMode == InputMode.Keyboard) cancel.requestFocus()
+        LaunchedEffect(focused, inputMode, busy) {
+            if (focused && inputMode == InputMode.Keyboard && !busy) cancel.requestFocus()
         }
         Surface(Modifier.widthIn(max = 400.dp).fillMaxWidth().onPreviewKeyEvent {
             if (it.key == Key.Escape) {
-                if (it.type == KeyEventType.KeyUp) onDismiss()
+                if (it.type == KeyEventType.KeyUp && !busy) onDismiss()
                 true
             } else false
         }, shape = MaterialTheme.shapes.extraLarge,
@@ -83,10 +97,13 @@ private fun ExitConfirmationDialog(title: String, message: String, confirmLabel:
                 Text(title, Modifier.fillMaxWidth().semantics { heading() }, style = WasteNotDialogHeading)
                 Text(message, Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium)
+                if (error) Text(stringResource(R.string.draft_cleanup_failed), color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium)
                 Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    ActionButton(confirmLabel, onConfirm, Modifier.fillMaxWidth(), destructive = destructive)
+                    ActionButton(confirmLabel, onConfirm, Modifier.fillMaxWidth(), destructive = destructive, loading = busy,
+                        loadingLabel = stringResource(R.string.draft_finishing))
                     OutlinedButton(onDismiss, Modifier.fillMaxWidth().heightIn(min = 52.dp).focusRequester(cancel),
-                        shape = MaterialTheme.shapes.small, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
+                        enabled = !busy, shape = MaterialTheme.shapes.small, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
                         Text(dismissLabel, Modifier.width(IntrinsicSize.Max), color = MaterialTheme.colorScheme.onSurface)
                     }
                 }

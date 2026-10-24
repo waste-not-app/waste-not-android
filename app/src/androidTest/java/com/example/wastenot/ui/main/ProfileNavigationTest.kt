@@ -19,6 +19,7 @@ class ProfileNavigationTest {
         override fun before() {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             val freshId = UUID.nameUUIDFromBytes("profile.zero@example.invalid".toByteArray(Charsets.UTF_8))
+            com.example.wastenot.clearEditorDraftFixtures(context)
             listOf("dummy_session", "dummy_logs_dummy-owner", "dummy_logs_$freshId", "appearance").forEach {
                 context.getSharedPreferences(it, android.content.Context.MODE_PRIVATE).edit().clear().commit()
             }

@@ -30,6 +30,7 @@ class ScanCameraNavigationTest {
             check(context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 "Revoke CAMERA before starting this instrumentation suite; revoking inside the runner kills its process."
             }
+            com.example.wastenot.clearEditorDraftFixtures(context)
             listOf("dummy_session", "dummy_logs_dummy-owner", "appearance").forEach {
                 check(context.getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().commit())
             }

@@ -31,6 +31,7 @@ class SessionRootTest {
     @get:Rule val compose = createComposeRule()
     private val tabs = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)
     private fun start(source: FixtureSession) {
+        com.example.wastenot.clearEditorDraftFixtures(InstrumentationRegistry.getInstrumentation().targetContext)
         compose.setContent { WasteNotTheme(darkTheme = false) {
             MainNavigation(source, CoreRepository(null), com.example.wastenot.data.dummy.DummyGuideStore(), ThemeMode.LIGHT, {}, Modifier.fillMaxSize())
         } }
@@ -186,6 +187,41 @@ class SessionRootTest {
         compose.waitUntil(5_000) { compose.onAllNodes(tabs and hasText("Panduan")).fetchSemanticsNodes().isNotEmpty() }
         compose.onNode(tabs and hasText("Panduan")).performClick()
         assertEquals("", compose.onNodeWithContentDescription("Cari panduan").fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
+    }
+
+    @Test fun changingIdentityNeverRestoresAnotherAccountsDraft() {
+        val source = FixtureSession(demo = true)
+        val a = source.user.copy(id = "00000000-0000-4000-8000-000000000031")
+        val b = source.user.copy(id = "00000000-0000-4000-8000-000000000032", name = "Fixture B")
+        source.state.value = SessionState.Authenticated(a, 1)
+        start(source)
+        compose.waitUntil(10_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
+        compose.onNodeWithText("Input manual").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Draf akun A pribadi")
+        fun disk(owner: String): StoredEditorDraft? {
+            var draft: StoredEditorDraft? = null
+            kotlinx.coroutines.test.runTest {
+                draft = (com.example.wastenot.data.local.LocalEditorDraftStore.create(draftTestContext, owner).read() as ApiResult.Success).value
+            }
+            return draft
+        }
+        compose.waitUntil(10_000) { disk(a.id)?.fields?.get(12) == "Draf akun A pribadi" }
+        val requestA = checkNotNull(disk(a.id)).requestId
+        compose.onNodeWithContentDescription("Catatan (opsional)").performTextReplacement("Draf akun A terkini")
+        compose.runOnIdle { source.state.value = SessionState.Authenticated(b, 2) }
+        compose.waitUntil(10_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
+        compose.onNodeWithText("Draf akun A", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Input manual").performScrollTo().performClick()
+        assertEquals("", compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo()
+            .fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
+        compose.waitUntil(10_000) { disk(b.id) != null }
+        assertEquals("", checkNotNull(disk(b.id)).fields[12])
+        org.junit.Assert.assertNotEquals(requestA, checkNotNull(disk(b.id)).requestId)
+        compose.runOnIdle { source.state.value = SessionState.Authenticated(a, 3) }
+        compose.waitUntil(10_000) { compose.onAllNodesWithText("Draf dipulihkan. Periksa isian sebelum menyimpan.").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().assertTextContains("Draf akun A", substring = true)
+        assertEquals(requestA, checkNotNull(disk(a.id)).requestId)
+        captureDraftFixture("draft-account-A-restored")
     }
 
     private class FixtureSession(private val demo: Boolean = false) : AccountSession {

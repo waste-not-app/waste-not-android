@@ -119,6 +119,9 @@ class EditorDraft(original: EditorValues) {
         return input(current)
     }
 
+    fun snapshot(): List<String> = encode(original) + encode(values) +
+        (submittedValues?.let(::encode) ?: List(7) { "" }) + submissionError?.name.orEmpty()
+
     companion object {
         fun forGuide(guide: WasteGuide, date: LocalDate) = EditorDraft(EditorValues(
             guide.category, guide.method, QuantityInput(), date, "", null,
@@ -139,16 +142,27 @@ class EditorDraft(original: EditorValues) {
             value.quantity.rawText, value.quantity.unit.name, value.date.toString(), value.notes, value.version?.toString().orEmpty())
         private fun decode(value: List<String>) = EditorValues(value[0].takeIf(String::isNotEmpty)?.let(WasteCategory::valueOf),
             value[1].takeIf(String::isNotEmpty)?.let(DisposalMethod::valueOf), QuantityInput(value[2], QuantityUnit.valueOf(value[3])),
-            LocalDate.parse(value[4]), value[5], value[6].toIntOrNull())
-        val Saver = listSaver<EditorDraft, String>(
-            save = { encode(it.original) + encode(it.values) +
-                (it.submittedValues?.let(::encode) ?: List(7) { "" }) + it.submissionError?.name.orEmpty() },
-            restore = { EditorDraft(decode(it.take(7))).apply {
-                values = decode(it.drop(7).take(7))
-                if (it.getOrNull(14)?.isNotEmpty() == true) submittedValues = decode(it.drop(14).take(7))
-                submissionError = it.getOrNull(21)?.takeIf(String::isNotEmpty)?.let(ApiFailureKind::valueOf)
+            LocalDate.parse(value[4]), value[5], value[6].takeIf(String::isNotEmpty)?.toInt()?.also { require(it > 0) })
+
+        fun fromSnapshot(snapshot: List<String>): EditorDraft {
+            require(snapshot.size in setOf(14, 21, 22))
+            return EditorDraft(decode(snapshot.take(7))).apply {
+                values = decode(snapshot.drop(7).take(7))
+                require(values.version == original.version)
+                if (snapshot.getOrNull(14)?.isNotEmpty() == true) submittedValues = decode(snapshot.drop(14).take(7))
+                else require(snapshot.drop(14).take(7).all(String::isEmpty))
+                submittedValues?.let { submitted ->
+                    require(values == submitted && submitted.category != null && submitted.method != null)
+                    require(parseQuantity(submitted.quantity.rawText, submitted.quantity.unit) is QuantityParseResult.Valid)
+                    require(submitted.notes.trim().length <= 500)
+                }
+                submissionError = snapshot.getOrNull(21)?.takeIf(String::isNotEmpty)?.let(ApiFailureKind::valueOf)
                     ?: ApiFailureKind.TIMEOUT.takeIf { submittedValues != null }
-            } },
+            }
+        }
+        val Saver = listSaver<EditorDraft, String>(
+            save = { it.snapshot() },
+            restore = ::fromSnapshot,
         )
         val NullableSaver = androidx.compose.runtime.saveable.Saver<EditorDraft?, Any>(
             save = { draft -> draft?.let { with(Saver) { save(it) } } },
