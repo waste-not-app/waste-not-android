@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -16,7 +15,6 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +35,7 @@ import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.model.WasteLog
 import com.example.wastenot.theme.WasteNotDialogHeading
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.labelResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,11 +93,8 @@ internal fun DeleteLogDialog(
                         else -> ActionButton(stringResource(R.string.delete_action), onConfirm, Modifier.fillMaxWidth(), loading = busy,
                             loadingLabel = stringResource(R.string.deleting_log), destructive = true)
                     }
-                    OutlinedButton(onClick = onDismiss, enabled = !busy, shape = MaterialTheme.shapes.small,
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).focusRequester(cancelFocus)) {
-                        Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.onSurface)
-                    }
+                    SecondaryActionButton(stringResource(R.string.cancel), onDismiss,
+                        Modifier.fillMaxWidth().focusRequester(cancelFocus), enabled = !busy)
                 }
             }
         }

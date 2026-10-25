@@ -9,10 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
@@ -23,7 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -38,6 +33,7 @@ import com.example.wastenot.data.repository.ActivityInput
 import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.CategoryPicker
 import com.example.wastenot.ui.components.DateField
 import com.example.wastenot.ui.components.MethodSelector
@@ -143,10 +139,8 @@ fun LogEditorScreen(
                         persistence.failure == DraftFailure.FINISH -> R.string.draft_cleanup_failed
                         else -> R.string.draft_write_failed
                     }), isError = true)
-                    OutlinedButton(onRetryPersistence, Modifier.fillMaxWidth().heightIn(min = 52.dp), enabled = !persistence.busy,
-                        shape = MaterialTheme.shapes.small, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
-                        Text(stringResource(R.string.retry), Modifier.width(IntrinsicSize.Max), color = MaterialTheme.colorScheme.onSurface)
-                    }
+                    SecondaryActionButton(stringResource(R.string.retry), onRetryPersistence,
+                        Modifier.fillMaxWidth(), enabled = !persistence.busy)
                 } else Text(stringResource(when {
                     saveConfirmed -> R.string.draft_completing
                     persistence.persisted?.fields == draft.snapshot() && !persistence.writing -> R.string.draft_saved

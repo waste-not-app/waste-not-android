@@ -1,5 +1,6 @@
 package com.example.wastenot.ui.main
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -10,6 +11,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
+import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.model.*
 import com.example.wastenot.theme.WasteNotTheme
@@ -19,11 +21,38 @@ import org.junit.Test
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.io.File
 
 class LogDetailDesignTest {
     @get:Rule val compose = createComposeRule()
     private val log = WasteLog("detail", WasteCategory.METAL, DisposalMethod.RECYCLE, Quantity.Weight.of(99_999),
         LocalDate.of(2026, 10, 19), ZoneId.of("Asia/Jakarta"), "Catatan pribadi", 1, Instant.EPOCH, Instant.EPOCH)
+
+    @Test fun pendingDeleteUsesTheKitDisabledCancelInBothThemes() {
+        var dark by mutableStateOf(false)
+        compose.setContent { WasteNotTheme(dark) {
+            DeleteLogDialog(log, true, null, {}, {}, {}, {})
+        } }
+        for (theme in listOf(false, true)) {
+            compose.runOnIdle { dark = theme }
+            compose.onNodeWithText("Batal").performScrollTo().assertIsNotEnabled()
+            val layouts = mutableListOf<TextLayoutResult>()
+            compose.onNodeWithText("Batal", useUnmergedTree = true)
+                .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+            val instrumentation = InstrumentationRegistry.getInstrumentation()
+            instrumentation.uiAutomation.waitForIdle(300, 5_000)
+            instrumentation.uiAutomation.takeScreenshot()?.recycle()
+            android.os.SystemClock.sleep(150)
+            val bitmap = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
+            val directory = File(instrumentation.targetContext.getExternalFilesDir(null), "secondary-qa").apply { mkdirs() }
+            File(directory, "delete-${if (theme) "dark" else "light"}-pending.png").outputStream().use {
+                check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it))
+            }
+            bitmap.recycle()
+            val expected = if (theme) com.example.wastenot.theme.OnSurfaceVariantDark else com.example.wastenot.theme.OnSurfaceVariant
+            assertEquals("Pending delete must use the kit muted label", expected, layouts.single().layoutInput.style.color)
+        }
+    }
 
     @Test fun largestValuesKeepTheirDigitsTogetherAndCacheErrorsDisableWrites() {
         val quantity = mutableStateOf<Quantity>(log.quantity)

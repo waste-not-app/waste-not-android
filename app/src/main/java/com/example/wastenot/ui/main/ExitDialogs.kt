@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
 import com.example.wastenot.theme.WasteNotDialogHeading
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 
 @Composable
 internal fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, busy: Boolean = false, error: Boolean = false,
@@ -108,15 +109,8 @@ private fun ExitConfirmationDialog(title: String, message: String, confirmLabel:
                 Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     ActionButton(confirmLabel, onConfirm, Modifier.fillMaxWidth(), destructive = destructive, loading = busy,
                         loadingLabel = stringResource(loadingText))
-                    OutlinedButton(onDismiss, Modifier.fillMaxWidth().heightIn(min = 52.dp).focusRequester(cancel),
-                        enabled = !busy, shape = MaterialTheme.shapes.small,
-                        colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant),
-                        border = BorderStroke(1.dp, if (busy) MaterialTheme.colorScheme.outlineVariant else MaterialTheme.colorScheme.outline)) {
-                        Text(dismissLabel, Modifier.width(IntrinsicSize.Max))
-                    }
+                    SecondaryActionButton(dismissLabel, onDismiss,
+                        Modifier.fillMaxWidth().focusRequester(cancel), enabled = !busy)
                 }
             }
         }

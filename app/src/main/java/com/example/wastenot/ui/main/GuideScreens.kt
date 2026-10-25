@@ -31,6 +31,7 @@ import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.model.WasteGuide
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.labelResource
 import kotlinx.coroutines.launch
 
@@ -71,15 +72,8 @@ fun GuideListScreen(
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                         keyboardActions = KeyboardActions(onSearch = { submit() }))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        OutlinedButton(onClick = ::submit, shape = MaterialTheme.shapes.small,
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.onSurface),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                            modifier = Modifier.heightIn(min = 48.dp).focusProperties { canFocus = true }.focusRequester(searchAction)) {
-                            Icon(painterResource(R.drawable.ic_search), null, Modifier.size(24.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.guide_search_action))
-                        }
+                        SecondaryActionButton(stringResource(R.string.guide_search_action), ::submit,
+                            Modifier.focusProperties { canFocus = true }.focusRequester(searchAction), icon = R.drawable.ic_search)
                         TextButton(onClick = ::clear, enabled = data.query.isNotEmpty() || data.category != null,
                             colors = ButtonDefaults.textButtonColors(disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant),
                             modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.guide_clear_action)) }

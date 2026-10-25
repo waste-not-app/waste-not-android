@@ -43,6 +43,7 @@ import com.example.wastenot.theme.Pine900
 import com.example.wastenot.theme.LimeEnd
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.labelResource
 import com.example.wastenot.ui.main.SheetDragHandle
 import com.example.wastenot.ui.main.SheetSystemBar
@@ -261,7 +262,7 @@ internal fun <T> ScanChoice(label: String, value: String, options: List<T>, opti
 }
 
 @Composable private fun ScanSecondary(label: Int, onClick: () -> Unit) {
-    OutlinedButton(onClick, Modifier.fillMaxWidth().heightIn(min = 48.dp), shape = MaterialTheme.shapes.small) { Text(stringResource(label)) }
+    SecondaryActionButton(stringResource(label), onClick, Modifier.fillMaxWidth())
 }
 @Composable private fun ScanBusy(label: Int) {
     LinearProgressIndicator(Modifier.fillMaxWidth())

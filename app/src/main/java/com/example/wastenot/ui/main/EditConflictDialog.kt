@@ -21,6 +21,7 @@ import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.model.WasteLog
 import com.example.wastenot.theme.WasteNotDialogHeading
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.labelResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,6 +88,5 @@ private fun ConflictValues(title: String, value: EditorValues) {
 
 @Composable
 private fun ConflictSecondary(label: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    OutlinedButton(onClick, modifier.fillMaxWidth().heightIn(min = 52.dp), shape = MaterialTheme.shapes.small,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) { Text(stringResource(label), color = MaterialTheme.colorScheme.onSurface) }
+    SecondaryActionButton(stringResource(label), onClick, modifier.fillMaxWidth())
 }

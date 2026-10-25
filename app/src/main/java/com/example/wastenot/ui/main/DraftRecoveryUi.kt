@@ -1,7 +1,6 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,6 +16,7 @@ import com.example.wastenot.R
 import com.example.wastenot.theme.WasteNotStateHeading
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 
 @Composable
 internal fun DraftRestoreScreen(loading: Boolean, onRetry: () -> Unit, onDiscard: () -> Unit, modifier: Modifier = Modifier) {
@@ -36,10 +36,7 @@ internal fun DraftRestoreScreen(loading: Boolean, onRetry: () -> Unit, onDiscard
             Text(stringResource(R.string.draft_read_help), Modifier.widthIn(max = 270.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
             ActionButton(stringResource(R.string.retry), onRetry, Modifier.fillMaxWidth())
-            OutlinedButton(onDiscard, Modifier.fillMaxWidth().heightIn(min = 52.dp), shape = MaterialTheme.shapes.small,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
-                Text(stringResource(R.string.draft_discard_stored), Modifier.width(IntrinsicSize.Max), color = MaterialTheme.colorScheme.onSurface)
-            }
+            SecondaryActionButton(stringResource(R.string.draft_discard_stored), onDiscard, Modifier.fillMaxWidth())
         }
       }
     }
@@ -49,9 +46,6 @@ internal fun DraftRestoreScreen(loading: Boolean, onRetry: () -> Unit, onDiscard
 internal fun PausedDraftNotice(onResume: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         MessageBanner(stringResource(R.string.draft_pending_message))
-        OutlinedButton(onResume, Modifier.fillMaxWidth().heightIn(min = 52.dp), shape = MaterialTheme.shapes.small,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
-            Text(stringResource(R.string.draft_resume), Modifier.width(IntrinsicSize.Max), color = MaterialTheme.colorScheme.onSurface)
-        }
+        SecondaryActionButton(stringResource(R.string.draft_resume), onResume, Modifier.fillMaxWidth())
     }
 }

@@ -2,6 +2,7 @@ package com.example.wastenot.ui.main
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.view.ViewTreeObserver
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.SemanticsActions
@@ -12,6 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.MainActivity
 import java.io.File
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.junit.Rule
 import org.junit.Test
 import org.junit.Assert.assertTrue
@@ -104,9 +107,27 @@ class Iteration2DesignTest {
     }
 
     private fun capture(name: String) {
+        if (name.startsWith("home-")) compose.onNodeWithText("Halo,", substring = true).performScrollTo()
+        compose.mainClock.advanceTimeBy(64)
         compose.waitForIdle()
         val instrumentation = InstrumentationRegistry.getInstrumentation()
-        instrumentation.uiAutomation.waitForIdle(300, 5_000)
+        instrumentation.waitForIdleSync()
+        if (name.startsWith("home-")) {
+            compose.waitUntil(5_000) { compose.activity.hasWindowFocus() }
+            val drawn = CountDownLatch(1)
+            instrumentation.runOnMainSync {
+                val decor = compose.activity.window.decorView
+                val listener = object : ViewTreeObserver.OnDrawListener {
+                    override fun onDraw() { decor.post { decor.viewTreeObserver.removeOnDrawListener(this); drawn.countDown() } }
+                }
+                decor.viewTreeObserver.addOnDrawListener(listener)
+                decor.invalidate()
+            }
+            assertTrue("The owned app window must draw before capture", drawn.await(5, TimeUnit.SECONDS))
+        }
+        instrumentation.uiAutomation.waitForIdle(500, 5_000)
+        instrumentation.uiAutomation.takeScreenshot()?.recycle()
+        android.os.SystemClock.sleep(150)
         val file = File(instrumentation.targetContext.cacheDir, "qa/iteration-2/$name.png")
         file.parentFile!!.mkdirs()
         val bitmap = checkNotNull(instrumentation.uiAutomation.takeScreenshot())

@@ -27,6 +27,7 @@ import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.theme.*
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import java.util.Locale
 
 @Composable
@@ -80,11 +81,8 @@ fun ProfileScreen(
             }
         } else if (!loading && error == null) MessageBanner(stringResource(R.string.profile_progress_unavailable))
         AccountMenuRow(stringResource(R.string.settings_title), onSettings, Modifier.fillMaxWidth())
-        OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), shape = MaterialTheme.shapes.small) {
-            Icon(painterResource(R.drawable.ic_logout), null, Modifier.size(20.dp))
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.logout_action))
-        }
+        SecondaryActionButton(stringResource(R.string.logout_action), onLogout,
+            Modifier.fillMaxWidth(), icon = R.drawable.ic_logout)
         Text(stringResource(R.string.profile_xp_basis), style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
     }

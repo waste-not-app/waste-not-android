@@ -54,6 +54,7 @@ import com.example.wastenot.R
 import com.example.wastenot.data.local.ScanPhotoCache
 import com.example.wastenot.model.ScanPhoto
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -104,9 +105,9 @@ internal fun ScanCamera(session: String, cache: ScanPhotoCache, onPhoto: (ScanPh
                     }
                 }
             }
-            if (blocked) OutlinedButton(onClick = {
+            if (blocked) SecondaryActionButton(stringResource(R.string.scan_open_settings), onClick = {
                 context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}")))
-            }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(stringResource(R.string.scan_open_settings)) }
+            }, modifier = Modifier.fillMaxWidth())
             else ActionButton(stringResource(R.string.scan_activate), onClick = {
                 if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) active = true
                 else permission.launch(Manifest.permission.CAMERA)

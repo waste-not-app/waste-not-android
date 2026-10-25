@@ -1,6 +1,5 @@
 package com.example.wastenot.ui.auth
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +22,7 @@ import com.example.wastenot.R
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.WasteNotStateHeading
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.BrandWordmark
 
 @Composable
@@ -50,10 +50,7 @@ internal fun StartupScreen(error: Boolean, onRetry: () -> Unit, onLoginAgain: ()
                 if (error) {
                     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         ActionButton(stringResource(R.string.retry), onRetry, Modifier.fillMaxWidth())
-                        OutlinedButton(onClick = onLoginAgain, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
-                            shape = MaterialTheme.shapes.small, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
-                            Text(stringResource(R.string.login_again), color = MaterialTheme.colorScheme.onSurface)
-                        }
+                        SecondaryActionButton(stringResource(R.string.login_again), onLoginAgain, Modifier.fillMaxWidth())
                     }
                 } else LinearProgressIndicator(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(8.dp)),
                     color = MaterialTheme.colorScheme.primary, trackColor = MaterialTheme.colorScheme.surfaceContainer, gapSize = 0.dp)

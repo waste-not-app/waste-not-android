@@ -1,13 +1,10 @@
 package com.example.wastenot.ui.main
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +24,7 @@ import com.example.wastenot.R
 import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.model.WasteLog
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.labelResource
 
 @Composable
@@ -62,11 +60,6 @@ fun SaveConfirmationScreen(
             }
         }
         ActionButton(stringResource(R.string.save_confirm_view), onView, Modifier.fillMaxWidth())
-        OutlinedButton(onClick = onHome, shape = MaterialTheme.shapes.small,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.onSurface),
-            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
-            Text(stringResource(R.string.save_confirm_home))
-        }
+        SecondaryActionButton(stringResource(R.string.save_confirm_home), onHome, Modifier.fillMaxWidth())
     }
 }

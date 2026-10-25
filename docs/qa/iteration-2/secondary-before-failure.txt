@@ -1,0 +1,44 @@
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.main.LogDetailDesignTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=pendingDeleteUsesTheKitDisabledCancelInBothThemes
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.LogDetailDesignTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+Error in pendingDeleteUsesTheKitDisabledCancelInBothThemes(com.example.wastenot.ui.main.LogDetailDesignTest):
+java.lang.AssertionError: Pending delete must use the kit muted label expected:<Color(0.32156864, 0.39215687, 0.34117648, 1.0, sRGB IEC61966-2.1)> but was:<Color(0.09411765, 0.16862746, 0.1254902, 1.0, sRGB IEC61966-2.1)>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.example.wastenot.ui.main.LogDetailDesignTest.pendingDeleteUsesTheKitDisabledCancelInBothThemes(LogDetailDesignTest.kt:40)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=pendingDeleteUsesTheKitDisabledCancelInBothThemes
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.LogDetailDesignTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Pending delete must use the kit muted label expected:<Color(0.32156864, 0.39215687, 0.34117648, 1.0, sRGB IEC61966-2.1)> but was:<Color(0.09411765, 0.16862746, 0.1254902, 1.0, sRGB IEC61966-2.1)>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.example.wastenot.ui.main.LogDetailDesignTest.pendingDeleteUsesTheKitDisabledCancelInBothThemes(LogDetailDesignTest.kt:40)
+
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 3.756
+There was 1 failure:
+1) pendingDeleteUsesTheKitDisabledCancelInBothThemes(com.example.wastenot.ui.main.LogDetailDesignTest)
+java.lang.AssertionError: Pending delete must use the kit muted label expected:<Color(0.32156864, 0.39215687, 0.34117648, 1.0, sRGB IEC61966-2.1)> but was:<Color(0.09411765, 0.16862746, 0.1254902, 1.0, sRGB IEC61966-2.1)>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.example.wastenot.ui.main.LogDetailDesignTest.pendingDeleteUsesTheKitDisabledCancelInBothThemes(LogDetailDesignTest.kt:40)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

@@ -84,10 +84,7 @@ fun OverviewScreen(user: User, data: WorkspaceUiState, demo: Boolean, date: Loca
         if (demo) {
             val today = demoSummary(data.records.filter { it.activityDate == date })
             SummaryBlock(today, stringResource(R.string.handled_today), afterPrimary = {
-                OutlinedButton(onClick = onRecord, shape = MaterialTheme.shapes.small,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.onSurface),
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(stringResource(R.string.manual_input)) }
+                SecondaryActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth())
             }, personal = true)
             ProgressMeter(dummyProgress(data.records, date))
         } else MessageBanner(stringResource(R.string.summary_pending))

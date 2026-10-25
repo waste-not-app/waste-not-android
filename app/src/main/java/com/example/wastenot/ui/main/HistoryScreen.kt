@@ -26,6 +26,7 @@ import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.DateField
 import com.example.wastenot.ui.components.labelResource
 import java.time.LocalDate
@@ -131,8 +132,7 @@ fun HistoryScreen(
                 }
             }
             item(key = "manual") {
-                OutlinedButton(onClick = onRecord, shape = MaterialTheme.shapes.small, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp).heightIn(min = 52.dp)) { Text(stringResource(R.string.manual_input)) }
+                SecondaryActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth().padding(top = 20.dp))
             }
         }
     }
@@ -180,8 +180,7 @@ private fun HistoryFilterSheet(
                 attempted = true
                 if (draft.dateError == null) onApply(draft)
             }, Modifier.fillMaxWidth())
-            OutlinedButton(onClick = { draft = HistoryFilter(); attempted = false }, shape = MaterialTheme.shapes.small, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(stringResource(R.string.reset_filter_draft)) }
+            SecondaryActionButton(stringResource(R.string.reset_filter_draft), { draft = HistoryFilter(); attempted = false }, Modifier.fillMaxWidth())
         }
     }
 }

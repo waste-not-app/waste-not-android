@@ -1,6 +1,5 @@
 package com.example.wastenot.ui.main
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -21,6 +20,7 @@ import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.model.WasteLog
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.labelResource
 
 @Composable
@@ -85,10 +85,7 @@ fun LogDetailScreen(
             if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
             val canWrite = log.version > 0 && !loading && !loadError
             ActionButton(stringResource(R.string.log_edit), onEdit, Modifier.fillMaxWidth(), enabled = canWrite)
-            OutlinedButton(onClick = onDelete, enabled = canWrite, shape = MaterialTheme.shapes.small,
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(stringResource(R.string.delete_log)) }
+            SecondaryActionButton(stringResource(R.string.delete_log), onDelete, Modifier.fillMaxWidth(), enabled = canWrite)
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(stringResource(R.string.created_timestamp, WasteFormat.timestamp(log.createdAt, log.activityTimezone)),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

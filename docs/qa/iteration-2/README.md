@@ -65,3 +65,5 @@ Checkpoint D02/D03/C27 dan lebar label C03: [Keluar, Buang perubahan, Tutup form
 Checkpoint A05/S05/S09/D03/C27–C29: [draf per akun, pemulihan proses, retry idempotent dan pembersihan eksplisit](DRAFTS.md).
 
 Checkpoint D02/C27/root akun dan auth: [status menunggu/gagal, retry, pemulihan dialog dan warna nonaktif](SESSION_EXIT.md).
+
+Checkpoint C04/C07: [secondary bersama, D01 pending, label panjang, keyboard dan regresi lintas layar](SECONDARY_ACTIONS.md).
