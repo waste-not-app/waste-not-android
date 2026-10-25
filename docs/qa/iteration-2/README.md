@@ -63,3 +63,5 @@ Checkpoint S01/C01/C29: [pemulihan sesi, wordmark bersama dan sampel transisi ro
 Checkpoint D02/D03/C27 dan lebar label C03: [Keluar, Buang perubahan, Tutup formulir dan keyboard](EXIT_DIALOGS.md).
 
 Checkpoint A05/S05/S09/D03/C27–C29: [draf per akun, pemulihan proses, retry idempotent dan pembersihan eksplisit](DRAFTS.md).
+
+Checkpoint D02/C27/root akun dan auth: [status menunggu/gagal, retry, pemulihan dialog dan warna nonaktif](SESSION_EXIT.md).

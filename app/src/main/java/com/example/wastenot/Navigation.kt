@@ -59,6 +59,7 @@ fun MainNavigation(
     val model: SessionViewModel = viewModel(factory = factory)
     val session by model.session.collectAsStateWithLifecycle()
     val bootstrapping by model.bootstrapping.collectAsStateWithLifecycle()
+    val logout by model.logoutState.collectAsStateWithLifecycle()
     val root = rememberNavBackStack(SessionRoot)
     var choosingTheme by remember { mutableStateOf(false) }
     val target: NavKey = when (val phase = session.phase) {
@@ -92,7 +93,7 @@ fun MainNavigation(
                 val phase = session.phase as? SessionState.Authenticated
                 if (phase != null && key == AccountRoot(phase.user.id, phase.epoch, session.isDemo)) {
                     AccountNavigation(phase.user, session.isDemo, coreRepository, guideStore, themeMode,
-                        { choosingTheme = true }, model::logout, Modifier.fillMaxSize())
+                        { choosingTheme = true }, model::logout, Modifier.fillMaxSize(), logoutState = logout)
                 }
             }
         },

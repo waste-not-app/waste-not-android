@@ -22,6 +22,7 @@
     <string name="logout_title">Keluar dari akun?</string>
     <string name="logout_message">Kamu perlu masuk lagi untuk membuka catatanmu. Catatan yang sudah tersimpan tetap tersedia saat kamu masuk kembali.</string>
     <string name="logout_action">Keluar</string>
+    <string name="logout_account_cleanup_failed">Sesi perangkat belum bisa ditutup. Kamu masih masuk. Coba lagi untuk keluar.</string>
     <string name="demo_caption">Data contoh</string>
     <string name="demo_caption_date">Data contoh · %1$s</string>
     <string name="greeting">Halo, %1$s</string>

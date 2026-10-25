@@ -113,6 +113,49 @@ class ExitDialogsTest {
         assertEquals(6, confirms); assertEquals(0, dismisses)
     }
 
+    @Test fun accountLogoutPendingAndFailureKeepTheKitActionsAndReadableFeedback() {
+        var dark by mutableStateOf(false)
+        var pending by mutableStateOf(true)
+        var draftFailed by mutableStateOf(false)
+        var confirms = 0; var dismisses = 0
+        val failure = "Sesi perangkat belum bisa ditutup. Kamu masih masuk. Coba lagi untuk keluar."
+        compose.setContent { WasteNotTheme(dark) {
+            Surface(color = MaterialTheme.colorScheme.background) { Box(Modifier.fillMaxSize()) }
+            LogoutDialog({ dismisses++ }, { confirms++ }, error = draftFailed, sessionPending = pending, sessionFailed = !pending)
+        } }
+        for (theme in listOf(false, true)) for (state in 0..2) {
+            val waiting = state == 0
+            val name = when(state) { 0 -> "pending"; 1 -> "failed"; else -> "draft-failed" }
+            compose.runOnIdle { dark = theme; pending = waiting; draftFailed = state == 2 }
+            assertReadable("Keluar dari akun?")
+            if (!waiting) {
+                val message = if (draftFailed) "Penyimpanan draf belum bisa diperbarui. Isian belum ditutup. Coba lagi." else failure
+                assertReadable(message)
+                compose.onNodeWithText(message).assert(SemanticsMatcher.expectValue(
+                    androidx.compose.ui.semantics.SemanticsProperties.LiveRegion, androidx.compose.ui.semantics.LiveRegionMode.Polite))
+                if (draftFailed) compose.onNodeWithText(failure).assertDoesNotExist()
+            }
+            capture("logout-${if(theme) "dark" else "light"}-$name-heading")
+            val label = if (waiting) "Menutup sesi perangkat…" else "Keluar"
+            assertReadable(label)
+            val primary = compose.onNodeWithText(label).performScrollTo().assertHeightIsAtLeast(48.dp)
+            if (waiting) primary.assertIsNotEnabled() else primary.assertIsEnabled()
+            val cancel = compose.onNodeWithText("Batal").performScrollTo().assertHeightIsAtLeast(48.dp)
+            if (waiting) cancel.assertIsNotEnabled() else cancel.assertIsEnabled()
+            val labels = mutableListOf<TextLayoutResult>()
+            compose.onNodeWithText("Batal", useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(labels) }
+            val expected = if (waiting) {
+                if (theme) com.example.wastenot.theme.OnSurfaceVariantDark else com.example.wastenot.theme.OnSurfaceVariant
+            } else if (theme) com.example.wastenot.theme.OnSurfaceDark else com.example.wastenot.theme.OnSurface
+            assertEquals("Cancel text must expose the disabled state without lowering readability", expected, labels.single().layoutInput.style.color)
+            capture("logout-${if(theme) "dark" else "light"}-$name-actions")
+        }
+        assertEquals(0, confirms); assertEquals(0, dismisses)
+        compose.onNodeWithText("Keluar").performScrollTo().performClick()
+        compose.onNodeWithText("Batal").performScrollTo().performClick()
+        assertEquals(1, confirms); assertEquals(1, dismisses)
+    }
+
     private fun assertReadable(text: String) {
         val node = compose.onNodeWithText(text, useUnmergedTree = true).performScrollTo().assertIsDisplayed()
         val layouts = mutableListOf<TextLayoutResult>()

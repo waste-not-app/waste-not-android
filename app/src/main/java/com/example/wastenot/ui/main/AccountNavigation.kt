@@ -49,6 +49,7 @@ import com.example.wastenot.theme.OnAccent
 import com.example.wastenot.theme.ThemeMode
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.LocalWasteNotDockEdge
+import com.example.wastenot.ui.auth.LogoutUiState
 import java.time.LocalDate
 import java.util.UUID
 import kotlinx.coroutines.flow.collect
@@ -74,6 +75,7 @@ fun AccountNavigation(
     onTheme: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier,
+    logoutState: LogoutUiState = LogoutUiState.None,
 ) {
     val context = LocalContext.current.applicationContext
     val factory = remember(user.id, demo, core) { viewModelFactory { initializer {
@@ -123,7 +125,7 @@ fun AccountNavigation(
     var activeEditorDraft by remember { mutableStateOf<EditorEntryDraft?>(null) }
     val draft = activeEditorDraft?.takeIf { it.requestId == editor?.requestId }?.draft
     var discard by remember { mutableStateOf(false) }
-    var leaving by remember { mutableStateOf(false) }
+    var leaving by rememberSaveable { mutableStateOf(false) }
     var capture by rememberSaveable { mutableStateOf<String?>(null) }
     var conflictRequest by rememberSaveable { mutableStateOf<String?>(null) }
     var historyFilterOpen by rememberSaveable { mutableStateOf(false) }
@@ -261,8 +263,10 @@ fun AccountNavigation(
     )
     if (leaving) LogoutDialog(
         onDismiss = { leaving = false },
-        onConfirm = { persistence.clear { leaving = false; onLogout() } },
+        onConfirm = { persistence.clear { onLogout() } },
         busy = disk.busy, error = disk.failure == DraftFailure.FINISH, hasDraft = disk.active != null,
+        sessionPending = logoutState is LogoutUiState.Pending,
+        sessionFailed = (logoutState as? LogoutUiState.Complete)?.result?.localCleared == false,
     )
     if (resumingPrompt) ResumeDraftDialog({ resumingPrompt = false }, ::resumeDraft)
     capture?.let { session -> CaptureSheet(user.id, demo, session, onDismiss = { capture = null }, onPrefill = { prefill ->

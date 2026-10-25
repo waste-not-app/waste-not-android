@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -132,7 +134,7 @@ fun AuthScreen(
                     !logoutState.result.localCleared -> {
                         MessageBanner(stringResource(R.string.logout_cleanup_failed), isError = true)
                         TextButton(onClick = onRetryCleanup, modifier = Modifier.heightIn(min = 48.dp)) {
-                            Text(stringResource(R.string.logout_cleanup_retry))
+                            Text(stringResource(R.string.logout_cleanup_retry), Modifier.width(IntrinsicSize.Max))
                         }
                     }
                     !logoutState.result.serverRevoked && !logoutState.isDemo -> MessageBanner(stringResource(R.string.logout_local_message))

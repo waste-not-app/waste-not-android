@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.MainNavigation
@@ -30,11 +31,12 @@ import org.json.JSONObject
 class SessionRootTest {
     @get:Rule val compose = createComposeRule()
     private val tabs = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)
-    private fun start(source: FixtureSession) {
+    private fun start(source: FixtureSession, restoration: StateRestorationTester? = null) {
         com.example.wastenot.clearEditorDraftFixtures(InstrumentationRegistry.getInstrumentation().targetContext)
-        compose.setContent { WasteNotTheme(darkTheme = false) {
+        val content: @androidx.compose.runtime.Composable () -> Unit = { WasteNotTheme(darkTheme = false) {
             MainNavigation(source, CoreRepository(null), com.example.wastenot.data.dummy.DummyGuideStore(), ThemeMode.LIGHT, {}, Modifier.fillMaxSize())
         } }
+        if (restoration == null) compose.setContent(content) else restoration.setContent(content)
         compose.waitForIdle()
     }
 
@@ -224,6 +226,96 @@ class SessionRootTest {
         captureDraftFixture("draft-account-A-restored")
     }
 
+    @Test fun failedLogoutKeepsTheAccountDialogAndAnExplicitRetryCanFinish() {
+        val source = FixtureSession(demo = true).apply {
+            state.value = SessionState.Authenticated(user, 1)
+            logoutResult = LogoutResult(false, false)
+        }
+        start(source)
+        compose.waitUntil(10_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
+        compose.onNode(tabs and hasText("Profil")).performClick()
+        compose.onNodeWithText("Keluar").performScrollTo().performClick()
+        compose.onNode(hasText("Keluar") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.waitUntil(5_000) { source.logoutCompletions == 1 }
+        org.junit.Assert.assertTrue(source.state.value is SessionState.Authenticated)
+        compose.onNode(isDialog()).assertExists()
+        compose.onNodeWithText("Sesi perangkat belum bisa ditutup. Kamu masih masuk. Coba lagi untuk keluar.").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Fixture A").assertExists()
+        captureDraftFixture("logout-account-failed")
+        compose.onNode(hasText("Batal") and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.onNode(isDialog()).assertDoesNotExist()
+        compose.onNode(tabs and hasText("Profil")).assertIsSelected()
+        source.logoutResult = LogoutResult(true, false)
+        compose.onNodeWithText("Keluar").performScrollTo().performClick()
+        compose.onNode(hasText("Keluar") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.waitUntil(10_000) { compose.onAllNodes(hasText("Masuk") and hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
+        compose.onAllNodes(tabs).assertCountEquals(0)
+        compose.onNodeWithText("Fixture A").assertDoesNotExist()
+        assertEquals(2, source.logoutCalls)
+    }
+
+    @Test fun pendingLogoutBlocksDuplicateConfirmationBackAndEscapeUntilItsResult() {
+        val source = FixtureSession(demo = true).apply {
+            state.value = SessionState.Authenticated(user, 1)
+            logoutResult = LogoutResult(false, false)
+            logoutGate = CompletableDeferred()
+        }
+        val restoration = StateRestorationTester(compose)
+        start(source, restoration)
+        compose.waitUntil(10_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
+        compose.onNode(tabs and hasText("Profil")).performClick()
+        compose.onNodeWithText("Keluar").performScrollTo().performClick()
+        compose.onNode(hasText("Keluar") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.waitUntil(5_000) { source.logoutCalls == 1 }
+        restoration.emulateSavedInstanceStateRestore()
+        compose.waitUntil(10_000) { compose.onAllNodesWithText("Menutup sesi perangkat…").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Menutup sesi perangkat…").performScrollTo().assertIsNotEnabled()
+        compose.onNode(hasText("Batal") and hasAnyAncestor(isDialog())).assertIsNotEnabled()
+        InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
+        InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_ESCAPE)
+        compose.onNode(isDialog()).assertExists()
+        compose.onNodeWithText("Menutup sesi perangkat…").performScrollTo().performTouchInput { click() }
+        assertEquals(1, source.logoutCalls)
+        captureDraftFixture("logout-account-pending")
+        source.logoutGate!!.complete(Unit)
+        compose.waitUntil(5_000) { source.logoutCompletions == 1 }
+        compose.onNodeWithText("Sesi perangkat belum bisa ditutup. Kamu masih masuk. Coba lagi untuk keluar.").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasText("Batal") and hasAnyAncestor(isDialog())).assertIsEnabled()
+    }
+
+    @Test fun aClosedAccountRootKeepsSessionCleanupRetryOnTheLoginScreen() {
+        val source = FixtureSession(demo = true).apply {
+            state.value = SessionState.Authenticated(user, 1)
+            logoutResult = LogoutResult(false, false)
+            logoutClosesRoot = true
+            logoutGate = CompletableDeferred()
+        }
+        start(source)
+        compose.waitUntil(10_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
+        compose.onNode(tabs and hasText("Profil")).performClick()
+        compose.onNodeWithText("Keluar").performScrollTo().performClick()
+        compose.onNode(hasText("Keluar") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.waitUntil(10_000) { compose.onAllNodesWithText("Menutup sesi perangkat…").fetchSemanticsNodes().isNotEmpty() }
+        compose.onAllNodes(tabs).assertCountEquals(0)
+        compose.onNodeWithText("Fixture A").assertDoesNotExist()
+        source.logoutGate!!.complete(Unit)
+        compose.waitUntil(5_000) { source.logoutCompletions == 1 }
+        compose.onNodeWithText("Catatan sudah ditutup, tetapi penyimpanan sesi belum bisa dibersihkan. Coba lagi sebelum meninggalkan perangkat ini.")
+            .performScrollTo().assertIsDisplayed()
+        val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+        compose.onNodeWithText("Coba bersihkan sesi", useUnmergedTree = true).performScrollTo()
+            .performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        org.junit.Assert.assertFalse("cleanup label box=${layouts.single().size}, paragraph=${layouts.single().multiParagraph.width}", layouts.single().didOverflowWidth)
+        org.junit.Assert.assertFalse(layouts.single().didOverflowHeight)
+        captureDraftFixture("logout-auth-cleanup-failed")
+        source.logoutResult = LogoutResult(true, false)
+        compose.onNodeWithText("Coba bersihkan sesi").performScrollTo().performClick()
+        compose.waitUntil(5_000) { source.logoutCompletions == 2 }
+        compose.onNodeWithText("Coba bersihkan sesi").assertDoesNotExist()
+        compose.onNode(hasText("Masuk") and hasClickAction()).performScrollTo().assertIsDisplayed()
+        compose.onAllNodes(tabs).assertCountEquals(0)
+    }
+
     private class FixtureSession(private val demo: Boolean = false) : AccountSession {
         val user = User("00000000-0000-4000-8000-000000000009", "Fixture A", "fixture@example.invalid", ZoneId.of("Asia/Jakarta"), null)
         override val state = MutableStateFlow<SessionState>(SessionState.SignedOut())
@@ -236,6 +328,11 @@ class SessionRootTest {
         var receivedPassword: String? = null
         var receivedTimezone: ZoneId? = null
         var loginGate: CompletableDeferred<Unit>? = null
+        var logoutCalls = 0
+        var logoutCompletions = 0
+        var logoutGate: CompletableDeferred<Unit>? = null
+        var logoutResult = LogoutResult(true, false)
+        var logoutClosesRoot = false
         override suspend fun bootstrap() { bootstrapCalls++; bootstrapGate?.await(); bootstrapTarget?.let { state.value = it } }
         override suspend fun login(email: String, password: String): ApiResult<User> {
             loginCalls++; receivedPassword = password
@@ -249,8 +346,12 @@ class SessionRootTest {
             return ApiResult.Success(created)
         }
         override suspend fun logout(): LogoutResult {
-            state.value = SessionState.SignedOut()
-            return LogoutResult(true, false)
+            logoutCalls++
+            if (logoutClosesRoot) state.value = SessionState.SignedOut()
+            logoutGate?.await()
+            if (logoutResult.localCleared) state.value = SessionState.SignedOut()
+            logoutCompletions++
+            return logoutResult
         }
     }
 }
