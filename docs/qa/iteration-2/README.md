@@ -1,5 +1,7 @@
 # Checkpoint dock, Beranda dan dummy
 
+Checkpoint C08/C09/C11: [field akun/editor, nilai terisi saat pending, placeholder dan visibility](TEXT_FIELDS.md). Border/placeholder/ikon nonaktif kini mengikuti token opak; 171 debug unit tests dan 33 eksekusi native/11 metode unik lulus pada tiga konfigurasi, nol skip. Seluruh screen/navbar/navigasi tetap dalam pengerjaan.
+
 Checkpoint C06 terbaru: [tombol ikon header/sheet, perbandingan dan regresi dock](ICON_ACTIONS.md). Enam tindakan kini mengikuti soft/ink/radius 12; 171 debug unit tests dan 27 eksekusi native/9 metode unik lulus pada tiga konfigurasi, nol skip. Angka checkpoint lain tetap berlaku pada source masing-masing; seluruh screen/navbar/navigasi belum diterima.
 
 Kelanjutan S07/S10 tersedia pada [bukti Riwayat dan filter](HISTORY.md), S08/D01 pada [bukti Detail dan hapus](DETAIL.md), S06 pada [bukti feedback simpan](SAVE.md), S05/S09 pada [bukti editor Catat/Ubah](EDITOR.md), serta retry/hasil simpan belum pasti pada [bukti submission](SUBMISSION.md), serta transisi editor dan gestur keyboard pada [bukti navigasi](NAVIGATION_MOTION.md), serta gradasi/label tombol utama pada [bukti C03](ACTIONS.md), dan S11/S12 serta viewport selama transisi pada [bukti Panduan](GUIDE.md). Angka tes pada halaman ini merujuk checkpoint awal `1693e7c`, bukan total source terbaru.

@@ -1,0 +1,123 @@
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.components.TextFieldDesignTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=darkFieldsKeepDistinctIdleFocusErrorAndEditingFeedback
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.TextFieldDesignTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=darkFieldsKeepDistinctIdleFocusErrorAndEditingFeedback
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.TextFieldDesignTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=disabledEmptyFieldKeepsAnOpaquePlaceholderAndBorder
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.TextFieldDesignTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+Error in disabledEmptyFieldKeepsAnOpaquePlaceholderAndBorder(com.example.wastenot.ui.components.TextFieldDesignTest):
+java.lang.AssertionError: disabled placeholder Color(0.09411765, 0.16862746, 0.1254902, 0.38039216, sRGB IEC61966-2.1) != Color(0.32156864, 0.39215687, 0.34117648, 1.0, sRGB IEC61966-2.1)
+disabled-empty/light border -3156017 != -9206665
+disabled placeholder Color(0.9411765, 0.9607843, 0.92941177, 0.38039216, sRGB IEC61966-2.1) != Color(0.69803923, 0.76862746, 0.7137255, 1.0, sRGB IEC61966-2.1)
+disabled-empty/dark border -12627900 != -8416124
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.TextFieldDesignTest.disabledEmptyFieldKeepsAnOpaquePlaceholderAndBorder(TextFieldDesignTest.kt:80)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=disabledEmptyFieldKeepsAnOpaquePlaceholderAndBorder
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.TextFieldDesignTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: disabled placeholder Color(0.09411765, 0.16862746, 0.1254902, 0.38039216, sRGB IEC61966-2.1) != Color(0.32156864, 0.39215687, 0.34117648, 1.0, sRGB IEC61966-2.1)
+disabled-empty/light border -3156017 != -9206665
+disabled placeholder Color(0.9411765, 0.9607843, 0.92941177, 0.38039216, sRGB IEC61966-2.1) != Color(0.69803923, 0.76862746, 0.7137255, 1.0, sRGB IEC61966-2.1)
+disabled-empty/dark border -12627900 != -8416124
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.TextFieldDesignTest.disabledEmptyFieldKeepsAnOpaquePlaceholderAndBorder(TextFieldDesignTest.kt:80)
+
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=pendingAccountKeepsFilledValuesBorderAndPasswordActionReadable
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.TextFieldDesignTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+Error in pendingAccountKeepsFilledValuesBorderAndPasswordActionReadable(com.example.wastenot.ui.components.TextFieldDesignTest):
+java.lang.AssertionError: account-email/light border -3156017 != -9206665
+account-password/light border -3156017 != -9206665
+account-password/light disabled visibility glyph has 0 muted pixels
+account-email/dark border -12627900 != -8416124
+account-password/dark border -12627900 != -8416124
+account-password/dark disabled visibility glyph has 0 muted pixels
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.TextFieldDesignTest.pendingAccountKeepsFilledValuesBorderAndPasswordActionReadable(TextFieldDesignTest.kt:61)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=pendingAccountKeepsFilledValuesBorderAndPasswordActionReadable
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.TextFieldDesignTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: account-email/light border -3156017 != -9206665
+account-password/light border -3156017 != -9206665
+account-password/light disabled visibility glyph has 0 muted pixels
+account-email/dark border -12627900 != -8416124
+account-password/dark border -12627900 != -8416124
+account-password/dark disabled visibility glyph has 0 muted pixels
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.TextFieldDesignTest.pendingAccountKeepsFilledValuesBorderAndPasswordActionReadable(TextFieldDesignTest.kt:61)
+
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lightFieldsKeepDistinctIdleFocusErrorAndEditingFeedback
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.TextFieldDesignTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lightFieldsKeepDistinctIdleFocusErrorAndEditingFeedback
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.TextFieldDesignTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 13.267
+There were 2 failures:
+1) disabledEmptyFieldKeepsAnOpaquePlaceholderAndBorder(com.example.wastenot.ui.components.TextFieldDesignTest)
+java.lang.AssertionError: disabled placeholder Color(0.09411765, 0.16862746, 0.1254902, 0.38039216, sRGB IEC61966-2.1) != Color(0.32156864, 0.39215687, 0.34117648, 1.0, sRGB IEC61966-2.1)
+disabled-empty/light border -3156017 != -9206665
+disabled placeholder Color(0.9411765, 0.9607843, 0.92941177, 0.38039216, sRGB IEC61966-2.1) != Color(0.69803923, 0.76862746, 0.7137255, 1.0, sRGB IEC61966-2.1)
+disabled-empty/dark border -12627900 != -8416124
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.TextFieldDesignTest.disabledEmptyFieldKeepsAnOpaquePlaceholderAndBorder(TextFieldDesignTest.kt:80)
+2) pendingAccountKeepsFilledValuesBorderAndPasswordActionReadable(com.example.wastenot.ui.components.TextFieldDesignTest)
+java.lang.AssertionError: account-email/light border -3156017 != -9206665
+account-password/light border -3156017 != -9206665
+account-password/light disabled visibility glyph has 0 muted pixels
+account-email/dark border -12627900 != -8416124
+account-password/dark border -12627900 != -8416124
+account-password/dark disabled visibility glyph has 0 muted pixels
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.TextFieldDesignTest.pendingAccountKeepsFilledValuesBorderAndPasswordActionReadable(TextFieldDesignTest.kt:61)
+
+FAILURES!!!
+Tests run: 4,  Failures: 2
+
+
+INSTRUMENTATION_CODE: -1

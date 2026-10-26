@@ -16,6 +16,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -97,6 +98,7 @@ fun WasteTextField(
     autofillType: ContentType? = null,
 ) {
     var visible by rememberSaveable { mutableStateOf(false) }
+    val colors = MaterialTheme.colorScheme
     val support = errorText ?: helper
     val field: @Composable (Modifier) -> Unit = { placement ->
         OutlinedTextField(
@@ -112,13 +114,18 @@ fun WasteTextField(
                     if (errorText != null) error(errorText)
                 },
             shape = MaterialTheme.shapes.small,
-            colors = if (labelAbove) OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                errorContainerColor = MaterialTheme.colorScheme.surface,
-                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            ) else OutlinedTextFieldDefaults.colors(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = colors.surface,
+                unfocusedContainerColor = colors.surface,
+                errorContainerColor = colors.surface,
+                disabledContainerColor = colors.surfaceContainer,
+                disabledTextColor = colors.onSurfaceVariant,
+                disabledBorderColor = colors.outline,
+                disabledPlaceholderColor = colors.onSurfaceVariant,
+                disabledLabelColor = colors.onSurfaceVariant,
+                disabledSupportingTextColor = colors.onSurfaceVariant,
+                disabledTrailingIconColor = colors.onSurfaceVariant,
+            ),
             enabled = enabled,
             isError = errorText != null,
             singleLine = singleLine,
@@ -130,7 +137,8 @@ fun WasteTextField(
             }) else null,
             visualTransformation = if (password && !visible) PasswordVisualTransformation() else VisualTransformation.None,
             trailingIcon = if (password) ({
-                IconButton(onClick = { visible = !visible }, enabled = enabled) {
+                IconButton(onClick = { visible = !visible }, enabled = enabled,
+                    colors = IconButtonDefaults.iconButtonColors(disabledContentColor = colors.onSurfaceVariant)) {
                     Icon(
                         painterResource(if (visible) R.drawable.ic_visibility_off else R.drawable.ic_visibility),
                         stringResource(if (visible) R.string.hide_password else R.string.show_password),
