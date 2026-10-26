@@ -1,0 +1,89 @@
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.components.HeaderIconDesignTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=accountHeaderUsesTheKitForThemeAndBackWithoutChangingTheirActions
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.HeaderIconDesignTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stream=
+Error in accountHeaderUsesTheKitForThemeAndBackWithoutChangingTheirActions(com.example.wastenot.ui.components.HeaderIconDesignTest):
+java.lang.AssertionError: Tampilan: soft/12dp corner sample (4.0,4.0) -722958 != -1511449
+Tampilan: soft/12dp corner sample (24.0,4.0) -722958 != -1511449
+Tampilan: soft/12dp corner sample (44.0,4.0) -722958 != -1511449
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.inspect(HeaderIconDesignTest.kt:118)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.accountHeaderUsesTheKitForThemeAndBackWithoutChangingTheirActions(HeaderIconDesignTest.kt:48)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=accountHeaderUsesTheKitForThemeAndBackWithoutChangingTheirActions
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.HeaderIconDesignTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Tampilan: soft/12dp corner sample (4.0,4.0) -722958 != -1511449
+Tampilan: soft/12dp corner sample (24.0,4.0) -722958 != -1511449
+Tampilan: soft/12dp corner sample (44.0,4.0) -722958 != -1511449
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.inspect(HeaderIconDesignTest.kt:118)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.accountHeaderUsesTheKitForThemeAndBackWithoutChangingTheirActions(HeaderIconDesignTest.kt:48)
+
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=homeProfileUsesTheKitCornerAndKeepsItsAccessibleAction
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.HeaderIconDesignTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stream=
+Error in homeProfileUsesTheKitCornerAndKeepsItsAccessibleAction(com.example.wastenot.ui.components.HeaderIconDesignTest):
+java.lang.AssertionError: Buka profil: soft/12dp corner sample (4.0,4.0) -722958 != -1511449
+Buka profil: soft/12dp corner sample (44.0,4.0) -722958 != -1511449
+Buka profil: expected ink glyph, found 0 matching pixels
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.inspect(HeaderIconDesignTest.kt:118)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.homeProfileUsesTheKitCornerAndKeepsItsAccessibleAction(HeaderIconDesignTest.kt:72)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=homeProfileUsesTheKitCornerAndKeepsItsAccessibleAction
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.HeaderIconDesignTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Buka profil: soft/12dp corner sample (4.0,4.0) -722958 != -1511449
+Buka profil: soft/12dp corner sample (44.0,4.0) -722958 != -1511449
+Buka profil: expected ink glyph, found 0 matching pixels
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.inspect(HeaderIconDesignTest.kt:118)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.homeProfileUsesTheKitCornerAndKeepsItsAccessibleAction(HeaderIconDesignTest.kt:72)
+
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 6.774
+There were 2 failures:
+1) accountHeaderUsesTheKitForThemeAndBackWithoutChangingTheirActions(com.example.wastenot.ui.components.HeaderIconDesignTest)
+java.lang.AssertionError: Tampilan: soft/12dp corner sample (4.0,4.0) -722958 != -1511449
+Tampilan: soft/12dp corner sample (24.0,4.0) -722958 != -1511449
+Tampilan: soft/12dp corner sample (44.0,4.0) -722958 != -1511449
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.inspect(HeaderIconDesignTest.kt:118)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.accountHeaderUsesTheKitForThemeAndBackWithoutChangingTheirActions(HeaderIconDesignTest.kt:48)
+2) homeProfileUsesTheKitCornerAndKeepsItsAccessibleAction(com.example.wastenot.ui.components.HeaderIconDesignTest)
+java.lang.AssertionError: Buka profil: soft/12dp corner sample (4.0,4.0) -722958 != -1511449
+Buka profil: soft/12dp corner sample (44.0,4.0) -722958 != -1511449
+Buka profil: expected ink glyph, found 0 matching pixels
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.inspect(HeaderIconDesignTest.kt:118)
+	at com.example.wastenot.ui.components.HeaderIconDesignTest.homeProfileUsesTheKitCornerAndKeepsItsAccessibleAction(HeaderIconDesignTest.kt:72)
+
+FAILURES!!!
+Tests run: 2,  Failures: 2
+
+
+INSTRUMENTATION_CODE: -1

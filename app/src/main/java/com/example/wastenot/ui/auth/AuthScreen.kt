@@ -16,10 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,6 +46,7 @@ import com.example.wastenot.model.AccountField
 import com.example.wastenot.model.AccountInputError
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.TextActionButton
+import com.example.wastenot.ui.components.IconActionButton
 import com.example.wastenot.ui.components.BrandWordmark
 import com.example.wastenot.ui.components.WasteTextField
 import com.example.wastenot.theme.LocalWasteNotGradients
@@ -93,16 +91,9 @@ fun AuthScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 BrandWordmark()
-                Row {
-                    if (onBack != null) FilledIconButton(
-                        onClick = onBack,
-                        shape = MaterialTheme.shapes.small,
-                        colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                        modifier = Modifier.size(48.dp),
-                    ) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
-                    IconButton(onClick = onTheme, modifier = Modifier.size(48.dp)) {
-                        Icon(painterResource(R.drawable.ic_device), stringResource(R.string.theme_title))
-                    }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (onBack != null) IconActionButton(R.drawable.ic_back, stringResource(R.string.back), onBack)
+                    IconActionButton(R.drawable.ic_device, stringResource(R.string.theme_title), onTheme)
                 }
             }
             Box(

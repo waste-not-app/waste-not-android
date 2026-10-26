@@ -73,11 +73,7 @@ fun OverviewScreen(user: User, data: WorkspaceUiState, demo: Boolean, date: Loca
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(stringResource(R.string.greeting, user.name), style = MaterialTheme.typography.headlineMedium)
             }
-            FilledIconButton(onClick = onProfile, shape = MaterialTheme.shapes.medium,
-                colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                modifier = Modifier.size(48.dp)) {
-                Icon(painterResource(R.drawable.ic_profile), stringResource(R.string.open_profile))
-            }
+            IconActionButton(R.drawable.ic_profile, stringResource(R.string.open_profile), onProfile)
         }
         if (data.error != null) MessageBanner(stringResource(R.string.refresh_failed), isError = true)
         if (onResumeDraft != null) PausedDraftNotice(onResumeDraft)

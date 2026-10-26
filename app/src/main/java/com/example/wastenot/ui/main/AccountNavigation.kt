@@ -50,6 +50,7 @@ import com.example.wastenot.theme.ThemeMode
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.LocalWasteNotDockEdge
 import com.example.wastenot.ui.auth.LogoutUiState
+import com.example.wastenot.ui.components.IconActionButton
 import java.time.LocalDate
 import java.util.UUID
 import kotlinx.coroutines.flow.collect
@@ -435,15 +436,11 @@ private fun AccountPage(
                 Settings -> R.string.settings_title
                 else -> tab.label
             }), style = MaterialTheme.typography.headlineMedium) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent), navigationIcon = {
-                if (route != tab.key && !confirmation) FilledIconButton(onClick = onBack, shape = MaterialTheme.shapes.small,
-                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                    modifier = Modifier.padding(start = 16.dp).size(48.dp)) { Icon(painterResource(R.drawable.ic_back), stringResource(R.string.back)) }
+                if (route != tab.key && !confirmation) IconActionButton(R.drawable.ic_back, stringResource(R.string.back),
+                    onBack, Modifier.padding(start = 16.dp))
             }, actions = {
-                if (route == History) FilledIconButton(onClick = onFilter, shape = MaterialTheme.shapes.medium,
-                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                    modifier = Modifier.padding(end = 12.dp).size(48.dp)) {
-                    Icon(painterResource(R.drawable.ic_filter), stringResource(R.string.filter_history))
-                }
+                if (route == History) IconActionButton(R.drawable.ic_filter, stringResource(R.string.filter_history),
+                    onFilter, Modifier.padding(end = 12.dp))
             }) },
             bottomBar = { if (!rail && route == tab.key) TabDock(tab, onSelect, onRecord) },
         ) { padding ->

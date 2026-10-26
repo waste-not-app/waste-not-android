@@ -44,6 +44,7 @@ import com.example.wastenot.theme.LimeEnd
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.SecondaryActionButton
+import com.example.wastenot.ui.components.IconActionButton
 import com.example.wastenot.ui.components.labelResource
 import com.example.wastenot.ui.main.SheetDragHandle
 import com.example.wastenot.ui.main.SheetSystemBar
@@ -88,11 +89,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                 .background(MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(2.dp)))
             Row(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(title), Modifier.weight(1f).semantics { heading() }, style = MaterialTheme.typography.headlineSmall)
-                FilledTonalIconButton(onClick = onDismiss, modifier = Modifier.size(48.dp), shape = MaterialTheme.shapes.medium,
-                    colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        contentColor = MaterialTheme.colorScheme.onSurface)) {
-                    Icon(painterResource(R.drawable.ic_close), stringResource(R.string.scan_close))
-                }
+                IconActionButton(R.drawable.ic_close, stringResource(R.string.scan_close), onDismiss)
             }
             HorizontalDivider()
             val scroll = remember(state.phase) { ScrollState(0) }
