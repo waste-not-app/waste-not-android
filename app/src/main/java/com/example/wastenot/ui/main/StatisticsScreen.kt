@@ -49,7 +49,7 @@ fun StatisticsScreen(
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (data.error != null) {
             MessageBanner(stringResource(R.string.refresh_failed), isError = true)
-            TextButton(onClick = onRetry) { Text(stringResource(R.string.retry)) }
+            TextActionButton(stringResource(R.string.retry), onRetry)
         }
         if (data.loading) LinearProgressIndicator(Modifier.fillMaxWidth())
         if (!demo) {
@@ -64,10 +64,8 @@ fun StatisticsScreen(
                 DailyChart(period.daily, count = false, Modifier.fillMaxWidth())
                 if (period.summary.handled.itemCount > 0) DailyChart(period.daily, count = true, Modifier.fillMaxWidth())
                 val expansionState = stringResource(if (expanded) R.string.daily_expanded else R.string.daily_collapsed)
-                TextButton(onClick = { expanded = !expanded }, modifier = Modifier.heightIn(min = 48.dp)
-                    .semantics { stateDescription = expansionState }) {
-                    Text(stringResource(if (expanded) R.string.daily_hide else R.string.daily_show))
-                }
+                TextActionButton(stringResource(if (expanded) R.string.daily_hide else R.string.daily_show),
+                    onClick = { expanded = !expanded }, modifier = Modifier.semantics { stateDescription = expansionState })
                 if (expanded) {
                     Text(stringResource(R.string.daily_values), style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.semantics { heading() })

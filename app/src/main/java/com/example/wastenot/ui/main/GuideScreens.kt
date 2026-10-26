@@ -32,6 +32,7 @@ import com.example.wastenot.model.WasteGuide
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.SecondaryActionButton
+import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.labelResource
 import kotlinx.coroutines.launch
 
@@ -74,9 +75,8 @@ fun GuideListScreen(
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         SecondaryActionButton(stringResource(R.string.guide_search_action), ::submit,
                             Modifier.focusProperties { canFocus = true }.focusRequester(searchAction), icon = R.drawable.ic_search)
-                        TextButton(onClick = ::clear, enabled = data.query.isNotEmpty() || data.category != null,
-                            colors = ButtonDefaults.textButtonColors(disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant),
-                            modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.guide_clear_action)) }
+                        TextActionButton(stringResource(R.string.guide_clear_action), ::clear,
+                            enabled = data.query.isNotEmpty() || data.category != null)
                         GuideCategory(data.category, { onCategory(it); resetScroll() })
                     }
                 }
@@ -201,7 +201,7 @@ fun GuideDetailScreen(
                 val review = article.review
                 if (review == null) GuideEditorialNotice(stringResource(R.string.guide_review_pending), title = stringResource(R.string.guide_editorial_draft)) else {
                     Text(stringResource(R.string.guide_sources), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
-                    TextButton(onClick = { onSource(review.source.toASCIIString()) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(review.source.host) }
+                    TextActionButton(review.source.host, onClick = { onSource(review.source.toASCIIString()) })
                     Text(stringResource(R.string.guide_reviewed, WasteFormat.activityDate(review.date)), style = MaterialTheme.typography.bodySmall)
                 }
                 if (sourceUnavailable) MessageBanner(stringResource(R.string.guide_source_error), isError = true)

@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -101,15 +100,16 @@ fun DateField(
         DatePickerDialog(
             onDismissRequest = { choosing = false },
             confirmButton = {
-                TextButton(
+                TextActionButton(
+                    label = stringResource(R.string.apply),
                     enabled = picker.selectedDateMillis?.let(dates::isSelectableDate) == true,
                     onClick = {
                         picker.selectedDateMillis?.let { onChange(Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate()) }
                         choosing = false
                     },
-                ) { Text(stringResource(R.string.apply)) }
+                )
             },
-            dismissButton = { TextButton(onClick = { choosing = false }) { Text(stringResource(R.string.cancel)) } },
+            dismissButton = { TextActionButton(stringResource(R.string.cancel), onClick = { choosing = false }) },
         ) { DatePicker(picker, modifier = Modifier.verticalScroll(rememberScrollState())) }
     }
 }

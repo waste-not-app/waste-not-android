@@ -67,3 +67,5 @@ Checkpoint A05/S05/S09/D03/C27–C29: [draf per akun, pemulihan proses, retry id
 Checkpoint D02/C27/root akun dan auth: [status menunggu/gagal, retry, pemulihan dialog dan warna nonaktif](SESSION_EXIT.md).
 
 Checkpoint C04/C07: [secondary bersama, D01 pending, label panjang, keyboard dan regresi lintas layar](SECONDARY_ACTIONS.md).
+
+Checkpoint C05: [text action bersama, form pending opak, label panjang, kalender/tema dan regresi pemakai](TEXT_ACTIONS.md).

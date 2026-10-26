@@ -91,7 +91,7 @@ fun OverviewScreen(user: User, data: WorkspaceUiState, demo: Boolean, date: Loca
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.recent_activities), style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.weight(1f).semantics { heading() })
-            TextButton(onClick = onHistory) { Text(stringResource(R.string.see_history)) }
+            TextActionButton(stringResource(R.string.see_history), onHistory)
         }
         if (data.records.isEmpty()) Text(stringResource(R.string.logs_empty))
         data.records.take(3).forEach { log -> ActivityRow(log, { onDetail(log.id) }, Modifier.fillMaxWidth()) }

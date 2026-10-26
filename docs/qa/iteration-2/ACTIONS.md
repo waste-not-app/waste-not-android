@@ -59,3 +59,5 @@ Contoh dalam form: [Catat terang 200%](actions-editor-phone200.png), [Catat gela
 Pekerjaan penuh masih mencakup konflik D04, draf tahan process death/per akun, pagination/pull-to-refresh, Panduan/detail, Statistik/grafik, Profil/achievement/pengaturan, auth, kamera/AI dan audit material global. PR #96 tetap draft; checkpoint ini tidak membuktikan integrasi backend HTTP atau menyatakan semua UI sesuai mockup.
 
 Kelanjutan 26 Oktober 2026: [C04/C07 kini memakai secondary bersama](SECONDARY_ACTIONS.md), termasuk label D01 pending dan regresi pemakainya. Angka di atas tetap bukti historis C03; audit pressed/focus, text/icon controls dan seluruh layar masih terbuka.
+
+Kelanjutan C05 pada tanggal yang sama: [aksi teks bersama dan form pending opak](TEXT_ACTIONS.md). Audit visual pressed/focus, C06, field/selector dan kesesuaian seluruh layar tetap berlanjut.

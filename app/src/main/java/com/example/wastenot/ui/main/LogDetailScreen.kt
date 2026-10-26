@@ -21,6 +21,7 @@ import com.example.wastenot.model.WasteLog
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.SecondaryActionButton
+import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.labelResource
 
 @Composable
@@ -52,7 +53,7 @@ fun LogDetailScreen(
         } else {
             if (loadError) {
                 MessageBanner(stringResource(R.string.refresh_failed), isError = true)
-                TextButton(onClick = onRetry) { Text(stringResource(R.string.retry)) }
+                TextActionButton(stringResource(R.string.retry), onRetry)
             }
             val badgeColor = when (log.method) {
                 DisposalMethod.REDUCE, DisposalMethod.RECYCLE -> MaterialTheme.colorScheme.primaryContainer

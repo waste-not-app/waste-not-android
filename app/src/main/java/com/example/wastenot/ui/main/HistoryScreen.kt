@@ -27,6 +27,7 @@ import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.SecondaryActionButton
+import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.DateField
 import com.example.wastenot.ui.components.labelResource
 import java.time.LocalDate
@@ -75,7 +76,7 @@ fun HistoryScreen(
         if (deletedNotice) Row(Modifier.widthIn(max = 840.dp).fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             MessageBanner(stringResource(R.string.log_deleted_notice), Modifier.weight(1f))
-            TextButton(onClick = onDismissNotice) { Text(stringResource(R.string.close)) }
+            TextActionButton(stringResource(R.string.close), onDismissNotice)
         }
         LazyColumn(
             modifier = Modifier.weight(1f).widthIn(max = 840.dp).fillMaxWidth().testTag("history-list"),
@@ -97,20 +98,20 @@ fun HistoryScreen(
                     if (filter.from != null && filter.to != null) FilterChip(true, onOpenFilter, label = {
                         Text(stringResource(R.string.history_date_range, WasteFormat.activityDate(filter.from!!), WasteFormat.activityDate(filter.to!!)))
                     }, modifier = Modifier.heightIn(min = 48.dp))
-                    TextButton(onClick = { applyFilter(HistoryFilter()) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.clear_filters)) }
+                    TextActionButton(stringResource(R.string.clear_filters), onClick = { applyFilter(HistoryFilter()) })
                 }
             }
             if (data.loading) item(key = "loading") { CircularProgressIndicator(Modifier.padding(vertical = 20.dp)) }
             if (data.error != null) item(key = "error") {
                 Column(Modifier.padding(vertical = 16.dp)) {
                     MessageBanner(stringResource(R.string.logs_load_failed), isError = true)
-                    TextButton(onClick = onRetry) { Text(stringResource(R.string.retry)) }
+                    TextActionButton(stringResource(R.string.retry), onRetry)
                 }
             }
             if (!data.loading && data.error == null && visible.isEmpty()) item(key = "empty") {
                 Column(Modifier.padding(vertical = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(stringResource(if (filter.active) R.string.filtered_empty else R.string.logs_empty))
-                    if (filter.active) TextButton(onClick = { applyFilter(HistoryFilter()) }) { Text(stringResource(R.string.clear_filters)) }
+                    if (filter.active) TextActionButton(stringResource(R.string.clear_filters), onClick = { applyFilter(HistoryFilter()) })
                 }
             }
             groups.forEach { (date, records) ->
@@ -128,7 +129,7 @@ fun HistoryScreen(
                 Column(Modifier.fillMaxWidth().padding(top = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(stringResource(R.string.history_shown, WasteFormat.integer(minOf(limit, visible.size).toLong()), WasteFormat.integer(visible.size.toLong())),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    if (limit < visible.size) TextButton(onClick = { limit += 20 }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.load_more_logs)) }
+                    if (limit < visible.size) TextActionButton(stringResource(R.string.load_more_logs), onClick = { limit += 20 })
                 }
             }
             item(key = "manual") {
@@ -165,7 +166,7 @@ private fun HistoryFilterSheet(
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(R.string.filter_history), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f).semantics { heading() })
-                TextButton(onClick = onDismiss, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.cancel)) }
+                TextActionButton(stringResource(R.string.cancel), onDismiss)
             }
             Text(stringResource(R.string.filter_description), color = MaterialTheme.colorScheme.onSurfaceVariant)
             FilterChoice(draft.category, WasteCategory.entries, R.string.category, R.string.all_categories,

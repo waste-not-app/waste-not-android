@@ -6,12 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -52,6 +48,7 @@ import com.example.wastenot.data.repository.SignOutReason
 import com.example.wastenot.model.AccountField
 import com.example.wastenot.model.AccountInputError
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.BrandWordmark
 import com.example.wastenot.ui.components.WasteTextField
 import com.example.wastenot.theme.LocalWasteNotGradients
@@ -133,9 +130,7 @@ fun AuthScreen(
                 is LogoutUiState.Complete -> when {
                     !logoutState.result.localCleared -> {
                         MessageBanner(stringResource(R.string.logout_cleanup_failed), isError = true)
-                        TextButton(onClick = onRetryCleanup, modifier = Modifier.heightIn(min = 48.dp)) {
-                            Text(stringResource(R.string.logout_cleanup_retry), Modifier.width(IntrinsicSize.Max))
-                        }
+                        TextActionButton(stringResource(R.string.logout_cleanup_retry), onRetryCleanup)
                     }
                     !logoutState.result.serverRevoked && !logoutState.isDemo -> MessageBanner(stringResource(R.string.logout_local_message))
                     else -> Unit
@@ -175,9 +170,8 @@ fun AuthScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
-            TextButton(onClick = onSwitchForm, enabled = !state.submitting, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                Text(stringResource(if (register) R.string.go_to_login else R.string.go_to_register))
-            }
+            TextActionButton(stringResource(if (register) R.string.go_to_login else R.string.go_to_register),
+                onSwitchForm, Modifier.fillMaxWidth(), enabled = !state.submitting)
         }
     }
 }

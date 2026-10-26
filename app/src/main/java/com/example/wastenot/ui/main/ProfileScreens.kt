@@ -28,6 +28,7 @@ import com.example.wastenot.theme.*
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.SecondaryActionButton
+import com.example.wastenot.ui.components.TextActionButton
 import java.util.Locale
 
 @Composable
@@ -61,7 +62,7 @@ fun ProfileScreen(
         if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
         if (error != null) {
             MessageBanner(stringResource(R.string.profile_refresh_failed), isError = true)
-            TextButton(onClick = onRetry) { Text(stringResource(R.string.retry)) }
+            TextActionButton(stringResource(R.string.retry), onRetry)
         }
         if (progress != null) {
             Column(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.large)
