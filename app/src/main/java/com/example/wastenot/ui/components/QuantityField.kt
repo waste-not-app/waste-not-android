@@ -83,7 +83,7 @@ fun QuantityField(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun QuantityUnitPicker(unit: QuantityUnit, onChange: (QuantityUnit) -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember(enabled) { mutableStateOf(false) }
     val label = stringResource(R.string.quantity_unit)
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(label, style = MaterialTheme.typography.titleSmall)
@@ -113,6 +113,7 @@ private fun QuantityUnitPicker(unit: QuantityUnit, onChange: (QuantityUnit) -> U
             DropdownMenu(expanded, onDismissRequest = { expanded = false }) {
                 QuantityUnit.entries.forEach { option ->
                     DropdownMenuItem(text = { Text(stringResource(option.optionLabelResource)) },
+                        enabled = enabled,
                         onClick = { onChange(option); expanded = false })
                 }
             }

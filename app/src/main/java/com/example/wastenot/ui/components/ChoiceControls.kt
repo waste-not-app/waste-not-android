@@ -23,7 +23,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
@@ -55,7 +54,7 @@ fun CategoryPicker(
     error: String? = null,
     enabled: Boolean = true,
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember(enabled) { mutableStateOf(false) }
     val label = stringResource(R.string.category)
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(label, style = MaterialTheme.typography.titleSmall)
@@ -71,13 +70,7 @@ fun CategoryPicker(
                 supportingText = if (error != null) ({ Text(error) }) else null,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
                 shape = MaterialTheme.shapes.small,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    errorContainerColor = MaterialTheme.colorScheme.surface,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
+                colors = wasteTextFieldColors(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
@@ -86,7 +79,8 @@ fun CategoryPicker(
             )
             ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 WasteCategory.entries.forEach { option ->
-                    DropdownMenuItem(text = { Text(stringResource(option.labelResource)) }, onClick = { onChange(option); expanded = false })
+                    DropdownMenuItem(text = { Text(stringResource(option.labelResource)) }, enabled = enabled,
+                        onClick = { onChange(option); expanded = false })
                 }
             }
         }

@@ -1,5 +1,7 @@
 # Checkpoint dock, Beranda dan dummy
 
+Checkpoint C12/C11/C31: [kategori nonaktif serta picker kategori/satuan/kalender ketika form terkunci](PICKERS.md). Palet field kini dipakai bersama dan picker menutup tanpa callback saat dinonaktifkan. 171 debug unit tests dan 54 eksekusi native/18 metode unik lulus pada tiga konfigurasi, nol skip. Penerimaan seluruh screen/navbar/navigasi tetap terbuka.
+
 Checkpoint C08/C09/C11: [field akun/editor, nilai terisi saat pending, placeholder dan visibility](TEXT_FIELDS.md). Border/placeholder/ikon nonaktif kini mengikuti token opak; 171 debug unit tests dan 33 eksekusi native/11 metode unik lulus pada tiga konfigurasi, nol skip. Seluruh screen/navbar/navigasi tetap dalam pengerjaan.
 
 Checkpoint C06 terbaru: [tombol ikon header/sheet, perbandingan dan regresi dock](ICON_ACTIONS.md). Enam tindakan kini mengikuti soft/ink/radius 12; 171 debug unit tests dan 27 eksekusi native/9 metode unik lulus pada tiga konfigurasi, nol skip. Angka checkpoint lain tetap berlaku pada source masing-masing; seluruh screen/navbar/navigasi belum diterima.

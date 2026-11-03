@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -114,18 +115,7 @@ fun WasteTextField(
                     if (errorText != null) error(errorText)
                 },
             shape = MaterialTheme.shapes.small,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = colors.surface,
-                unfocusedContainerColor = colors.surface,
-                errorContainerColor = colors.surface,
-                disabledContainerColor = colors.surfaceContainer,
-                disabledTextColor = colors.onSurfaceVariant,
-                disabledBorderColor = colors.outline,
-                disabledPlaceholderColor = colors.onSurfaceVariant,
-                disabledLabelColor = colors.onSurfaceVariant,
-                disabledSupportingTextColor = colors.onSurfaceVariant,
-                disabledTrailingIconColor = colors.onSurfaceVariant,
-            ),
+            colors = wasteTextFieldColors(),
             enabled = enabled,
             isError = errorText != null,
             singleLine = singleLine,
@@ -154,4 +144,21 @@ fun WasteTextField(
             color = if (errorText != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
     } else field(modifier)
+}
+
+@Composable
+internal fun wasteTextFieldColors(): TextFieldColors {
+    val colors = MaterialTheme.colorScheme
+    return OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = colors.surface,
+        unfocusedContainerColor = colors.surface,
+        errorContainerColor = colors.surface,
+        disabledContainerColor = colors.surfaceContainer,
+        disabledTextColor = colors.onSurfaceVariant,
+        disabledBorderColor = colors.outline,
+        disabledPlaceholderColor = colors.onSurfaceVariant,
+        disabledLabelColor = colors.onSurfaceVariant,
+        disabledSupportingTextColor = colors.onSurfaceVariant,
+        disabledTrailingIconColor = colors.onSurfaceVariant,
+    )
 }

@@ -51,7 +51,7 @@ fun DateField(
     label: String = stringResource(R.string.activity_date),
     preservedDate: LocalDate? = null,
 ) {
-    var choosing by rememberSaveable { mutableStateOf(false) }
+    var choosing by rememberSaveable(enabled) { mutableStateOf(false) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(label, style = MaterialTheme.typography.titleSmall)
         OutlinedButton(
@@ -79,7 +79,7 @@ fun DateField(
         }
         if (error != null) Text(error, color = MaterialTheme.colorScheme.error)
     }
-    if (choosing) {
+    if (choosing && enabled) {
         val firstYear = minOf(minimum.year, preservedDate?.year ?: minimum.year)
         val lastYear = maxOf(maximum.year, preservedDate?.year ?: maximum.year)
         val dates = remember(minimum, maximum, preservedDate) {
