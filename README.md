@@ -2,6 +2,76 @@
 
 WasteNot membantu pengguna mencatat aktivitas Reduce, Reuse, Recycle dan Trash, mencari panduan, serta memantau kebiasaan pribadi.
 
+Prototipe lokal **YOLO + Gemini**, katalog objek pilot, baseline inference, pengujian policy dan worker privat tersedia di [panduan AI](ai/README.md). Panduan tersebut mencakup cara mencoba YOLO/LLM, konfigurasi Gemini, dan langkah integrasi backend Go serta frontend Android. Integrasi AI ke aplikasi masih mengikuti backlog; mode fixture dan panduan draf diberi label khusus.
+
+[Kontrak HTTP AI v1](ai/docs/AI_HTTP_CONTRACT.md) menyediakan OpenAPI publik/privat, contoh dan mock server untuk tim. Python menjadi pemilik tunggal aturan AI/Gemini; Go menangani akun, sesi, idempotensi dan penyimpanan. Coba mock tanpa key/model: `.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli serve-mock`, lalu buka `http://127.0.0.1:8094/docs` dengan token contoh `mock-user-a`.
+
+## Menggunakan YOLO dan Gemini
+
+**Demo kamera interaktif:** setelah environment AI siap, jalankan dari root repo:
+
+```powershell
+.\ai\demo-camera.bat
+```
+
+Browser terbuka di `http://127.0.0.1:8092` dan meminta izin kamera. Izinkan kamera → ambil foto → tinjau dan kirim untuk deteksi → klik bbox/daftar objek → konfirmasi material serta kondisi → minta rekomendasi Gemini. Tombol **Pilih foto** dan katalog manual tersedia jika kamera tidak bisa digunakan. Hentikan server dengan `Ctrl+C` pada terminal.
+
+Gemini memilih **satu** label **Reduce, Reuse, Recycle, atau Trash**, disertai alasan, langkah dan tautan sumber panduan. Reduce ditandai sebagai pencegahan penggunaan berikutnya. **Penanganan khusus menjadi peringatan tambahan**, bukan pengganti label: kaca pecah → Trash dengan pengemasan pelindung; baterai → Recycle melalui pengelola khusus. Contoh keempat label dan kontrak backend/frontend ada di [kontrak rekomendasi](ai/docs/RECOMMENDATION_CONTRACT.md). Saat layanan/panduan tidak tersedia, demo menampilkan kegagalan dengan jelas.
+
+Pembaruan mutu panduan: cangkir utuh dan layak dengan kotoran biasa yang dikonfirmasi bisa dibersihkan mendapat **Reuse setelah dicuci**. Demo menanyakan jenis kotoran dan rincian risiko; kondisi biasa yang belum diketahui dapat menghasilkan saran bersyarat, sedangkan rincian risiko tetap ditanyakan. Reduce hanya untuk fokus pencegahan yang dipilih pengguna. Sumber kini menampilkan penerbit dan wilayah. Lihat [mutu panduan dan contoh cangkir](ai/docs/GUIDE_QUALITY.md).
+
+Untuk eksperimen model botol/kaleng, lihat [fine-tuning YOLO](ai/docs/FINE_TUNING.md): dataset publik dan lisensinya, audit/split, setup GPU terpisah, training, evaluasi, dan cara menjalankan checkpoint hasil training pada kamera maupun worker backend. Kandidat khusus dipilih dengan `--model`; demo default tetap memakai model COCO dengan cakupan objek luas.
+
+Eksperimen variasi objek lebih luas: [Broad Waste YOLO](ai/docs/BROAD_WASTE_TRAINING.md), dengan data tambahan TACO/COCO, 10 kelas visual, evaluasi per kelas, dan launcher `.\ai\demo-camera-broad.bat --port 8095`. Pilihan bahan tetap dikonfirmasi pengguna; kandidat ini tidak otomatis mengganti model default.
+
+Kondisi boleh dibiarkan belum tahu: Gemini kini memberi saran bersyarat dengan alasan, sumber, dan hal yang perlu diperiksa. Cara mencoba serta audit/training ulang YOLO dijelaskan di [saran kondisi kosong dan background](ai/docs/CONDITIONAL_AND_BACKGROUND.md).
+
+Peningkatan poin 3-4 sudah tersedia: [threshold per kelas dan prediksi bertumpuk](ai/docs/DETECTION_QUALITY.md), [panduan pilot HDPE dan evaluasi Gemini](ai/docs/RECOMMENDATION_EVALUATION.md). Jalankan `.\ai\demo-camera-trained.bat` untuk mencoba. HDPE meminta isi sebelumnya; Recycle yang terkonfirmasi memerlukan penerima; jika belum tahu, sarannya tetap bersyarat. Panduan integrasi dan perintah evaluasi ada di [README AI](ai/README.md).
+
+Fine-tuning pertama sudah selesai pada 30 epoch. Coba checkpoint botol/kaleng dengan `.\ai\demo-camera-trained.bat`; [hasil test dan batas penggunaannya](ai/docs/FINETUNING_RESULTS.md) dicatat terpisah dari baseline COCO.
+
+Demo memakai katalog 78 pilihan benda/material; sebagian pilihan terhubung ke 58 kelas visual checkpoint COCO; jenis yang belum memiliki kelas, misalnya kaleng/HDPE/kardus/baterai, tetap dipilih manual. Semua panduan perlu review lokal; launcher ini mengaktifkan mode draf berlabel khusus demonstrasi. Langkah, cakupan dan batasnya ada di [demo kamera](ai/README.md#demo-kamera-di-browser).
+
+Semua perintah berikut dijalankan dari root repository melalui PowerShell. Prototipe Python dapat dicoba tanpa menjalankan Android atau backend Go.
+
+```powershell
+python -m venv .venv-ai
+.\.venv-ai\Scripts\python.exe -m pip install -e "./ai[yolo,worker,test]" -c ai/constraints.txt
+# Salin konfigurasi contoh hanya jika file lokal belum ada.
+if (-not (Test-Path -LiteralPath ai/.env)) { Copy-Item -LiteralPath ai/.env.example -Destination ai/.env }
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli fetch-assets
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli doctor
+```
+
+Untuk Gemini sungguhan, isi `GEMINI_API_KEY` dan `GEMINI_MODEL` pada `ai/.env` dengan kredensial/model yang tersedia di akunmu. File lokal tersebut diabaikan Git. `--demo-guides` pada contoh di bawah mengizinkan panduan draf khusus demonstrasi; tanpa flag itu, panduan bawaan belum dapat dipakai untuk rekomendasi produksi.
+
+Untuk rotasi lima key, isi `GEMINI_API_KEY_1` sampai `GEMINI_API_KEY_5` di `ai/.env`, lalu mulai ulang demo. Slot kosong/duplikat dilewati; key dipakai bergiliran dan diistirahatkan saat HTTP 429 sebelum mencoba key lain yang tersedia. Jika semua slot bernomor kosong, key tunggal lama tetap digunakan. Periksa jumlah key dengan `doctor`. [Panduan rotasi dan cooldown](ai/README.md#gemini-api) menjelaskan batas percobaan dan integrasi backend. Google menerapkan [kuota per proyek](https://ai.google.dev/gemini-api/docs/rate-limits), sehingga banyak key pada satu proyek tetap berbagi limit.
+
+```powershell
+# Coba YOLO saja; tidak membutuhkan Gemini API key.
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli detect ai/data/local/smoke/bottle.jpg --output ai/artifacts/detection.json
+
+# Coba Gemini saja dengan konteks contoh; membutuhkan API key.
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli recommend --context ai/examples/context-glass.json --provider gemini --demo-guides --output ai/artifacts/gemini-demo.json
+
+# Coba alur rekomendasi offline dengan simulator yang diberi label fixture.
+.\.venv-ai\Scripts\python.exe -m wastenot_ai.cli recommend --context ai/examples/context-glass.json --provider fixture --demo-guides
+```
+
+Ganti path foto untuk memakai gambarmu sendiri. Ubah context JSON mengikuti material dan kondisi yang dikonfirmasi pengguna. CLI menampilkan hasil rekomendasi untuk ditinjau; penyimpanan aktivitas tetap melalui backend setelah konfirmasi metode dan input jumlah.
+
+| Kebutuhan | Panduan |
+|---|---|
+| Instalasi, objek pilot dan batas model | [Mulai](ai/README.md#mulai-di-powershell), [objek pilot](ai/README.md#objek-pilot-awal) |
+| Mencoba YOLO + Gemini dalam satu alur | [Percobaan langkah demi langkah](ai/README.md#percobaan-langkah-demi-langkah) |
+| API key, model dan output Gemini | [Konfigurasi Gemini](ai/README.md#gemini-api) |
+| Menjalankan worker dan menghubungkannya ke Go | [Integrasi backend](ai/README.md#integrasi-backend-go) |
+| Endpoint, DTO dan alur scan Android | [Integrasi frontend](ai/README.md#integrasi-frontend-android) |
+| Error dan pemeriksaan hasil | [Troubleshooting](ai/README.md#troubleshooting) |
+| Pembagian tanggung jawab dan pekerjaan integrasi tersisa | [Handoff](ai/docs/HANDOFF.md) |
+
+Worker Python untuk deteksi sudah tersedia. Endpoint AI publik, sesi/idempotensi dan pemanggilan Gemini produksi masih perlu diimplementasikan pada Go; frontend kemudian berkomunikasi melalui Go. Gemini key dan token worker hanya berada pada lingkungan server.
+
 ## Status implementasi
 
 Repo memiliki satu module `:app`, Navigation 3, tema terang/gelap, form bersama, transport HTTP dan penyimpanan sesi remote berbasis Android Keystore. Iteration 2 memakai adapter **dummy secara default**, langsung membuka Beranda, serta menyimpan sesi/catatan fixture secara lokal per akun. Jalur “Lihat data contoh” dihapus; Masuk/Daftar dan editor memakai label normal. Password dummy tidak disimpan atau dikirim ke server. `-Pwastenot.useDummyData=false` memilih adapter remote yang masih memerlukan integrasi write/ringkasan backend.

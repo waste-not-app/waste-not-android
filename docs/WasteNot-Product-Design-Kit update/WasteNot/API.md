@@ -2,6 +2,8 @@
 
 Versi 1.2 · 28 September 2026 · Core + AI extension · Rancangan implementasi
 
+Pembaruan AI 20 Oktober 2026: satu label REDUCE/REUSE/RECYCLE/TRASH, alasan dan sumber menggantikan rekomendasi dengan alternatif. Lihat [kontrak empat metode](../../../ai/docs/RECOMMENDATION_CONTRACT.md) untuk perilaku prototipe dan perubahan integrasi yang belum diimplementasikan pada Go/Android.
+
 Dokumen ini menetapkan kontrak usulan Android dan backend, melengkapi draft endpoint halaman 4 PDF. Aturan domain ada di [PRD.md](PRD.md). Prefix `/v1` merupakan keputusan rancangan. Contoh menggunakan data simulasi, bukan akun atau endpoint nyata.
 
 ## 1. Konvensi
@@ -326,6 +328,8 @@ Kasus wajib: user A tidak dapat membaca/mengubah/menghapus log user B; integer b
 
 ## 10. AI extension v1.2
 
+Pembaruan integrasi 20 Oktober 2026: [kontrak HTTP v1](../../../ai/docs/AI_HTTP_CONTRACT.md) dan [OpenAPI publik](../../../ai/contracts/v1/public.openapi.json) menjadi acuan mesin yang lebih lengkap dari contoh ringkas di bawah. Envelope menambah api_version=1.0.0; request rekomendasi menambah confirmed_object=true, input_source dan context_revision. Python adalah pemilik tunggal mapping/policy/Gemini; Go membungkus hasil dengan sesi/ownership/TTL/dedup dan penyimpanan. Mock publik tersedia; backend Go produksi tetap pekerjaan lanjutan.
+
 Kontrak ini memperluas core, menggunakan prefix `/v1` yang sama (contoh `/api/v1` pada plan dinormalisasi). Semua payload di bawah contoh rancangan. [AI_SPEC](AI_SPEC.md) menetapkan mapping, kebijakan rekomendasi, batas media, TTL dan retensi. Tidak ada endpoint AI yang membuat log atau XP.
 
 | Method | Endpoint | Fungsi |
@@ -378,8 +382,12 @@ Tidak ada foto/URL permanen pada respons. `status`: REVIEW_REQUIRED bila ada kan
   "object_id": "object-1",
   "confirmed_object_key": "pet_bottle",
   "confirmed_category": "PLASTIC",
-  "condition": {"cleanliness": "CLEAN", "integrity": "INTACT", "reusable": "UNKNOWN"},
-  "reuse_intention": false
+  "condition": {"cleanliness": "CLEAN", "integrity": "INTACT", "reusable": "UNKNOWN", "cleanable": "UNKNOWN", "soiling": "UNKNOWN"},
+  "reuse_intention": false,
+  "risk_flag": false,
+  "risk_type": "UNKNOWN",
+  "recommendation_goal": "AUTO",
+  "recycling_access": "UNKNOWN"
 }
 ```
 
@@ -392,19 +400,23 @@ Server mengambil confidence/model/mapping dari sesi sendiri, bukan percaya nilai
     "status": "READY",
     "category": "PLASTIC",
     "recommended_method": "RECYCLE",
-    "alternative_method": null,
+    "recommendation_scope": "HANDLING",
     "reason": "Contoh respons: periksa ketentuan penerimaan dalam panduan fasilitas.",
     "special_handling": false,
     "caution": "Ini contoh kontrak, bukan rekomendasi yang sudah diverifikasi.",
     "guide_refs": [{"guide_id": "9fbd97ab-9450-4b6e-a43e-e0bda8a61011", "version": 1}],
-    "recommendation_version": "policy-01",
+    "source_urls": ["https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"],
+    "steps": ["Periksa ketentuan fasilitas penerima."],
+    "recommendation_version": "pilot-policy-05",
     "expires_at": "2026-09-29T03:00:00Z"
   },
   "request_id": "request-example-2"
 }
 ```
 
-`status` READY / SPECIAL_HANDLING / UNAVAILABLE. SPECIAL_HANDLING mengharuskan special_handling=true dan kedua method=null. UNAVAILABLE mengharuskan kedua method=null dengan reason_code seperti NO_REVIEWED_GUIDE atau INVALID_MODEL_OUTPUT. Tidak mengembalikan exception/provider raw text. Expiry recommendation tidak boleh melampaui sesi deteksi. Konfirmasi pengguna tidak disimpulkan dari tombol generate.
+`status` READY / NEEDS_CONTEXT / UNAVAILABLE. READY memiliki tepat satu recommended_method dari REDUCE/REUSE/RECYCLE/TRASH, reason, source_urls dan recommendation_scope=PREVENTION untuk REDUCE atau HANDLING untuk lainnya. source_details menambahkan judul/penerbit/wilayah/checked_at/scope_note dari registri. Tidak ada alternative_method atau status SPECIAL_HANDLING. special_handling=true adalah peringatan tambahan yang boleh menyertai READY. Contoh: kaca pecah READY/TRASH/true, baterai READY/RECYCLE/true melalui pengelola khusus. recommendation_goal=AUTO/PREVENTION/HANDLING dan recycling_access=YES/NO/UNKNOWN memiliki default AUTO/UNKNOWN; REDUCE hanya ditawarkan untuk PREVENTION yang dipilih pengguna.
+
+Tambahan policy-04: condition.cleanable=YES/NO/UNKNOWN, condition.soiling=FOOD_DRINK/DUST/HAZARDOUS/UNKNOWN, risk_type=UNKNOWN/SHARP/CHEMICAL/BIOLOGICAL/ELECTRICAL/OTHER; default UNKNOWN. Peralatan kotor biasa yang dikonfirmasi bisa dibersihkan dapat REUSE setelah dicuci. NEEDS_CONTEXT memakai metode/scope null dan missing_context (misalnya ["risk_type"] atau ["condition.cleanable"]), tanpa memanggil Gemini. UNAVAILABLE memakai metode/scope null ketika panduan/layanan/output tidak siap atau risiko tidak tercakup; caution risiko dipertahankan. Tidak mengembalikan exception/provider raw text. Expiry recommendation tidak boleh melampaui sesi deteksi. Konfirmasi pengguna tidak disimpulkan dari tombol generate.
 
 Simpan rekomendasi identik/replay satu client_request_id tanpa memanggil provider lagi selama TTL. Payload berbeda dengan ID sama →409. Context berubah memakai request ID baru; respons lama dibuang di Android. Infrastruktur timeout memakai error 504 AI_TIMEOUT; provider unavailable 503 AI_UNAVAILABLE; output semantik invalid dapat kembali 200 status UNAVAILABLE sebagai hasil fallback yang terkontrol.
 
@@ -441,3 +453,13 @@ Saat create, snapshot metadata dan waste log dibuat dalam transaksi yang sama. S
 413/415/422 untuk ukuran/tipe/decoder; 401 sesi; 404 session milik orang lain; 410 AI_SESSION_EXPIRED; 429 RATE_LIMITED + Retry-After; 503 AI_UNAVAILABLE/AI_DISABLED; 504 AI_TIMEOUT. Error envelope tetap §8. Retry upload/inference harus eksplisit dan dibatasi; retry simpan core mempertahankan ID yang sama.
 
 Uji malformed bbox/NaN, spoof category/guide/confidence, AI lintas akun, replay identik/berbeda, expiry, special handling override, LLM schema/evidence invalid, unknown class, no guide, timeout, cancel, log transaction rollback, concurrent save, dan log manual tanpa metadata. Jangan mencatat body gambar/prompt/Authorization di access log.
+
+### Pembaruan kualitas pilot, 20 Oktober 2026
+
+Kontrak Python v1 menambahkan review_profile dan review_thresholds/review_reasons/ambiguous_with per kandidat, serta condition.former_contents=FOOD_DRINK/CHEMICAL/OTHER/UNKNOWN. Band server mengutamakan profil checkpoint; tabel threshold global adalah default COCO. Kandidat empat kelas SHA af1446f33338... memakai dw-val-01: can/HDPE OFFERED >=0,70; PET >=0,725; kaca selalu UNCERTAIN; beda kelas dengan overlap IoU>=0,65 tetap terlihat dan UNCERTAIN. Semua kandidat memerlukan konfirmasi pengguna.
+
+Go mengirim model_sha256 dari snapshot privat pada selection agar aturan bisa diperiksa ulang; tidak menerima provenance tersebut dari frontend. Pilot RECYCLE memerlukan recycling_access=YES; HDPE memerlukan former_contents=FOOD_DRINK. UNKNOWN meminta konteks; tidak ditebak menjadi Trash/Reduce. Semua 69 panduan masih DRAFT. Rincian, metrik val beserta tradeoff, evaluasi Gemini dan perintah reproduksi: [mutu deteksi](../../../ai/docs/DETECTION_QUALITY.md), [mutu rekomendasi](../../../ai/docs/RECOMMENDATION_EVALUATION.md). OpenAPI pada ai/contracts/v1 merupakan acuan DTO yang diregenerasi.
+
+### Saran bersyarat saat kondisi kosong, policy-06
+
+Konteks biasa yang belum diisi tetap UNKNOWN/null. allow_conditional default true mengizinkan READY dengan recommendation_basis=CONDITIONAL dan conditions_to_verify; false mempertahankan mode ketat NEEDS_CONTEXT. UI menampilkan saran sementara dan syarat, tanpa mengisi data kosong atau menyimpan otomatis. Risiko ambigu, kontaminasi berbahaya dan riwayat isi HDPE tetap dibatasi. Lihat [perilaku terbaru, reproduksi dan hasil pengujian](../../../ai/docs/CONDITIONAL_AND_BACKGROUND.md).

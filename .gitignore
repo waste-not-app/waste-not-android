@@ -17,3 +17,20 @@ local.properties
 *.jks
 *.keystore
 keystore/
+
+# Local AI experiments, credentials and downloaded artifacts
+/.venv-ai/
+/.venv-ai-train/
+/.cache-ai/
+/weights/
+/ai/.env
+/ai/.env.*
+!/ai/.env.example
+/ai/artifacts/
+/ai/build/
+/ai/dist/
+/ai/data/local/
+/ai/.pytest_cache/
+/ai/.ruff_cache/
+**/__pycache__/
+*.egg-info/

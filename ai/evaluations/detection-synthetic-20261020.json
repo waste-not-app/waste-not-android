@@ -1,0 +1,137 @@
+{
+  "kind": "synthetic_sanity_NOT_real_negative_OOD_accuracy",
+  "model_sha256": "af1446f3333806b0aba3b4618846fe8f95cf5ab3269e2730629b090702498bcf",
+  "review_profile": "dw-val-01",
+  "manifest_sha256": null,
+  "images": 6,
+  "by_kind": {
+    "SYNTHETIC": {
+      "images": 6,
+      "images_with_false_review": 0,
+      "images_with_false_offered": 0,
+      "review": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "offered": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      }
+    }
+  },
+  "records": [
+    {
+      "id": "black",
+      "kind": "SYNTHETIC",
+      "image_sha256": "9347fe86f6b448518e30d671057b4ece3e7f2cf3906488168f63736a4c990bc0",
+      "review": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "offered": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "false_review_on_empty": false,
+      "false_offered_on_empty": false,
+      "objects": []
+    },
+    {
+      "id": "white",
+      "kind": "SYNTHETIC",
+      "image_sha256": "120c1240687151295935aed17aeca686ea6cd339ec7ffa3aff5cc7039ff350eb",
+      "review": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "offered": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "false_review_on_empty": false,
+      "false_offered_on_empty": false,
+      "objects": []
+    },
+    {
+      "id": "gray",
+      "kind": "SYNTHETIC",
+      "image_sha256": "f4421d9d0d5e6bad1c6408df2d45e86eb4830d8e52d1d30bfd9464163cd00af4",
+      "review": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "offered": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "false_review_on_empty": false,
+      "false_offered_on_empty": false,
+      "objects": []
+    },
+    {
+      "id": "green",
+      "kind": "SYNTHETIC",
+      "image_sha256": "52fb44ad831b69cfe5759cc21beaff23c29d2a42df0c7baff14dbeb21d7cacc4",
+      "review": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "offered": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "false_review_on_empty": false,
+      "false_offered_on_empty": false,
+      "objects": []
+    },
+    {
+      "id": "checker-8",
+      "kind": "SYNTHETIC",
+      "image_sha256": "db0074c8efd324e928e0a33695026d947bd1c40be1a039e7c35d56ce830d62ca",
+      "review": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "offered": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "false_review_on_empty": false,
+      "false_offered_on_empty": false,
+      "objects": []
+    },
+    {
+      "id": "checker-64",
+      "kind": "SYNTHETIC",
+      "image_sha256": "255356b36b05d9f81cc84bb61173b168e65c6d53275207fa0e1667e747cc04e9",
+      "review": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "offered": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "false_review_on_empty": false,
+      "false_offered_on_empty": false,
+      "objects": []
+    }
+  ],
+  "limitations": [
+    "Synthetic patterns do not validate real-world OOD rejection"
+  ]
+}

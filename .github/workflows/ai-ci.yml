@@ -1,0 +1,40 @@
+name: AI Prototype CI
+
+on:
+  push:
+    branches: [main, develop, 'feature/**', 'fix/**', 'codex/**']
+    paths: ['ai/**', '.github/workflows/ai-ci.yml']
+  pull_request:
+    paths: ['ai/**', '.github/workflows/ai-ci.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Python contracts and policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Install prototype test dependencies
+        run: python -m pip install -e './ai[worker,test]' -c ai/constraints.txt
+      - name: Run offline regression tests
+        env:
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+        run: python -m pytest ai/tests -q
+      - name: Check versioned HTTP contracts and fixture drift
+        run: python -m wastenot_ai.cli export-contracts --check
+      - name: Evaluate fixed recommendation scenarios without API keys
+        run: python ai/scripts/evaluate_recommendations.py --provider fixture --output /tmp/wastenot-recommendation-evaluation.json
+      - name: Verify distributable assets
+        run: |
+          python -m pip wheel ./ai --no-deps --wheel-dir /tmp/wastenot-ai-wheel
+          python ai/scripts/verify_package.py /tmp/wastenot-ai-wheel

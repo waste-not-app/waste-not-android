@@ -1,0 +1,81 @@
+"""Author the demo extension from verified COCO class IDs, without inventing labels."""
+import json
+from pathlib import Path
+
+root = Path(__file__).resolve().parents[1] / "src/wastenot_ai/data"
+catalog = json.loads((root / "catalog.json").read_text("utf-8"))
+# key, Indonesian label, domain category, COCO ID, raw class, guide template
+rows = [
+    ("bicycle","Sepeda","OTHER",1,"bicycle","reuse"),
+    ("bench","Bangku","OTHER",13,"bench","reuse"),
+    ("backpack","Ransel","OTHER",24,"backpack","reuse"),
+    ("umbrella","Payung","OTHER",25,"umbrella","reuse"),
+    ("handbag","Tas tangan","OTHER",26,"handbag","reuse"),
+    ("tie","Dasi","OTHER",27,"tie","reuse"),
+    ("suitcase","Koper","OTHER",28,"suitcase","reuse"),
+    ("frisbee","Frisbee","OTHER",29,"frisbee","reuse"),
+    ("skis","Peralatan ski","OTHER",30,"skis","reuse"),
+    ("snowboard","Papan snowboard","OTHER",31,"snowboard","reuse"),
+    ("sports_ball","Bola olahraga","OTHER",32,"sports ball","reuse"),
+    ("kite","Layang-layang","OTHER",33,"kite","reuse"),
+    ("baseball_bat","Pemukul bisbol","OTHER",34,"baseball bat","reuse"),
+    ("baseball_glove","Sarung tangan bisbol","OTHER",35,"baseball glove","reuse"),
+    ("skateboard","Skateboard","OTHER",36,"skateboard","reuse"),
+    ("surfboard","Papan selancar","OTHER",37,"surfboard","reuse"),
+    ("tennis_racket","Raket tenis","OTHER",38,"tennis racket","reuse"),
+    ("wine_glass","Gelas berkaki (kaca)","GLASS",40,"wine glass","tableware"),
+    ("plastic_cup","Gelas plastik","PLASTIC",41,"cup","plastic"),
+    ("glass_cup","Gelas kaca","GLASS",41,"cup","tableware"),
+    ("ceramic_cup","Cangkir keramik","OTHER",41,"cup","tableware"),
+    ("metal_cup","Cangkir logam","METAL",41,"cup","tableware"),
+    ("metal_fork","Garpu logam","METAL",42,"fork","tableware"),
+    ("knife","Pisau","METAL",43,"knife","sharp"),
+    ("metal_spoon","Sendok logam","METAL",44,"spoon","tableware"),
+    ("plastic_bowl","Mangkuk plastik","PLASTIC",45,"bowl","plastic"),
+    ("glass_bowl","Mangkuk kaca","GLASS",45,"bowl","tableware"),
+    ("ceramic_bowl","Mangkuk keramik","OTHER",45,"bowl","tableware"),
+    ("banana","Pisang / sisa pisang","ORGANIC",46,"banana","food"),
+    ("apple","Apel / sisa apel","ORGANIC",47,"apple","food"),
+    ("sandwich","Roti isi / sisanya","ORGANIC",48,"sandwich","food"),
+    ("orange","Jeruk / sisa jeruk","ORGANIC",49,"orange","food"),
+    ("broccoli","Brokoli / sisanya","ORGANIC",50,"broccoli","food"),
+    ("carrot","Wortel / sisanya","ORGANIC",51,"carrot","food"),
+    ("hot_dog","Hot dog / sisanya","ORGANIC",52,"hot dog","food"),
+    ("pizza","Piza / sisanya","ORGANIC",53,"pizza","food"),
+    ("donut","Donat / sisanya","ORGANIC",54,"donut","food"),
+    ("cake","Kue / sisanya","ORGANIC",55,"cake","food"),
+    ("chair","Kursi","OTHER",56,"chair","reuse"),
+    ("couch","Sofa","OTHER",57,"couch","reuse"),
+    ("potted_plant","Tanaman beserta pot","OTHER",58,"potted plant","mixed"),
+    ("bed","Tempat tidur","OTHER",59,"bed","reuse"),
+    ("dining_table","Meja makan","OTHER",60,"dining table","reuse"),
+    ("toilet","Kloset","OTHER",61,"toilet","mixed"),
+    ("tv","Televisi / monitor","ELECTRONIC",62,"tv","electronics"),
+    ("laptop","Laptop","ELECTRONIC",63,"laptop","electronics"),
+    ("mouse","Mouse komputer","ELECTRONIC",64,"mouse","electronics"),
+    ("remote","Remote kontrol","ELECTRONIC",65,"remote","electronics"),
+    ("keyboard","Keyboard","ELECTRONIC",66,"keyboard","electronics"),
+    ("cell_phone","Ponsel","ELECTRONIC",67,"cell phone","electronics"),
+    ("microwave","Microwave","ELECTRONIC",68,"microwave","electronics"),
+    ("oven","Oven","ELECTRONIC",69,"oven","electronics"),
+    ("toaster","Pemanggang roti","ELECTRONIC",70,"toaster","electronics"),
+    ("sink","Bak cuci","OTHER",71,"sink","mixed"),
+    ("refrigerator","Kulkas","ELECTRONIC",72,"refrigerator","electronics"),
+    ("book","Buku kertas","PAPER",73,"book","book"),
+    ("clock","Jam","ELECTRONIC",74,"clock","electronics"),
+    ("glass_vase","Vas kaca","GLASS",75,"vase","tableware"),
+    ("ceramic_vase","Vas keramik","OTHER",75,"vase","tableware"),
+    ("scissors","Gunting","METAL",76,"scissors","sharp"),
+    ("teddy_bear","Boneka","OTHER",77,"teddy bear","reuse"),
+    ("hair_drier","Pengering rambut","ELECTRONIC",78,"hair drier","electronics"),
+    ("toothbrush","Sikat gigi plastik manual","OTHER",79,"toothbrush","toothbrush"),
+]
+items = {item["object_key"]:item for item in catalog["items"]}
+for key,label,category,class_id,raw,template in rows:
+    items[key] = {"object_key":key,"label":label,"category":category,"guide_key":key,
+                  "special_handling":template in {"electronics","sharp"},
+                  "baseline_raw_class":raw,"baseline_class_id":class_id,
+                  "requires_material_confirmation":True,"guide_template":template}
+catalog.update(catalog_version="demo-catalog-05", mapping_version="coco-reviewed-objects-03",items=list(items.values()))
+(root / "catalog.json").write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print(json.dumps({"catalog_items":len(items),"supported_raw_classes":len({x['baseline_raw_class'] for x in items.values() if x['baseline_raw_class']})}))

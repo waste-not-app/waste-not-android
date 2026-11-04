@@ -1,0 +1,280 @@
+{
+  "dataset": "broad-waste-v1",
+  "runs": [
+    {
+      "run": "broad-waste-v1-yolo11n",
+      "sha256": "cea6211513e461fcd7acb6717332e3c8426521466c46d471baf6878e7d96510f",
+      "training": {
+        "epochs_completed": 30,
+        "best_epoch": 20,
+        "last_csv_time_seconds": 564.943,
+        "configuration": {
+          "epochs": 35,
+          "imgsz": 640,
+          "batch": 16,
+          "optimizer": "AdamW",
+          "lr0": 0.001,
+          "patience": 10,
+          "freeze": null,
+          "cos_lr": true,
+          "mosaic": 0.5,
+          "degrees": 15,
+          "scale": 0.35,
+          "close_mosaic": 6,
+          "seed": 42
+        }
+      },
+      "per_class": {
+        "bottle": {
+          "tp": 436,
+          "fp": 47,
+          "fn": 248,
+          "precision": 0.9026915113871635,
+          "recall": 0.6374269005847953
+        },
+        "can": {
+          "tp": 114,
+          "fp": 25,
+          "fn": 55,
+          "precision": 0.8201438848920863,
+          "recall": 0.6745562130177515
+        },
+        "cup": {
+          "tp": 91,
+          "fp": 71,
+          "fn": 190,
+          "precision": 0.5617283950617284,
+          "recall": 0.3238434163701068
+        },
+        "plastic_bag": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        },
+        "paper": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        },
+        "cardboard": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 3,
+          "precision": null,
+          "recall": 0.0
+        },
+        "drink_carton": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null
+        },
+        "plastic_wrapper": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": null,
+          "recall": 0.0
+        },
+        "food_container": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        },
+        "bottle_cap": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 3,
+          "precision": null,
+          "recall": 0.0
+        }
+      },
+      "test_metrics": {
+        "metrics/precision(B)": 0.9201466620177313,
+        "metrics/recall(B)": 0.2101239360242565,
+        "metrics/mAP50(B)": 0.27525643657435667,
+        "metrics/mAP50-95(B)": 0.1835273377755614,
+        "fitness": 0.1835273377755614
+      },
+      "report": "broad-waste-v1-20261020.json",
+      "common_class_gates": {
+        "bottle": {
+          "precision_min": 0.85,
+          "recall_min": 0.6,
+          "passed": true
+        },
+        "can": {
+          "precision_min": 0.8,
+          "recall_min": 0.65,
+          "passed": true
+        },
+        "cup": {
+          "precision_min": 0.8,
+          "recall_min": 0.4,
+          "passed": false
+        }
+      },
+      "all_common_gates_passed": false
+    },
+    {
+      "run": "broad-waste-v2-yolo11s",
+      "sha256": "a3f34225287ad8dd01fe9082488db3f9c40dea5b7a90b8a19f1e6bc77d69a069",
+      "training": {
+        "epochs_completed": 18,
+        "best_epoch": 8,
+        "last_csv_time_seconds": 437.335,
+        "configuration": {
+          "epochs": 30,
+          "imgsz": 640,
+          "batch": 16,
+          "optimizer": "AdamW",
+          "lr0": 0.0003,
+          "patience": 10,
+          "freeze": 10,
+          "cos_lr": true,
+          "mosaic": 0.5,
+          "degrees": 15,
+          "scale": 0.35,
+          "close_mosaic": 6,
+          "seed": 42
+        },
+        "head_transfer": {
+          "source_sha256": "85a76fe86dd8afe384648546b56a7a78580c7cb7b404fc595f97969322d502d5",
+          "class_rows": {
+            "39:bottle": "0:bottle",
+            "41:cup": "2:cup"
+          },
+          "target_branch_shapes": [
+            [
+              10,
+              128,
+              1,
+              1
+            ],
+            [
+              10,
+              128,
+              1,
+              1
+            ],
+            [
+              10,
+              128,
+              1,
+              1
+            ]
+          ],
+          "other_rows": "standard fresh initialization"
+        }
+      },
+      "per_class": {
+        "bottle": {
+          "tp": 561,
+          "fp": 143,
+          "fn": 123,
+          "precision": 0.796875,
+          "recall": 0.8201754385964912
+        },
+        "can": {
+          "tp": 94,
+          "fp": 2,
+          "fn": 75,
+          "precision": 0.9791666666666666,
+          "recall": 0.5562130177514792
+        },
+        "cup": {
+          "tp": 156,
+          "fp": 47,
+          "fn": 125,
+          "precision": 0.7684729064039408,
+          "recall": 0.5551601423487544
+        },
+        "plastic_bag": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        },
+        "paper": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        },
+        "cardboard": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 3,
+          "precision": null,
+          "recall": 0.0
+        },
+        "drink_carton": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null
+        },
+        "plastic_wrapper": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 4,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "food_container": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        },
+        "bottle_cap": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 3,
+          "precision": null,
+          "recall": 0.0
+        }
+      },
+      "test_metrics": {
+        "metrics/precision(B)": 0.7219730430284402,
+        "metrics/recall(B)": 0.3877030440997556,
+        "metrics/mAP50(B)": 0.3644431167333885,
+        "metrics/mAP50-95(B)": 0.23622769143687722,
+        "fitness": 0.23622769143687722
+      },
+      "report": "broad-waste-v2-yolo11s-20261020.json",
+      "common_class_gates": {
+        "bottle": {
+          "precision_min": 0.85,
+          "recall_min": 0.6,
+          "passed": false
+        },
+        "can": {
+          "precision_min": 0.8,
+          "recall_min": 0.65,
+          "passed": false
+        },
+        "cup": {
+          "precision_min": 0.8,
+          "recall_min": 0.4,
+          "passed": false
+        }
+      },
+      "all_common_gates_passed": false
+    }
+  ],
+  "default_changed": false,
+  "gate_scope": "Common bottle/can/cup validation usability only; sparse classes remain experimental and no field holdout exists",
+  "test_independence": "Public-data exploration; COCO pretraining and previous DW test inspection preclude an untouched-field claim"
+}

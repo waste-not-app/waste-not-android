@@ -1,0 +1,212 @@
+{
+  "model_sha256": "af1446f3333806b0aba3b4618846fe8f95cf5ab3269e2730629b090702498bcf",
+  "manifest_sha256": "a2c498641f51cbeebded1fc147a3d7b93d171eac5b534fc2554833e4a666e602",
+  "split": "val",
+  "prediction": {
+    "imgsz": 640,
+    "conf": 0.25,
+    "iou": 0.7,
+    "max_det": 50,
+    "agnostic_nms": false
+  },
+  "images": 681,
+  "match_iou": 0.5,
+  "selection_rule": "Smallest cutoff >= .50 review / .70 offered meeting empirical precision .85 / .95, minimum 20 TP; fallback .50 review / disable OFFERED. Selection and scoring both use val, NOT independent validation.",
+  "selection": {
+    "aluminium_can": {
+      "lower": 0.5,
+      "lower_target_met": true,
+      "offered": 0.7,
+      "offered_enabled": true,
+      "offered_target_met": true
+    },
+    "glass_bottle": {
+      "lower": 0.5,
+      "lower_target_met": false,
+      "offered": 1.0,
+      "offered_enabled": false,
+      "offered_target_met": false
+    },
+    "hdpe_bottle": {
+      "lower": 0.5,
+      "lower_target_met": true,
+      "offered": 0.7,
+      "offered_enabled": true,
+      "offered_target_met": true
+    },
+    "plastic_bottle": {
+      "lower": 0.5,
+      "lower_target_met": true,
+      "offered": 0.725,
+      "offered_enabled": true,
+      "offered_target_met": true
+    }
+  },
+  "previous_review": {
+    "overall": {
+      "tp": 558,
+      "fp": 122,
+      "fn": 123,
+      "precision": 0.8205882352941176,
+      "recall": 0.8193832599118943
+    },
+    "per_class": {
+      "aluminium_can": {
+        "tp": 102,
+        "fp": 7,
+        "fn": 67,
+        "precision": 0.9357798165137615,
+        "recall": 0.6035502958579881
+      },
+      "glass_bottle": {
+        "tp": 137,
+        "fp": 84,
+        "fn": 11,
+        "precision": 0.6199095022624435,
+        "recall": 0.9256756756756757
+      },
+      "hdpe_bottle": {
+        "tp": 150,
+        "fp": 5,
+        "fn": 35,
+        "precision": 0.967741935483871,
+        "recall": 0.8108108108108109
+      },
+      "plastic_bottle": {
+        "tp": 169,
+        "fp": 26,
+        "fn": 10,
+        "precision": 0.8666666666666667,
+        "recall": 0.9441340782122905
+      }
+    },
+    "ambiguous_images": 3
+  },
+  "previous_offered": {
+    "overall": {
+      "tp": 540,
+      "fp": 73,
+      "fn": 141,
+      "precision": 0.8809135399673735,
+      "recall": 0.7929515418502202
+    },
+    "per_class": {
+      "aluminium_can": {
+        "tp": 100,
+        "fp": 4,
+        "fn": 69,
+        "precision": 0.9615384615384616,
+        "recall": 0.591715976331361
+      },
+      "glass_bottle": {
+        "tp": 125,
+        "fp": 59,
+        "fn": 23,
+        "precision": 0.6793478260869565,
+        "recall": 0.8445945945945946
+      },
+      "hdpe_bottle": {
+        "tp": 148,
+        "fp": 1,
+        "fn": 37,
+        "precision": 0.9932885906040269,
+        "recall": 0.8
+      },
+      "plastic_bottle": {
+        "tp": 167,
+        "fp": 9,
+        "fn": 12,
+        "precision": 0.9488636363636364,
+        "recall": 0.9329608938547486
+      }
+    },
+    "ambiguous_images": 0
+  },
+  "selected_review": {
+    "overall": {
+      "tp": 558,
+      "fp": 122,
+      "fn": 123,
+      "precision": 0.8205882352941176,
+      "recall": 0.8193832599118943
+    },
+    "per_class": {
+      "aluminium_can": {
+        "tp": 102,
+        "fp": 7,
+        "fn": 67,
+        "precision": 0.9357798165137615,
+        "recall": 0.6035502958579881
+      },
+      "glass_bottle": {
+        "tp": 137,
+        "fp": 84,
+        "fn": 11,
+        "precision": 0.6199095022624435,
+        "recall": 0.9256756756756757
+      },
+      "hdpe_bottle": {
+        "tp": 150,
+        "fp": 5,
+        "fn": 35,
+        "precision": 0.967741935483871,
+        "recall": 0.8108108108108109
+      },
+      "plastic_bottle": {
+        "tp": 169,
+        "fp": 26,
+        "fn": 10,
+        "precision": 0.8666666666666667,
+        "recall": 0.9441340782122905
+      }
+    },
+    "ambiguous_images": 3
+  },
+  "selected_offered": {
+    "overall": {
+      "tp": 411,
+      "fp": 12,
+      "fn": 270,
+      "precision": 0.9716312056737588,
+      "recall": 0.6035242290748899
+    },
+    "per_class": {
+      "aluminium_can": {
+        "tp": 100,
+        "fp": 4,
+        "fn": 69,
+        "precision": 0.9615384615384616,
+        "recall": 0.591715976331361
+      },
+      "glass_bottle": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 148,
+        "precision": null,
+        "recall": 0.0
+      },
+      "hdpe_bottle": {
+        "tp": 147,
+        "fp": 1,
+        "fn": 38,
+        "precision": 0.9932432432432432,
+        "recall": 0.7945945945945946
+      },
+      "plastic_bottle": {
+        "tp": 164,
+        "fp": 7,
+        "fn": 15,
+        "precision": 0.9590643274853801,
+        "recall": 0.9162011173184358
+      }
+    },
+    "ambiguous_images": 0
+  },
+  "limitations": [
+    "No true negative/OOD images",
+    "No Indonesian camera holdout",
+    "No verified object-disjoint split",
+    "No confidence probability calibration",
+    "Test split not used for threshold selection"
+  ]
+}
