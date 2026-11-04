@@ -75,3 +75,5 @@ Checkpoint D02/C27/root akun dan auth: [status menunggu/gagal, retry, pemulihan 
 Checkpoint C04/C07: [secondary bersama, D01 pending, label panjang, keyboard dan regresi lintas layar](SECONDARY_ACTIONS.md).
 
 Checkpoint C05: [text action bersama, form pending opak, label panjang, kalender/tema dan regresi pemakai](TEXT_ACTIONS.md).
+
+Checkpoint sembilan viewport S04–S16 dan aksi rail pada halaman anak: [review kit/native dan batas penerimaan](SCREENS_NAVIGATION.md).

@@ -1,0 +1,56 @@
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.main.ScreenKitReviewTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.ScreenKitReviewTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+Error in screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks(com.example.wastenot.ui.main.ScreenKitReviewTest):
+java.lang.AssertionError: S08: visible rail Catat/Scan must open the sheet
+	at com.example.wastenot.ui.main.ScreenKitReviewTest.railCapture(ScreenKitReviewTest.kt:125)
+	at com.example.wastenot.ui.main.ScreenKitReviewTest.screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks(ScreenKitReviewTest.kt:69)
+	... 65 trimmed
+Caused by: androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 5000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:887)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:482)
+	at com.example.wastenot.ui.main.ScreenKitReviewTest.railCapture(ScreenKitReviewTest.kt:123)
+	... 67 more
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.ScreenKitReviewTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: S08: visible rail Catat/Scan must open the sheet
+	at com.example.wastenot.ui.main.ScreenKitReviewTest.railCapture(ScreenKitReviewTest.kt:125)
+	at com.example.wastenot.ui.main.ScreenKitReviewTest.screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks(ScreenKitReviewTest.kt:69)
+	... 65 trimmed
+Caused by: androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 5000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:887)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:482)
+	at com.example.wastenot.ui.main.ScreenKitReviewTest.railCapture(ScreenKitReviewTest.kt:123)
+	... 67 more
+
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 30.051
+There was 1 failure:
+1) screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks(com.example.wastenot.ui.main.ScreenKitReviewTest)
+java.lang.AssertionError: S08: visible rail Catat/Scan must open the sheet
+	at com.example.wastenot.ui.main.ScreenKitReviewTest.railCapture(ScreenKitReviewTest.kt:125)
+	at com.example.wastenot.ui.main.ScreenKitReviewTest.screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks(ScreenKitReviewTest.kt:69)
+	... 65 trimmed
+Caused by: androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 5000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:887)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:482)
+	at com.example.wastenot.ui.main.ScreenKitReviewTest.railCapture(ScreenKitReviewTest.kt:123)
+	... 67 more
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

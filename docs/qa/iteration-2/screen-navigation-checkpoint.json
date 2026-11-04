@@ -1,0 +1,2783 @@
+{
+  "scope": "Nine initial screen viewports, title and chrome readability, five tabs and child rail capture; whole-design acceptance remains open",
+  "app_sha256": "a90996bd3048d909beb5a2592e4487888a8289fa58e1e56be21ff6305753118d",
+  "test_sha256": "69309a944f8abf21d64fe0fecd8e9dfa66d3f30d28a407e2da4c12ef89e57aec",
+  "same_test_apk_before_after": true,
+  "baseline": {
+    "profile": "wide200",
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "cases": [],
+    "seconds": 30.051,
+    "app_sha256": "f92977c773b96f49ba111500838a63ff0ba807b45d95c35fc302dabc1863fc1c",
+    "test_sha256": "69309a944f8abf21d64fe0fecd8e9dfa66d3f30d28a407e2da4c12ef89e57aec",
+    "log_sha256": "9511da59e30d2b56f5732fbc35fd8e417bddd430c06860e0a4737f27752befb4"
+  },
+  "profiles": [
+    {
+      "profile": "normal",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        "com.example.wastenot.ui.main.ScreenKitReviewTest#screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks",
+        "com.example.wastenot.ui.main.Iteration2DesignTest#directDummyHomeDockAndManualFallbackRetainAllFiveStacks"
+      ],
+      "seconds": 64.884,
+      "app_sha256": "a90996bd3048d909beb5a2592e4487888a8289fa58e1e56be21ff6305753118d",
+      "test_sha256": "69309a944f8abf21d64fe0fecd8e9dfa66d3f30d28a407e2da4c12ef89e57aec",
+      "log_sha256": "e16d977a29f01d4fd4ce4a41ffb5e13f9f0772f8e290b76566e8c9f1d1b788ce"
+    },
+    {
+      "profile": "phone200",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        "com.example.wastenot.ui.main.ScreenKitReviewTest#screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks",
+        "com.example.wastenot.ui.main.Iteration2DesignTest#directDummyHomeDockAndManualFallbackRetainAllFiveStacks"
+      ],
+      "seconds": 70.459,
+      "app_sha256": "a90996bd3048d909beb5a2592e4487888a8289fa58e1e56be21ff6305753118d",
+      "test_sha256": "69309a944f8abf21d64fe0fecd8e9dfa66d3f30d28a407e2da4c12ef89e57aec",
+      "log_sha256": "8180557a4537bd9904ec5947fa1c61d25cc7d9049388a1463306b5980afc7340"
+    },
+    {
+      "profile": "wide200",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        "com.example.wastenot.ui.main.ScreenKitReviewTest#screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks",
+        "com.example.wastenot.ui.main.Iteration2DesignTest#directDummyHomeDockAndManualFallbackRetainAllFiveStacks"
+      ],
+      "seconds": 66.83,
+      "app_sha256": "a90996bd3048d909beb5a2592e4487888a8289fa58e1e56be21ff6305753118d",
+      "test_sha256": "69309a944f8abf21d64fe0fecd8e9dfa66d3f30d28a407e2da4c12ef89e57aec",
+      "log_sha256": "d35c6edf1cf221d0cf320db9aecb43511ddba24f56c350d40958d9393c6ffc7c"
+    }
+  ],
+  "native_passed": 6,
+  "unique_methods": 2,
+  "debug_unit": {
+    "tests": 171,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "captures": [
+    {
+      "profile": "normal",
+      "screen": "S04",
+      "theme": "light",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Halo, Pengguna",
+      "title_width_px": 527,
+      "paragraph_width_px": 780,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 526,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 1971,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "830685232de3492d3a449bd00f6fba6052dbb558d0ce0487f3ee516b9ed0d3f8"
+    },
+    {
+      "profile": "normal",
+      "screen": "S04",
+      "theme": "dark",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Halo, Pengguna",
+      "title_width_px": 527,
+      "paragraph_width_px": 780,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 526,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 1971,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "00ad8465670aa46672e25047c74c765b58ebd782fe3cc6277d4fafb6a7971ed7"
+    },
+    {
+      "profile": "normal",
+      "screen": "S07",
+      "theme": "light",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Riwayat",
+      "title_width_px": 270,
+      "paragraph_width_px": 852,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 269,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 1971,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "0dc43fb9d55d417d04c13983d5b1db8b0725221523d824f1d7a8c4721a452905"
+    },
+    {
+      "profile": "normal",
+      "screen": "S07",
+      "theme": "dark",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Riwayat",
+      "title_width_px": 270,
+      "paragraph_width_px": 852,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 269,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 1971,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "28b2cfc88c78255e80fa8cbe2875051da6ca86afd109d7ef8ed2d60eadbc5979"
+    },
+    {
+      "profile": "normal",
+      "screen": "S11",
+      "theme": "light",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Panduan",
+      "title_width_px": 293,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 292,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 1971,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "a7143f71faf8e4339418d4a964d4c7608f74aee2140ecf249ff2eb5488bf156e"
+    },
+    {
+      "profile": "normal",
+      "screen": "S11",
+      "theme": "dark",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Panduan",
+      "title_width_px": 293,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 292,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 1971,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "b53221ac875e43730872e317fa61c682eb6d8ece54182b0fceccabe6f1d0d477"
+    },
+    {
+      "profile": "normal",
+      "screen": "S13",
+      "theme": "light",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Statistik",
+      "title_width_px": 276,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 275,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 1971,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "a915f76ac74d17f1b97add3ee1d4e633f2a374a58b0822990dc22ce041236156"
+    },
+    {
+      "profile": "normal",
+      "screen": "S13",
+      "theme": "dark",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Statistik",
+      "title_width_px": 276,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 275,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 1971,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "a51d5cf7f76f517fb0e8513be7126db40f061ca1290accd2720e905ba2a679e4"
+    },
+    {
+      "profile": "normal",
+      "screen": "S14",
+      "theme": "light",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Profil",
+      "title_width_px": 174,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 173,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 1971,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "55d69168c065d498ac30fe3a240bc736f2865ac818cc8b326c4db15608cf4eec"
+    },
+    {
+      "profile": "normal",
+      "screen": "S14",
+      "theme": "dark",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Profil",
+      "title_width_px": 174,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 173,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 1971,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "642fe6d13f37a1d9b11fe9b207e8bfee7fd163f4e1eb93d9d5a97a396dba08f4"
+    },
+    {
+      "profile": "normal",
+      "screen": "S05",
+      "theme": "light",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Catat aktivitas",
+      "title_width_px": 481,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 480,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "ccfca5b9fed98b17b737388411dfedfdf92d901b76a98ce41c445f87b290ce7f"
+    },
+    {
+      "profile": "normal",
+      "screen": "S05",
+      "theme": "dark",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Catat aktivitas",
+      "title_width_px": 481,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 480,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "c901de1591a6725f0e375336ffe6dfab69692ea9c7588a9cac5457595767d1c0"
+    },
+    {
+      "profile": "normal",
+      "screen": "S08",
+      "theme": "light",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Detail catatan",
+      "title_width_px": 462,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 461,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "4bb580dc04965817a948512a2663d4a479a5972e23cf0fbe63fbe851177e36aa"
+    },
+    {
+      "profile": "normal",
+      "screen": "S08",
+      "theme": "dark",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Detail catatan",
+      "title_width_px": 462,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 461,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "99411a592c51633627953010df50d06e02ad81a8e386172958521fc4394db544"
+    },
+    {
+      "profile": "normal",
+      "screen": "S12",
+      "theme": "light",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Detail panduan",
+      "title_width_px": 500,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 499,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "60b605f9540a25c44a3a92eb4de3cd515a143df22f1999f40f9b4755ca09a9ad"
+    },
+    {
+      "profile": "normal",
+      "screen": "S12",
+      "theme": "dark",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Detail panduan",
+      "title_width_px": 500,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 499,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "38ff0d57120b7635e5c93f70f11deab0a42a9f7c951b997e8a9ae1406120391e"
+    },
+    {
+      "profile": "normal",
+      "screen": "S16",
+      "theme": "light",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Pengaturan",
+      "title_width_px": 387,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 386,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "5b887c96a302ade64e2802d56dc7d64a1a94f2d735f85eda1571b5bfd358c0d9"
+    },
+    {
+      "profile": "normal",
+      "screen": "S16",
+      "theme": "dark",
+      "font_scale": 1,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 91,
+      "title_visible_height_px": 91,
+      "title_text": "Pengaturan",
+      "title_width_px": 387,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 91,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 386,
+          "top": 0,
+          "bottom": 91,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "b7bb978ff35bc949bcc8f9f8b10ecea6bdbd394499ef318990be0b0992e7a941"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S04",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 2,
+      "title_height_px": 280,
+      "title_visible_height_px": 280,
+      "title_text": "Halo, Pengguna",
+      "title_width_px": 780,
+      "paragraph_width_px": 780,
+      "paragraph_height_px": 280,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 263,
+          "top": 0,
+          "bottom": 138,
+          "ellipsized": false
+        },
+        {
+          "left": 0,
+          "right": 505,
+          "top": 138,
+          "bottom": 280,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": false,
+      "overflow_width": false,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 8613,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "39302f1b23ff62eaf73a62d0b52edb8e9af6955f8cf25e39b6e113ea2f0c6a98"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S04",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 2,
+      "title_height_px": 280,
+      "title_visible_height_px": 280,
+      "title_text": "Halo, Pengguna",
+      "title_width_px": 780,
+      "paragraph_width_px": 780,
+      "paragraph_height_px": 280,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 263,
+          "top": 0,
+          "bottom": 138,
+          "ellipsized": false
+        },
+        {
+          "left": 0,
+          "right": 505,
+          "top": 138,
+          "bottom": 280,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": false,
+      "overflow_width": false,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 8613,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "930d17c3fbccb5894a0a957a7c965516b32cdd1d9010c429e5a206c3dbd6e0ed"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S07",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Riwayat",
+      "title_width_px": 402,
+      "paragraph_width_px": 852,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 401,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 8613,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "3799da43bdda10c0337fdc74816e36ee1de4ed7156c297cee9a29ca5bdc897ea"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S07",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Riwayat",
+      "title_width_px": 402,
+      "paragraph_width_px": 852,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 401,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 8613,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "82a10eed5ee79fb5127bd8b3f12dd84e7652cc107eed4cd8a9ac1eb5bb57bff5"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S11",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Panduan",
+      "title_width_px": 438,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 437,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 8613,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "091f14972319314c1aea669a0610f7139b5cf2008559592a34356c90b4745087"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S11",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Panduan",
+      "title_width_px": 438,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 437,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 8613,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "6e85ff96cc8e8bf62ba0d4dad590c6c72a46d786575df0eed5a961c855a07903"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S13",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Statistik",
+      "title_width_px": 413,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 412,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 8613,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "51de04dacda4b9aac517bca71827b96699054fe7fa8ff09cdc27b8f797ee2422"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S13",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Statistik",
+      "title_width_px": 413,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 412,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 8613,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "bffd8cd8eaf46c69db4d53bb5cd3c1c0c8b10056a7f7cf177641b4487af738ea"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S14",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Profil",
+      "title_width_px": 259,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 258,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 8613,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "067477e7f760291f1d9314c516f1fa52d77826c8c60921e12ee20f0d38b3eca1"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S14",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Profil",
+      "title_width_px": 259,
+      "paragraph_width_px": 1032,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 258,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 801
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 982
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 916
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 870
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 530
+        },
+        {
+          "capture_text_pixels": 8613,
+          "capture_camera_pixels": 1525
+        }
+      ],
+      "violations": [],
+      "sha256": "0d5189fb4bd0c28bcdd472b44bfa66ea76848123b710549f664f70b532e181b7"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S05",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Catat aktivitas",
+      "title_width_px": 721,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 720,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "f4eeb0f73280bfae3a1a97393bd00aa8828623d2c161dfcc3b03f9ad2d2de752"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S05",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Catat aktivitas",
+      "title_width_px": 721,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 720,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "91dde5d91b4ea761c4b42319f116782c41c2b205a5962a14e6f541d7cdfd5148"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S08",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Detail catatan",
+      "title_width_px": 693,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 692,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "0f481a1686e97e37524ce7fb4e80c653545fe188983d736ed6d2e4254d2c54e1"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S08",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Detail catatan",
+      "title_width_px": 693,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 692,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "a44d7fcb38657fa3ef2e53b966ed9d29fee800ea3dcd3550912dccea005617e4"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S12",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Detail panduan",
+      "title_width_px": 750,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 749,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "2ba7ed56cacda3ad44833649de915c416430c7c55b874d95803495015b27b5d8"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S12",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Detail panduan",
+      "title_width_px": 750,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 749,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "81ee0aafe4d0d5e450c9698af295c4ec60f0cf4ddf787f1951a7ebf0d37ce2e1"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S16",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Pengaturan",
+      "title_width_px": 577,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 576,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "85aa82e1b87b9508fca24c49b74aec42c7058030d36d0fe0b6a3a61ccdf8f835"
+    },
+    {
+      "profile": "phone200",
+      "screen": "S16",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 360,
+      "density_dpi": 480,
+      "title_lines": 1,
+      "title_height_px": 136,
+      "title_visible_height_px": 136,
+      "title_text": "Pengaturan",
+      "title_width_px": 577,
+      "paragraph_width_px": 840,
+      "paragraph_height_px": 136,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 576,
+          "top": 0,
+          "bottom": 136,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "9c9f2bc61f03bb836fda385cde975d40d0d7cd0814edabb37cd6cd6ea2292923"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S04",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 82,
+      "title_visible_height_px": 82,
+      "title_text": "Halo, Pengguna",
+      "title_width_px": 463,
+      "paragraph_width_px": 641,
+      "paragraph_height_px": 82,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 462,
+          "top": 0,
+          "bottom": 82,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "ab2d733b35d05408c24ebde5a0bd46d7961ca0b3e7f989bccef948a4378d7050"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S04",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 82,
+      "title_visible_height_px": 82,
+      "title_text": "Halo, Pengguna",
+      "title_width_px": 463,
+      "paragraph_width_px": 641,
+      "paragraph_height_px": 82,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 462,
+          "top": 0,
+          "bottom": 82,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "ddf914a8cbbe25faa830bc5878bbb1b930a566d970e725c1940813dac16bd6b6"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S07",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 82,
+      "title_visible_height_px": 82,
+      "title_text": "Riwayat",
+      "title_width_px": 237,
+      "paragraph_width_px": 685,
+      "paragraph_height_px": 82,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 236,
+          "top": 0,
+          "bottom": 82,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "313aa28e48c8663c23ae27a89332c822b28f169f9e174e5351bd50052230ccd0"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S07",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 82,
+      "title_visible_height_px": 82,
+      "title_text": "Riwayat",
+      "title_width_px": 237,
+      "paragraph_width_px": 685,
+      "paragraph_height_px": 82,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 236,
+          "top": 0,
+          "bottom": 82,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "c634dede31723e824550a319917ac8b53861841eb0bacf2d792ea0a7f65619a7"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S11",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Panduan",
+      "title_width_px": 257,
+      "paragraph_width_px": 793,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 256,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "16551b298734c53989b3f2fdf7b56696c0af741b5731dac18de1833dd84febcd"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S11",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Panduan",
+      "title_width_px": 257,
+      "paragraph_width_px": 793,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 256,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "00c1f76ceafc33f7de1922c39a62ca5ac389ecf5be1f3b8dd33ad21c31e47433"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S13",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Statistik",
+      "title_width_px": 240,
+      "paragraph_width_px": 793,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 239,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "bbdcba111305482e18d7f2f61854b469a0bda08cd44be7dcc2a35ecdfb79a48d"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S13",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Statistik",
+      "title_width_px": 240,
+      "paragraph_width_px": 793,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 239,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "ee47fe700de38c3878ea3485df96435d526f7313e4591e91a3c8be140422e286"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S14",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Profil",
+      "title_width_px": 153,
+      "paragraph_width_px": 793,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 152,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "2663222c5db062e1f2b90bfd11021e946a9d786fe5fbfe7e35f51d2031a34620"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S14",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Profil",
+      "title_width_px": 153,
+      "paragraph_width_px": 793,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 152,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "8814ec2557b4af6ff34b6bd03066f71f6d88e2737fef2cec68da131d00d55d3c"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S05",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Catat aktivitas",
+      "title_width_px": 419,
+      "paragraph_width_px": 937,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 418,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "f058858739732ff6960ad56d32d9e008a55369ed98eae9b322034ce1b001e76c"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S05",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Catat aktivitas",
+      "title_width_px": 419,
+      "paragraph_width_px": 937,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 418,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [],
+      "violations": [],
+      "sha256": "9cbe8bf2f00fc811df4e2dbee897d1ab69e28413791fd0cced6f4c47e6027204"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S08",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Detail catatan",
+      "title_width_px": 403,
+      "paragraph_width_px": 678,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 402,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "7b5f73360882dd7b0d9cd27c9f02bc1398ebea1491a9516f2cb750bef201ed8b"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S08",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Detail catatan",
+      "title_width_px": 403,
+      "paragraph_width_px": 678,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 402,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "ef58561f15913251b8d0400928c8f85050857fdf2e6debac66743d3f2e95bb5a"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S12",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Detail panduan",
+      "title_width_px": 439,
+      "paragraph_width_px": 678,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 438,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "c30f516613bd733df9c73e2ad4f63681eed7e4c6966923a12e5ae67ceb6923a4"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S12",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 81,
+      "title_visible_height_px": 81,
+      "title_text": "Detail panduan",
+      "title_width_px": 439,
+      "paragraph_width_px": 678,
+      "paragraph_height_px": 81,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 438,
+          "top": 0,
+          "bottom": 81,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "1fa12037f8abfa386b8e555060c3e978bfc94787c0df6d777e14038b52ea7cd6"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S16",
+      "theme": "light",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 82,
+      "title_visible_height_px": 82,
+      "title_text": "Pengaturan",
+      "title_width_px": 339,
+      "paragraph_width_px": 678,
+      "paragraph_height_px": 82,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 338,
+          "top": 0,
+          "bottom": 82,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "5239b702fe53f15c71e271ed71578e495c8ecc8949217f71eb02236a9dcf4533"
+    },
+    {
+      "profile": "wide200",
+      "screen": "S16",
+      "theme": "dark",
+      "font_scale": 2,
+      "width_dp": 600,
+      "density_dpi": 288,
+      "title_lines": 1,
+      "title_height_px": 82,
+      "title_visible_height_px": 82,
+      "title_text": "Pengaturan",
+      "title_width_px": 339,
+      "paragraph_width_px": 678,
+      "paragraph_height_px": 82,
+      "title_line_bounds": [
+        {
+          "left": 0,
+          "right": 338,
+          "top": 0,
+          "bottom": 82,
+          "ellipsized": false
+        }
+      ],
+      "raw_visual_overflow": true,
+      "overflow_width": true,
+      "overflow_height": false,
+      "navigation": [
+        {
+          "label": "Beranda",
+          "glyph_pixels": 262
+        },
+        {
+          "label": "Riwayat",
+          "glyph_pixels": 326
+        },
+        {
+          "label": "Panduan",
+          "glyph_pixels": 306
+        },
+        {
+          "label": "Statistik",
+          "glyph_pixels": 276
+        },
+        {
+          "label": "Profil",
+          "glyph_pixels": 154
+        },
+        {
+          "capture_text_pixels": 3024,
+          "capture_camera_pixels": 466
+        }
+      ],
+      "violations": [],
+      "sha256": "f82794685c3fec407a745581b660711a16fcb86b1b8f3fe2fd36144986819359"
+    }
+  ],
+  "reference_canvas_px": 360,
+  "reference_frame_height_px": 800,
+  "reference_files": {
+    "kit-S07-dark.png": "9c447902730b35af152428d54e5507415d48d531b3704ce0e4f2e0af94bc81f3",
+    "kit-S05-dark.png": "657d9e2d116169b1ad6286654c946fb0c13b3578db7dffd839a423e8d2cc405d",
+    "kit-S12-light.png": "a186bdff809a80f183f3c58857e5982b92738a801845f3dd498f9e471c5ddd67",
+    "kit-S14-light.png": "47bf70d5bfcdbf720c1909ae2eddaa7a8963ca7a5381527821363d3aad49e4bd",
+    "kit-S04-light.png": "6e4756b31b1351e3eca5cf775a3e2bc5d7b1ef98cb588e5d825a5d01df1bfafa",
+    "kit-S16-light.png": "d7ab4efacc95680e1ed0b4756bd4b69a98f9e0c944979d76a17f3d1677af69d9",
+    "kit-S11-light.png": "d3a92c91a814516740dc93dbe2d17d225b52b17d3b1071aff0e715195cfe47e5",
+    "kit-S13-dark.png": "333f193c7dcb766b2f54afee9a41cd2d38760d38c674265831fc3403cd469a84",
+    "kit-S13-light.png": "6638ca31e022e1e62d2b04795cd93be116afede05aa48a2d0533e139b8bf2324",
+    "kit-S05-light.png": "a968058623daf62ebab333ff0451b88368768fc88c64edd08c5a62251266fb47",
+    "kit-S07-light.png": "5985afa2c90de139e71d27cb9a99c2c432c75ec6330dd142a13d82bd686e33f5",
+    "kit-S11-dark.png": "7ff511ba76bcec4608e6e97fe47534f5c5fcbc73f1196db88a5bf30fbf49241a",
+    "kit-S04-dark.png": "6ee50e09679a61ff7f865ea3197e02507ea677209b30b5ebe561762c735b38a0",
+    "kit-S08-light.png": "c90951028aa07117b51b68e765e9e4a6829f44f5a6edc6eaa019e80ec5e82d67",
+    "kit-S08-dark.png": "d24740c34101172fa843ad2f3462783b41043f46d429b9b3c45446fae9d74d2a",
+    "kit-S12-dark.png": "ad83b20e9d4225af497f4d72d391b9e8cdd1761e0db532d994e7d11d2d13a150",
+    "kit-S14-dark.png": "505286c9b04134dfda465368bdb0bc930cb496957e5d81623fda996901598b23",
+    "kit-S16-dark.png": "f9223c94f5838adabaca44e40079a732189f803878a72a2d20623e61d2171483",
+    "kit-computed.json": "0da0cd6ed42569924d2c10d623b9577ee2bf7c56343d4f463fdf7b09eb8168b1"
+  },
+  "runtime_sources": {
+    "app/src/main/AndroidManifest.xml": "529b167ccd87806ca5da7b9bfa0d3728210142b41e78885bf8caba8b4c302225",
+    "app/src/main/assets/licenses/OFL-PlusJakartaSans.txt": "995c7199cab65954f545996326755daee7b63cc6b42b06c13da1f9502ab08a99",
+    "app/src/main/java/com/example/wastenot/AppContainer.kt": "528b415c851fc331cd0c18f23c8221843a23317e134798957f0f4f6ae09ced60",
+    "app/src/main/java/com/example/wastenot/MainActivity.kt": "5c90c7e3a2c7936f42d36007ee7c1430eb75ff203a3ccca7887cac253b1271d2",
+    "app/src/main/java/com/example/wastenot/Navigation.kt": "e20d56eb8378e359d65275803f322137502f26d25414272871b018d5e76d654e",
+    "app/src/main/java/com/example/wastenot/NavigationKeys.kt": "b0ad4bf78691b4c2f06fef2e9517fb9c990ab9abcf056e7a7d5767b435ef11cc",
+    "app/src/main/java/com/example/wastenot/WasteNotApplication.kt": "aa0d468d1c4ae5820b5a70b82968a7f9f39592f0a096a51d4f7709401b563e06",
+    "app/src/main/java/com/example/wastenot/data/demo/DemoAccountSession.kt": "162f63b63f87d1e9d47db12e91c37576d3f304f5f9e383ae3dd939b4f02f81c2",
+    "app/src/main/java/com/example/wastenot/data/demo/DemoActivityStore.kt": "3730edb978a23ef189fc164d21b4471a2a730f5e3c686dac8e3702ef5a319af7",
+    "app/src/main/java/com/example/wastenot/data/dummy/DummyAccountSession.kt": "363d05e18a60f1f3e2bb34b98df4bdae931b3df24b31deb6f155472b98ba1277",
+    "app/src/main/java/com/example/wastenot/data/dummy/DummyActivityStore.kt": "d1af9727ec6b4850e03f5365379c4d2984b56d985c2c98bafeeb736a56a7cb5f",
+    "app/src/main/java/com/example/wastenot/data/dummy/DummyGuideStore.kt": "a1474c724c29ea9f98f6add58fee3429f04e136cddda395126d308b1f54e9fcf",
+    "app/src/main/java/com/example/wastenot/data/dummy/DummyProgress.kt": "2c71b20581ba2d427150b35d6c14b60e038d3d980b8849e92d0fb6097e38d54d",
+    "app/src/main/java/com/example/wastenot/data/dummy/DummyStatistics.kt": "6e8d62d276bfeb3146efabe5315f9eaf8ccd57ab7a0e1b5194b3fdd52b3613e6",
+    "app/src/main/java/com/example/wastenot/data/local/KeystoreRefreshTokenStore.kt": "56cfc1bac71bd93cde519606459856f9a22ed176ef495c8cf72cccb2f9b5d614",
+    "app/src/main/java/com/example/wastenot/data/local/LocalEditorDraftStore.kt": "49819efe6822cf1c83b611147b5e5abe572c0be0caa7811207519e437fd1d629",
+    "app/src/main/java/com/example/wastenot/data/local/RefreshTokenStore.kt": "75886c2dab103da15a49fd1391f0c3db58766d7ded3e946d72815675c588fc60",
+    "app/src/main/java/com/example/wastenot/data/local/ScanPhotoCache.kt": "bba606653f9886a691dcb5816ba9bb5ddc846e52b087bd61cd30ef9cfb90e110",
+    "app/src/main/java/com/example/wastenot/data/network/ApiExecutor.kt": "d338fbf597bbc9e65a4f176f0fa2169a3afd77f1e3abc2cd95f1b6b343eb1588",
+    "app/src/main/java/com/example/wastenot/data/network/ApiResult.kt": "c8ce5b85aac17b993c518309f9ffbbc0e3b4489e5c9c104b81cb170cba8ad690",
+    "app/src/main/java/com/example/wastenot/data/network/WasteNotApi.kt": "073c7335bdef650dd01e67e0ac997bc678980eca238c5b678ec48d269643f78d",
+    "app/src/main/java/com/example/wastenot/data/network/WasteNotNetwork.kt": "7c3f0457344dd0dfe5e5d2d9bb77fdc307dbbacde2e8334d43c8297b3cc53f89",
+    "app/src/main/java/com/example/wastenot/data/network/dto/AuthDtos.kt": "6e538163c69d17542c9ddcab99e0459d47d17055c7918814503e408f1038a8ab",
+    "app/src/main/java/com/example/wastenot/data/network/dto/CoreDtos.kt": "cf05143fa132a294fc2b97bedad806d57e7a2ed31b31fdd439470624d52582e6",
+    "app/src/main/java/com/example/wastenot/data/network/dto/QuantityRequestFields.kt": "ce29c9b4f5a91d9d0cc192fe32f83ad94836595c435ab315417dcc800eefe286",
+    "app/src/main/java/com/example/wastenot/data/repository/AccountSession.kt": "657ecaca5c2f7895d507ff170476732872ee896f2d338d997d0a8f4342bd9b38",
+    "app/src/main/java/com/example/wastenot/data/repository/ActivityStore.kt": "d751732e94b809c3adc9f822b567324d69075ec14368d7b41596074e847803dc",
+    "app/src/main/java/com/example/wastenot/data/repository/CoreRepository.kt": "d59fccfc4fc7d446e95108446f5f35e69a0f8aa51149328e895e8262ace1a223",
+    "app/src/main/java/com/example/wastenot/data/repository/EditorDraftStore.kt": "18713fbd3b7ab4bf37c59df9a26c98876ec83a3fd2a18c9e85b0add8cd13781e",
+    "app/src/main/java/com/example/wastenot/data/repository/GuideStore.kt": "8f61607bbe8da7dc10f2301819fc0b1f55dc301e24f52d800c378dbc0f127a22",
+    "app/src/main/java/com/example/wastenot/data/repository/ScanRepository.kt": "6e7c15c7654c1c51844379b885ca6adb12af858e3b724037550d14e9eaeb8b12",
+    "app/src/main/java/com/example/wastenot/data/repository/SessionRepository.kt": "8c8302eb369c8a84ea7b5afbc725b79b88cc9cb763495d4519840efe432c70a8",
+    "app/src/main/java/com/example/wastenot/data/repository/SessionState.kt": "56b901c190c448722f25698d2b065bfcba9c71a27bbfc0f85939d74e2a836cab",
+    "app/src/main/java/com/example/wastenot/model/AccountInput.kt": "8d5a100a1dfdf51a00e205e99e5e2df4503499747c0e084df7f004b6ca6847b6",
+    "app/src/main/java/com/example/wastenot/model/ActivityDates.kt": "e55775c94fe655f247b5ef3fa6f02fec155949b6c3892038308360eb2c14834b",
+    "app/src/main/java/com/example/wastenot/model/Metadata.kt": "8b330b028856c77f413029c7d2d573fdf05a694de0efdb16113950f39fb21471",
+    "app/src/main/java/com/example/wastenot/model/QuantityInput.kt": "f3636daccfa817cca0d6954344209915c17dcee3274769e3e9f75785ee3b7706",
+    "app/src/main/java/com/example/wastenot/model/Scan.kt": "9fddf931fc2b97766dceed3256cb114189a30fb6e7a30fe5f1d766eadad35e18",
+    "app/src/main/java/com/example/wastenot/model/User.kt": "b872b33c1c510f8fa9b4dddd3d4e8bc593e2ac947608c1dbdf1544d599343d34",
+    "app/src/main/java/com/example/wastenot/model/WasteFormat.kt": "9277ea14fe8f8176383f475e21b8e7013b6f0b42795cedb96caa0de19a18440a",
+    "app/src/main/java/com/example/wastenot/model/WasteGuide.kt": "7acf3d8a025dc2f91161abebc880d20179ab1d833e66fa58393bc952d0e841da",
+    "app/src/main/java/com/example/wastenot/model/WasteLog.kt": "f727cd286a9f2d7d77c0255f41e3ba4a6868cea1c489f8b03e94ddb2004d9eca",
+    "app/src/main/java/com/example/wastenot/model/WasteSummary.kt": "3bb8c6c2e8dd79aef35b895be2521cf02e9bb362de97edac58829eafa494a862",
+    "app/src/main/java/com/example/wastenot/theme/Color.kt": "cf534ed929e83867bfd9befbf8eb15de63b67faac6998404e5b34e044b8ccbcf",
+    "app/src/main/java/com/example/wastenot/theme/Theme.kt": "c29892af961c1e402788c4a8e0367bc2ce62dbe8f9e6266ba420e28ac1db6f3f",
+    "app/src/main/java/com/example/wastenot/theme/ThemeMode.kt": "3ef2335e70a70e4980a0b708e83233f0a761493b9552e6d21b00d303475c52da",
+    "app/src/main/java/com/example/wastenot/theme/ThemePicker.kt": "34e8577cc5d62461754329c57880c7a22ca4498c3a3a69ad08b9b85086a7f6ff",
+    "app/src/main/java/com/example/wastenot/theme/ThemePreview.kt": "e522ff52df25547d2518bbf3361286ed0423e40a6e1cd2013d5df1683099a535",
+    "app/src/main/java/com/example/wastenot/theme/Tokens.kt": "e420426d2df17b98c84099f018b0ec3c755ac49fe484d092ef21f1e25760a4ad",
+    "app/src/main/java/com/example/wastenot/theme/Typography.kt": "0f6a87a7397d769d96eb0c746fc96e119fd8190f02404d465fa56aad0e05061f",
+    "app/src/main/java/com/example/wastenot/ui/auth/AuthScreen.kt": "8f7296fc2d9e671e6e0ec38b67879fe91c0877eae9d82ecef14a582f78fa0462",
+    "app/src/main/java/com/example/wastenot/ui/auth/SessionViewModel.kt": "35cf4735dc73be4cd0b758f7c08ea0ea952026cd81b462f3835a3ad5a3908fa8",
+    "app/src/main/java/com/example/wastenot/ui/auth/StartupScreen.kt": "1ec3ac0d90ab0f1f66798704f6d328b9919f14e2b7d725fcf8c12047ec3b645f",
+    "app/src/main/java/com/example/wastenot/ui/components/BrandWordmark.kt": "10e93a4cb2fd6336b799aa646fed8a1401602ecd6ff3df4656378d0cbc8947f8",
+    "app/src/main/java/com/example/wastenot/ui/components/ChoiceControls.kt": "73393d459b0a3434c86cab5210c3ed20fc370f3bbaa9b50a2db622962fa2c880",
+    "app/src/main/java/com/example/wastenot/ui/components/DateField.kt": "152bfa2ede747233647ad588b62a0d40743cc999680d0cfcab31026efcb2e946",
+    "app/src/main/java/com/example/wastenot/ui/components/FormControls.kt": "a38f311902c8e6785520058ada945df4445a39d28e5c7fc2ee4fef5cc0ae2300",
+    "app/src/main/java/com/example/wastenot/ui/components/FormPreview.kt": "d614bb6deaa4313e50d7bc646d7290ef44598fd99fb6795cca120d29c4059106",
+    "app/src/main/java/com/example/wastenot/ui/components/IconActionButton.kt": "46fc1acb43ff3fb1078f17182e2782f07a70928347d13b6aee38161907c3b257",
+    "app/src/main/java/com/example/wastenot/ui/components/QuantityField.kt": "066f31dbefa8b224bc82a9e5dcbe7db5a9d0fca9d5303d2bfd07931eabd3588b",
+    "app/src/main/java/com/example/wastenot/ui/components/SecondaryActionButton.kt": "cff51f74c8003841e6b7a74dd8c5037b648280e890f15899aa9007825e64c8f7",
+    "app/src/main/java/com/example/wastenot/ui/components/TextActionButton.kt": "2558a0a271108cfae0286c64ffe7c55e17e8d89dd7c239bac67e5468ce6c780d",
+    "app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt": "604066c644ed911bc9a7964ae6fbbc023de95295ff7538c71d821232eee9600e",
+    "app/src/main/java/com/example/wastenot/ui/main/CaptureSheet.kt": "d9776007b59f3e1ee2b2258a3c3a2bccac2059c13c31794402629734ba3f391d",
+    "app/src/main/java/com/example/wastenot/ui/main/DeleteLogDialog.kt": "8b7875c46f3b79c33c8a7b590008e5a0b9cd32c2ff9e8c651306288c48aca23b",
+    "app/src/main/java/com/example/wastenot/ui/main/DraftRecoveryUi.kt": "2934e4dd81b8c49e7984e41923b6fda55984116ac47f48c113d9273908907d89",
+    "app/src/main/java/com/example/wastenot/ui/main/EditConflictDialog.kt": "c5212433e5cd20146c3f2dce31de5d1becc5f93d671f9541747c09b8401a8488",
+    "app/src/main/java/com/example/wastenot/ui/main/EditorDraft.kt": "7dbaa1d9e792896a95f02459a2b6ae3c8b0d61fd30c3ff716b4bb9830770be10",
+    "app/src/main/java/com/example/wastenot/ui/main/EditorPersistenceViewModel.kt": "9534a9969886eae39e19a6667c596ef9a25e9187984fb2abd7f29b1098ffc9bf",
+    "app/src/main/java/com/example/wastenot/ui/main/ExitDialogs.kt": "d0b666ec47bbdf8d51f9b476724387666b5afc81f0f976f3e5efae3a14ed7cc0",
+    "app/src/main/java/com/example/wastenot/ui/main/GuideScreens.kt": "08c06af6964a9e9c27627acdb9d606b0799b2bd33229b1c2b487112a21d9ed99",
+    "app/src/main/java/com/example/wastenot/ui/main/GuideViewModel.kt": "963f6d155756384585196d14696aca0b7979415f73c5483b1d75d87ca462870f",
+    "app/src/main/java/com/example/wastenot/ui/main/HistoryFilter.kt": "f2019b050fcede882f1cd2493d121bffd7f7e32fcdfd4614e1bda98a9faa455a",
+    "app/src/main/java/com/example/wastenot/ui/main/HistoryScreen.kt": "e8fd660d1e037a4f34a9b907cb9f99ddb43fa8d00b560e1e314ffb1ce214cab6",
+    "app/src/main/java/com/example/wastenot/ui/main/LogDetailScreen.kt": "df05325b0ba5682dd2db08ed676e7cb031424643dd9a883a7300286dc2cbd07c",
+    "app/src/main/java/com/example/wastenot/ui/main/LogEditorScreen.kt": "cd42f43b313606f0da7e1120ba98684e396190dda8a60455d1d4e89f646e6fcb",
+    "app/src/main/java/com/example/wastenot/ui/main/ProfileScreens.kt": "5a00430d6fd7413dc8b16a3ab4d00837be694b1de31af6f6386b83c0ef8b1ac1",
+    "app/src/main/java/com/example/wastenot/ui/main/SaveConfirmationScreen.kt": "1eee5d755baa35151ab260e307acfdacade0103b1f43f5ff0a4ecd80f84e40cb",
+    "app/src/main/java/com/example/wastenot/ui/main/StatisticsScreen.kt": "dda2d458bf03564497a3a1e11c1105af90370363283b6e3057b6870a5bbb7788",
+    "app/src/main/java/com/example/wastenot/ui/main/WorkspaceScreens.kt": "6dfb067e4b80b6939d33d5905c4aa72e6626df00211f295d25982f0b27098165",
+    "app/src/main/java/com/example/wastenot/ui/main/WorkspaceViewModel.kt": "5e8fbcd098f3bf4064a8932d4aa55dad77776094b5e2adf74a8d1d72c828d8d4",
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanCamera.kt": "be47e721d9de007b50141bc9ddfd8eec04dd32acd63c4cb6654b4f6aecf7b488",
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanSheet.kt": "ef5734b2433a622f017a8017a5a219fe75053a2e7f9c1a11162b01973fb22963",
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanViewModel.kt": "4e37ad59cd26bc6efca5dc5c97cad6ba0f3daa8db7f6fbac0e5c264d60a5ace8",
+    "app/src/main/res/drawable/ic_add.xml": "a987343b290f8da70040047b09dc1dd5e4948a3a4acc8a4860bb7f71d4976c68",
+    "app/src/main/res/drawable/ic_alert.xml": "33c15a262606dd19bbf7686913e26df06f6641594db260bc19576b38a40a2635",
+    "app/src/main/res/drawable/ic_back.xml": "9e4eba406e6e99dc160eebe3fe4fabe73db264c90eac1111a1cd4109ed8f01dd",
+    "app/src/main/res/drawable/ic_bottle.xml": "d36a4a53bf94a4b16ac12e475b1209e7c39c26e351a26bbdc0256a0729d240ac",
+    "app/src/main/res/drawable/ic_calendar.xml": "33c8345456bf29b5d788eaf2407de837d08633c75db80459b69a32db65a5aff7",
+    "app/src/main/res/drawable/ic_camera.xml": "b29bc380e51e10c06c1fd990c4c7d2f081fe459f7d2ab5e119390aa190934aca",
+    "app/src/main/res/drawable/ic_check.xml": "3ad5c2afb6903097cf48d33f02ac3cc534b64700acd5549765cb7e84a68c2af6",
+    "app/src/main/res/drawable/ic_chevron_down.xml": "5a8aadfc90e364120de42138574ce205f0acc472426f4d8a042fc05f538d0d86",
+    "app/src/main/res/drawable/ic_clear.xml": "52da6968f0885400e1bdac646601913d102e30963bebd0ab1e827f00960bf3e3",
+    "app/src/main/res/drawable/ic_clock.xml": "9fadebf32212552f09246a7703487dfc469a488924439f2fca78107942657bea",
+    "app/src/main/res/drawable/ic_close.xml": "ad052f74c126a69a1205131585627371c28ed56406149c8c11007fd6b2049359",
+    "app/src/main/res/drawable/ic_delete.xml": "1d6d194aad32588de57a568c3fc289a912ac62f27fcde588e4ee80a6e2de2104",
+    "app/src/main/res/drawable/ic_device.xml": "5f85b5577b7276b0d80ca15ce7725974596910c945b70e5f98dcb287664d6c3e",
+    "app/src/main/res/drawable/ic_filter.xml": "2808d18a41bad3cd3f009fdc89317efc3c6ef92316928e84b034d7678d7dd7bd",
+    "app/src/main/res/drawable/ic_guide.xml": "2a654683d7d6a37616c72739cca20d7a6320a326cb6634dd7d008219741819e0",
+    "app/src/main/res/drawable/ic_history.xml": "995e1b62fe89fcfdf400f84372fb10551bae116c59554b9a5dddce88981e3b29",
+    "app/src/main/res/drawable/ic_home.xml": "c953cd03a39f1d5de1c9fe40b3a6440a08627b8e8a8b861e9e3ec89cff2b6e38",
+    "app/src/main/res/drawable/ic_jar.xml": "5e484ea397e03430b17fabb18bcfc572b037bbf788f4a7b877c86d2d78123436",
+    "app/src/main/res/drawable/ic_launcher_background.xml": "ed423c73a6f40a4d2909f0901e60527b3a807cd59e1b5593bcaae1808b1c6321",
+    "app/src/main/res/drawable/ic_launcher_foreground.xml": "01d1a6a6c1234eb7fe270d097eb283d72b9c95ae5118886f1b6573aad280f1f7",
+    "app/src/main/res/drawable/ic_leaf.xml": "30411588904db28e64ab89529e54a317117095b1375f9a08ea574d96e5e204ad",
+    "app/src/main/res/drawable/ic_logout.xml": "851c039b08503bb79bf971a2a30aa5773244a9dc3ed26012cc01b2722e644fcb",
+    "app/src/main/res/drawable/ic_metal.xml": "83394fa6e2f882a3fd1579de0f1dc59a3f1d65b58f757e24c01dad067e71bbf4",
+    "app/src/main/res/drawable/ic_more.xml": "336e96bcf8b310badd4bb588f43b87bd867ac288a7494a9f137d78c7b935d60c",
+    "app/src/main/res/drawable/ic_next.xml": "2b0c152ef581aedc6e313a69b941e04c7a857ee0f2a08d9abe96a03d918590e2",
+    "app/src/main/res/drawable/ic_paper.xml": "1e2f929e97cb63f1c80b6d336c76c5bcd163ddf8fe85686a86c373d91d1baaa9",
+    "app/src/main/res/drawable/ic_profile.xml": "aebbb473f283ebb29f42d54ed943833860b813e281dd349cb77d73e583874092",
+    "app/src/main/res/drawable/ic_recycle.xml": "d782ed28a0a3eba34a99b742efbf1020d8ddd9ec46c3b7cf0957af53648606ec",
+    "app/src/main/res/drawable/ic_search.xml": "8b734c6ece02589178aa8201b23193e7b3b4d563023a3900f2941d8c4b64a7c7",
+    "app/src/main/res/drawable/ic_settings.xml": "3f5e7aef44b77d6b2e7b7f30cfc6e527809a276bf40118633d59507e7c45ae8f",
+    "app/src/main/res/drawable/ic_statistics.xml": "d0787c82c499aa3341a55daac306bd9aa91b813c908a5f42f110015c14edbebe",
+    "app/src/main/res/drawable/ic_visibility.xml": "884d76b5f81264fb6762ee7534713c2e757134248362c376e8195fe021683f54",
+    "app/src/main/res/drawable/ic_visibility_off.xml": "e0fafadb4cadb0131037b26912945f4ea60c7d859341a2931a191c6c1f204be4",
+    "app/src/main/res/font/plus_jakarta_sans_bold.ttf": "ec91d7241d4580fdf5c1f606549114cb903d2e088d2e5564a16afd84a8842307",
+    "app/src/main/res/font/plus_jakarta_sans_extrabold.ttf": "431b0d8e3b53c814b11c022f8063d89ffea42af1b57417935859ed15aa5cc4a3",
+    "app/src/main/res/font/plus_jakarta_sans_medium.ttf": "b57f57c8a66edf7aecf9ff820731d1b17cf316732dfba41d001c34c87ff492ce",
+    "app/src/main/res/font/plus_jakarta_sans_regular.ttf": "18ce6145b17f13511c983125f469307e6a03df21c95c809be301cb5006f7a1b9",
+    "app/src/main/res/font/plus_jakarta_sans_semibold.ttf": "295fad3e9c809e0e7b49da0bfe900762188b91128a25d144966363911d65b794",
+    "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml": "88f7653499ef524126ea5018a99baf9cc3269e7e584d6205dfdd76db39f39cc0",
+    "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml": "88f7653499ef524126ea5018a99baf9cc3269e7e584d6205dfdd76db39f39cc0",
+    "app/src/main/res/mipmap-hdpi/ic_launcher.webp": "dd00996198640ed28fbc09cdcd7a3807cf8707f3eb255b659634da3ca6a6ff01",
+    "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp": "1ed73f5341a69d3b41c7e02e126803f50cc8c3284adf4bbb737f0c93577aef07",
+    "app/src/main/res/mipmap-mdpi/ic_launcher.webp": "846219e6f72fe9a6c104ca8919cbee36a101e7d2ff8da9da67b689a5888f060d",
+    "app/src/main/res/mipmap-mdpi/ic_launcher_round.webp": "4e2c58b91de01130e6479e00cbbaaf6e77cd961dd2c8e303cf13cd077fa92632",
+    "app/src/main/res/mipmap-xhdpi/ic_launcher.webp": "398340dad816fc9a6338cb151a8cf1e45b926f9bfb70628b24c4bd2523cc94d4",
+    "app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp": "91b490aef86574901137f0a252272e1f1add99c1ad709e0696ed68929b88d261",
+    "app/src/main/res/mipmap-xxhdpi/ic_launcher.webp": "58ae87fa0c5b5d1562d27fd648d2c061553fe20e3ed570bde588162d01ea7a27",
+    "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp": "3009fad079f5772f30ecd767f98924367fbe0f81c30048d672d4fda2d5ca7d12",
+    "app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp": "f98fef5bc3bfe5b65692c40ad1cbae2bec4faf9f1b249c397626740db71b62d8",
+    "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp": "5faf033745c8c882c43bb1b372d4e4a5890caec63d9892a2e756c954108b85dc",
+    "app/src/main/res/values/auth.xml": "e4b380495318b751ec37ed96ecc3074e5306e4e2306f77ffd1f462a06360855c",
+    "app/src/main/res/values/conflict.xml": "8dfd62274af143309bae2e985765c61abf40a1a171d872024d89631ab2ba1638",
+    "app/src/main/res/values/editor_persistence.xml": "693902886d5293a9f976ea907f9d504d7ca7990448e3117cb30968973747b6ab",
+    "app/src/main/res/values/editor_submission.xml": "218469a46e85ded5233f09ee3bf97de56a47965b7982264d6bfeee3b53dd545d",
+    "app/src/main/res/values/forms.xml": "0fa938d4caae0ce8c33b886bc907c3db26a0046a073c7d629bf4b2ce3314f972",
+    "app/src/main/res/values/history.xml": "8f2b1e0274a1b10cfcb0aa77d07c0db06ea36fbb733cea63ebbd8980a7076d39",
+    "app/src/main/res/values/iteration2.xml": "1288b150f164aef129765ac89496ec9b20afe669ff495b5a0d0ddc84cba97056",
+    "app/src/main/res/values/log_detail.xml": "26f1853e52680df21335fbb5dbe62fdaee40c48387f0fa9b1229b3d3c5b2e79e",
+    "app/src/main/res/values/navigation.xml": "e358e4b1382e2428c06def51a9a06cbe437cbcea1eb60f74ad480dffe9c404d4",
+    "app/src/main/res/values/profile.xml": "585e26a8c9f31581c62db916ac1cbd41a8a14017da750934bf16a1b002e0bb01",
+    "app/src/main/res/values/save_confirmation.xml": "2d807b242d570ed98aa4aea9fccd0ed5d61897011c0b24db7646b9b447ec34fa",
+    "app/src/main/res/values/scan.xml": "b80af4d0a4219282570f7a607b4520189ca151a916fcc5e8652f5acc19af3a8b",
+    "app/src/main/res/values/statistics.xml": "7c160cd7dc64b7434d93c7b7ee14ef98b24080e7a88e8b0d0804d06b0dd4d1d4",
+    "app/src/main/res/values/strings.xml": "3e2ef21412aef1f1a212edd1e7d934ac4ab597b2657ffb1a1688d14faad452b0",
+    "app/src/main/res/values/themes.xml": "8d8bfa4afd4bf90108f5ed865c79b6268d382232c8534fb889272c49b20fa9c8",
+    "app/src/main/res/xml/backup_rules.xml": "2c5c697984f4c52b526337ab61113f5843e0bfc6af4722374916ffe6da38dd9a",
+    "app/src/main/res/xml/data_extraction_rules.xml": "eda9dddce1e895de1efd716fe75e244187bf8f91a3bb7444c6ea1731e51c74a8",
+    "app/src/main/res/xml/network_security_config.xml": "dea35ebed76536c24c13f74036f02dc874f944147cb3a49c2ad0550f71e3e0c7"
+  },
+  "test_source_sha256": "5e4acab0285bbe697712adc4abc2fda1fd82ebae84593756a7aebccff83fbf77"
+}

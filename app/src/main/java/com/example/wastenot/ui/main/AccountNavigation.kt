@@ -390,7 +390,7 @@ fun AccountNavigation(
                         confirmation = key is LogDetail && key.id == savedNoticeId && log != null,
                         onBack = { if (selected == tab && stacks.getValue(selected).lastOrNull() == key) latestBack() },
                         onSelect = ::selectTab, onRecord = {
-                            if (selected == tab && stacks.getValue(selected).lastOrNull() == tab.key) openCapture()
+                            if (selected == tab && stacks.getValue(selected).lastOrNull() == key) openCapture()
                         },
                         onFilter = { if (selected == tab && stacks.getValue(selected).lastOrNull() == History) historyFilterOpen = true }) {
                         entry.Content()
