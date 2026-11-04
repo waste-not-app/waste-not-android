@@ -6,12 +6,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
@@ -29,6 +25,7 @@ import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.TextActionButton
+import com.example.wastenot.ui.components.summarySurface
 import java.util.Locale
 
 @Composable
@@ -65,11 +62,13 @@ fun ProfileScreen(
             TextActionButton(stringResource(R.string.retry), onRetry)
         }
         if (progress != null) {
-            Column(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.large)
-                .background(LocalWasteNotGradients.current.summary).drawBehind {
-                    drawCircle(Color.White.copy(alpha = 0.06f), radius = 82.dp.toPx(),
-                        center = Offset(size.width, 0f), style = Stroke(width = 20.dp.toPx()))
-                }.padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .summarySurface()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 Text(stringResource(R.string.profile_progress), color = SummarySecondaryText)
                 Text(stringResource(R.string.level_title, progress.level), color = SummaryText, style = MaterialTheme.typography.displayLarge)
                 Text(stringResource(R.string.profile_xp_count, WasteFormat.integer(progress.xp.toLong()),

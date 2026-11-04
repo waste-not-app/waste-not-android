@@ -176,8 +176,8 @@ fun GuideDetailScreen(
                 ActionButton(stringResource(if (missing) R.string.guide_back_list else R.string.retry), if (missing) onList else onRetry)
             }
             else -> {
-                Box(Modifier.size(64.dp).background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.medium), contentAlignment = Alignment.Center) {
-                    Icon(painterResource(article.category.iconResource), null, Modifier.size(32.dp), tint = MaterialTheme.colorScheme.primary)
+                Box(Modifier.size(width = 64.dp, height = 44.dp).background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small), contentAlignment = Alignment.Center) {
+                    Icon(painterResource(article.category.iconResource), null, Modifier.size(24.dp), tint = MaterialTheme.colorScheme.primary)
                 }
                 Text(stringResource(article.category.labelResource), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Surface(color = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer, shape = MaterialTheme.shapes.extraSmall) {

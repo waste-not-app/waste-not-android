@@ -2,6 +2,9 @@ package com.example.wastenot.ui.main
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.SystemClock
+import android.view.InputDevice
+import android.view.MotionEvent
 import android.view.ViewTreeObserver
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toArgb
@@ -93,8 +96,17 @@ class ScreenKitReviewTest {
     }
 
     private fun tab(label: String) {
-        compose.onNode(tabs and hasText(label)).performTouchInput { click() }
+        val point = compose.onNode(tabs and hasText(label)).assertIsDisplayed().fetchSemanticsNode().boundsInWindow.center
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val down = SystemClock.uptimeMillis()
+        // Android dispatch updates system touch mode after hardware-key tests.
+        for (action in listOf(MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP)) {
+            val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, point.x, point.y, 0)
+                .apply { source = InputDevice.SOURCE_TOUCHSCREEN }
+            try { instrumentation.sendPointerSync(event) } finally { event.recycle() }
+        }
         compose.waitForIdle()
+        compose.waitUntil(5_000) { compose.activity.window.decorView.isInTouchMode }
         compose.onNode(tabs and hasText(label)).assertIsSelected()
     }
 

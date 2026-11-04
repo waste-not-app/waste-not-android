@@ -43,8 +43,8 @@ Sumber: DESIGN.md, SCREEN_SPEC.md dan render design-system.html v1.3. Referensi 
 ## Temuan visual dan pekerjaan berikutnya
 
 - Susunan lima tab, kamera di tengah atas dock, lime aktif, warna tema dan struktur screen tersedia untuk ditinjau dari pasangan gambar. Ini tidak menutup penerimaan setiap state dan setiap bagian scroll.
-- Ikon pembuka S12 masih memakai bidang 64 dp/glyph 32 dp; DESIGN menetapkan glyph 24 dalam bidang 44–48 dp. Ukuran ini perlu diselaraskan. Kategori/metode tetap harus terbaca sesuai SCREEN_SPEC.
-- Summary S04/S13/S14 belum memuat border/highlight tipis dan bayangan yang tampak pada render kit. Primary CTA juga masih memerlukan audit highlight/bayangan bersama.
+- Koreksi S12: acuan umum 44–48 di catatan awal tidak menjelaskan override detail. Render kit sebenarnya 64×44/glyph 24/radius 12. Bidang dan glyph kini dikoreksi dan diukur pada [checkpoint material](MATERIALS.md); kategori/metode tetap terbaca.
+- Border/highlight/bayangan dan motif summary S04/S13/S14 serta primary aktif kini memakai [material kit](MATERIALS.md). Audit semua state dan seluruh screen tetap terbuka.
 - S11 memuat kategori opsional dan ringkasan baris sesuai SCREEN_SPEC, sehingga tinggi daftar berbeda dari mockup ringkas. Artikel dummy tetap memiliki status editorial yang jujur; tidak ada sumber/tanggal review rekaan.
 - Tautan achievement/pengingat tidak ditampilkan saat capability mati, sebagaimana SCREEN_SPEC. Itu tidak membuktikan fitur opsional sudah selesai.
 - Bagian bawah seluruh screen, state kosong/error/loading, selected/pressed/focus, pemulihan fokus pemicu modal, motion/predictive Back per frame, resize/rotasi dinamis serta API baru/perangkat fisik/TalkBack lisan tetap membutuhkan penerimaan.

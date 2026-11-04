@@ -29,6 +29,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.draw.innerShadow
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.graphics.Color
@@ -46,6 +50,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
 import com.example.wastenot.theme.LocalWasteNotGradients
+import com.example.wastenot.theme.ActionHighlight
+import com.example.wastenot.theme.ActionShadow
 
 @Composable
 fun ActionButton(
@@ -63,7 +69,11 @@ fun ActionButton(
         onClick = onClick,
         modifier = modifier
             .heightIn(min = 52.dp)
-            .then(if (actionable && !destructive) Modifier.background(LocalWasteNotGradients.current.action, MaterialTheme.shapes.small) else Modifier),
+            .then(if (actionable && !destructive) Modifier
+                .dropShadow(MaterialTheme.shapes.small, Shadow(12.dp, ActionShadow, spread = (-9).dp, offset = DpOffset(0.dp, 5.dp)))
+                .background(LocalWasteNotGradients.current.action, MaterialTheme.shapes.small)
+                .innerShadow(MaterialTheme.shapes.small, Shadow(0.dp, ActionHighlight, offset = DpOffset(0.dp, 1.dp)))
+            else Modifier),
         enabled = actionable,
         shape = MaterialTheme.shapes.small,
         colors = ButtonDefaults.buttonColors(

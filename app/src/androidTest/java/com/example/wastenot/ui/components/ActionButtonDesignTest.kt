@@ -1,6 +1,7 @@
 package com.example.wastenot.ui.components
 
 import android.graphics.Bitmap
+import android.view.KeyEvent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -126,7 +127,8 @@ class ActionButtonDesignTest {
         } }
         compose.onNodeWithText("Hapus catatan").assertIsNotEnabled().performTouchInput { click() }
         compose.runOnIdle { assertEquals(0, calls) }
-        compose.onNodeWithText("Simpan catatan").performSemanticsAction(SemanticsActions.RequestFocus)
+        InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB)
+        compose.waitForIdle()
         compose.onNodeWithText("Simpan catatan").assertIsFocused().performKeyInput { pressKey(Key.Enter) }
         compose.onNodeWithText("Menyimpan catatan…").assertIsNotEnabled().performTouchInput { click() }
         compose.onRoot().performKeyInput { pressKey(Key.Enter) }

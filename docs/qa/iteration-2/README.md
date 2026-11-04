@@ -77,3 +77,5 @@ Checkpoint C04/C07: [secondary bersama, D01 pending, label panjang, keyboard dan
 Checkpoint C05: [text action bersama, form pending opak, label panjang, kalender/tema dan regresi pemakai](TEXT_ACTIONS.md).
 
 Checkpoint sembilan viewport S04–S16 dan aksi rail pada halaman anak: [review kit/native dan batas penerimaan](SCREENS_NAVIGATION.md).
+
+Checkpoint material S04/S13/S14, primary C03 dan proporsi ikon S12: [perbandingan kit/native, geometri dan regresi](MATERIALS.md).
