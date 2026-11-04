@@ -23,8 +23,6 @@
     <string name="logout_message">Kamu perlu masuk lagi untuk membuka catatanmu. Catatan yang sudah tersimpan tetap tersedia saat kamu masuk kembali.</string>
     <string name="logout_action">Keluar</string>
     <string name="logout_account_cleanup_failed">Sesi perangkat belum bisa ditutup. Kamu masih masuk. Coba lagi untuk keluar.</string>
-    <string name="demo_caption">Data contoh</string>
-    <string name="demo_caption_date">Data contoh · %1$s</string>
     <string name="greeting">Halo, %1$s</string>
     <string name="manual_input">Input manual</string>
     <string name="recent_activities">Aktivitas terbaru</string>
@@ -38,7 +36,7 @@
     <string name="recycling_rate">Recycling rate %1$s%% · %2$d dari %3$d aktivitas penanganan</string>
     <string name="activity_count">%1$d aktivitas</string>
     <string name="progress_summary">Level %1$d · %2$d/100 XP</string>
-    <string name="summary_pending">Ringkasan sedang disiapkan. Angka contoh hanya tersedia melalui mode contoh.</string>
+    <string name="summary_pending">Ringkasan belum tersedia.</string>
     <string name="refresh_failed">Data belum bisa diperbarui. Catatan terakhir tetap ditampilkan.</string>
     <string name="logs_empty">Belum ada catatan. Mulai lewat tombol Catat.</string>
     <string name="filtered_empty">Tidak ada catatan yang cocok. Coba hapus filter.</string>
@@ -54,13 +52,11 @@
     <string name="log_not_loaded">Catatan ini belum tersedia dalam daftar yang dimuat.</string>
     <string name="no_notes">Tanpa catatan</string>
     <string name="record_version">Versi catatan %1$d</string>
-    <string name="demo_write_message">Mode contoh. Catatan percobaan hanya tersimpan selama sesi ini.</string>
     <string name="remote_write_message">Penyimpanan catatan belum tersedia. Isianmu tetap ada bila penyimpanan gagal.</string>
     <string name="edit_progress_message">Perubahan memperbarui statistik, tanpa XP tambahan.</string>
     <string name="notes_optional">Catatan (opsional)</string>
     <string name="notes_helper">Maksimal 500 karakter.</string>
     <string name="save_activity">Simpan catatan</string>
-    <string name="save_example">Simpan contoh</string>
     <string name="save_changes">Simpan perubahan</string>
     <string name="saving">Menyimpan…</string>
     <string name="save_failed_message">Catatan belum tersimpan. Isian tetap tersedia; coba lagi atau kembali untuk meninjau catatan.</string>

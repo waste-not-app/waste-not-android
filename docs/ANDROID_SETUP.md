@@ -30,6 +30,8 @@ Starter menyediakan task unit test debug (termasuk renderer Navigation Graph); t
 
 Iteration 2 menggunakan `BuildConfig.USE_DUMMY_DATA=true` secara default pada debug/staging/release, sesuai permintaan pengerjaan UI tanpa backend. Sesi dan catatan fixture tersimpan lokal per akun; tidak ada tombol mode demo. Base URL di bawah tetap divalidasi, tetapi request akun/catatan tidak dipakai selama adapter dummy aktif. Untuk menguji adapter remote, tambahkan `-Pwastenot.useDummyData=false` bersama URL yang sesuai. Adapter write/agregat remote belum lengkap, sehingga konfigurasi ini bukan klaim backend sudah terintegrasi.
 
+Pembaruan 4 November 2026: repo backend dan deployment HTTPS sudah tersedia. Readiness core menjawab 200; alur Android yang terautentikasi dan write belum diverifikasi. [Peta integrasi dan kontrak yang diperiksa](tasks/BACKEND_INTEGRATION.md) mencatat sumber remote, endpoint, dan pekerjaan sebelum mengganti adapter default.
+
 | Build type | Property Gradle | Default | Kebijakan |
 |---|---|---|---|
 | debug | `wastenot.debugApiBaseUrl` | `http://10.0.2.2:8080/v1/` | HTTP hanya untuk emulator/localhost |

@@ -1,5 +1,7 @@
 # Checkpoint dock, Beranda dan dummy
 
+Checkpoint Statistik dan bagian scroll: [grafik bernilai, rincian metode/kategori, serta 13 posisi konten dalam dua tema](SCROLLED_CONTENT.md). Build/lint, 171 debug unit tests dan 33 eksekusi native/enam metode unik lulus pada ponsel normal/200% serta rail 600 dp/200%, nol skip. Ada 138 PNG sesudah perubahan dan 24 render kit. Update `main` sampai `c125859` sudah disinkronkan; backend HTTPS kini tersedia tetapi wiring Android masih mengikuti [peta integrasi](../../tasks/BACKEND_INTEGRATION.md). Penerimaan seluruh screen/navbar/navigasi tetap terbuka.
+
 Checkpoint C12/C11/C31: [kategori nonaktif serta picker kategori/satuan/kalender ketika form terkunci](PICKERS.md). Palet field kini dipakai bersama dan picker menutup tanpa callback saat dinonaktifkan. 171 debug unit tests dan 54 eksekusi native/18 metode unik lulus pada tiga konfigurasi, nol skip. Penerimaan seluruh screen/navbar/navigasi tetap terbuka.
 
 Checkpoint C08/C09/C11: [field akun/editor, nilai terisi saat pending, placeholder dan visibility](TEXT_FIELDS.md). Border/placeholder/ikon nonaktif kini mengikuti token opak; 171 debug unit tests dan 33 eksekusi native/11 metode unik lulus pada tiga konfigurasi, nol skip. Seluruh screen/navbar/navigasi tetap dalam pengerjaan.

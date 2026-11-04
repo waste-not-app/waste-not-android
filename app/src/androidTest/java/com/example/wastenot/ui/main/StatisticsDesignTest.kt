@@ -7,6 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
@@ -18,6 +20,7 @@ import java.io.File
 import java.time.ZoneId
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -49,6 +52,8 @@ class StatisticsDesignTest {
         capture("statistics-daily")
         compose.onNodeWithText("2 dari 4 aktivitas penanganan").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Metode pengelolaan").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasText("Recycle") and SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "2 dari 5 aktivitas"))
+            .performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Trash").performScrollTo().assertIsDisplayed()
         capture("statistics-methods")
         compose.onNodeWithText("Menurut kategori").performScrollTo().assertIsDisplayed()
@@ -99,6 +104,27 @@ class StatisticsDesignTest {
         compose.onNodeWithText("30 hari").performScrollTo().performClick()
         compose.onNodeWithText("1,4 kg").assertExists()
         capture("statistics-refresh-error")
+    }
+
+    @Test fun largeDailyValuesRemainReachableWithoutShrinkingText() = runTest {
+        val template = store.load().value.first { it.method == DisposalMethod.RECYCLE }
+        val records = (0..6).map { offset -> template.copy(id = "large-$offset",
+            activityDate = today.minusDays(offset.toLong()), quantity = Quantity.Weight.of(100_000)) }
+        show({ WorkspaceUiState(records = records, loading = false) })
+        val plot = compose.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.HorizontalScrollAxisRange)
+            and hasAnyAncestor(hasTestTag("daily-weight-chart")))
+        plot.performScrollTo()
+        compose.onNodeWithText("Geser grafik untuk melihat tanggal lainnya.").assertExists()
+        val range = plot.fetchSemanticsNode().config[SemanticsProperties.HorizontalScrollAxisRange]
+        assertTrue("The seven full-size values need a scrollable plot", range.maxValue() > 0)
+        plot.performSemanticsAction(SemanticsActions.ScrollBy) { it(range.maxValue(), 0f) }
+        compose.waitForIdle()
+        val end = plot.fetchSemanticsNode().config[SemanticsProperties.HorizontalScrollAxisRange]
+        assertEquals(end.maxValue(), end.value(), 1f)
+        compose.onNodeWithText("21").assertIsDisplayed()
+        capture("statistics-large-values")
+        compose.onNodeWithText("Lihat angka harian").performScrollTo().performClick()
+        compose.onNodeWithText("21 Sep 2026 · 100.000 g · 0 benda").performScrollTo().assertIsDisplayed()
     }
 
     private fun capture(name: String) {

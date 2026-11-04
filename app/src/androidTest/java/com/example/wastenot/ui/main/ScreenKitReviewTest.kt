@@ -17,6 +17,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.MainActivity
+import com.example.wastenot.BuildConfig
 import com.example.wastenot.theme.*
 import java.io.File
 import java.util.concurrent.CountDownLatch
@@ -86,6 +87,56 @@ class ScreenKitReviewTest {
         }
     }
 
+    @Test fun scrolledSectionsStayReachableAboveTheDock() {
+        compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
+        for (dark in listOf(false, true)) {
+            theme(dark)
+            tab("Beranda")
+            section("S04", "Aktivitas terbaru", "recent", dark)
+            compose.onNodeWithText("250 g").performScrollTo().performTouchInput { click() }
+            section("S08", "Hapus catatan", "actions", dark)
+            back("Beranda")
+            tab("Riwayat")
+            section("S07", "Kertas", "last-record", dark, lazy = true)
+            tab("Panduan")
+            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Botol plastik"))
+            compose.onNodeWithText("Botol plastik").performScrollTo().performTouchInput { click() }
+            section("S12", "Catat aktivitas ini", "article-end", dark)
+            back("Panduan")
+            section("S11", "Kertas dan kardus", "last-guide", dark, lazy = true)
+            tab("Statistik")
+            compose.onNodeWithText("7 hari").performScrollTo().performTouchInput { click() }
+            section("S13", "Berat ditangani per hari", "week", dark)
+            compose.onNodeWithText("Lihat angka harian").performScrollTo().performTouchInput { click() }
+            section("S13", "Angka harian", "daily-values", dark)
+            section("S13", "Metode pengelolaan", "methods", dark)
+            section("S13", "Lainnya", "categories-end", dark)
+            compose.onNodeWithText("30 hari").performScrollTo().performTouchInput { click() }
+            section("S13", "Berat ditangani per hari", "month", dark)
+            tab("Profil")
+            section("S14", "Keluar", "account-end", dark)
+            compose.onNodeWithText("Pengaturan").performScrollTo().performTouchInput { click() }
+            section("S16", "Versi ${BuildConfig.VERSION_NAME}", "settings-end", dark)
+            back("Profil")
+            tab("Beranda")
+            compose.onNodeWithText("Input manual").performScrollTo().performTouchInput { click() }
+            section("S05", "Simpan catatan", "editor-end", dark)
+            back("Beranda")
+        }
+    }
+
+    private fun section(id: String, anchor: String, name: String, dark: Boolean, lazy: Boolean = false) {
+        val selector = SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange) and !hasAnyDescendant(tabs)
+        val scroll = compose.onNode(selector)
+        if (lazy) scroll.performScrollToNode(hasText(anchor))
+        else compose.onNodeWithText(anchor).performScrollTo()
+        val target = compose.onNodeWithText(anchor).fetchSemanticsNode().boundsInWindow
+        val viewport = scroll.fetchSemanticsNode().boundsInWindow
+        scroll.performSemanticsAction(SemanticsActions.ScrollBy) { it(0f, target.top - viewport.top) }
+        compose.waitForIdle()
+        capture(id, anchor, dark, name)
+    }
+
     private fun theme(dark: Boolean) {
         tab("Profil")
         compose.onNodeWithText("Pengaturan").performScrollTo().performTouchInput { click() }
@@ -144,9 +195,9 @@ class ScreenKitReviewTest {
         compose.onNodeWithText("Simpan catatan").assertDoesNotExist()
     }
 
-    private fun capture(id: String, title: String, dark: Boolean) {
+    private fun capture(id: String, title: String, dark: Boolean, section: String? = null) {
         compose.waitForIdle()
-        val caption = if (id == "S04") compose.onNodeWithText("Halo,", substring = true, useUnmergedTree = true)
+        val caption = if (id == "S04" && section == null) compose.onNodeWithText("Halo,", substring = true, useUnmergedTree = true)
             else compose.onNode(hasText(title) and !hasAnyAncestor(tabs), useUnmergedTree = true)
         caption.assertIsDisplayed()
         val layouts = mutableListOf<TextLayoutResult>()
@@ -180,7 +231,7 @@ class ScreenKitReviewTest {
         instrumentation.uiAutomation.takeScreenshot()?.recycle(); android.os.SystemClock.sleep(150)
         val bitmap = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
         val directory = File(instrumentation.targetContext.getExternalFilesDir(null), "screen-kit-review").apply { mkdirs() }
-        val name = "$id-${if (dark) "dark" else "light"}"
+        val name = "$id${section?.let { "-$it" } ?: ""}-${if (dark) "dark" else "light"}"
         File(directory, "$name.png").outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) }
         val paint = JSONArray()
         val scheme = if (dark) DarkColorScheme else LightColorScheme

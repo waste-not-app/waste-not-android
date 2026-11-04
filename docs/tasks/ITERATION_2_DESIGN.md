@@ -8,6 +8,8 @@ Implementasi mengikuti `docs/WasteNot-Product-Design-Kit update/WasteNot/DESIGN.
 
 Permintaan pengguna mengubah sumber data: hapus mode demo dan tombol masuk contoh. Gunakan dummy sebagai adapter aplikasi yang dapat digunakan tanpa menunggu backend. Adapter HTTP tetap terpisah untuk integrasi berikutnya. Dummy tidak membuktikan autentikasi server, penyimpanan cloud, inference, atau penerbitan artikel yang sudah ditinjau.
 
+Pembaruan remote 4 November: Android `main` sampai `c125859` telah digabungkan melalui `98ddeaf`. Backend Go sudah tersedia; readiness HTTPS menjawab 200, metadata memerlukan login. [Peta integrasi](BACKEND_INTEGRATION.md) mempertahankan pekerjaan core/write/agregat/Panduan/AI dan penerimaan perangkat sebelum adapter default diganti. [Checkpoint konten scroll](../qa/iteration-2/SCROLLED_CONTENT.md) memperbaiki grafik, metode/kategori dan memeriksa keterjangkauan 13 posisi dalam dua tema; 171 debug unit tests dan 33 eksekusi native/enam metode unik lulus, tanpa menjadikan seluruh matriks selesai.
+
 Pilihan implementasi: ENERGY 2 / RHYTHM 2 / MOTION 1. Pinus memberi fokus pada angka ringkasan; lime menandai Reduce dan tindakan/tujuan aktif. Font dan ikon berasal dari kit. Daftar aktivitas memakai baris berikon dengan divider. Dock mengikuti radius 26 dp, indikator lime, dan aksi kamera di tengah. Baseline memakai surface opak sebagaimana diizinkan DESIGN §2; blur bukan syarat baseline. Fade 180 ms menjelaskan perpindahan tanpa gerak dekoratif.
 
 ## Sumber data dummy

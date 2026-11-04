@@ -1,19 +1,20 @@
 package com.example.wastenot.ui.main
 
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.*
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
@@ -78,40 +79,50 @@ fun StatisticsScreen(
                 }
             })
             StatisticsHeading(stringResource(R.string.methods_title))
-            DisposalMethod.entries.forEach { method ->
+            val methodLabels = DisposalMethod.entries.map { stringResource(it.labelResource) }
+            val percentages = DisposalMethod.entries.map { method ->
                 val count = period.methods.getValue(method)
-                val fraction = count.toFloat() / period.summary.activityCount
                 val percent = BigDecimal(count * 100L).divide(BigDecimal(period.summary.activityCount), 1, RoundingMode.HALF_UP)
-                Column(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
-                        Text(stringResource(method.labelResource), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                        Text(stringResource(R.string.rate_value, checkNotNull(WasteFormat.percentage(percent))), style = MaterialTheme.typography.titleSmall)
+                stringResource(R.string.rate_value, checkNotNull(WasteFormat.percentage(percent)))
+            }
+            val measurer = rememberTextMeasurer()
+            val density = LocalDensity.current
+            val labelStyle = MaterialTheme.typography.bodySmall
+            val percentStyle = MaterialTheme.typography.labelMedium
+            val labelWidth = with(density) { methodLabels.maxOf { measurer.measure(it, labelStyle).size.width }.toDp() + 1.dp }.coerceAtLeast(66.dp)
+            val percentWidth = with(density) { percentages.maxOf { measurer.measure(it, percentStyle).size.width }.toDp() + 1.dp }.coerceAtLeast(35.dp)
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                DisposalMethod.entries.forEachIndexed { index, method ->
+                    val count = period.methods.getValue(method)
+                    val fraction = count.toFloat() / period.summary.activityCount
+                    val description = stringResource(R.string.method_fraction, count, period.summary.activityCount)
+                    Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) { stateDescription = description },
+                        horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(methodLabels[index], Modifier.width(labelWidth), style = labelStyle)
+                        LinearProgressIndicator(progress = { fraction }, Modifier.weight(1f).height(7.dp).clearAndSetSemantics {},
+                            trackColor = MaterialTheme.colorScheme.surfaceContainer, gapSize = 0.dp, drawStopIndicator = {})
+                        Text(percentages[index], Modifier.width(percentWidth), textAlign = TextAlign.End, style = percentStyle)
                     }
-                    LinearProgressIndicator(progress = { fraction }, Modifier.fillMaxWidth().height(7.dp).clearAndSetSemantics {},
-                        trackColor = MaterialTheme.colorScheme.surfaceContainer, gapSize = 0.dp, drawStopIndicator = {})
-                    Text(stringResource(R.string.method_fraction, count, period.summary.activityCount),
-                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Text(stringResource(R.string.methods_basis), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
-            StatisticsHeading(stringResource(R.string.categories_title))
-            Text(stringResource(R.string.category_totals_basis), style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-            WasteCategory.entries.forEach { category ->
-                val totals = period.categories.getValue(category)
-                Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Icon(painterResource(category.iconResource), null, Modifier.size(24.dp))
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(stringResource(category.labelResource), style = MaterialTheme.typography.titleSmall)
-                        val weight = WasteFormat.weight(totals.weightGrams, summary = true)
-                        Text(stringResource(R.string.category_totals, weight.amount + " " + stringResource(weight.unit.labelResource),
-                            WasteFormat.integer(totals.itemCount)), style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+            val categoryBasis = stringResource(R.string.category_totals_basis)
+            StatisticsHeading(stringResource(R.string.categories_title), Modifier.semantics { stateDescription = categoryBasis })
+            Column(Modifier.fillMaxWidth()) {
+                WasteCategory.entries.forEach { category ->
+                    val totals = period.categories.getValue(category)
+                    val weight = WasteFormat.weight(totals.weightGrams, summary = true)
+                    val weightLabel = weight.amount + " " + stringResource(weight.unit.labelResource)
+                    val totalLabel = if (totals.itemCount == 0L) weightLabel else stringResource(R.string.category_totals,
+                        weightLabel, WasteFormat.integer(totals.itemCount))
+                    Row(Modifier.fillMaxWidth().padding(vertical = 12.dp).semantics(mergeDescendants = true) {},
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Text(stringResource(category.labelResource), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
+                        Text(totalLabel, Modifier.weight(1f), textAlign = TextAlign.End, style = MaterialTheme.typography.bodySmall)
                     }
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             }
         }
     }
@@ -131,33 +142,63 @@ private fun DailyChart(daily: List<StatisticsDay>, count: Boolean, modifier: Mod
     val description = stringResource(R.string.daily_chart_description, title, unit,
         WasteFormat.activityDate(daily.first().date), WasteFormat.activityDate(daily.last().date))
     val primary = MaterialTheme.colorScheme.primary
-    val divider = MaterialTheme.colorScheme.outlineVariant
+    val weekly = daily.size == 7
+    val labelStyle = MaterialTheme.typography.bodySmall
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val labels = values.map { if (it > 0) WasteFormat.integer(it) else "" }
+    val scroll = rememberScrollState()
     Column(modifier.testTag(if (count) "daily-count-chart" else "daily-weight-chart"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         StatisticsHeading(title)
-        Text(stringResource(R.string.daily_scale, WasteFormat.integer(values.max()), unit),
+        if (!weekly) Text(stringResource(R.string.daily_scale, WasteFormat.integer(values.max()), unit),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Canvas(Modifier.fillMaxWidth().height(128.dp)
-            .semantics { contentDescription = description; role = Role.Image }) {
-            val slot = size.width / values.size
-            val barWidth = (slot * 0.65f).coerceAtMost(27.dp.toPx())
-            val bottom = size.height - 1.dp.toPx()
-            drawLine(divider, Offset(0f, bottom), Offset(size.width, bottom), 1.dp.toPx())
-            values.forEachIndexed { index, value ->
-                if (value > 0) {
-                    val height = (value.toDouble() / max * bottom).toFloat()
-                    drawRoundRect(primary, Offset(index * slot + (slot - barWidth) / 2, bottom - height),
-                        Size(barWidth, height), CornerRadius(3.dp.toPx()))
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val viewportWidth = maxWidth
+            val labelSizes = (labels + daily.map { it.date.dayOfMonth.toString() }).map {
+                textMeasurer.measure(it.ifEmpty { "0" }, labelStyle).size
+            }
+            val slot = if (weekly) with(density) { labelSizes.maxOf { it.width }.toDp() + 8.dp }.coerceAtLeast(32.dp) else 0.dp
+            val plotWidth = viewportWidth.coerceAtLeast(slot * daily.size)
+            val barWidth = (plotWidth / daily.size * 0.65f).coerceAtMost(27.dp)
+            val maxBarHeight = if (weekly) 90.dp else 95.dp
+            val plotHeight = maxBarHeight + if (weekly) with(density) { labelSizes.maxOf { it.height }.toDp() + 7.dp } else 0.dp
+            Column {
+                Column(Modifier.horizontalScroll(scroll)) {
+                    Row(
+                        modifier = Modifier
+                            .width(plotWidth)
+                            .height(plotHeight)
+                            .clearAndSetSemantics { contentDescription = description; role = Role.Image },
+                        verticalAlignment = Alignment.Bottom,
+                    ) {
+                        values.forEachIndexed { index, value ->
+                            Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                                if (weekly && value > 0) Text(labels[index], style = labelStyle,
+                                    color = MaterialTheme.colorScheme.onSurface)
+                                Box(
+                                    Modifier
+                                        .width(barWidth)
+                                        .height((maxBarHeight * (value.toDouble() / max).toFloat()).coerceAtLeast(2.dp))
+                                        .background(primary, RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)),
+                                )
+                            }
+                        }
+                    }
+                    Row(Modifier.width(plotWidth).padding(top = 7.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                        val ticks = if (weekly) daily else listOf(daily.first(), daily[daily.size / 2], daily.last())
+                        ticks.forEach { Text(it.date.dayOfMonth.toString(),
+                            modifier = if (weekly) Modifier.weight(1f) else Modifier,
+                            textAlign = if (weekly) TextAlign.Center else TextAlign.Start, style = labelStyle,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    }
                 }
+                if (plotWidth > viewportWidth) Text(stringResource(R.string.daily_scroll_hint),
+                    Modifier.width(viewportWidth).padding(top = 8.dp), style = labelStyle,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            val ticks = if (daily.size == 7) daily else listOf(daily.first(), daily[daily.size / 2], daily.last())
-            ticks.forEach { Text(it.date.dayOfMonth.toString(),
-                modifier = if (daily.size == 7) Modifier.weight(1f) else Modifier,
-                textAlign = if (daily.size == 7) TextAlign.Center else TextAlign.Start, style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        }
-        Text(stringResource(R.string.daily_axis), style = MaterialTheme.typography.bodySmall,
+        Text(stringResource(R.string.daily_axis, unit), style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
