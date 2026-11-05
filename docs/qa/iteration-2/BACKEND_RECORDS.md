@@ -36,9 +36,21 @@ Sebelas kasus baru `RemoteActivityStoreTest` memakai MockWebServer untuk menguji
 
 ### Koreksi skenario koneksi putus di CI
 
-CI head `945f601` gagal pada kedua event ([PR](https://github.com/waste-not-app/waste-not-android/actions/runs/41945791629), [push](https://github.com/waste-not-app/waste-not-android/actions/runs/41945780072)): retry eksplisit dalam tes kehilangan respons masih mengembalikan Failure, sehingga cast langsung ke Success gagal. Hasil itu tidak dihitung sebagai CI lulus. Kasus tunggal, seluruh 11 kasus catatan dan probe 40 pengulangan lokal tidak mereproduksi kegagalan tersebut.
+CI head `945f601` gagal pada kedua event ([PR](https://github.com/waste-not-app/waste-not-android/actions/runs/41945791629), [push](https://github.com/waste-not-app/waste-not-android/actions/runs/41945780072)): retry eksplisit dalam tes kehilangan respons masih mengembalikan Failure, sehingga cast langsung ke Success gagal. Head `6bd4af8` menambah diagnostic dan mencoba membersihkan pool, tetapi [CI berikutnya](https://github.com/waste-not-app/waste-not-android/actions/runs/41948712144) tetap gagal: NETWORK dengan jumlah request server tetap satu. Keduanya tidak dihitung sebagai CI lulus.
 
-Skenario tes kini mengosongkan pool koneksi setelah gangguan buatan, sebelum menguji retry eksplisit pada koneksi baru. Assertion juga melaporkan hasil dan jumlah request sebelum cast, serta membatasi waktu tunggu request. [MockWebServer 4.12.0](https://github.com/square/okhttp/blob/parent-4.12.0/mockwebserver/src/main/kotlin/okhttp3/mockwebserver/MockWebServer.kt) memang menutup socket untuk DISCONNECT_AFTER_REQUEST. Perubahan ini memperjelas prasyarat koneksi pulih dalam tes; aturan transport produksi tidak diubah. Kelulusan CI head perbaikan tetap harus diperiksa terpisah dari probe lokal dan tes backend asli.
+Resolver lokal hanya mengembalikan IPv4 untuk localhost, sehingga kasus tunggal, seluruh 11 kasus dan 40 pengulangan lokal tidak mereproduksinya. Pada JVM penguji yang diberi mapping localhost ke IPv4 dan IPv6, head `6bd4af8` gagal dengan NETWORK/request satu yang sama. [MockWebServer 4.12.0](https://github.com/square/okhttp/blob/parent-4.12.0/mockwebserver/src/main/kotlin/okhttp3/mockwebserver/MockWebServer.kt) bind satu hasil getByName; [RouteSelector](https://github.com/square/okhttp/blob/parent-4.12.0/okhttp/src/main/kotlin/okhttp3/internal/connection/RouteSelector.kt) menunda route yang sebelumnya gagal. Setelah disconnect buatan pada IPv4, alamat IPv6 yang tidak dilayani bisa menjadi percobaan berikutnya. Ini menjelaskan pola gagal sebelum request kedua mencapai server.
+
+Fixture kini bind dan memakai URL literal loopback IPv4 yang sama. Pembersihan pool yang tidak menyelesaikan masalah sudah dihapus. Profil resolver dua alamat yang sebelumnya gagal kini lulus. Assertion diagnostic dan batas tunggu request dipertahankan. Tidak ada perubahan DNS, retry atau client produksi.
+
+[Laporan sebelum](backend-records/dual-stack-red.xml) dan [sesudah](backend-records/dual-stack-green.xml) merekam kasus tunggal. Profil reproduksi memakai [mekanisme hosts-file OpenJDK 17](https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/net/InetAddress.java), hanya pada JVM tes; tidak mengubah file hosts atau pengaturan jaringan sistem:
+
+```sh
+./gradlew -I docs/qa/iteration-2/backend-records/dual-stack.init.gradle \
+  :app:testDebugUnitTest \
+  --tests 'com.example.wastenot.data.repository.RemoteActivityStoreTest.lostCreateResponseDoesNotRetryUntilTheCallerExplicitlyRetries'
+```
+
+Kelulusan CI head perbaikan tetap diperiksa terpisah dari reproduksi lokal dan tes backend asli.
 
 ## Lifecycle native ke database: lulus melalui SSH
 

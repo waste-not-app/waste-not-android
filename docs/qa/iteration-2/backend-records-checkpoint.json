@@ -18,7 +18,7 @@
     "app/src/main/java/com/example/wastenot/data/network/dto/ActivityRequestFields.kt": "d1cbda025306138fa9b986a3be07284370f2c2edb68c66a1b81a9364f48c5919",
     "app/src/main/java/com/example/wastenot/data/repository/ActivityStore.kt": "083aabd0a5dc93bcd1eb2730fe2192e68fb95e5a714707fa2867e6a9fff780cd",
     "app/src/main/java/com/example/wastenot/data/repository/CoreRepository.kt": "9ee0ae74264fb7508b870db44cae504f066b4ddbf91b4f838c0b67f6f79d4229",
-    "app/src/test/java/com/example/wastenot/data/repository/RemoteActivityStoreTest.kt": "49a4157dc0c4d7009bf8f7f724552acd497a02970b4a9632a78035cc663b814a",
+    "app/src/test/java/com/example/wastenot/data/repository/RemoteActivityStoreTest.kt": "6b83b9ff10e5244e55f27e6fdc223161e38b99fd3293e22d1039eeb8f2e1ed42",
     "app/src/androidTest/java/com/example/wastenot/data/network/RemoteReadOnlyContractTest.kt": "4ead426200ff843d529a5837f3479f98892651095ff8bbc20741dbc298fa6dce",
     "app/src/androidTest/java/com/example/wastenot/data/network/RemoteActivityLifecycleTest.kt": "56890db9278b2bb90bbc945d3c308e07c207fbea1c097efaf69ed863452e05bc"
   },
@@ -35,7 +35,7 @@
     "updateAndDeletePreserveVersionAndMissingRecordFailures",
     "authenticatedWritesUseAccountCredentialsAndReusePayloadAfterA401Refresh"
   ],
-  "unit_xml_sha256": "52f769965ca61f1f176f82768c34aba8c186a4cbfbaa16fef13a10b6559b47e4",
+  "unit_xml_sha256": "ce0218cbc4c54e17ad59b86c3f8c08a1c75ca60c11963d58c00324feec63dd69",
   "test_sha256": "e7bdb54f0041327a5a0bae11c74f2bea3036678318d86533c9e869bdc74353ce",
   "native_readonly": {
     "api": 24,
@@ -51,12 +51,16 @@
     "compatibility_gate_open": true
   },
   "bundled_evidence": {
-    "RemoteActivityStoreTest.xml": "52f769965ca61f1f176f82768c34aba8c186a4cbfbaa16fef13a10b6559b47e4",
-    "clienthello-api24.json": "b4221a41d6940c4f0795f5a0fb21dd6fd31b3b03c7ebf6d6e7d0b66fe8127dbc",
     "native-readonly-failure.log": "e92a6591c4c23d6fa9231ff3923cae859141b5b75e323f82effe8c65e4e58ae2",
+    "RemoteActivityStoreTest.xml": "ce0218cbc4c54e17ad59b86c3f8c08a1c75ca60c11963d58c00324feec63dd69",
+    "dual-stack-hosts": "b69b2c741be48691edabe3771c644c70473ccd6aa8effd9f17cc07fa129917f9",
+    "native-lifecycle-result.json": "4acad715718b36d59e907d0eb21cae4710a11bdf5064752cf4f64827f8bbcf19",
     "tls-groups.json": "e001264b265700c5ee56d6a5c7a18ff7141fe0b168d81f9e2de2ab30a7b7efff",
-    "native-lifecycle.log": "d6886fefbc8bc979ce13e9b9fc7940dc468ec1af4e807b45b91e16e20ee801e2",
-    "native-lifecycle-result.json": "4acad715718b36d59e907d0eb21cae4710a11bdf5064752cf4f64827f8bbcf19"
+    "dual-stack.init.gradle": "e4b7c6dbca93a2aae77c4bbd026251dfdc2344cba3f71ba7900d41148a1bca58",
+    "dual-stack-green.xml": "a2841cfff518bce602f23798770887485bb299161c36f0ebcac21a436f28d711",
+    "clienthello-api24.json": "b4221a41d6940c4f0795f5a0fb21dd6fd31b3b03c7ebf6d6e7d0b66fe8127dbc",
+    "dual-stack-red.xml": "250840d56ae32fe6ad36f3206c03d46587159a16925a9d9dc2a214bfb1eac127",
+    "native-lifecycle.log": "d6886fefbc8bc979ce13e9b9fc7940dc468ec1af4e807b45b91e16e20ee801e2"
   },
   "native_lifecycle": {
     "api": 24,
@@ -81,12 +85,26 @@
   "gateway_owner": "BCC admin/team (confirmed by user)",
   "backend_core_rechecked_commit": "5cc59bc461b81c45e08878da2c44a8b3e9eef15b",
   "ci_scenario_correction": {
-    "previous_failed_head": "945f601201f5a029ee260ce32eeae6eae8226d2b",
+    "previous_failed_heads": [
+      "945f601201f5a029ee260ce32eeae6eae8226d2b",
+      "6bd4af820716ece94cb0931c2dacd9dbf015fd22"
+    ],
     "previous_failed_runs": [
       41945791629,
-      41945780072
+      41945780072,
+      41948720383,
+      41948712144
     ],
-    "local_debug_unit": {
+    "dual_stack_red": {
+      "tests": 1,
+      "failed": 1,
+      "observed": "NETWORK; server request count remains 1"
+    },
+    "dual_stack_green": {
+      "tests": 1,
+      "failed": 0
+    },
+    "dual_stack_full_unit": {
       "tests": 182,
       "failures": 0,
       "errors": 0,
@@ -97,8 +115,9 @@
       "staging",
       "release"
     ],
+    "fixture": "server bind and URL both use literal IPv4 loopback",
     "production_retry_changed": false,
-    "scenario": "fresh connection before explicit retry after simulated outage",
+    "system_hosts_changed": false,
     "ci_recheck_required": true
   }
 }

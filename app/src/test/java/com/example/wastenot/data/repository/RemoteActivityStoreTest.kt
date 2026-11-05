@@ -6,6 +6,7 @@ import com.example.wastenot.data.local.TokenReadResult
 import com.example.wastenot.data.network.*
 import com.example.wastenot.model.*
 import java.time.LocalDate
+import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -31,8 +32,9 @@ class RemoteActivityStoreTest {
         Quantity.Weight.of(250), LocalDate.parse("2026-09-21"), "Catatan pengguna")
 
     @Before fun setup() {
-        server = MockWebServer().apply { start() }
-        network = requireNotNull(WasteNotNetwork.create(server.url("/v1/").toString(),
+        server = MockWebServer().apply { start(InetAddress.getByName("127.0.0.1"), 0) }
+        val base = server.url("/v1/").newBuilder().host("127.0.0.1").build()
+        network = requireNotNull(WasteNotNetwork.create(base.toString(),
             accessToken = { "fixture-fallback-token" }, allowLocalHttp = true))
         store = RemoteActivityStore(CoreRepository(network))
     }
@@ -147,8 +149,6 @@ class RemoteActivityStoreTest {
         assertEquals(ApiFailureKind.NETWORK, (store.create(input, requestId) as ApiResult.Failure).error.kind)
         assertEquals(1, server.requestCount)
         val first = requireNotNull(server.takeRequest(5, TimeUnit.SECONDS)).body.readUtf8()
-        // Restore a fresh connection before exercising the caller's explicit retry.
-        network.client.connectionPool.evictAll()
         server.enqueue(reply(record(), 200))
         val retried = store.create(input, requestId)
         assertTrue("Explicit replay: $retried; requests=${server.requestCount}", retried is ApiResult.Success)
