@@ -1,6 +1,6 @@
 # Integrasi Android dengan backend WasteNot
 
-Pemeriksaan remote: 4 November 2026. Ini pekerjaan lanjutan dari [Iteration 2](ITERATION_2_DESIGN.md), dengan penerimaan visual seluruh screen/navbar/navigasi tetap aktif.
+Pemeriksaan remote: 5 November 2026. Ini pekerjaan lanjutan dari [Iteration 2](ITERATION_2_DESIGN.md), dengan penerimaan visual seluruh screen/navbar/navigasi tetap aktif. Baseline yang kini dipilih pengguna adalah Android 11 / API 30 ke atas; uji API 24 di bawah menjadi bukti historis, bukan persyaratan rilis yang masih aktif.
 
 ## Sumber yang sudah diperiksa
 
@@ -14,7 +14,7 @@ Adapter dummy tetap default selama rangkaian integrasi belum selesai. Login/regi
 
 `RemoteGuideStore` dan `UnconfiguredScanRepository` masih mengembalikan NOT_CONFIGURED. Branch lanjutan `codex/android-backend-summaries` menyediakan binding dashboard/statistik, 190 debug unit tests dan satu lifecycle native API 24 ke Go/PostgreSQL lewat SSH yang memeriksa perubahan agregat setelah simpan, edit satuan dan hapus; [bukti ringkasan](../qa/iteration-2/BACKEND_SUMMARIES.md). Beranda/Statistik/Profil remote masih perlu memakai model server tersebut. Cursor/filter riwayat dan penerimaan screen remote juga belum selesai. Mengganti flag adapter sekarang belum menghasilkan aplikasi remote yang lengkap. Build remote dalam checkpoint transport tidak mengubah default dummy pada source.
 
-Gerbang perangkat, 5 November: GET metadata anonim dari emulator API 24 gagal pada handshake TLS. Bukti ClientHello dan uji host menunjukkan sertifikat gateway ECDSA P-384 tidak cocok dengan grup P-256 yang ditawarkan emulator. [Rincian dan reproduksi](../qa/iteration-2/BACKEND_RECORDS.md#uji-https-native-belum-lulus-pada-api-24) tetap menjadi syarat sebelum aktivasi remote. Pengguna mengonfirmasi panel Nginx Proxy Manager `proxy.bccdev.id` dikelola admin/tim BCC; `cp-bcc` hanya menangani HTTP di belakang gateway. Belum ada perubahan pada TLS server atau trust client. Backend terbaru saat pemeriksaan adalah `5cc59bc461b81c45e08878da2c44a8b3e9eef15b`; kontrak core dan handler catatan tidak berubah dari commit yang diuji.
+Pemeriksaan historis, 5 November: GET metadata anonim dari emulator API 24 gagal pada handshake TLS. Bukti ClientHello dan uji host menunjukkan sertifikat gateway ECDSA P-384 tidak cocok dengan grup P-256 yang ditawarkan emulator. [Rincian dan reproduksi](../qa/iteration-2/BACKEND_RECORDS.md#uji-https-native-belum-lulus-pada-api-24) dipertahankan; API 24 sudah berada di luar baseline baru. Pengguna mengonfirmasi panel Nginx Proxy Manager `proxy.bccdev.id` dikelola admin/tim BCC; `cp-bcc` hanya menangani HTTP di belakang gateway. Belum ada perubahan pada TLS server atau trust client. Backend terbaru saat pemeriksaan adalah `5cc59bc461b81c45e08878da2c44a8b3e9eef15b`; kontrak core dan handler catatan tidak berubah dari commit yang diuji.
 
 ## Urutan penyambungan dan penerimaan
 

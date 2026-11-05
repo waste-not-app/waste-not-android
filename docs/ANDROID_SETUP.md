@@ -16,6 +16,10 @@ Staging tidak debuggable dan memakai debug certificate untuk instalasi uji. HotS
 
 ## Build dari checkout baru
 
+Baseline dukungan diperbarui atas pilihan pengguna pada 5 November 2026: **Android 11 / API 30 ke atas**. Native, staging, release dan hot reload memakai minimum yang sama; CI memeriksa manifest APK native dengan `verify_minimum_sdk.py` dan menyimpan artifact `app-native-api30`. Angka SDK 24 pada audit starter dan bukti QA lama adalah riwayat pengujian, bukan batas instalasi saat ini. Pengujian berikutnya mencakup baseline API 30 serta Android stabil terbaru; compile/target SDK yang terpasang pada checkpoint ini masih 36.
+
+Pemeriksaan dokumentasi resmi pada tanggal tersebut mengidentifikasi Android 17 / API 37 sebagai versi stabil terbaru: [referensi API AOSP](https://source.android.com/docs/setup/reference/build-numbers) dan [panduan pengujian Android 17](https://developer.android.com/about/versions/17). Bukti runtime API 36 yang sudah ada adalah Android 16; jangan menyebutnya pengujian Android terbaru. Penerimaan API 30 dan API 37 masih perlu dijalankan.
+
 Pasang JDK 17 dan Android SDK Platform 36. Arahkan `ANDROID_HOME` ke SDK, atau isi `sdk.dir` dalam `local.properties` yang diabaikan Git.
 
 ```sh
@@ -32,7 +36,7 @@ Iteration 2 menggunakan `BuildConfig.USE_DUMMY_DATA=true` secara default pada de
 
 Pembaruan 4 November 2026: repo backend dan deployment HTTPS sudah tersedia. Readiness core menjawab 200; alur Android yang terautentikasi dan write belum diverifikasi. [Peta integrasi dan kontrak yang diperiksa](tasks/BACKEND_INTEGRATION.md) mencatat sumber remote, endpoint, dan pekerjaan sebelum mengganti adapter default.
 
-Pemeriksaan perangkat 5 November menemukan kegagalan handshake pada emulator API 24 karena kompatibilitas kurva sertifikat gateway. [Bukti transport dan TLS](qa/iteration-2/BACKEND_RECORDS.md) memisahkan 182 unit tests yang lulus dari satu uji HTTPS perangkat yang belum lulus. Selesaikan kompatibilitas gateway dan penerimaan perangkat sebelum mengaktifkan remote sebagai default.
+Pemeriksaan sebelumnya pada API 24 menemukan kegagalan handshake kurva sertifikat gateway; [bukti transport dan TLS](qa/iteration-2/BACKEND_RECORDS.md) tetap dipertahankan sebagai riwayat. Sesudah baseline dipilih menjadi API 30, Android 7 tidak lagi menjadi gerbang penerimaan. Penerimaan HTTPS pada Android 11 dan Android stabil terbaru, serta integrasi seluruh alur, tetap diperlukan sebelum remote menjadi default.
 
 | Build type | Property Gradle | Default | Kebijakan |
 |---|---|---|---|
