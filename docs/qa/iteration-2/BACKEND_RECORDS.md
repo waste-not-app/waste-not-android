@@ -34,6 +34,12 @@ Sebelas kasus baru `RemoteActivityStoreTest` memakai MockWebServer untuk menguji
 
 [Manifest](backend-records-checkpoint.json) mengikat source, kontrak, hasil unit, konfigurasi build remote dan APK pengujian. [Laporan sebelas kasus](backend-records/RemoteActivityStoreTest.xml) merekam hasil test runner. Angka unit ini berasal dari server tiruan; penerimaan perangkat/database dicatat terpisah berikut ini.
 
+### Koreksi skenario koneksi putus di CI
+
+CI head `945f601` gagal pada kedua event ([PR](https://github.com/waste-not-app/waste-not-android/actions/runs/41945791629), [push](https://github.com/waste-not-app/waste-not-android/actions/runs/41945780072)): retry eksplisit dalam tes kehilangan respons masih mengembalikan Failure, sehingga cast langsung ke Success gagal. Hasil itu tidak dihitung sebagai CI lulus. Kasus tunggal, seluruh 11 kasus catatan dan probe 40 pengulangan lokal tidak mereproduksi kegagalan tersebut.
+
+Skenario tes kini mengosongkan pool koneksi setelah gangguan buatan, sebelum menguji retry eksplisit pada koneksi baru. Assertion juga melaporkan hasil dan jumlah request sebelum cast, serta membatasi waktu tunggu request. [MockWebServer 4.12.0](https://github.com/square/okhttp/blob/parent-4.12.0/mockwebserver/src/main/kotlin/okhttp3/mockwebserver/MockWebServer.kt) memang menutup socket untuk DISCONNECT_AFTER_REQUEST. Perubahan ini memperjelas prasyarat koneksi pulih dalam tes; aturan transport produksi tidak diubah. Kelulusan CI head perbaikan tetap harus diperiksa terpisah dari probe lokal dan tes backend asli.
+
 ## Lifecycle native ke database: lulus melalui SSH
 
 Pada 5 November 2026, satu kasus `RemoteActivityLifecycleTest` lulus pada emulator API 24 dalam 1,538 detik terhadap aplikasi Go dan PostgreSQL deployment `cp-bcc`. Kanal pengembangan: emulator `10.0.2.2:18088` → port loopback host → tunnel SSH → Go `127.0.0.1:18080`. Tunnel hanya bind loopback, lalu dihentikan setelah tes. HTTP lokal memakai izin debug yang sudah ada; kebijakan HTTPS publik dan release tidak diperlonggar.

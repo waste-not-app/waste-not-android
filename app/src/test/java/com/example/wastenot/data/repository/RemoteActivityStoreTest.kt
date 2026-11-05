@@ -146,11 +146,15 @@ class RemoteActivityStoreTest {
         server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AFTER_REQUEST))
         assertEquals(ApiFailureKind.NETWORK, (store.create(input, requestId) as ApiResult.Failure).error.kind)
         assertEquals(1, server.requestCount)
-        val first = server.takeRequest().body.readUtf8()
+        val first = requireNotNull(server.takeRequest(5, TimeUnit.SECONDS)).body.readUtf8()
+        // Restore a fresh connection before exercising the caller's explicit retry.
+        network.client.connectionPool.evictAll()
         server.enqueue(reply(record(), 200))
-        val replay = (store.create(input, requestId) as ApiResult.Success).value
+        val retried = store.create(input, requestId)
+        assertTrue("Explicit replay: $retried; requests=${server.requestCount}", retried is ApiResult.Success)
+        val replay = (retried as ApiResult.Success).value
         assertFalse(replay.created)
-        assertEquals(first, server.takeRequest().body.readUtf8())
+        assertEquals(first, requireNotNull(server.takeRequest(5, TimeUnit.SECONDS)).body.readUtf8())
         assertEquals(2, server.requestCount)
     }
 
