@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.ui.auth.SessionViewModelTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-05T13:42:19.390Z" hostname="oktaavsm" time="0.226">
+  <properties/>
+  <testcase name="bootstrapKeepsTheInjectedAccountSourceWithoutPreviewSwitching" classname="com.example.wastenot.ui.auth.SessionViewModelTest" time="0.129"/>
+  <testcase name="cancelledRequestCannotUnlockANewerSubmission" classname="com.example.wastenot.ui.auth.SessionViewModelTest" time="0.021"/>
+  <testcase name="logoutNeverClaimsLocalCleanupBeforeItsResult" classname="com.example.wastenot.ui.auth.SessionViewModelTest" time="0.01"/>
+  <testcase name="serverFieldErrorsOnlyFocusFieldsPresentInTheSubmittedForm" classname="com.example.wastenot.ui.auth.SessionViewModelTest" time="0.017"/>
+  <testcase name="bootstrapIsStartedByRouteAndRetriesOnlyWhenRequested" classname="com.example.wastenot.ui.auth.SessionViewModelTest" time="0.008"/>
+  <testcase name="invalidRegistrationOnlyProducesFieldErrors" classname="com.example.wastenot.ui.auth.SessionViewModelTest" time="0.009"/>
+  <testcase name="pendingServerRevocationDoesNotBlockANewLogin" classname="com.example.wastenot.ui.auth.SessionViewModelTest" time="0.01"/>
+  <testcase name="doubleTapIsSingleFlightAndSuccessClearsInMemoryPasswords" classname="com.example.wastenot.ui.auth.SessionViewModelTest" time="0.01"/>
+  <testcase name="duplicateEmailPreservesFieldsAndDoesNotInventASession" classname="com.example.wastenot.ui.auth.SessionViewModelTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

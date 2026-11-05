@@ -1,14 +1,14 @@
 # Progres Android WasteNot
 
-Snapshot checklist GitHub: 2026-11-05T07:34:28.773561+00:00. Cakupan pekerjaan tetap seluruh backlog Android, kesesuaian design system/mockup termasuk navbar dan navigasi, integrasi backend serta AI. Sumber visual dan penerimaan menyeluruh berada pada [matriks Iteration 2](ITERATION_2_DESIGN.md); urutan integrasi pada [peta backend](BACKEND_INTEGRATION.md).
+Snapshot checklist GitHub: 2026-11-05T14:32:18.888143+00:00. Cakupan pekerjaan tetap seluruh backlog Android, kesesuaian design system/mockup termasuk navbar dan navigasi, integrasi backend serta AI. Sumber visual dan penerimaan menyeluruh berada pada [matriks Iteration 2](ITERATION_2_DESIGN.md); urutan integrasi pada [peta backend](BACKEND_INTEGRATION.md).
 
 ## Angka backlog yang dapat dihitung
 
 | Ukuran | Tercentang | Total | Persentase |
 |---|---:|---:|---:|
-| Seluruh butir checklist awal Android | 130 | 417 | 31,2% |
-| Checklist implementasi | 86 | 260 | 33,1% |
-| Checklist bukti penerimaan | 44 | 157 | 28,0% |
+| Seluruh butir checklist awal Android | 133 | 417 | 31,9% |
+| Checklist implementasi | 88 | 260 | 33,8% |
+| Checklist bukti penerimaan | 45 | 157 | 28,7% |
 
 Ada 52 issue Android; delapan memiliki checklist awal tercentang seluruhnya. Seluruh issue masih terbuka dan ditugaskan ke `oktavsm`. [Snapshot angka](android-progress-baseline.json) merekam dasar perhitungan.
 
@@ -18,18 +18,19 @@ Persentase dihitung dari checkbox pada bagian backlog awal, sebelum marker `wast
 
 | Pekerjaan | Bukti | Penerimaan berikutnya |
 |---|---|---|
-| Transport catatan backend | [PR #97](https://github.com/waste-not-app/waste-not-android/pull/97), head `76f2b19`: CI push/PR termasuk upload APK/laporan lulus; 182 unit dan lifecycle API 24 ke Go/PostgreSQL lewat SSH | HTTPS publik API 24, screen remote dan rangkaian akun/draf lengkap |
+| Transport catatan backend | [PR #97](https://github.com/waste-not-app/waste-not-android/pull/97), head `76f2b19`: CI push/PR termasuk upload APK/laporan lulus; 182 unit dan lifecycle API 24 ke Go/PostgreSQL lewat SSH | Screen remote dan rangkaian akun/draf lengkap; API 24 menjadi bukti historis setelah minimum dinaikkan ke API 30 |
 | Binding dashboard/statistik | [PR #98](https://github.com/waste-not-app/waste-not-android/pull/98), head `eae6345`: CI push/PR termasuk upload lulus; 190 unit dan 11 tahap lifecycle native ke database | Hubungkan Beranda/Statistik/Profil ke snapshot server dan refresh setelah mutasi |
-| Pemulihan write belum pasti | Branch `codex/android-write-outcome-recovery`: tiga regresi awal gagal; perbaikan lulus 196 unit dan 23 eksekusi native, termasuk PID berbeda sesudah force-stop serta font 200%; [QA](../qa/iteration-2/WRITE_RECOVERY.md) | CI/review serta alur HTTP melalui screen |
+| Pemulihan write belum pasti | Branch `codex/android-write-outcome-recovery`: tiga regresi awal gagal; perbaikan lulus 196 unit dan 23 eksekusi native, termasuk PID berbeda sesudah force-stop serta font 200%; [QA](../qa/iteration-2/WRITE_RECOVERY.md) | CI push/PR #99 lulus; alur HTTP melalui screen masih diverifikasi per checkpoint |
+| Layar ringkasan server | Branch `codex/android-summary-screens`: 202 debug unit tests, MainActivity/HTTPS publik API 30 dan API 37, sembilan eksekusi komponen API 37 terang/gelap/font 200%; [QA](../qa/iteration-2/SERVER_SCREENS.md) | CI head layar dan penerimaan luas; pergantian hari otomatis, Riwayat, Panduan/AI tetap terbuka |
 | Screen/navbar/navigasi | Bukti per checkpoint tertaut di matriks Iteration 2 | Seluruh state, scroll, tema, ukuran teks, perangkat dan alur tetap mengikuti matriks lengkap |
 
 ## Prioritas lanjutan
 
-1. Selesaikan pemulihan UUID/payload/draf setelah hasil write tidak diketahui, termasuk error lanjutan, jeda, restart proses dan konfirmasi simpan.
-2. Hubungkan data server ke Beranda, Statistik dan Profil; lengkapi cursor/filter/pull-to-refresh Riwayat dan pemisahan akun.
+1. Lengkapi penerimaan pemulihan write melalui layar HTTP; logika UUID/payload/draf dan bukti restart proses sudah tersedia pada PR #99 dengan CI lulus.
+2. Verifikasi checkpoint Beranda/Statistik/Profil terhadap server publik pada API 30 dan Android terbaru; lengkapi pergantian hari otomatis, cursor/filter/pull-to-refresh Riwayat serta pemisahan akun.
 3. Integrasikan Panduan PUBLISHED beserta sumber/review, lalu katalog/deteksi/rekomendasi AI publik melalui Go. Key dan layanan Python tetap privat; tidak auto-save/XP dari scan.
 4. Lengkapi migrasi penyimpanan, lifecycle kamera/permission, capability opsional dan audit seluruh screen/control/navigasi terhadap kit.
-5. Jalankan penerimaan remote publik dan seluruh gate perangkat/visual. Sertifikat/chain gateway untuk Android 7 masih menjadi ketergantungan admin/tim BCC.
+5. Jalankan penerimaan HTTPS publik pada Android 11/API 30 dan Android terbaru, serta seluruh gate visual. Android 7/API 24 tidak lagi menjadi syarat rilis sesuai keputusan pengguna.
 
 ## Daftar task awal
 
@@ -42,7 +43,7 @@ Persentase dihitung dari checkbox pada bagian backlog awal, sebelum marker `wast
 | [#10](https://github.com/waste-not-app/waste-not-android/issues/10) | [Android][A07] Komponen input, pilihan kategori/metode dan tindakan form | 8/8 |
 | [#11](https://github.com/waste-not-app/waste-not-android/issues/11) | [Android][A08] Komponen ringkasan, daftar, progres dan feedback | 0/8 |
 | [#21](https://github.com/waste-not-app/waste-not-android/issues/21) | [Android][A04] Penyimpanan token aman dan refresh sesi terserialisasi | 8/8 |
-| [#27](https://github.com/waste-not-app/waste-not-android/issues/27) | [Android][A05] Draf per akun, process death dan pembatalan pekerjaan akun | 0/8 |
+| [#27](https://github.com/waste-not-app/waste-not-android/issues/27) | [Android][A05] Draf per akun, process death dan pembatalan pekerjaan akun | 3/8 |
 | [#28](https://github.com/waste-not-app/waste-not-android/issues/28) | [Android][A09] Root auth, lima tab dan perilaku Back Navigation 3 | 8/8 |
 | [#33](https://github.com/waste-not-app/waste-not-android/issues/33) | [Android][A10] Dock lima tujuan dan action utama Catat/Scan | 0/8 |
 | [#34](https://github.com/waste-not-app/waste-not-android/issues/34) | [Android][A11] S01 Pemulihan sesi dan retry validasi identitas | 8/8 |

@@ -1,0 +1,13 @@
+{
+  "completed": true,
+  "native_passed": true,
+  "cleanup_complete": true,
+  "original_result": "core-api30-result.json",
+  "original_restore_error_preserved": true,
+  "repair": "Delete font_scale setting that was originally absent; no instrumentation rerun",
+  "device_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "null"
+  }
+}

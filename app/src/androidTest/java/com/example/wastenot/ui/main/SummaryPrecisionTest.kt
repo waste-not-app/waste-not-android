@@ -9,6 +9,8 @@ import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.model.Quantity
 import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteLog
+import com.example.wastenot.model.ActivityDateRange
+import com.example.wastenot.data.dummy.dummyStatistics
 import com.example.wastenot.theme.WasteNotTheme
 import java.time.Instant
 import java.time.LocalDate
@@ -27,7 +29,8 @@ class SummaryPrecisionTest {
         val state = WorkspaceUiState(loading = false, records = listOf(record,
             record.copy(id = "00000000-0000-4000-8000-000000000002", method = DisposalMethod.REDUCE)))
         compose.setContent { WasteNotTheme(darkTheme = false) {
-            StatisticsScreen(state, demo = true, date = date, padding = PaddingValues(0.dp), onRetry = {}, onRecord = {})
+            StatisticsScreen(SnapshotState(dummyStatistics(state.records, ActivityDateRange.lastDays(date, 7), record.activityTimezone), loading = false),
+                days = 7, padding = PaddingValues(0.dp), onRetry = {}, onRecord = {}, onDays = {})
         } }
         compose.onAllNodes(androidx.compose.ui.test.hasText("1,66 kg", substring = true) and androidx.compose.ui.test.hasAnyAncestor(androidx.compose.ui.test.hasTestTag("statistics-summary"))).assertCountEquals(2)
         compose.onNodeWithText("1,655 kg", substring = true).assertDoesNotExist()

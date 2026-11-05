@@ -1,0 +1,20 @@
+{
+  "run_id": "999ea195-cbd3-4363-87f4-b5f41c38c7ce",
+  "email": "android-999ea195-cbd3-4363-87f4-b5f41c38c7ce@example.test",
+  "name": "Android transport probe",
+  "input_checks": {
+    "name_matches": true,
+    "email_matches": true,
+    "password_length_matches": true,
+    "confirmation_length_matches": true
+  },
+  "user_id": "050e7a9b-09ed-47bb-a3e5-f0225c1e7251",
+  "passed_steps": [
+    "register",
+    "ui_create_updates_dashboard",
+    "ui_statistics_and_profile_use_server_progress",
+    "ui_edit_refreshes_units_without_extra_xp",
+    "ui_delete_refreshes_all_server_aggregates",
+    "ui_logout_returns_to_login"
+  ]
+}
