@@ -12,10 +12,11 @@ import com.example.wastenot.data.repository.RequestCredential
 import com.example.wastenot.data.repository.SessionRepository
 import com.example.wastenot.data.repository.SessionState
 import com.example.wastenot.model.DisposalMethod
+import com.example.wastenot.model.ActivityDateRange
 import com.example.wastenot.model.Quantity
+import com.example.wastenot.model.QuantityTotals
 import com.example.wastenot.model.WasteCategory
 import java.io.File
-import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
@@ -69,8 +70,17 @@ class RemoteActivityLifecycleTest {
             success(core.metadata())
             record("authenticated_metadata")
 
+            val emptyDashboard = success(core.dashboard())
+            val range = ActivityDateRange.lastDays(emptyDashboard.date, 2)
+            assertEquals(user.timezone, emptyDashboard.timezone)
+            assertTrue(emptyDashboard.recentLogs.isEmpty())
+            assertEquals(0L, emptyDashboard.summary.activityCount)
+            assertNull(emptyDashboard.summary.recyclingRatePercent)
+            assertEquals(2, success(core.statistics(range)).daily.size)
+            record("empty_server_dashboard_and_statistics")
+
             val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE,
-                Quantity.Weight.of(250), LocalDate.now(user.timezone), "Isolated Android transport probe")
+                Quantity.Weight.of(250), emptyDashboard.date, "Isolated Android transport probe")
             val requestId = UUID.randomUUID().toString()
             val created = success(store.create(input, requestId))
             assertTrue(created.created)
@@ -81,6 +91,18 @@ class RemoteActivityLifecycleTest {
             assertEquals(listOf(created.log), success(store.load()))
             record("create_replay_detail_list")
 
+            val dashboard = success(core.dashboard())
+            assertEquals(QuantityTotals(250, 0), dashboard.summary.handled)
+            assertEquals(listOf(created.log), dashboard.recentLogs)
+            assertEquals(10, dashboard.progress.xp)
+            val period = success(core.statistics(range))
+            assertEquals(QuantityTotals(250, 0), period.summary.handled)
+            assertEquals(1L, period.methods[DisposalMethod.RECYCLE])
+            assertEquals(QuantityTotals(250, 0), period.categories[WasteCategory.PLASTIC])
+            assertEquals(QuantityTotals(0, 0), period.daily.first().handled)
+            assertEquals(QuantityTotals(250, 0), period.daily.last().handled)
+            record("created_record_updates_server_aggregates")
+
             val counted = input.copy(quantity = Quantity.Count.of(3))
             val updated = success(store.update(created.log.id, created.log.version, counted))
             assertEquals(Quantity.Count.of(3), updated.quantity)
@@ -88,6 +110,9 @@ class RemoteActivityLifecycleTest {
             failure(ApiFailureKind.VERSION_CONFLICT, store.update(updated.id, created.log.version, counted))
             failure(ApiFailureKind.VERSION_CONFLICT, store.delete(updated.id, created.log.version))
             record("quantity_switch_and_stale_version_conflicts")
+            assertEquals(QuantityTotals(0, 3), success(core.dashboard()).summary.handled)
+            assertEquals(QuantityTotals(0, 3), success(core.statistics(range)).summary.handled)
+            record("quantity_switch_updates_server_aggregates")
 
             suspend fun progress() = success(session.authenticated { credential ->
                 network.executor.execute({ it.toModel() }) { network.api.me(credential) }
@@ -102,6 +127,15 @@ class RemoteActivityLifecycleTest {
             assertEquals(0, progress().activeLogCount)
             assertEquals(0, progress().xp)
             record("delete_replay_and_server_progress")
+            val deletedDashboard = success(core.dashboard())
+            assertEquals(QuantityTotals(0, 0), deletedDashboard.summary.handled)
+            assertTrue(deletedDashboard.recentLogs.isEmpty())
+            assertEquals(0, deletedDashboard.progress.xp)
+            val deletedPeriod = success(core.statistics(range))
+            assertEquals(0L, deletedPeriod.summary.activityCount)
+            assertNull(deletedPeriod.summary.recyclingRatePercent)
+            assertTrue(deletedPeriod.daily.all { it.handled == QuantityTotals(0, 0) })
+            record("delete_clears_server_aggregates")
 
             var old: RequestCredential? = null
             success(session.authenticated { credential -> old = credential; ApiResult.Success(Unit) })

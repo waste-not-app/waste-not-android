@@ -1,0 +1,34 @@
+{
+  "run_id": "592713d6-5753-4989-85cc-dee2e2ddc3c6",
+  "email": "android-592713d6-5753-4989-85cc-dee2e2ddc3c6@example.test",
+  "channel": "loopback-over-owned-SSH-tunnel",
+  "public_https_verified": false,
+  "cleanup_complete": true,
+  "before_count": 0,
+  "summaries-v2-remote-api24.apk": "15acf2089df16429fa3bd60d3a103dd19af64ac45fc3c9e79ca32755f45fe736",
+  "summaries-v2-tests.apk": "b018a88efa805b9374c511bb9fd8a21958921b993925afaf2acae9a65f44eccc",
+  "instrument_returncode": 0,
+  "native_passed": true,
+  "passed_steps": [
+    "register",
+    "logout_and_login",
+    "authenticated_metadata",
+    "empty_server_dashboard_and_statistics",
+    "create_replay_detail_list",
+    "created_record_updates_server_aggregates",
+    "quantity_switch_and_stale_version_conflicts",
+    "quantity_switch_updates_server_aggregates",
+    "delete_replay_and_server_progress",
+    "delete_clears_server_aggregates",
+    "logout_revokes_session"
+  ],
+  "removed_user_ids": [
+    "c0be5884-bfe4-439f-8e03-98a43eb5b4e0"
+  ],
+  "after_count": 0,
+  "owned_child_rows_remaining": {
+    "sessions": 0,
+    "waste_logs": 0,
+    "ai_operations": 0
+  }
+}

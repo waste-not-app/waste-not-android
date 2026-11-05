@@ -6,6 +6,8 @@ import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.network.WasteNotNetwork
 import com.example.wastenot.data.network.dto.toRequestFields
 import com.example.wastenot.model.ActivityDateRange
+import com.example.wastenot.model.DashboardSnapshot
+import com.example.wastenot.model.StatisticsSnapshot
 import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.model.Metadata
 import com.example.wastenot.model.WasteCategory
@@ -14,6 +16,20 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 class CoreRepository(private val network: WasteNotNetwork?, private val session: SessionRepository? = null) {
+    suspend fun dashboard(): ApiResult<DashboardSnapshot> = protected { credential ->
+        network?.executor?.executeWithStatus({ dto, status ->
+            require(status == 200)
+            dto.toModel()
+        }) { network.api.dashboard(credential) } ?: notConfigured()
+    }
+
+    suspend fun statistics(range: ActivityDateRange): ApiResult<StatisticsSnapshot> = protected { credential ->
+        network?.executor?.executeWithStatus({ dto, status ->
+            require(status == 200)
+            dto.toModel().also { require(it.range == range) }
+        }) { network.api.statistics(range.from.toString(), range.to.toString(), credential) } ?: notConfigured()
+    }
+
     suspend fun metadata(): ApiResult<Metadata> = protected { credential ->
         network?.executor?.execute({ it.toModel() }) { network.api.metadata(credential) } ?: notConfigured()
     }

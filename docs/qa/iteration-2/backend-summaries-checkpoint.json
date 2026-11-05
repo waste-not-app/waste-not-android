@@ -1,0 +1,52 @@
+{
+  "base_commit": "76f2b1948c17ea5ad12e0554ac1eca6fd5a84f16",
+  "backend_contract_commit": "5cc59bc461b81c45e08878da2c44a8b3e9eef15b",
+  "sources": {
+    "app/src/main/java/com/example/wastenot/model/ServerSummaries.kt": "53a2cf7ccd2f31ddd794c9e5b1148d245f7d6b450daab927cbe434f66d0b0410",
+    "app/src/main/java/com/example/wastenot/data/network/dto/SummaryDtos.kt": "30a8fcfcc6859186dfe2408c99d49f48e179eb009ae8b7feba6e61419e9a3395",
+    "app/src/main/java/com/example/wastenot/data/network/WasteNotApi.kt": "b3eef5da499befdc2f24b579cf511d692c88b484ef6ea17e5219e4ae9b69e141",
+    "app/src/main/java/com/example/wastenot/data/repository/CoreRepository.kt": "145bb18d87bc312e9f38e473e861403f8aa5dcd8a6929bb64308413a38f039ac",
+    "app/src/androidTest/java/com/example/wastenot/data/network/RemoteActivityLifecycleTest.kt": "0471e79e2bcd94a1287cfe38aaa22ad417aeafe5b1d4e9f31e7cbfadd59a7459",
+    "app/src/test/java/com/example/wastenot/data/repository/ServerSummaryTest.kt": "e41dd8a15af6fd3fe3ce94bf0cf6aaf69f84b721e0a11dacdf9a9ce15535fddb"
+  },
+  "unit": {
+    "tests": 190,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "new_unit_cases": 8,
+  "lint_debug_passed": true,
+  "default_dummy_changed": false,
+  "screen_wiring_complete": false,
+  "native": {
+    "api": 24,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "passed_steps": [
+      "register",
+      "logout_and_login",
+      "authenticated_metadata",
+      "empty_server_dashboard_and_statistics",
+      "create_replay_detail_list",
+      "created_record_updates_server_aggregates",
+      "quantity_switch_and_stale_version_conflicts",
+      "quantity_switch_updates_server_aggregates",
+      "delete_replay_and_server_progress",
+      "delete_clears_server_aggregates",
+      "logout_revokes_session"
+    ],
+    "channel": "loopback-over-owned-SSH-tunnel",
+    "public_https_verified": false,
+    "fixture_cleanup_complete": true,
+    "app_sha256": "15acf2089df16429fa3bd60d3a103dd19af64ac45fc3c9e79ca32755f45fe736",
+    "test_sha256": "b018a88efa805b9374c511bb9fd8a21958921b993925afaf2acae9a65f44eccc",
+    "native_sources_unchanged": true
+  },
+  "bundled_evidence": {
+    "native-lifecycle-result.json": "1fc8776089baff42bf7d64e6c0bc04e4290dda7a4a4cc031ea185e0d2cbdd51e",
+    "ServerSummaryTest.xml": "2550dd5faecb4753798609f90063a06e32492fc6b2fdfbab5f911a26199bff4d",
+    "native-lifecycle.log": "e04d121de55a40ef9224d3eca95fcd9eb7433179c72ebb5f9a5b7f5d59a07242"
+  }
+}
