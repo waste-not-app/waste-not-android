@@ -1,7 +1,5 @@
 package com.example.wastenot.data.repository
 
-import com.example.wastenot.data.network.ApiFailure
-import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.model.Quantity
@@ -34,11 +32,9 @@ class RemoteActivityStore(private val core: CoreRepository) : ActivityStore {
     override val isDemo = false
     override val referenceDate: LocalDate? = null
     override suspend fun load() = core.wasteLogs()
-    override suspend fun get(id: String) = unavailable()
-    // shortcut: writes await the log API integration; UI retains the draft on this failure.
-    override suspend fun create(input: ActivityInput, clientRequestId: String) = unavailable()
-    override suspend fun update(id: String, version: Int, input: ActivityInput) = unavailable()
-    override suspend fun delete(id: String, version: Int) = unavailable()
+    override suspend fun get(id: String) = core.wasteLog(id)
+    override suspend fun create(input: ActivityInput, clientRequestId: String) = core.createLog(input, clientRequestId)
+    override suspend fun update(id: String, version: Int, input: ActivityInput) = core.updateLog(id, version, input)
+    override suspend fun delete(id: String, version: Int) = core.deleteLog(id, version)
     override fun clear() = Unit
-    private fun unavailable() = ApiResult.Failure(ApiFailure(ApiFailureKind.NOT_CONFIGURED))
 }

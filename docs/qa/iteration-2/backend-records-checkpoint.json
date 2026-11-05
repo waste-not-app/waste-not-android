@@ -1,0 +1,58 @@
+{
+  "base_commit": "ef4fccaba27a7bb41834fa880f5d6a618240805b",
+  "backend_contract_commit": "28a3cb78031c1c60f687ab2567aa2a5c4de41260",
+  "backend_core_contract_sha256": "2294fc4bfcf0acc9a75953b8b5ecb6de697aed57a30bf0039c42268de1141068",
+  "unit": {
+    "tests": 182,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "new_transport_tests": 11,
+  "app_sha256": "0b90f41f92c547b9a587df7f8b645e2fbb5720d28bc95b075f01c3ca60826920",
+  "remote_build_flag": true,
+  "lint_passed": true,
+  "sources": {
+    "app/src/main/java/com/example/wastenot/data/network/ApiExecutor.kt": "300863a4481c5c364485520cf6061ab87f32098837a9bd0458724a8662ae95b4",
+    "app/src/main/java/com/example/wastenot/data/network/WasteNotApi.kt": "95f2867befd86d1e91fdddc91e69d53962a94642aad7aaf0ab361ff8ecd2f7db",
+    "app/src/main/java/com/example/wastenot/data/network/dto/ActivityRequestFields.kt": "d1cbda025306138fa9b986a3be07284370f2c2edb68c66a1b81a9364f48c5919",
+    "app/src/main/java/com/example/wastenot/data/repository/ActivityStore.kt": "083aabd0a5dc93bcd1eb2730fe2192e68fb95e5a714707fa2867e6a9fff780cd",
+    "app/src/main/java/com/example/wastenot/data/repository/CoreRepository.kt": "9ee0ae74264fb7508b870db44cae504f066b4ddbf91b4f838c0b67f6f79d4229",
+    "app/src/test/java/com/example/wastenot/data/repository/RemoteActivityStoreTest.kt": "6c3d62e92896001eaff6f6d6b0e7fdbf5e563886444c57295e84e3e61c39db69",
+    "app/src/androidTest/java/com/example/wastenot/data/network/RemoteReadOnlyContractTest.kt": "4ead426200ff843d529a5837f3479f98892651095ff8bbc20741dbc298fa6dce"
+  },
+  "cases": [
+    "malformedOrUnconfirmedWriteResultsNeverBecomeSuccessfulReceipts",
+    "detailAcceptsTheRequestedUuidAndRejectsAnUnrelatedRecord",
+    "lostCreateResponseDoesNotRetryUntilTheCallerExplicitlyRetries",
+    "createAndExplicitReplayKeepTheSamePayloadAndDistinguishReceipts",
+    "cancellingAnInFlightWriteRemainsCancellationAndDoesNotReplay",
+    "deleteUsesQuotedIfMatchAndAcceptsOnlyAnEmpty204Success",
+    "changingQuantityKindClearsTheOtherUnitAndSendsTheReadVersion",
+    "invalidLocalKeysNeverReachTheServerAndMissingConfigurationStaysExplicit",
+    "writeErrorsKeepConflictValidationAndRetryMetadata",
+    "updateAndDeletePreserveVersionAndMissingRecordFailures",
+    "authenticatedWritesUseAccountCredentialsAndReusePayloadAfterA401Refresh"
+  ],
+  "unit_xml_sha256": "a9313dff7b040eea80a14fd6f0e559db7a2ad51eacb0a64db9fade64e0c1c6b2",
+  "test_sha256": "e7bdb54f0041327a5a0bae11c74f2bea3036678318d86533c9e869bdc74353ce",
+  "native_readonly": {
+    "api": 24,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "expected_http_status": 401,
+    "observed": "SSLHandshakeException / handshake_failure before HTTP",
+    "gateway_certificate_curve": "secp384r1",
+    "client_supported_groups": [
+      "secp256r1"
+    ],
+    "compatibility_gate_open": true
+  },
+  "bundled_evidence": {
+    "RemoteActivityStoreTest.xml": "a9313dff7b040eea80a14fd6f0e559db7a2ad51eacb0a64db9fade64e0c1c6b2",
+    "clienthello-api24.json": "b4221a41d6940c4f0795f5a0fb21dd6fd31b3b03c7ebf6d6e7d0b66fe8127dbc",
+    "native-readonly-failure.log": "e92a6591c4c23d6fa9231ff3923cae859141b5b75e323f82effe8c65e4e58ae2",
+    "tls-groups.json": "e001264b265700c5ee56d6a5c7a18ff7141fe0b168d81f9e2de2ab30a7b7efff"
+  }
+}

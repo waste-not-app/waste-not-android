@@ -28,9 +28,11 @@ Starter menyediakan task unit test debug (termasuk renderer Navigation Graph); t
 
 ## Konfigurasi lingkungan
 
-Iteration 2 menggunakan `BuildConfig.USE_DUMMY_DATA=true` secara default pada debug/staging/release, sesuai permintaan pengerjaan UI tanpa backend. Sesi dan catatan fixture tersimpan lokal per akun; tidak ada tombol mode demo. Base URL di bawah tetap divalidasi, tetapi request akun/catatan tidak dipakai selama adapter dummy aktif. Untuk menguji adapter remote, tambahkan `-Pwastenot.useDummyData=false` bersama URL yang sesuai. Adapter write/agregat remote belum lengkap, sehingga konfigurasi ini bukan klaim backend sudah terintegrasi.
+Iteration 2 menggunakan `BuildConfig.USE_DUMMY_DATA=true` secara default pada debug/staging/release, sesuai permintaan pengerjaan UI tanpa backend. Sesi dan catatan fixture tersimpan lokal per akun; tidak ada tombol mode demo. Base URL di bawah tetap divalidasi, tetapi request akun/catatan tidak dipakai selama adapter dummy aktif. Untuk menguji adapter remote, tambahkan `-Pwastenot.useDummyData=false` bersama URL yang sesuai. Detail/create/update/delete catatan sudah tersambung pada checkpoint [transport catatan](qa/iteration-2/BACKEND_RECORDS.md); dashboard/statistik server, pagination/filter, Panduan, AI dan penerimaan perangkat masih diperlukan sebelum mode remote menjadi default.
 
 Pembaruan 4 November 2026: repo backend dan deployment HTTPS sudah tersedia. Readiness core menjawab 200; alur Android yang terautentikasi dan write belum diverifikasi. [Peta integrasi dan kontrak yang diperiksa](tasks/BACKEND_INTEGRATION.md) mencatat sumber remote, endpoint, dan pekerjaan sebelum mengganti adapter default.
+
+Pemeriksaan perangkat 5 November menemukan kegagalan handshake pada emulator API 24 karena kompatibilitas kurva sertifikat gateway. [Bukti transport dan TLS](qa/iteration-2/BACKEND_RECORDS.md) memisahkan 182 unit tests yang lulus dari satu uji HTTPS perangkat yang belum lulus. Selesaikan kompatibilitas gateway dan penerimaan perangkat sebelum mengaktifkan remote sebagai default.
 
 | Build type | Property Gradle | Default | Kebijakan |
 |---|---|---|---|

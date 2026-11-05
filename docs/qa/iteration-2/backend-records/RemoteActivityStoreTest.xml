@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.data.repository.RemoteActivityStoreTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-04T16:06:20.078Z" hostname="oktaavsm" time="1.093">
+  <properties/>
+  <testcase name="malformedOrUnconfirmedWriteResultsNeverBecomeSuccessfulReceipts" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.157"/>
+  <testcase name="detailAcceptsTheRequestedUuidAndRejectsAnUnrelatedRecord" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.062"/>
+  <testcase name="lostCreateResponseDoesNotRetryUntilTheCallerExplicitlyRetries" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.022"/>
+  <testcase name="createAndExplicitReplayKeepTheSamePayloadAndDistinguishReceipts" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.062"/>
+  <testcase name="cancellingAnInFlightWriteRemainsCancellationAndDoesNotReplay" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.018"/>
+  <testcase name="deleteUsesQuotedIfMatchAndAcceptsOnlyAnEmpty204Success" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.08"/>
+  <testcase name="changingQuantityKindClearsTheOtherUnitAndSendsTheReadVersion" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.079"/>
+  <testcase name="invalidLocalKeysNeverReachTheServerAndMissingConfigurationStaysExplicit" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.009"/>
+  <testcase name="writeErrorsKeepConflictValidationAndRetryMetadata" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.151"/>
+  <testcase name="updateAndDeletePreserveVersionAndMissingRecordFailures" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.148"/>
+  <testcase name="authenticatedWritesUseAccountCredentialsAndReusePayloadAfterA401Refresh" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="0.301"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Nov 04, 2026 11:06:20 PM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[53819] connection from /127.0.0.1 didn't make a request
+Nov 04, 2026 11:06:20 PM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[59091] connection from /127.0.0.1 didn't make a request
+]]></system-err>
+</testsuite>

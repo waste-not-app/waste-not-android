@@ -15,6 +15,11 @@ import retrofit2.http.Query
 import retrofit2.http.POST
 import retrofit2.http.Body
 import retrofit2.http.Tag
+import retrofit2.http.DELETE
+import retrofit2.http.Header
+import retrofit2.http.PATCH
+import retrofit2.http.Path
+import kotlinx.serialization.json.JsonObject
 
 interface WasteNotApi {
     @GET("metadata")
@@ -30,6 +35,20 @@ interface WasteNotApi {
         @Query("limit") limit: Int = 20,
         @Tag credential: RequestCredential? = null,
     ): Response<DataEnvelope<List<WasteLogDto>>>
+
+    @GET("waste-logs/{id}")
+    suspend fun wasteLog(@Path("id") id: String, @Tag credential: RequestCredential? = null): Response<DataEnvelope<WasteLogDto>>
+
+    @POST("waste-logs")
+    suspend fun createLog(@Body input: JsonObject, @Tag credential: RequestCredential? = null): Response<DataEnvelope<WasteLogDto>>
+
+    @PATCH("waste-logs/{id}")
+    suspend fun updateLog(@Path("id") id: String, @Body input: JsonObject,
+        @Tag credential: RequestCredential? = null): Response<DataEnvelope<WasteLogDto>>
+
+    @DELETE("waste-logs/{id}")
+    suspend fun deleteLog(@Path("id") id: String, @Header("If-Match") version: String,
+        @Tag credential: RequestCredential? = null): Response<Unit>
 
     @POST("auth/login")
     suspend fun login(@Body input: LoginDto): Response<DataEnvelope<SessionDto>>

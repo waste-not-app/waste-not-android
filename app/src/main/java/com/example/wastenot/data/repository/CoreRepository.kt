@@ -4,11 +4,14 @@ import com.example.wastenot.data.network.ApiFailure
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.network.WasteNotNetwork
+import com.example.wastenot.data.network.dto.toRequestFields
 import com.example.wastenot.model.ActivityDateRange
 import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.model.Metadata
 import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteLog
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class CoreRepository(private val network: WasteNotNetwork?, private val session: SessionRepository? = null) {
     suspend fun metadata(): ApiResult<Metadata> = protected { credential ->
@@ -32,8 +35,56 @@ class CoreRepository(private val network: WasteNotNetwork?, private val session:
         } else result
     }
 
+    suspend fun wasteLog(id: String): ApiResult<WasteLog> {
+        if (!uuid.matches(id)) return invalidRequest()
+        return protected { credential ->
+            network?.executor?.executeWithStatus({ dto, status ->
+                require(status == 200 && dto.id.equals(id, ignoreCase = true))
+                dto.toModel()
+            }) { network.api.wasteLog(id, credential) } ?: notConfigured()
+        }
+    }
+
+    suspend fun createLog(input: ActivityInput, requestId: String): ApiResult<ActivityCreation> {
+        if (!uuid.matches(requestId)) return invalidRequest()
+        val body = buildJsonObject {
+            input.toRequestFields().forEach { (name, value) -> put(name, value) }
+            put("client_request_id", requestId)
+        }
+        return protected { credential ->
+            network?.executor?.executeWithStatus({ dto, status ->
+                require(status == 200 || status == 201)
+                ActivityCreation(dto.toModel(), created = status == 201)
+            }) { network.api.createLog(body, credential) } ?: notConfigured()
+        }
+    }
+
+    suspend fun updateLog(id: String, version: Int, input: ActivityInput): ApiResult<WasteLog> {
+        if (!uuid.matches(id) || version < 1) return invalidRequest()
+        val body = buildJsonObject {
+            input.toRequestFields().forEach { (name, value) -> put(name, value) }
+            put("version", version)
+        }
+        return protected { credential ->
+            network?.executor?.executeWithStatus({ dto, status ->
+                require(status == 200 && dto.id.equals(id, ignoreCase = true) && dto.version > version)
+                dto.toModel()
+            }) { network.api.updateLog(id, body, credential) } ?: notConfigured()
+        }
+    }
+
+    suspend fun deleteLog(id: String, version: Int): ApiResult<Unit> {
+        if (!uuid.matches(id) || version < 1) return invalidRequest()
+        return protected { credential ->
+            network?.executor?.executeEmpty { network.api.deleteLog(id, "\"$version\"", credential) } ?: notConfigured()
+        }
+    }
+
     private fun notConfigured() = ApiResult.Failure(ApiFailure(ApiFailureKind.NOT_CONFIGURED))
+    private fun invalidRequest() = ApiResult.Failure(ApiFailure(ApiFailureKind.INVALID_REQUEST))
 
     private suspend fun <T> protected(call: suspend (RequestCredential?) -> ApiResult<T>): ApiResult<T> =
         session?.authenticated { call(it) } ?: call(null)
 }
+
+private val uuid = Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
