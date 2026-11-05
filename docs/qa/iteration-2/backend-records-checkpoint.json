@@ -19,7 +19,8 @@
     "app/src/main/java/com/example/wastenot/data/repository/ActivityStore.kt": "083aabd0a5dc93bcd1eb2730fe2192e68fb95e5a714707fa2867e6a9fff780cd",
     "app/src/main/java/com/example/wastenot/data/repository/CoreRepository.kt": "9ee0ae74264fb7508b870db44cae504f066b4ddbf91b4f838c0b67f6f79d4229",
     "app/src/test/java/com/example/wastenot/data/repository/RemoteActivityStoreTest.kt": "6c3d62e92896001eaff6f6d6b0e7fdbf5e563886444c57295e84e3e61c39db69",
-    "app/src/androidTest/java/com/example/wastenot/data/network/RemoteReadOnlyContractTest.kt": "4ead426200ff843d529a5837f3479f98892651095ff8bbc20741dbc298fa6dce"
+    "app/src/androidTest/java/com/example/wastenot/data/network/RemoteReadOnlyContractTest.kt": "4ead426200ff843d529a5837f3479f98892651095ff8bbc20741dbc298fa6dce",
+    "app/src/androidTest/java/com/example/wastenot/data/network/RemoteActivityLifecycleTest.kt": "56890db9278b2bb90bbc945d3c308e07c207fbea1c097efaf69ed863452e05bc"
   },
   "cases": [
     "malformedOrUnconfirmedWriteResultsNeverBecomeSuccessfulReceipts",
@@ -53,6 +54,30 @@
     "RemoteActivityStoreTest.xml": "a9313dff7b040eea80a14fd6f0e559db7a2ad51eacb0a64db9fade64e0c1c6b2",
     "clienthello-api24.json": "b4221a41d6940c4f0795f5a0fb21dd6fd31b3b03c7ebf6d6e7d0b66fe8127dbc",
     "native-readonly-failure.log": "e92a6591c4c23d6fa9231ff3923cae859141b5b75e323f82effe8c65e4e58ae2",
-    "tls-groups.json": "e001264b265700c5ee56d6a5c7a18ff7141fe0b168d81f9e2de2ab30a7b7efff"
-  }
+    "tls-groups.json": "e001264b265700c5ee56d6a5c7a18ff7141fe0b168d81f9e2de2ab30a7b7efff",
+    "native-lifecycle.log": "d6886fefbc8bc979ce13e9b9fc7940dc468ec1af4e807b45b91e16e20ee801e2",
+    "native-lifecycle-result.json": "4acad715718b36d59e907d0eb21cae4710a11bdf5064752cf4f64827f8bbcf19"
+  },
+  "native_lifecycle": {
+    "api": 24,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "channel": "loopback-over-owned-SSH-tunnel",
+    "public_https_verified": false,
+    "fixture_cleanup_complete": true,
+    "passed_steps": [
+      "register",
+      "logout_and_login",
+      "authenticated_metadata",
+      "create_replay_detail_list",
+      "quantity_switch_and_stale_version_conflicts",
+      "delete_replay_and_server_progress",
+      "logout_revokes_session"
+    ],
+    "app_sha256": "0b90f41f92c547b9a587df7f8b645e2fbb5720d28bc95b075f01c3ca60826920",
+    "test_sha256": "b2905208fcbbf733e2d6ef3db1bc653afa53c7f1fd4bd1e6649032e4300d5932"
+  },
+  "gateway_owner": "BCC admin/team (confirmed by user)",
+  "backend_core_rechecked_commit": "5cc59bc461b81c45e08878da2c44a8b3e9eef15b"
 }

@@ -32,7 +32,25 @@ Sebelas kasus baru `RemoteActivityStoreTest` memakai MockWebServer untuk menguji
 - respons create yang hilang, retry eksplisit dan cancellation tanpa replay transport;
 - input lokal tidak valid, konfigurasi tidak tersedia, serta credential akun dan payload setelah refresh 401.
 
-[Manifest](backend-records-checkpoint.json) mengikat source, kontrak, hasil unit, konfigurasi build remote dan APK pengujian. [Laporan sebelas kasus](backend-records/RemoteActivityStoreTest.xml) merekam hasil test runner. Ini bukti binding/transport dengan server tiruan dan kompilasi varian remote, **belum** penerimaan alur perangkat terhadap database/deployment backend.
+[Manifest](backend-records-checkpoint.json) mengikat source, kontrak, hasil unit, konfigurasi build remote dan APK pengujian. [Laporan sebelas kasus](backend-records/RemoteActivityStoreTest.xml) merekam hasil test runner. Angka unit ini berasal dari server tiruan; penerimaan perangkat/database dicatat terpisah berikut ini.
+
+## Lifecycle native ke database: lulus melalui SSH
+
+Pada 5 November 2026, satu kasus `RemoteActivityLifecycleTest` lulus pada emulator API 24 dalam 1,538 detik terhadap aplikasi Go dan PostgreSQL deployment `cp-bcc`. Kanal pengembangan: emulator `10.0.2.2:18088` → port loopback host → tunnel SSH → Go `127.0.0.1:18080`. Tunnel hanya bind loopback, lalu dihentikan setelah tes. HTTP lokal memakai izin debug yang sudah ada; kebijakan HTTPS publik dan release tidak diperlonggar.
+
+Tes memakai satu akun sementara dengan email unik `example.test` dan password acak dalam memori, bukan akun pengguna. Tanggal aktivitas memakai tanggal aktual dalam zona akun Asia/Jakarta. Tujuh tahap lulus:
+
+1. Register akun uji.
+2. Logout server lalu login kembali ke identitas sama.
+3. Metadata terautentikasi.
+4. Create 201, replay eksplisit 200 dengan ID/payload sama, detail dan daftar.
+5. Edit berat menjadi 3 benda; PATCH dan DELETE memakai versi lama menghasilkan konflik.
+6. Progres `/me` menjadi 1 catatan/10 XP, lalu delete, detail 404, replay create 410, replay delete 204, daftar kosong dan progres 0/0.
+7. Logout membersihkan credential lokal dan token akses lama ditolak server.
+
+[Log native](backend-records/native-lifecycle.log) dan [hasil beserta cleanup](backend-records/native-lifecycle-result.json) merekam bukti. Driver host memverifikasi email fixture belum ada sebelum tes, lalu menghapus hanya identitas persis tersebut beserta ID yang dikembalikan register. Pemeriksaan sesudahnya: akun fixture tidak ada; sesi, catatan dan operasi AI milik ID itu masing-masing nol. Password/token tidak ditulis ke bukti. Counter rate limit/audit normal tidak dihapus. Konfigurasi deployment dan data akun lain tidak diubah.
+
+APK aplikasi sama dengan checkpoint transport (`0b90f41f…`); APK tes baru terikat pada manifest. Tes ini opt-in melalui `verifyLiveFixture=true`, `fixtureRunId=<UUID>` dan `recordsTestBaseUrl=http://10.0.2.2:18088/v1/`. Jalankan hanya dengan tunnel dan driver cleanup akun fixture yang sudah disiapkan. CI tidak membuat akun live. Ini bukti repository/session dari perangkat ke database, **belum** koneksi HTTPS publik, interaksi screen remote, refresh nyata, pergantian akun atau agregat dashboard/statistik.
 
 ## Uji HTTPS native: belum lulus pada API 24
 
@@ -47,7 +65,7 @@ Pemeriksaan baca-saja `RemoteReadOnlyContractTest` pada emulator API 24 gagal se
 
 [ClientHello yang difilter ke endpoint](backend-records/clienthello-api24.json), [uji pembanding grup host](backend-records/tls-groups.json) dan [log native](backend-records/native-readonly-failure.log) memuat bukti. PCAP mentah tetap di artifact root eksternal, tidak dibundel. Standar TLS 1.2 mensyaratkan kunci EC sertifikat server mengikuti grup yang didukung client; lihat [RFC 8422 §5.3](https://www.rfc-editor.org/rfc/rfc8422.html#section-5.3).
 
-Gerbang yang masih perlu diselesaikan: gateway menyediakan sertifikat P-256 atau RSA yang kompatibel, lalu rantai sertifikat dan koneksi diverifikasi lagi pada API 24. Lokasi/pengelola gateway masih diminta kepada pengguna; dokumentasi backend hanya menunjukkan Nginx HTTP di belakang gateway. Verifikasi sertifikat/hostname tetap memakai perilaku OkHttp/platform, dan minimum API 24 dipertahankan. Uji native gagal ini tidak dihitung sebagai kelulusan atau diganti dengan uji host.
+Gerbang yang masih perlu diselesaikan: gateway menyediakan sertifikat P-256 atau RSA yang kompatibel, lalu rantai sertifikat dan koneksi diverifikasi lagi pada API 24. Pengguna mengonfirmasi bahwa panel Nginx Proxy Manager di `https://proxy.bccdev.id` dikelola admin/tim BCC. Pemeriksaan baca-saja melalui SSH `cp-bcc` menemukan Nginx HTTP pada port 80 dan aplikasi Go pada loopback 18080, tanpa listener TLS 443. Konfigurasi gateway publik perlu ditangani pengelola BCC; konfigurasi VPS tidak diubah. Verifikasi sertifikat/hostname tetap memakai perilaku OkHttp/platform, dan minimum API 24 dipertahankan. Uji native gagal ini tidak dihitung sebagai kelulusan atau diganti dengan uji host.
 
 Reproduksi setelah memasang APK remote dan APK penguji yang cocok:
 
@@ -62,6 +80,6 @@ Kasus ini hanya aktif ketika argumen tersebut diberikan. Ia melakukan GET metada
 
 ## Penerimaan yang masih diperlukan
 
-Dashboard/statistik/progres harus memakai agregat server; satu halaman 20 catatan tidak boleh dianggap keseluruhan data. Pagination/filter, Panduan PUBLISHED dan AI publik masih mengikuti [peta integrasi](../../tasks/BACKEND_INTEGRATION.md). Lanjutkan penerimaan auth → create/replay → detail/edit/konflik/delete → agregat → logout/pergantian akun pada perangkat dengan backend. Jangan menyatakan mode remote siap dari hasil unit atau readiness saja.
+Dashboard/statistik/progres harus memakai agregat server; satu halaman 20 catatan tidak boleh dianggap keseluruhan data. Pagination/filter, Panduan PUBLISHED dan AI publik masih mengikuti [peta integrasi](../../tasks/BACKEND_INTEGRATION.md). Lanjutkan penerimaan melalui screen remote, refresh/pergantian akun dan agregat dashboard/statistik setelah binding datanya tersedia, serta ulangi koneksi publik setelah pengelola BCC memperbaiki TLS. Jangan menyatakan mode remote siap dari tes repository lewat SSH ini.
 
 Penerimaan seluruh screen/navbar/navigasi tetap berada pada [matriks Iteration 2](../../tasks/ITERATION_2_DESIGN.md). Hasil visual sebelumnya tetap berlaku pada source checkpoint masing-masing dan tidak dihitung ulang dalam angka transport ini.

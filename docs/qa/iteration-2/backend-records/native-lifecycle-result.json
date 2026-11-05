@@ -1,0 +1,30 @@
+{
+  "run_id": "91df665f-50ef-425f-b7f1-c907097f00ce",
+  "email": "android-91df665f-50ef-425f-b7f1-c907097f00ce@example.test",
+  "channel": "loopback-over-owned-SSH-tunnel",
+  "public_https_verified": false,
+  "cleanup_complete": true,
+  "before_count": 0,
+  "records-v4-remote-api24.apk": "0b90f41f92c547b9a587df7f8b645e2fbb5720d28bc95b075f01c3ca60826920",
+  "records-v4-tests.apk": "b2905208fcbbf733e2d6ef3db1bc653afa53c7f1fd4bd1e6649032e4300d5932",
+  "instrument_returncode": 0,
+  "native_passed": true,
+  "passed_steps": [
+    "register",
+    "logout_and_login",
+    "authenticated_metadata",
+    "create_replay_detail_list",
+    "quantity_switch_and_stale_version_conflicts",
+    "delete_replay_and_server_progress",
+    "logout_revokes_session"
+  ],
+  "removed_user_ids": [
+    "20d1f07e-9a30-4678-9e9f-8ccec2b48df7"
+  ],
+  "after_count": 0,
+  "owned_child_rows_remaining": {
+    "sessions": 0,
+    "waste_logs": 0,
+    "ai_operations": 0
+  }
+}
