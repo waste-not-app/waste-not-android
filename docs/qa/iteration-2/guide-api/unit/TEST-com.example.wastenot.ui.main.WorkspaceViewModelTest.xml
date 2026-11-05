@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.ui.main.WorkspaceViewModelTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:34:29.538Z" hostname="oktaavsm" time="0.226">
+  <properties/>
+  <testcase name="lateLoadCannotRepopulateAClearedAccountOwner" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.006"/>
+  <testcase name="deleteRetainsTheRecordUntilConfirmationAndSerializesWrites" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.009"/>
+  <testcase name="saveIsCorrelatedAndAcknowledgedWithoutAddingEditActivities" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.006"/>
+  <testcase name="detailLoadsByIdEvenWhenTheListDoesNotContainTheRecord" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.024"/>
+  <testcase name="retryAfterCommittedResponseIsLostDoesNotAnnounceAnotherCreation" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.007"/>
+  <testcase name="anUnresolvedCreateRejectsChangedPayloadBeforeCallingTheStore" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.012"/>
+  <testcase name="removingAccountOwnerClearsDataAndReplayCache" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.004"/>
+  <testcase name="createWhileInitialLoadIsPendingRefreshesTheWholeSnapshot" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.011"/>
+  <testcase name="missingDetailHidesTheCacheWhileNetworkFailureRetainsItForReading" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.01"/>
+  <testcase name="failedDeleteKeepsTheVisibleRecordAndCanBeRetried" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.013"/>
+  <testcase name="staleLoadCannotResurrectADeletedRecordEvenWhenRefreshFails" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.115"/>
+  <testcase name="aLateDetailResponseCannotResurrectADeletedRecord" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.004"/>
+  <testcase name="definiteCreateRejectionAllowsCorrectionsAndRapidTapsNeverStartAnotherWrite" classname="com.example.wastenot.ui.main.WorkspaceViewModelTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

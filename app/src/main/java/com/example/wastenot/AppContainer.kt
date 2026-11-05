@@ -20,5 +20,5 @@ class AppContainer(context: Context) {
         DummyAccountSession(context.getSharedPreferences("dummy_session", Context.MODE_PRIVATE))
     } else RemoteAccountSession(sessions) { connectivity?.activeNetwork != null }
     val core = CoreRepository(network, sessions)
-    val guides: GuideStore = if (BuildConfig.USE_DUMMY_DATA) DummyGuideStore() else RemoteGuideStore()
+    val guides: GuideStore = if (BuildConfig.USE_DUMMY_DATA) DummyGuideStore() else RemoteGuideStore(core)
 }

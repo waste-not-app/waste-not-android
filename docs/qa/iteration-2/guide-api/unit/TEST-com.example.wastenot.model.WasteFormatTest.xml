@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.model.WasteFormatTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:34:22.809Z" hostname="oktaavsm" time="2.736">
+  <properties/>
+  <testcase name="prd94ServerSummaryKeepsHandledAndAvoidedQuantitiesSeparate" classname="com.example.wastenot.model.WasteFormatTest" time="2.711"/>
+  <testcase name="emptyAndReduceOnlySummariesHaveNoRecyclingRate" classname="com.example.wastenot.model.WasteFormatTest" time="0.001"/>
+  <testcase name="formatsDetailAndSummaryWeightsWithSeparateUnitAndNoPrecisionLossInTheModel" classname="com.example.wastenot.model.WasteFormatTest" time="0.001"/>
+  <testcase name="percentageUsesOneOptionalDecimalAndPreservesNoDenominator" classname="com.example.wastenot.model.WasteFormatTest" time="0.001"/>
+  <testcase name="formatsActivityDateWithoutReinterpretingItAsUtc" classname="com.example.wastenot.model.WasteFormatTest" time="0.022"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

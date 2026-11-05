@@ -1,0 +1,16 @@
+{
+  "use_dummy": false,
+  "url": "https://pred-autoscaler.bccdev.id/wastenot/api/v1/",
+  "minimum_api": 30,
+  "base_commit": "90e04c5ea6cf46bbfa6bb4bf94d7c50fead61b5d",
+  "unit": {
+    "tests": 212,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "apks": {
+    "guide-native.apk": "d52a3693a4dc181463fceed2be7e431983564184f3678c4769e29af1c58fef99",
+    "guide-native-tests.apk": "ae1a7eab147c4f89690a0597f4ed9b209badfde67f26963b3871ac7692354bed"
+  }
+}

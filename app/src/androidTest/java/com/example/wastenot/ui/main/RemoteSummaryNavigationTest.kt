@@ -115,6 +115,18 @@ class RemoteSummaryNavigationTest {
             assertEquals(0, success(core.dashboard()).progress.xp)
             compose.onNodeWithText("Belum ada catatan hari ini.").assertExists()
             capture("remote-home-empty")
+            if (args.getString("verifyEmptyGuideCatalog") == "true") {
+                assertTrue("This live check requires an empty published catalog", success(core.guides("")).isEmpty())
+                tab("Panduan")
+                waitFor("Panduan belum ditemukan")
+                compose.onNodeWithText("Coba nama material yang lebih umum.").assertExists()
+                capture("remote-guide-empty")
+                compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Hapus pencarian"))
+                compose.onNodeWithText("Hapus pencarian").performClick()
+                waitFor("Panduan belum ditemukan")
+                record("ui_empty_published_guide_catalog")
+                tab("Beranda")
+            }
             compose.onNodeWithText("Input manual").performScrollTo().performClick()
             compose.onNodeWithText("Recycle").performScrollTo().performClick()
             compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
