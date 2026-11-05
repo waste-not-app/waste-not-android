@@ -18,4 +18,5 @@ import java.util.UUID
 @Serializable data object Settings : NavKey
 @Serializable data class LogDetail(val id: String, val instanceId: String = UUID.randomUUID().toString()) : NavKey
 @Serializable data class LogEditor(val logId: String?, val requestId: String, val guideId: String? = null,
-    val scanCategory: String? = null, val scanMethod: String? = null) : NavKey
+    val scanCategory: String? = null, val scanMethod: String? = null,
+    val scanRecommendationId: String? = null) : NavKey

@@ -13,6 +13,7 @@ data class StoredEditorDraft(
     val scanCategory: String? = null,
     val scanMethod: String? = null,
     val paused: Boolean = false,
+    val scanRecommendationId: String? = null,
 )
 
 interface EditorDraftStore {

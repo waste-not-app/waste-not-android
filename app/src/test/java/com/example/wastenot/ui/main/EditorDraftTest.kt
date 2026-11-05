@@ -12,6 +12,68 @@ import org.junit.Test
 class EditorDraftTest {
     private val today = LocalDate.of(2026, 9, 21)
 
+    @Test fun aiReferenceSurvivesUnknownWriteAndProcessRestoreWithoutChangingTheReplayPayload() {
+        val draft = aiDraft()
+        val submitted = draft.prepareSubmission(today)!!
+        assertNotNull(submitted.aiProvenance)
+        draft.submissionFailed(ApiFailureKind.TIMEOUT)
+        draft.useManualEntry()
+        assertEquals(submitted.aiProvenance, draft.values.aiProvenance)
+        val restored = EditorDraft.fromSnapshot(draft.snapshot())
+        assertEquals(28, draft.snapshot().size)
+        assertEquals(draft.values, restored.values)
+        assertEquals(submitted, restored.prepareSubmission(today.plusDays(31)))
+        restored.submissionFailed(ApiFailureKind.AI_EXPIRED)
+        assertTrue(restored.locked)
+        assertEquals(submitted, restored.prepareSubmission(today.plusDays(31)))
+    }
+
+    @Test fun methodCorrectionRetainsInitialAiReferenceButCategoryAndReduceRequireExplicitManualEntry() {
+        val draft = aiDraft()
+        val source = draft.values.aiProvenance
+        draft.change(EditorField.METHOD, draft.values.copy(method = DisposalMethod.TRASH))
+        assertEquals(source, draft.validate(today)!!.aiProvenance)
+        draft.change(EditorField.CATEGORY, draft.values.copy(category = WasteCategory.METAL))
+        assertNull(draft.validate(today))
+        assertTrue(EditorField.CATEGORY in draft.errors)
+        assertEquals(source, draft.values.aiProvenance)
+        draft.change(EditorField.METHOD, draft.values.copy(method = DisposalMethod.REDUCE))
+        assertNull(draft.validate(today))
+        assertTrue(EditorField.METHOD in draft.errors)
+        draft.useManualEntry()
+        assertNull(draft.validate(today)!!.aiProvenance)
+        assertEquals(22, draft.snapshot().size)
+    }
+
+    @Test fun rejectedAiReferenceCanBeRemovedExplicitlyBeforeAFirstKnownSuccessfulWrite() {
+        for (error in listOf(ApiFailureKind.AI_EXPIRED, ApiFailureKind.AI_REFERENCE_INVALID, ApiFailureKind.AI_ALREADY_LINKED)) {
+            val draft = aiDraft()
+            draft.prepareSubmission(today)
+            draft.submissionFailed(error)
+            assertFalse(draft.locked)
+            assertNotNull(draft.values.aiProvenance)
+            draft.useManualEntry()
+            assertNull(draft.prepareSubmission(today)!!.aiProvenance)
+        }
+    }
+
+    @Test fun malformedAiDraftCannotRestoreAnUnconfirmedOrDifferentCategorySubmission() {
+        val draft = aiDraft()
+        draft.prepareSubmission(today)
+        val snapshot = draft.snapshot()
+        for (bad in listOf(snapshot.toMutableList().apply { this[26] = "not-a-uuid" },
+            snapshot.toMutableList().apply { this[27] = "METAL" },
+            snapshot.toMutableList().apply { this[24] = "" })) {
+            assertThrows(IllegalArgumentException::class.java) { EditorDraft.fromSnapshot(bad) }
+        }
+    }
+
+    private fun aiDraft() = EditorDraft.from(null, today).apply {
+        applyScan(com.example.wastenot.LogEditor(null, "draft-test", scanCategory = "GLASS", scanMethod = "RECYCLE",
+            scanRecommendationId = "00000000-0000-4000-8000-000000000002"))
+        change(EditorField.QUANTITY, values.copy(quantity = QuantityInput("1", QuantityUnit.ITEM)))
+    }
+
     @Test fun blankDraftDoesNotInventMethodOrCategory() {
         val draft = EditorDraft.from(null, today)
         assertFalse(draft.dirty)

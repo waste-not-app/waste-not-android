@@ -16,6 +16,23 @@ class DraftDiskCodecTest {
     }
     private val key = LogEditor(null, "7b20f6b4-278c-492c-bddf-8ef2daaf28e5")
 
+    @Test fun aiReferenceIsAccountBoundAndSurvivesDiskWithoutMakingAnUnknownWriteEditable() {
+        val aiKey = key.copy(scanCategory = "PLASTIC", scanMethod = "RECYCLE",
+            scanRecommendationId = "00000000-0000-4000-8000-000000000002")
+        val form = draft().apply { applyScan(aiKey) }
+        val submitted = form.prepareSubmission(date)
+        form.submissionFailed(ApiFailureKind.TIMEOUT)
+        val raw = DraftDiskCodec.encode("account-A", form.stored(aiKey, MainTab.HOME))
+        val stored = DraftDiskCodec.decode("account-A", raw)
+        assertEquals(aiKey, stored.editorKey())
+        val restored = stored.restoreForm()
+        assertEquals(submitted, restored.prepareSubmission(date.plusDays(60)))
+        assertTrue(restored.locked)
+        assertNotNull(restored.values.aiProvenance)
+        assertFalse(raw.contains("capture.jpg"))
+        assertThrows(IllegalArgumentException::class.java) { DraftDiskCodec.decode("account-B", raw) }
+    }
+
     @Test fun unfinishedFieldsKeepTheirExactRawInputAcrossDiskEncoding() {
         val original = draft().apply { change(EditorField.QUANTITY, values.copy(quantity = QuantityInput("0,", QuantityUnit.KILOGRAM))) }
         val restored = DraftDiskCodec.decode("account-A", DraftDiskCodec.encode("account-A", original.stored(key, MainTab.HOME))).restoreForm()

@@ -275,7 +275,8 @@ fun AccountNavigation(
     if (resumingPrompt) ResumeDraftDialog({ resumingPrompt = false }, ::resumeDraft)
     capture?.let { session -> CaptureSheet(user.id, demo, session, onDismiss = { capture = null }, onPrefill = { prefill ->
         capture = null
-        openEditor(LogEditor(null, UUID.randomUUID().toString(), scanCategory = prefill.category?.name, scanMethod = prefill.method?.name))
+        openEditor(LogEditor(null, UUID.randomUUID().toString(), scanCategory = prefill.category?.name,
+            scanMethod = prefill.method?.name, scanRecommendationId = prefill.aiProvenance?.recommendationId))
     }) }
     BoxWithConstraints(modifier) {
         val rail = maxWidth >= 600.dp

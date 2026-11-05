@@ -91,12 +91,13 @@ private fun classify(status: Int, code: String?): ApiFailureKind = when (status)
         "EMAIL_EXISTS" -> ApiFailureKind.EMAIL_EXISTS
         "VERSION_CONFLICT" -> ApiFailureKind.VERSION_CONFLICT
         "IDEMPOTENCY_CONFLICT" -> ApiFailureKind.IDEMPOTENCY_CONFLICT
+        "AI_ALREADY_LINKED" -> ApiFailureKind.AI_ALREADY_LINKED
         else -> ApiFailureKind.CONFLICT
     }
-    410 -> ApiFailureKind.DELETED
+    410 -> if (code == "AI_SESSION_EXPIRED") ApiFailureKind.AI_EXPIRED else ApiFailureKind.DELETED
     413 -> ApiFailureKind.FILE_TOO_LARGE
     415 -> ApiFailureKind.UNSUPPORTED_MEDIA
-    422 -> ApiFailureKind.VALIDATION
+    422 -> if (code == "AI_REFERENCE_INVALID") ApiFailureKind.AI_REFERENCE_INVALID else ApiFailureKind.VALIDATION
     428 -> ApiFailureKind.PRECONDITION_REQUIRED
     429 -> ApiFailureKind.RATE_LIMITED
     in 500..599 -> ApiFailureKind.SERVER

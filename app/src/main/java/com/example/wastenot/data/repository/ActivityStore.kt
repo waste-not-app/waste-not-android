@@ -2,6 +2,7 @@ package com.example.wastenot.data.repository
 
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.model.DisposalMethod
+import com.example.wastenot.model.AiLogProvenance
 import com.example.wastenot.model.Quantity
 import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteLog
@@ -16,7 +17,10 @@ data class ActivityInput(
     val quantity: Quantity,
     val date: LocalDate,
     val notes: String,
-)
+    val aiProvenance: AiLogProvenance? = null,
+) {
+    init { require(aiProvenance == null || (aiProvenance.category == category && method != DisposalMethod.REDUCE)) }
+}
 
 data class ActivityCreation(val log: WasteLog, val created: Boolean)
 

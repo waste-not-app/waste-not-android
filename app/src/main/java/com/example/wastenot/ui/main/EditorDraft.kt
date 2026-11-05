@@ -9,6 +9,7 @@ import com.example.wastenot.LogEditor
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.ActivityInput
 import com.example.wastenot.model.ActivityDates
+import com.example.wastenot.model.AiLogProvenance
 import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.model.Quantity
 import com.example.wastenot.model.QuantityInput
@@ -25,6 +26,7 @@ enum class EditorField { METHOD, CATEGORY, QUANTITY, DATE, NOTES }
 data class EditorValues(
     val category: WasteCategory?, val method: DisposalMethod?, val quantity: QuantityInput,
     val date: LocalDate, val notes: String, val version: Int?,
+    val aiProvenance: AiLogProvenance? = null,
 )
 
 class EditorDraft(original: EditorValues) {
@@ -63,8 +65,17 @@ class EditorDraft(original: EditorValues) {
         if (key.logId != null || key.guideId != null || key.scanCategory == null) return this
         val category = WasteCategory.entries.find { it.name == key.scanCategory } ?: return this
         val method = DisposalMethod.entries.find { it.name == key.scanMethod && it != DisposalMethod.REDUCE }
-        change(EditorField.CATEGORY, values.copy(category = category, method = method))
+        val source = key.scanRecommendationId?.let { AiLogProvenance(it, category) }
+        require(source == null || method != null)
+        change(EditorField.CATEGORY, values.copy(category = category, method = method, aiProvenance = source))
         return this
+    }
+
+    fun useManualEntry() {
+        if (locked) return
+        values = values.copy(aiProvenance = null)
+        errors = errors - EditorField.CATEGORY - EditorField.METHOD
+        submissionError = null
     }
 
     fun change(field: EditorField, updated: EditorValues) {
@@ -102,6 +113,10 @@ class EditorDraft(original: EditorValues) {
         return buildMap {
             if (current.method == null) put(EditorField.METHOD, R.string.error_choose_method)
             if (current.category == null) put(EditorField.CATEGORY, R.string.error_choose_category)
+            current.aiProvenance?.let { source ->
+                if (current.category != source.category) put(EditorField.CATEGORY, R.string.ai_category_changed)
+                if (current.method == DisposalMethod.REDUCE) put(EditorField.METHOD, R.string.ai_reduce_manual)
+            }
             if (quantity is QuantityParseResult.Invalid) put(EditorField.QUANTITY, when (quantity) {
                 QuantityParseResult.Invalid.EMPTY -> R.string.error_quantity_empty
                 QuantityParseResult.Invalid.FORMAT -> R.string.error_quantity_format
@@ -121,8 +136,14 @@ class EditorDraft(original: EditorValues) {
         return input(current)
     }
 
-    fun snapshot(): List<String> = encode(original) + encode(values) +
-        (submittedValues?.let(::encode) ?: List(7) { "" }) + submissionError?.name.orEmpty()
+    fun snapshot(): List<String> {
+        val base = encode(original) + encode(values) +
+            (submittedValues?.let(::encode) ?: List(7) { "" }) + submissionError?.name.orEmpty()
+        val sources = listOf(original, values, submittedValues).flatMap { value ->
+            listOf(value?.aiProvenance?.recommendationId.orEmpty(), value?.aiProvenance?.category?.name.orEmpty())
+        }
+        return if (sources.any(String::isNotEmpty)) base + sources else base
+    }
 
     companion object {
         fun forGuide(guide: WasteGuide, date: LocalDate) = EditorDraft(EditorValues(
@@ -130,7 +151,8 @@ class EditorDraft(original: EditorValues) {
         ))
 
         private fun input(value: EditorValues) = ActivityInput(checkNotNull(value.category), checkNotNull(value.method),
-            (parseQuantity(value.quantity.rawText, value.quantity.unit) as QuantityParseResult.Valid).quantity, value.date, value.notes.trim())
+            (parseQuantity(value.quantity.rawText, value.quantity.unit) as QuantityParseResult.Valid).quantity,
+            value.date, value.notes.trim(), value.aiProvenance)
 
         fun from(log: WasteLog?, date: LocalDate) = EditorDraft(valuesFrom(log, date))
         private fun valuesFrom(log: WasteLog?, date: LocalDate) = EditorValues(log?.category, log?.method,
@@ -147,16 +169,27 @@ class EditorDraft(original: EditorValues) {
             LocalDate.parse(value[4]), value[5], value[6].takeIf(String::isNotEmpty)?.toInt()?.also { require(it > 0) })
 
         fun fromSnapshot(snapshot: List<String>): EditorDraft {
-            require(snapshot.size in setOf(14, 21, 22))
-            return EditorDraft(decode(snapshot.take(7))).apply {
-                values = decode(snapshot.drop(7).take(7))
+            require(snapshot.size in setOf(14, 21, 22, 28))
+            fun source(index: Int): AiLogProvenance? {
+                if (snapshot.size != 28) return null
+                val id = snapshot[22 + index * 2]
+                val category = snapshot[23 + index * 2]
+                require(id.isEmpty() == category.isEmpty())
+                return id.takeIf(String::isNotEmpty)?.let { AiLogProvenance(it, WasteCategory.valueOf(category)) }
+            }
+            return EditorDraft(decode(snapshot.take(7)).copy(aiProvenance = source(0))).apply {
+                values = decode(snapshot.drop(7).take(7)).copy(aiProvenance = source(1))
                 require(values.version == original.version)
-                if (snapshot.getOrNull(14)?.isNotEmpty() == true) submittedValues = decode(snapshot.drop(14).take(7))
-                else require(snapshot.drop(14).take(7).all(String::isEmpty))
+                require(original.aiProvenance == null && (values.version == null || values.aiProvenance == null))
+                if (snapshot.getOrNull(14)?.isNotEmpty() == true) submittedValues =
+                    decode(snapshot.drop(14).take(7)).copy(aiProvenance = source(2))
+                else require(snapshot.drop(14).take(7).all(String::isEmpty) && source(2) == null)
                 submittedValues?.let { submitted ->
                     require(values == submitted && submitted.category != null && submitted.method != null)
                     require(parseQuantity(submitted.quantity.rawText, submitted.quantity.unit) is QuantityParseResult.Valid)
                     require(submitted.notes.trim().length <= 500)
+                    require(submitted.aiProvenance == null ||
+                        (submitted.category == submitted.aiProvenance.category && submitted.method != DisposalMethod.REDUCE))
                 }
                 submissionError = snapshot.getOrNull(21)?.takeIf(String::isNotEmpty)?.let(ApiFailureKind::valueOf)
                     ?: ApiFailureKind.TIMEOUT.takeIf { submittedValues != null }

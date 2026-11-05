@@ -97,6 +97,13 @@ class CoreRepository(private val network: WasteNotNetwork?, private val session:
         val body = buildJsonObject {
             input.toRequestFields().forEach { (name, value) -> put(name, value) }
             put("client_request_id", requestId)
+            input.aiProvenance?.let { source ->
+                put("ai_provenance", buildJsonObject {
+                    put("recommendation_id", source.recommendationId)
+                    put("user_confirmed_object", true)
+                    put("user_confirmed_method", true)
+                })
+            }
         }
         return protected { credential ->
             network?.executor?.executeWithStatus({ dto, status ->
@@ -107,7 +114,7 @@ class CoreRepository(private val network: WasteNotNetwork?, private val session:
     }
 
     suspend fun updateLog(id: String, version: Int, input: ActivityInput): ApiResult<WasteLog> {
-        if (!uuid.matches(id) || version < 1) return invalidRequest()
+        if (!uuid.matches(id) || version < 1 || input.aiProvenance != null) return invalidRequest()
         val body = buildJsonObject {
             input.toRequestFields().forEach { (name, value) -> put(name, value) }
             put("version", version)

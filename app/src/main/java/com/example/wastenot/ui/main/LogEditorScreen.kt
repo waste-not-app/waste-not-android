@@ -100,6 +100,12 @@ fun LogEditorScreen(
             if (!demo) MessageBanner(stringResource(R.string.remote_write_message))
             if (restored) Text(stringResource(R.string.draft_restored), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (value.aiProvenance != null) {
+                Text(stringResource(R.string.ai_provenance_attached), style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                SecondaryActionButton(stringResource(R.string.ai_use_manual), draft::useManualEntry,
+                    Modifier.fillMaxWidth(), enabled = enabled)
+            }
             MethodSelector(value.method, { draft.change(EditorField.METHOD, value.copy(method = it)) }, fieldModifier(EditorField.METHOD),
                 draft.errors[EditorField.METHOD]?.let { stringResource(it) }, enabled = enabled,
                 initialFocusModifier = inputModifier(EditorField.METHOD))
@@ -126,6 +132,8 @@ fun LogEditorScreen(
                     error.saveOutcomeUnknown() -> R.string.save_outcome_unknown
                     error == ApiFailureKind.IDEMPOTENCY_CONFLICT -> R.string.save_request_conflict
                     error == ApiFailureKind.DELETED -> R.string.save_record_deleted
+                    error in setOf(ApiFailureKind.AI_EXPIRED, ApiFailureKind.AI_REFERENCE_INVALID,
+                        ApiFailureKind.AI_ALREADY_LINKED) -> R.string.ai_reference_rejected
                     error == ApiFailureKind.VALIDATION || error == ApiFailureKind.INVALID_REQUEST -> R.string.save_rejected
                     error == ApiFailureKind.RATE_LIMITED -> R.string.save_rate_limited
                     error == ApiFailureKind.STORAGE -> R.string.save_storage_failed

@@ -26,8 +26,11 @@ data class ScanRecommendation(val method: DisposalMethod?, val reason: String,
     init { require(method != DisposalMethod.REDUCE) }
 }
 
-data class ScanPrefill(val category: WasteCategory?, val method: DisposalMethod?) {
-    init { require(method == null || category != null); require(method != DisposalMethod.REDUCE) }
+data class ScanPrefill(val category: WasteCategory?, val method: DisposalMethod?, val aiProvenance: AiLogProvenance? = null) {
+    init {
+        require(method == null || category != null); require(method != DisposalMethod.REDUCE)
+        require(aiProvenance == null || (method != null && category == aiProvenance.category))
+    }
 }
 
 interface ScanPhotoStore {

@@ -66,6 +66,29 @@ class RemoteActivityStoreTest {
             assertEquals("Bearer fixture-fallback-token", it.getHeader("Authorization")) }
     }
 
+    @Test fun aiCreateAndExplicitReplayKeepTheSameConfirmedReferenceAndManualMethodCorrection() = runTest {
+        val source = AiLogProvenance("00000000-0000-4000-8000-000000000012", input.category)
+        val corrected = input.copy(method = DisposalMethod.TRASH, aiProvenance = source)
+        server.enqueue(reply(record(), 201))
+        server.enqueue(reply(record(), 200))
+        assertTrue((store.create(corrected, requestId) as ApiResult.Success).value.created)
+        assertFalse((store.create(corrected, requestId) as ApiResult.Success).value.created)
+        val bodies = List(2) { server.takeRequest().body.readUtf8() }
+        assertEquals(bodies[0], bodies[1])
+        val body = Json.parseToJsonElement(bodies[0]).jsonObject
+        assertEquals("TRASH", body.getValue("method").jsonPrimitive.content)
+        val reference = body.getValue("ai_provenance").jsonObject
+        assertEquals(setOf("recommendation_id", "user_confirmed_object", "user_confirmed_method"), reference.keys)
+        assertEquals(source.recommendationId, reference.getValue("recommendation_id").jsonPrimitive.content)
+        assertEquals(true, reference.getValue("user_confirmed_object").jsonPrimitive.boolean)
+        assertEquals(true, reference.getValue("user_confirmed_method").jsonPrimitive.boolean)
+        assertFalse(body.containsKey("photo"))
+        assertEquals(ApiFailureKind.INVALID_REQUEST, (store.update(id, 1, corrected) as ApiResult.Failure).error.kind)
+        assertEquals(2, server.requestCount)
+        assertThrows(IllegalArgumentException::class.java) { corrected.copy(category = WasteCategory.METAL) }
+        assertThrows(IllegalArgumentException::class.java) { corrected.copy(method = DisposalMethod.REDUCE) }
+    }
+
     @Test fun detailAcceptsTheRequestedUuidAndRejectsAnUnrelatedRecord() = runTest {
         server.enqueue(reply(record()))
         assertEquals(id, (store.get(id.uppercase()) as ApiResult.Success).value.id)

@@ -35,8 +35,9 @@ internal object DraftDiskCodec {
     private fun checkDraft(draft: StoredEditorDraft) {
         require(draft.requestId.isNotBlank() && draft.requestId.length <= 128)
         require(draft.origin in setOf("HOME", "HISTORY", "GUIDE", "STATISTICS", "PROFILE"))
-        require(draft.fields.size == 22)
-        require(listOfNotNull(draft.logId, draft.guideId, draft.scanCategory, draft.scanMethod).all { it.length in 1..256 })
+        require(draft.fields.size in setOf(22, 28))
+        require(listOfNotNull(draft.logId, draft.guideId, draft.scanCategory, draft.scanMethod,
+            draft.scanRecommendationId).all { it.length in 1..256 })
     }
 }
 

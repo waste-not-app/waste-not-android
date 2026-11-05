@@ -28,9 +28,9 @@ data class EditorPersistenceState(
     val failure: DraftFailure? = null,
 )
 
-internal fun StoredEditorDraft.editorKey() = LogEditor(logId, requestId, guideId, scanCategory, scanMethod)
+internal fun StoredEditorDraft.editorKey() = LogEditor(logId, requestId, guideId, scanCategory, scanMethod, scanRecommendationId)
 internal fun StoredEditorDraft.restoreForm(): EditorDraft {
-    require(fields.size == 22 && origin in MainTab.entries.map { it.name })
+    require(fields.size in setOf(22, 28) && origin in MainTab.entries.map { it.name })
     return EditorDraft.fromSnapshot(fields).also {
         require((logId != null) == (it.original.version != null))
         require(!paused || it.outcomeUnknown)
@@ -38,6 +38,7 @@ internal fun StoredEditorDraft.restoreForm(): EditorDraft {
 }
 internal fun EditorDraft.stored(key: LogEditor, origin: MainTab) = StoredEditorDraft(
     key.requestId, origin.name, snapshot(), key.logId, key.guideId, key.scanCategory, key.scanMethod,
+    scanRecommendationId = key.scanRecommendationId,
 )
 
 class EditorPersistenceViewModel(private val store: EditorDraftStore) : ViewModel() {
