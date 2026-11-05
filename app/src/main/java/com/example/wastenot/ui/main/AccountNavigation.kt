@@ -250,7 +250,7 @@ fun AccountNavigation(
                 onUnavailable = { dismissDelete(); history(); model.load(true) })
         }
     }
-    val pendingOutcome = draft?.submissionError?.saveOutcomeUnknown() == true
+    val pendingOutcome = draft?.outcomeUnknown == true
     if (discard) DiscardChangesDialog(
         pendingOutcome = pendingOutcome,
         onDismiss = { discard = false },
@@ -358,7 +358,8 @@ fun AccountNavigation(
                     val confirmed = data.save?.let { it.requestId == key.requestId && it.id != null } == true
                     LogEditorScreen(form, date, user.timezone.id, demo, data.saving || disk.busy || leavingAfterSave, pageInsets,
                         { input -> persistence.checkpoint(form.stored(key, selected),
-                            { if (stack.lastOrNull() == key) model.save(input, key.logId, form.values.version, key.requestId) },
+                            { if (stack.lastOrNull() == key) model.save(input, key.logId, form.values.version, key.requestId,
+                                previousOutcomeUnknown = form.outcomeUnknown) },
                             { form.submissionFailed(ApiFailureKind.STORAGE) }) },
                         { persistence.leave(form.stored(key, selected)) {
                             if (stack.lastOrNull() == key) { stack.removeLastOrNull(); history(); model.load(true) }

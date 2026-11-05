@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.ui.main.UncertainWriteRecoveryTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-05T06:38:34.967Z" hostname="oktaavsm" time="0.83">
+  <properties/>
+  <testcase name="aLaterRejectionDoesNotResolveTheFirstUnknownCreate" classname="com.example.wastenot.ui.main.UncertainWriteRecoveryTest" time="0.455"/>
+  <testcase name="aVersionConflictStillAllowsAnUnknownEditToReconcileWithTheLatestRecord" classname="com.example.wastenot.ui.main.UncertainWriteRecoveryTest" time="0.172"/>
+  <testcase name="cancellationRemainsCancellationAndDoesNotReleaseAnUnconfirmedCreate" classname="com.example.wastenot.ui.main.UncertainWriteRecoveryTest" time="0.096"/>
+  <testcase name="aRestoredPendingCreateSeedsTheGuardBeforeItsFirstNewAttempt" classname="com.example.wastenot.ui.main.UncertainWriteRecoveryTest" time="0.004"/>
+  <testcase name="aFollowupErrorCanBePausedAndRestoredWithItsOriginalUuidAndPayload" classname="com.example.wastenot.ui.main.UncertainWriteRecoveryTest" time="0.097"/>
+  <testcase name="aRateLimitedReplayCannotReleaseTheViewModelsPayloadGuard" classname="com.example.wastenot.ui.main.UncertainWriteRecoveryTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

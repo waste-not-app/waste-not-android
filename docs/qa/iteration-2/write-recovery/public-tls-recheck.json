@@ -1,0 +1,11 @@
+{
+  "leaf": [
+    "subject=CN=*.bccdev.id",
+    "issuer=C=US, O=Let's Encrypt, CN=YE1",
+    "notBefore=Sep  9 01:15:35 2026 GMT",
+    "notAfter=Dec  8 01:15:34 2026 GMT",
+    "ASN1 OID: secp384r1"
+  ],
+  "p256_tls12_returncode": 1,
+  "p256_tls12_diagnostic": "Connecting to 103.179.134.116\n40C70B7B7A7D0000:error:0A000410:SSL routines:ssl3_read_bytes:ssl/tls alert handshake failure:../ssl/record/rec_layer_s3.c:918:SSL alert number 40\n"
+}

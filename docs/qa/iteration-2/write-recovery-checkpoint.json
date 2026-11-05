@@ -1,0 +1,94 @@
+{
+  "base_commit": "eae63459144f9618d9740faf1856b88e98e11b9a",
+  "sources": {
+    "app/src/main/java/com/example/wastenot/ui/main/EditorDraft.kt": "36049fe2b8f39359838c2dbf2f08a02830737fa2601691381b69c7a55542ab4f",
+    "app/src/main/java/com/example/wastenot/ui/main/EditorPersistenceViewModel.kt": "48176862798745f7d881e5c0c195c4fd254c9cd26082b514c0d43fac03ab490f",
+    "app/src/main/java/com/example/wastenot/ui/main/WorkspaceViewModel.kt": "655f6531c9645aeedf0f45b7f3ac6918641cd2defdb3d13f899724d5b162460b",
+    "app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt": "159f1c6af8de4ade09a859ff322f175dc123c38cb47393e213dd0899fc92f989",
+    "app/src/main/java/com/example/wastenot/ui/main/LogEditorScreen.kt": "cc39c3e4d387881a525a2b6b48b41469d5ca6abaf0322fed91f1bf030e2fc763",
+    "app/src/main/res/values/editor_submission.xml": "9affe95aa191e185f7d0cb7c92a59d37e8d72f43e2552f8f5cf50ef9f732304f",
+    "app/src/test/java/com/example/wastenot/ui/main/UncertainWriteRecoveryTest.kt": "9c8000e78f54c7d06e77fb080cb8ae7a6e93f56d3e55adbfe5186e5a628e1759",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/EditorSubmissionTest.kt": "c8c8509b23d1e73e17bde8b01e545ec93d7107aa182109f7d404866e922997c3",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/PausedDraftReplayTest.kt": "d864fce5913bd5d8c3e18a3aa778432ebeb24e3144fa93403e81809b663a747d",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/EditorProcessRecoveryTest.kt": "c3985814d1dd67b5ee5faf1cb4dc7f5ad8f635f181667f3cc6746568d10c2e05"
+  },
+  "unit": {
+    "tests": 196,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "new_unit_cases": 6,
+  "initial_regression_failures": 3,
+  "app_sha256": "f5536dc66e71ea417c79bd9e5e5ba07858b2605543fde965d8f9bc95e753ce48",
+  "test_sha256": "12645e0c9950175e85245963d1b2826250f5491dd650be457100db21d1233880",
+  "native": {
+    "executions": 23,
+    "unique_methods": 15,
+    "failed": 0,
+    "skipped": 0,
+    "api": 24,
+    "font_scales": [
+      1,
+      2
+    ],
+    "different_processes": {
+      "before_pid": 2858,
+      "after_pid": 2922,
+      "different_processes": true
+    },
+    "fixture_adapter": "dummy",
+    "public_https_verified": false
+  },
+  "captures": 29,
+  "device_before": {
+    "font_scale": "1.0",
+    "density": "Physical density: 480",
+    "size": "Physical size: 1080x1920"
+  },
+  "device_after": {
+    "font_scale": "1.0",
+    "density": "Physical density: 480"
+  },
+  "emulator_stopped": true,
+  "bundled_evidence": {
+    "native-process-prepare.log": "35524bee044b8fe91d84b27dcae8956dba3c699e1091f8249e02796201da779c",
+    "native-phone-200.log": "1581b54eec7fea13cc3e2b80a6e4d3e563c8ed912b08e7a9f9eb857ba3f70a34",
+    "recovery-red.xml": "5d86f32cb7f711c68ff6eed0c3adcd542ce096d2c0b536d5eb2b20870c67606d",
+    "recovery-green.xml": "5c700d09865fa3dbd6de4e3350ecfe3cdaf60c4a075a39bfca55ca977e8e553d",
+    "public-tls-recheck.json": "78b20dd558e0616330aab1c0a6c59f65aecfc4fc1ab9925aa7ad18f85492f242",
+    "native-result.json": "bfb92046f89ada392c3d842833fd93f030c93d4cd27109dad3956402f2f4d5a8",
+    "native-process-restore.log": "bc37bb0a8cdd5b274cd98b5e3993d55e656a20ba0d0f35d0e8770f657f20baf9",
+    "native-phone-normal.log": "c43b9a0fd5988869402e25f0f951f66645eb18861d4d9ef9395e406ecfe3caab",
+    "process-death/stored-before.json": "069bec0154a5ee9795dcf8fb2eb4da7e05df3e2a3086026a43a3e8770a3a20eb",
+    "process-death/process-pending-restored.png": "3f4bd9c38edd8a8630d629af9e126ea8b34c0ef9b5afc5bdf92fc11658662410",
+    "process-death/process-pending-replayed.png": "0b37d2cbd93fd2135e6305dcc9e1fbe4105e8be97ae8141f121fe2937a3c4dc5",
+    "process-death/process-pending-before.png": "f6567fa4268bb2c0e38f2b2e7fe4d99c59b7898c3a5478f88ebe2e466e0957e1",
+    "phone-200/submission-followup-action-light.png": "3cc8daab8dd90c67f156e1ea4fcbc3c083a931e96a18155873e51c740b3e2aa6",
+    "phone-200/submission-followup-banner-light.png": "f927376142e4aa28d912b3a4f407a5ccae84d6c5e069678228bfa0a857edf3af",
+    "phone-200/submission-deleted-light.png": "4bedd72e5e2fbea6b38e6edabcd19e1355c346100a388981b4f4242b00bdda7a",
+    "phone-200/submission-unknown-dark.png": "67989296d4ce1cf1066e4ba8c6fb5c467e5992b2b4477c9b76946208e61da901",
+    "phone-200/submission-followup-validation-light.png": "08cd72cf2a3e4545aca20c0dab180e00bf6052c167e8d30611ac9d604506ae64",
+    "phone-200/submission-unknown-light.png": "06889dd2abb2ae178f6f5339533813cf7e19314c7c3946ff713ae79176599adf",
+    "phone-200/submission-followup-banner-dark.png": "54f7fb7de9cf56faf54603a668aea782742e8162c10e37150a6ca4c27b11c53f",
+    "phone-200/submission-conflict-dark.png": "e0a44f4335b12af9aba390ef45fba7502e5140e0109d54efc636ca2d9bf52206",
+    "phone-200/submission-followup-validation-dark.png": "b81d17dc6619ef43ee32fa6b5bb8a6def6057bb6726186e978611a4d737ad6df",
+    "phone-200/submission-followup-action-dark.png": "9ab63a46eff036c81f962d015bb3445382c8a3259363f9593d74f15da23a5e77",
+    "phone-normal/draft-replayed-once.png": "db59d207a650213fc547ff0c235ff7e44cc59f79ef33bf49f29acd5235ee0df2",
+    "phone-normal/submission-followup-action-light.png": "209a4394bd371ed8dc633d6f32737d311642c1d839ec0c9659ba158ece6e7cfe",
+    "phone-normal/submission-followup-banner-light.png": "b35806fc038188cd970d62be58e99b7fb6980e7f4e37729e8ac2d833037e28ed",
+    "phone-normal/draft-logout-cleared.png": "d92abde999285073e0a43055cb673edb377ca9e28722e9a83b04c722d3e2fd45",
+    "phone-normal/submission-deleted-light.png": "3accc59e0da6c99b0d648affecc76e9ba1c337a575e03d7175b23740ce232ddd",
+    "phone-normal/submission-unknown-dark.png": "1f883478155e13d53bf35c079550ca77ff62ec18f408fee94d3b0d16102c1d9e",
+    "phone-normal/submission-followup-validation-light.png": "62dfb323be0ebd81232e1c1a3aad0bf25ee38e0a87ecc14447b8cfb357e95dda",
+    "phone-normal/draft-continue.png": "9b5aed4d76f062ccf62d345bda9398ec5cfcc380f6930018212fbd387a8581bf",
+    "phone-normal/submission-unknown-light.png": "077b75253e9ecd01392afc6b31ebbe10c90fba96168b4fa388af38a4d3d62b73",
+    "phone-normal/submission-followup-banner-dark.png": "5044098d25236b0f5f65caadcb51ef3c63249f0c9c728b429e03917f90c41f3b",
+    "phone-normal/submission-conflict-dark.png": "7d7780373915e09a8e647aeb9afd0166e39e9cf5644181acf2ff609e0648ba25",
+    "phone-normal/draft-save-cleaned.png": "84578084938786a75a3fbf906fe1c689e1f4a046ed1ac9b064f3c12edbf9ce55",
+    "phone-normal/submission-followup-validation-dark.png": "86e523403b88d229ca9db4b6da2057e1e555323b32b697e50bbbf5579da82963",
+    "phone-normal/submission-followup-action-dark.png": "72f43d6f8e0caf3e2f758c433feebcb545a528f3dc89d94d305d6f34f18ad432",
+    "phone-normal/draft-followup-close-dialog.png": "b356b7978f61c2344fec05b27b8d0d4eb10d98a5e790f4712bb0a58193873978",
+    "phone-normal/draft-paused-resumed.png": "06b5339c62ae06ebdd67a5f664568f66c5beb4f696fb76ab2d90b4865e1da0fc"
+  }
+}

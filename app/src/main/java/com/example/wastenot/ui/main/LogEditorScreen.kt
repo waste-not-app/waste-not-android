@@ -120,8 +120,8 @@ fun LogEditorScreen(
                 placeholder = stringResource(R.string.notes_placeholder))
             Text(if (value.version != null) stringResource(R.string.edit_progress_message) else stringResource(R.string.editor_date_helper, accountTimezone),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            draft.submissionError?.let { error ->
-                MessageBanner(stringResource(when {
+            draft.submissionError?.takeUnless { saveConfirmed }?.let { error ->
+                val latestError = stringResource(when {
                     draft.needsConflictResolution -> R.string.conflict_form_message
                     error.saveOutcomeUnknown() -> R.string.save_outcome_unknown
                     error == ApiFailureKind.IDEMPOTENCY_CONFLICT -> R.string.save_request_conflict
@@ -130,7 +130,11 @@ fun LogEditorScreen(
                     error == ApiFailureKind.RATE_LIMITED -> R.string.save_rate_limited
                     error == ApiFailureKind.STORAGE -> R.string.save_storage_failed
                     else -> R.string.save_failed_message
-                }), Modifier.bringIntoViewRequester(submissionReveal), isError = true)
+                })
+                val message = if (draft.outcomeUnknown && !error.saveOutcomeUnknown()) {
+                    stringResource(R.string.save_outcome_retry_error, stringResource(R.string.save_outcome_unknown), latestError)
+                } else latestError
+                MessageBanner(message, Modifier.bringIntoViewRequester(submissionReveal), isError = true)
             }
             if (persistence != null) {
                 if (persistence.failure == DraftFailure.WRITE || persistence.failure == DraftFailure.FINISH) {
