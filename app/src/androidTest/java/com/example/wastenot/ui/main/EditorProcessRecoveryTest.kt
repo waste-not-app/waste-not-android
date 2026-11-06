@@ -5,11 +5,20 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.MainActivity
+import com.example.wastenot.LogEditor
 import com.example.wastenot.data.dummy.DummyActivityStore
+import com.example.wastenot.data.local.LocalEditorDraftStore
+import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.repository.StoredEditorDraft
+import com.example.wastenot.model.DisposalMethod
+import com.example.wastenot.model.QuantityInput
+import com.example.wastenot.model.QuantityUnit
+import com.example.wastenot.model.WasteCategory
 import java.io.File
+import java.time.LocalDate
 import java.time.ZoneId
+import java.util.UUID
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.*
@@ -25,7 +34,10 @@ class EditorProcessRecoveryTest {
     @get:Rule(order = 0) val fixture = object : ExternalResource() {
         override fun before() {
             assumeTrue("Requires the host-driven process-death protocol", stage in listOf("prepare", "restore"))
-            if (stage == "prepare") resetDraftAccountFixture()
+            if (stage == "prepare") {
+                resetDraftAccountFixture()
+                if (mode == "pending") seedPendingReplay()
+            }
         }
     }
     @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
@@ -35,9 +47,36 @@ class EditorProcessRecoveryTest {
         File(expectedFile().parentFile, "process-$mode-$stage.pid").writeText(android.os.Process.myPid().toString())
     }
 
+    private fun seedPendingReplay() = runTest {
+        val zone = ZoneId.of("Asia/Jakarta")
+        val date = LocalDate.now(zone)
+        val form = EditorDraft.from(null, date).apply {
+            change(EditorField.QUANTITY, values.copy(category = WasteCategory.PLASTIC, method = DisposalMethod.RECYCLE,
+                quantity = QuantityInput("0,250", QuantityUnit.KILOGRAM), notes = "  Draf setelah proses mati  "))
+        }
+        val request = UUID.randomUUID().toString()
+        val input = checkNotNull(form.prepareSubmission(date))
+        val source = DummyActivityStore(draftTestContext.getSharedPreferences("dummy_logs_dummy-owner", Context.MODE_PRIVATE), zone)
+        assertTrue(source.create(input, request) is ApiResult.Success)
+        form.submissionFailed(ApiFailureKind.NETWORK)
+        form.submissionFailed(ApiFailureKind.RATE_LIMITED)
+        assertTrue(LocalEditorDraftStore.create(draftTestContext, "dummy-owner")
+            .write(form.stored(LogEditor(null, request), MainTab.HOME)) is ApiResult.Success)
+    }
+
     @Test fun prepareDraftForHostProcessTermination() {
         assumeTrue(stage == "prepare")
         recordProcess()
+        if (mode == "pending") {
+            waitFor("Draf dipulihkan. Periksa isian sebelum menyimpan.")
+            compose.onNodeWithContentDescription("Berat").performScrollTo().assertIsNotEnabled().assertTextContains("0,250")
+            val stored = checkNotNull(readDraftFixture())
+            assertTrue(stored.restoreForm().outcomeUnknown)
+            assertEquals(ApiFailureKind.RATE_LIMITED, stored.restoreForm().submissionError)
+            expectedFile().writeText(Json.encodeToString(StoredEditorDraft.serializer(), stored))
+            captureDraftFixture("process-pending-before")
+            return
+        }
         waitFor("650 g")
         if (mode == "edit") {
             compose.onNodeWithText("250 g").performScrollTo().performClick()
@@ -76,9 +115,21 @@ class EditorProcessRecoveryTest {
         runTest {
             val source = DummyActivityStore(draftTestContext.getSharedPreferences("dummy_logs_dummy-owner", Context.MODE_PRIVATE), ZoneId.of("Asia/Jakarta"))
             val records = (source.load() as ApiResult.Success).value
-            assertEquals(5, records.size)
+            assertEquals(if (mode == "pending") 6 else 5, records.size)
             if (expected.logId != null) assertEquals(1, records.single { it.id == expected.logId }.version)
         }
         captureDraftFixture("process-$mode-restored")
+        if (mode == "pending") {
+            assertTrue(restored.restoreForm().outcomeUnknown)
+            compose.onNodeWithContentDescription("Berat").assertIsNotEnabled()
+            compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+            waitFor("Catatanmu sudah tersimpan. Tidak ada XP tambahan.")
+            assertNull(readDraftFixture())
+            runTest {
+                val source = DummyActivityStore(draftTestContext.getSharedPreferences("dummy_logs_dummy-owner", Context.MODE_PRIVATE), ZoneId.of("Asia/Jakarta"))
+                assertEquals(6, (source.load() as ApiResult.Success).value.size)
+            }
+            captureDraftFixture("process-pending-replayed")
+        }
     }
 }

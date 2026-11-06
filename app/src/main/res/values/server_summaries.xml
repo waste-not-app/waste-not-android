@@ -1,0 +1,6 @@
+<resources>
+    <string name="summary_loading">Memuat ringkasan…</string>
+    <string name="summary_load_failed">Ringkasan belum bisa dimuat. Coba lagi.</string>
+    <string name="summary_refresh_failed">Ringkasan belum bisa diperbarui. Data dari pemuatan sebelumnya tetap ditampilkan.</string>
+    <string name="summary_previous_period">Data terakhir · %1$d hari · %2$s – %3$s</string>
+</resources>

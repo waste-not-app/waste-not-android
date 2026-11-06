@@ -3,9 +3,10 @@ package com.example.wastenot.model
 import java.net.URI
 import java.time.LocalDate
 
-data class GuideReview(val source: URI, val date: LocalDate) {
+data class GuideReview(val source: URI, val date: LocalDate, val reviewer: String? = null) {
     init {
         require(source.scheme.equals("https", ignoreCase = true) && !source.host.isNullOrBlank() && source.userInfo == null)
+        require(reviewer == null || reviewer.isNotBlank())
     }
 }
 

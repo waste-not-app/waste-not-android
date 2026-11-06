@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.ui.main.HistoryFilterTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-05T13:42:20.064Z" hostname="oktaavsm" time="0.007">
+  <properties/>
+  <testcase name="datesRequireACompletePairInOrder" classname="com.example.wastenot.ui.main.HistoryFilterTest" time="0.002"/>
+  <testcase name="categoryMethodAndInclusiveDateBoundsAreCombined" classname="com.example.wastenot.ui.main.HistoryFilterTest" time="0.003"/>
+  <testcase name="incompleteDraftCannotBeUsedAsAnActiveFilter" classname="com.example.wastenot.ui.main.HistoryFilterTest" time="0.0"/>
+  <testcase name="resetIncludesAllMethodsAndUnitsAndUsesApiDateIdOrder" classname="com.example.wastenot.ui.main.HistoryFilterTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

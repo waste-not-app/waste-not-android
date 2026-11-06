@@ -1,0 +1,28 @@
+{
+  "minimum_api": 30,
+  "decision": "user selected Android 11",
+  "compile_sdk": 36,
+  "target_sdk": 36,
+  "latest_runtime_to_add": 37,
+  "sources": {
+    "app/build.gradle.kts": "67041265bbc5305e0bf782063c40587d58a0433c4f6e6f55bfe8e574323025f4",
+    "scripts/verify_minimum_sdk.py": "1efccbbba4d5fcc3b6a2ed8b49f71bf5b0efc7949de93de29751403de326a938",
+    ".github/workflows/android-ci.yml": "6a0fc811c58274ede3fb0825c92fbc1c53ad55775f83ae05229ce9252348f98b",
+    "docs/ANDROID_SETUP.md": "a34370cf8089760fa32fa8f2c9878350e706fec7bfab25606b5623b8f34d87f5",
+    "docs/tasks/BACKEND_INTEGRATION.md": "c4b5b22b455e498538070a026bc809a1ee1ae8854c265a0d63be57996a4e9d6f"
+  },
+  "workspace_unit": {
+    "tests": 202,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "workspace_includes_pending_summary_screens": true,
+  "native_build": "success",
+  "minimum_manifest_verified": 30,
+  "runtime_api30_api37": "not yet run",
+  "apk_sha256": {
+    "android11-native-verification.apk": "3fe1cb6260c86f3a2d559e71d8fc623525a419cc7922a126e3dcc84ba56baa26",
+    "android11-native-verification-tests.apk": "dbb41de6749f0aa156652374c94f6b0b60280a64b80d6523d8e4fd2493639281"
+  }
+}

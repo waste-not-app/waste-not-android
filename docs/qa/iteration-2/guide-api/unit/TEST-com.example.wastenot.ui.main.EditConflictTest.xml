@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.ui.main.EditConflictTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:34:27.792Z" hostname="oktaavsm" time="0.029">
+  <properties/>
+  <testcase name="failedOrMissingLatestKeepsResolutionPendingUntilExplicitRetry" classname="com.example.wastenot.ui.main.EditConflictTest" time="0.009"/>
+  <testcase name="concurrentEditRequiresExplicitSelectionAndAnotherSaveWithoutAddingARecord" classname="com.example.wastenot.ui.main.EditConflictTest" time="0.005"/>
+  <testcase name="readsValidateIdentityAndVersionAndNeverWrite" classname="com.example.wastenot.ui.main.EditConflictTest" time="0.002"/>
+  <testcase name="cancelledReadCannotReplaceANewerEntryEvenWhenStoreIgnoresCancellation" classname="com.example.wastenot.ui.main.EditConflictTest" time="0.003"/>
+  <testcase name="choosingDraftKeepsAllUserFieldsAndOnlyAdoptsTheNewBaselineVersion" classname="com.example.wastenot.ui.main.EditConflictTest" time="0.002"/>
+  <testcase name="staleVersionCannotUnlockTheDraftAndUnknownOutcomeCannotBeRebased" classname="com.example.wastenot.ui.main.EditConflictTest" time="0.002"/>
+  <testcase name="changingFieldsAndRestoringStateCannotBypassTheConflict" classname="com.example.wastenot.ui.main.EditConflictTest" time="0.003"/>
+  <testcase name="choosingLatestReplacesEveryFieldAndDoesNotPrepareASubmission" classname="com.example.wastenot.ui.main.EditConflictTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

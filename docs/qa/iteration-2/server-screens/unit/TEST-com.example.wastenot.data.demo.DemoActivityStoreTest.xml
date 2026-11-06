@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.data.demo.DemoActivityStoreTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-05T13:42:09.480Z" hostname="oktaavsm" time="1.281">
+  <properties/>
+  <testcase name="editsKeepCreationTimeAndAdvanceTheDemoUpdateTime" classname="com.example.wastenot.data.demo.DemoActivityStoreTest" time="1.179"/>
+  <testcase name="clearingDropsRecordsAndReplayCache" classname="com.example.wastenot.data.demo.DemoActivityStoreTest" time="0.011"/>
+  <testcase name="editingWeightToCountDoesNotRetainGramsOrAwardANewActivity" classname="com.example.wastenot.data.demo.DemoActivityStoreTest" time="0.037"/>
+  <testcase name="reduceOnlyHasNoHandledRateAndNoInventedGramConversion" classname="com.example.wastenot.data.demo.DemoActivityStoreTest" time="0.006"/>
+  <testcase name="createReplaysOneIdAndRejectsChangedPayload" classname="com.example.wastenot.data.demo.DemoActivityStoreTest" time="0.036"/>
+  <testcase name="canonicalDatasetKeepsWeightCountAndDenominatorSeparate" classname="com.example.wastenot.data.demo.DemoActivityStoreTest" time="0.01"/>
+  <system-out><![CDATA[[I] HotSwanV2Desktop: installed desktop interpreter baseline: 410 class(es)
+[I] HotSwanV2: literal fast path: snapshot-observed invalidation ACTIVE (no whole-tree recompose)
+[I] HotSwanV2: v2 server listening on 127.0.0.1:8621 (no port file)
+[I] HotSwanV2Desktop: desktop reload server started (127.0.0.1:8621)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

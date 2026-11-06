@@ -10,7 +10,7 @@ plugins {
   alias(libs.plugins.skydoves.navgraph)
 }
 
-// HotSwan 2.0.1 raises debug minSdk to 26; native verification covers API 24.
+// Native verification and hot reload both use the Android 11 baseline.
 if (providers.gradleProperty("wastenot.hotReload").orElse("true").get().toBooleanStrict()) {
     pluginManager.apply("com.github.skydoves.compose.hotswan.compiler")
     extensions.configure<InterpreterExtension> {
@@ -44,7 +44,7 @@ android {
     compileSdk = 36
     defaultConfig {
         applicationId = "com.example.wastenot"
-        minSdk = 24
+        minSdk = 30
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"

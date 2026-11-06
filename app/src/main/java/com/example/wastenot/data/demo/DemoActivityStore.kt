@@ -13,6 +13,9 @@ import com.example.wastenot.model.QuantityTotals
 import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteLog
 import com.example.wastenot.model.WasteSummary
+import com.example.wastenot.model.ActivityDateRange
+import com.example.wastenot.data.dummy.dummyDashboard
+import com.example.wastenot.data.dummy.dummyStatistics
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -43,6 +46,9 @@ class DemoActivityStore(private val zone: ZoneId) : ActivityStore {
     }
 
     override suspend fun load() = ApiResult.Success(records.values.sortedWith(compareByDescending<WasteLog> { it.activityDate }.thenByDescending { it.createdAt }))
+
+    override suspend fun dashboard() = ApiResult.Success(dummyDashboard(records.values.toList(), referenceDate, zone))
+    override suspend fun statistics(range: ActivityDateRange) = ApiResult.Success(dummyStatistics(records.values.toList(), range, zone))
 
     override suspend fun get(id: String): ApiResult<WasteLog> =
         records[id]?.let { ApiResult.Success(it) } ?: failure(ApiFailureKind.NOT_FOUND)

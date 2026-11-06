@@ -8,6 +8,9 @@ import com.example.wastenot.data.network.dto.RegisterDto
 import com.example.wastenot.data.network.dto.RefreshDto
 import com.example.wastenot.data.network.dto.SessionDto
 import com.example.wastenot.data.network.dto.UserDto
+import com.example.wastenot.data.network.dto.DashboardDto
+import com.example.wastenot.data.network.dto.StatisticsDto
+import com.example.wastenot.data.network.dto.GuideDto
 import com.example.wastenot.data.repository.RequestCredential
 import retrofit2.Response
 import retrofit2.http.GET
@@ -22,6 +25,21 @@ import retrofit2.http.Path
 import kotlinx.serialization.json.JsonObject
 
 interface WasteNotApi {
+    @GET("waste-guide")
+    suspend fun guides(@Query("q") query: String? = null, @Query("category") category: String? = null,
+        @Query("cursor") cursor: String? = null, @Query("limit") limit: Int = 20,
+        @Tag credential: RequestCredential? = null): Response<DataEnvelope<List<GuideDto>>>
+
+    @GET("waste-guide/{id}")
+    suspend fun guide(@Path("id") id: String, @Tag credential: RequestCredential? = null): Response<DataEnvelope<GuideDto>>
+
+    @GET("dashboard")
+    suspend fun dashboard(@Tag credential: RequestCredential? = null): Response<DataEnvelope<DashboardDto>>
+
+    @GET("statistics")
+    suspend fun statistics(@Query("from") from: String, @Query("to") to: String,
+        @Tag credential: RequestCredential? = null): Response<DataEnvelope<StatisticsDto>>
+
     @GET("metadata")
     suspend fun metadata(@Tag credential: RequestCredential? = null): Response<DataEnvelope<MetadataDto>>
 

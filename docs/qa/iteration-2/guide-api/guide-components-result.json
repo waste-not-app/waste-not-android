@@ -1,0 +1,52 @@
+{
+  "completed": true,
+  "api_level": 37,
+  "original_font": "1.0",
+  "runs": [
+    {
+      "profile": "normal",
+      "passed": true,
+      "images": [
+        {
+          "file": "guide-refresh-error.png",
+          "sha256": "ff8c54b37dc1c4bcb57f036f9446a216bec69d60fafd734d76bb69246f6d55b3"
+        },
+        {
+          "file": "guide-removed.png",
+          "sha256": "01ec6922f92e60f203a1b8940440ba061175ab766ef0ece6c1e123d988618580"
+        },
+        {
+          "file": "guide-search-error.png",
+          "sha256": "4921483b3736437cc33f7956e4ce8f186acb7306d40aad44902df3378b440ab7"
+        },
+        {
+          "file": "guide-source-error.png",
+          "sha256": "899f66382f35ed2c97622585e1d275e902b580d2f4cc23ed32d44c0e192f60ad"
+        }
+      ]
+    },
+    {
+      "profile": "font200",
+      "passed": true,
+      "images": [
+        {
+          "file": "guide-refresh-error.png",
+          "sha256": "e7b2fcfdedab88a9f6c2fedb4019cbfb70f71b0ac71440e9e3fc807202a4c63e"
+        },
+        {
+          "file": "guide-removed.png",
+          "sha256": "3c8f4b9e3a147c8af70572b36486cf6d73289994aac0349dfb7fb02130949f6a"
+        },
+        {
+          "file": "guide-search-error.png",
+          "sha256": "a5c79aa0d06b51fecabdca6057ec1e2a87b10f105445b195833806a6a71164fb"
+        },
+        {
+          "file": "guide-source-error.png",
+          "sha256": "e7d91fbef40be79102ca391624794457bed70e9d3d681b0cbba8df97103613eb"
+        }
+      ]
+    }
+  ],
+  "restored_font": "1.0"
+}

@@ -30,6 +30,7 @@ class PausedDraftReplayTest {
             }
             val input = checkNotNull(form.prepareSubmission(today))
             form.submissionFailed(ApiFailureKind.NETWORK)
+            form.submissionFailed(ApiFailureKind.RATE_LIMITED)
             runTest {
                 val source = DummyActivityStore(draftTestContext.getSharedPreferences("dummy_logs_dummy-owner", Context.MODE_PRIVATE), ZoneId.of("Asia/Jakarta"))
                 assertTrue(source.create(input, requestId) is ApiResult.Success)
@@ -77,5 +78,27 @@ class PausedDraftReplayTest {
             assertEquals(6, (source.load() as ApiResult.Success).value.size)
         }
         captureDraftFixture("draft-logout-cleared")
+    }
+
+    @Test fun closingAResumedFollowupFailureKeepsTheDraftForReviewAgain() {
+        waitFor("Lanjutkan draf")
+        compose.onNodeWithText("Lanjutkan draf").performScrollTo().performClick()
+        waitFor("Draf dipulihkan. Periksa isian sebelum menyimpan.")
+        compose.onNodeWithText("Percobaan terakhir: Terlalu banyak permintaan.", substring = true).performScrollTo().assertIsDisplayed()
+        compose.onNodeWithContentDescription("Kembali").performClick()
+        compose.onNodeWithText("Tutup formulir?").assertIsDisplayed()
+        compose.onNodeWithText("Menutup formulir tidak membatalkan permintaan", substring = true).assertExists()
+        compose.onNodeWithText("Buang perubahan").assertDoesNotExist()
+        captureDraftFixture("draft-followup-close-dialog")
+        compose.onNode(hasText("Tutup formulir") and hasClickAction()).performScrollTo().performClick()
+        compose.waitUntil(10_000) { readDraftFixture()?.paused == true }
+        compose.onNode(hasText("Panduan") and hasClickAction()).assertIsSelected()
+        val saved = checkNotNull(readDraftFixture())
+        assertEquals(requestId, saved.requestId)
+        assertTrue(saved.paused)
+        assertTrue(saved.restoreForm().outcomeUnknown)
+        assertEquals(ApiFailureKind.RATE_LIMITED, saved.restoreForm().submissionError)
+        compose.onNode(hasText("Beranda") and hasClickAction()).performClick()
+        waitFor("Lanjutkan draf")
     }
 }

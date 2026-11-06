@@ -1,0 +1,9 @@
+{
+  "use_dummy": false,
+  "url": "https://pred-autoscaler.bccdev.id/wastenot/api/v1/",
+  "minimum_api": 30,
+  "apks": {
+    "core-final.apk": "3fe1cb6260c86f3a2d559e71d8fc623525a419cc7922a126e3dcc84ba56baa26",
+    "core-final-tests.apk": "16bfbf75d5cc3c8db8459c5e1d0a736dd1c877956cbd080ab998887f66496c59"
+  }
+}
