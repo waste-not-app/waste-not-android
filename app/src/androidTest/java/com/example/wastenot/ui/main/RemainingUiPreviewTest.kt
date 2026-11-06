@@ -3,6 +3,8 @@ package com.example.wastenot.ui.main
 import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -37,6 +39,7 @@ class RemainingUiPreviewTest {
         val log = WasteLog("preview", WasteCategory.PLASTIC, DisposalMethod.RECYCLE, Quantity.Weight.of(250),
             date, ZoneId.of("Asia/Jakarta"), "Botol sudah dibilas", 2, Instant.EPOCH, Instant.EPOCH)
         compose.setContent { WasteNotTheme(dark) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
             key(screen, dark) {
                 Box(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas)) {
                     when (screen) {
@@ -50,6 +53,7 @@ class RemainingUiPreviewTest {
                             ConflictReadState("request", log.id, latest = log), {}, {}, { _, _ -> })
                     }
                 }
+            }
             }
         } }
         for (theme in listOf(false, true)) {
