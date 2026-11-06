@@ -1,7 +1,0 @@
-{
-  "object_key": "book",
-  "category": "PAPER",
-  "condition": {"cleanliness": "CLEAN", "integrity": "INTACT", "reusable": "YES"},
-  "reuse_intention": true,
-  "risk_flag": false
-}
