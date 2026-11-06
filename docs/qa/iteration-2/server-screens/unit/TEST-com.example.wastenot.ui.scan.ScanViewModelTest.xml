@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.ui.scan.ScanViewModelTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-11-05T13:42:20.416Z" hostname="oktaavsm" time="0.184">
+  <properties/>
+  <testcase name="detectionRequiresMaterialAndNeverPrefillsAnUnconfirmedObject" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.056"/>
+  <testcase name="expiredOrMissingPhotoRequiresRetakeAndNeverCallsRepository" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.005"/>
+  <testcase name="cameraCallbackFromClosedSessionDeletesPhotoAndCannotEnterNewSession" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.005"/>
+  <testcase name="contextIsIndependentAndCategoryChangeResetsItWhileGoingBackPreservesIt" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.008"/>
+  <testcase name="unmatchedObjectDoesNotReceiveAGuideBasedOnlyOnItsCategory" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.002"/>
+  <testcase name="cancelledDetectionCannotResurrectAfterRetakeEvenWhenRepositoryIgnoresCancellation" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.009"/>
+  <testcase name="recommendationTimeoutPreservesContextAndRetryDoesNotSendAutomatically" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.015"/>
+  <testcase name="invalidRecommendationBecomesUnavailableRatherThanCrashingTheScreen" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.011"/>
+  <testcase name="correctedObjectRejectsLateRecommendationAndClearsOldMethod" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.01"/>
+  <testcase name="selectingAnotherObjectResetsContextAndDuplicateIdsAreRejected" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.013"/>
+  <testcase name="weakOrMissingCandidatesRequireManualWithoutPrefill" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.011"/>
+  <testcase name="specialHandlingAndUnavailableGuideNeverOfferAMethod" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.011"/>
+  <testcase name="recommendationIsConfirmedSeparatelyAndEditorStillRequiresManualQuantity" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.012"/>
+  <testcase name="boundingBoxesRejectInvalidCoordinatesAndFitLetterboxedImage" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.007"/>
+  <testcase name="uncertainCandidateStillNeedsExplicitConfirmation" classname="com.example.wastenot.ui.scan.ScanViewModelTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

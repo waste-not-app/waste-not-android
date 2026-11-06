@@ -65,7 +65,8 @@ class HeaderIconDesignTest {
         var profiles = 0
         compose.setContent { WasteNotTheme(dark) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                OverviewScreen(user, WorkspaceUiState(records = listOf(log), loading = false), true, date,
+                OverviewScreen(user, com.example.wastenot.ui.main.SnapshotState(
+                    com.example.wastenot.data.dummy.dummyDashboard(listOf(log), date, zone), loading = false),
                     PaddingValues(), {}, {}, {}, {}, onProfile = { profiles++ })
             }
         } }

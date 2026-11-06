@@ -9,7 +9,7 @@ import zipfile
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("apk", type=Path)
-parser.add_argument("--expected", type=int, default=24)
+parser.add_argument("--expected", type=int, default=30)
 args = parser.parse_args()
 sdk = Path(os.environ["ANDROID_HOME"])
 aapt = max((sdk / "build-tools").glob("*/aapt2"), key=lambda p: tuple(map(int, re.findall(r"\d+", p.parent.name))))

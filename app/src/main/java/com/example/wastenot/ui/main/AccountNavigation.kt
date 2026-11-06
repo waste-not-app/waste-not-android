@@ -37,7 +37,6 @@ import androidx.navigation3.runtime.*
 import androidx.navigation3.ui.NavDisplay
 import com.example.wastenot.*
 import com.example.wastenot.R
-import com.example.wastenot.data.dummy.dummyProgress
 import com.example.wastenot.data.dummy.DummyActivityStore
 import com.example.wastenot.data.local.LocalEditorDraftStore
 import com.example.wastenot.data.network.ApiFailureKind
@@ -79,11 +78,14 @@ fun AccountNavigation(
     logoutState: LogoutUiState = LogoutUiState.None,
 ) {
     val context = LocalContext.current.applicationContext
-    val factory = remember(user.id, demo, core) { viewModelFactory { initializer {
-        WorkspaceViewModel(if (demo) DummyActivityStore(
+    val activityStore = remember(user.id, demo, core) {
+        if (demo) DummyActivityStore(
             context.getSharedPreferences("dummy_logs_${user.id}", android.content.Context.MODE_PRIVATE), user.timezone,
             seedInitialRecords = user.id == "dummy-owner",
-        ) else RemoteActivityStore(core))
+        ) else RemoteActivityStore(core)
+    }
+    val factory = remember(activityStore) { viewModelFactory { initializer {
+        WorkspaceViewModel(activityStore)
     } } }
     val model: WorkspaceViewModel = viewModel(factory = factory)
     val data by model.state.collectAsStateWithLifecycle()
@@ -109,11 +111,12 @@ fun AccountNavigation(
     val guides: GuideViewModel = viewModel(factory = guideFactory)
     val guideData by guides.state.collectAsStateWithLifecycle()
     val date = model.referenceDate ?: LocalDate.now(user.timezone)
-    val profileProgress = remember(data.records, data.loading, data.error, demo, user.progress, date) {
-        if (!demo) user.progress
-        else if (data.records.isEmpty() && (data.loading || data.error != null)) null
-        else dummyProgress(data.records, date)
-    }
+    val summariesFactory = remember(activityStore) { viewModelFactory { initializer {
+        SummariesViewModel(activityStore, createSavedStateHandle()) { model.referenceDate ?: LocalDate.now(user.timezone) }
+    } } }
+    val summaries: SummariesViewModel = viewModel(factory = summariesFactory)
+    val summaryData by summaries.state.collectAsStateWithLifecycle()
+    LaunchedEffect(summaries, data.mutationRevision) { summaries.refresh() }
     val uriHandler = LocalUriHandler.current
     val focus = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
@@ -250,7 +253,7 @@ fun AccountNavigation(
                 onUnavailable = { dismissDelete(); history(); model.load(true) })
         }
     }
-    val pendingOutcome = draft?.submissionError?.saveOutcomeUnknown() == true
+    val pendingOutcome = draft?.outcomeUnknown == true
     if (discard) DiscardChangesDialog(
         pendingOutcome = pendingOutcome,
         onDismiss = { discard = false },
@@ -279,7 +282,7 @@ fun AccountNavigation(
         val railWidth = if (LocalDensity.current.fontScale >= 1.5f) 144.dp else 112.dp
         val pageInsets = PaddingValues(0.dp)
         val provider = entryProvider {
-            entry<Home> { OverviewScreen(user, data, demo, date, pageInsets, { edit() }, ::history, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
+            entry<Home> { OverviewScreen(user, summaryData.dashboard, pageInsets, { edit() }, ::history, ::detail, { summaries.dashboard(true) }, Modifier.fillMaxSize(),
                 onProfile = { selected = MainTab.PROFILE }, onResumeDraft = if (disk.active?.paused == true) ::resumeDraft else null) }
             entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
                 today = date, filterOpen = historyFilterOpen, onOpenFilter = { historyFilterOpen = true }, onDismissFilter = { historyFilterOpen = false },
@@ -302,9 +305,13 @@ fun AccountNavigation(
                         catch (_: IllegalArgumentException) { sourceError = true }
                     }, modifier = Modifier.fillMaxSize(), sourceUnavailable = sourceError)
             }
-            entry<Statistics> { StatisticsScreen(data, demo, date, pageInsets, { model.load(true) }, { edit() }, Modifier.fillMaxSize()) }
-            entry<Profile> { ProfileScreen(user, profileProgress, data.loading, data.error, pageInsets,
-                { model.load(true) }, { edit() }, { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Settings) },
+            entry<Statistics> {
+                LaunchedEffect(summaries) { summaries.statistics() }
+                StatisticsScreen(summaryData.statistics, summaryData.days, pageInsets, { summaries.statistics(retry = true) }, { edit() },
+                    onDays = { summaries.statistics(it) }, modifier = Modifier.fillMaxSize())
+            }
+            entry<Profile> { ProfileScreen(user, summaryData.dashboard.value?.progress, summaryData.dashboard.loading, summaryData.dashboard.error, pageInsets,
+                { summaries.dashboard(true) }, { edit() }, { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Settings) },
                 { leaving = true }, Modifier.fillMaxSize()) }
             entry<Settings> { SettingsScreen(user, theme, pageInsets, onTheme, Modifier.fillMaxSize()) }
             entry<LogDetail> { key ->
@@ -358,7 +365,8 @@ fun AccountNavigation(
                     val confirmed = data.save?.let { it.requestId == key.requestId && it.id != null } == true
                     LogEditorScreen(form, date, user.timezone.id, demo, data.saving || disk.busy || leavingAfterSave, pageInsets,
                         { input -> persistence.checkpoint(form.stored(key, selected),
-                            { if (stack.lastOrNull() == key) model.save(input, key.logId, form.values.version, key.requestId) },
+                            { if (stack.lastOrNull() == key) model.save(input, key.logId, form.values.version, key.requestId,
+                                previousOutcomeUnknown = form.outcomeUnknown) },
                             { form.submissionFailed(ApiFailureKind.STORAGE) }) },
                         { persistence.leave(form.stored(key, selected)) {
                             if (stack.lastOrNull() == key) { stack.removeLastOrNull(); history(); model.load(true) }

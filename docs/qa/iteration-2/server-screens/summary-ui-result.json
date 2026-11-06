@@ -1,0 +1,157 @@
+{
+  "runs": [
+    {
+      "profile": "normal-light",
+      "expected": 12,
+      "passed": true,
+      "reused_completed_run": true,
+      "images": [
+        {
+          "name": "server-home-light.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "acbd0c5774013e788c7a893f5897e08d253a9ba0d9fc708f53fd4ae7cf1faca6"
+        },
+        {
+          "name": "server-statistics-empty-light.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "e8e0f2360bde3303a48fdd5fd780d6b917283554496ec13eec0b30d0ebfb6f2d"
+        },
+        {
+          "name": "server-statistics-error-light.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "7a33d62457e584ad277325b70e7fddd6640a32d07aeef99ac55fa3d426c83adf"
+        },
+        {
+          "name": "server-statistics-loading-light.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "394a987df609ccc40b5faf09d7379f709fa827815ba05cbc7d5bc9dc94008145"
+        },
+        {
+          "name": "server-statistics-long-method-light.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "df8369ee1712d289dd0efcf8c58c117b8fc5dc91cdfc7f505d34d2bb60fe4e0c"
+        }
+      ]
+    },
+    {
+      "profile": "normal-dark",
+      "expected": 8,
+      "passed": true,
+      "returncode": 0,
+      "images": [
+        {
+          "name": "server-home-dark.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "b03d005179710ab0720b1795273afd8c331e0d189690d413b1effd6cb851c31c"
+        },
+        {
+          "name": "server-statistics-empty-dark.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "cce92c404f426eb1bb9382d7ced47866660bb19c1103387ca78d26d4f6667890"
+        },
+        {
+          "name": "server-statistics-error-dark.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "ac819e9cff14cc53fb782103f8bf77d6ccfb1ba5b59b0b2c4f90f6806d477c05"
+        },
+        {
+          "name": "server-statistics-loading-dark.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "b62ca00557616f98d25ccaaf5e911014950ce159a982f0669371fdda7d2b9074"
+        },
+        {
+          "name": "server-statistics-long-method-dark.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "dbe831dba60fd8413741a077b9ffb5a8c921cac8725fcf06f54dd796b64b9339"
+        }
+      ],
+      "reused_completed_run": true
+    },
+    {
+      "profile": "font200",
+      "expected": 9,
+      "passed": true,
+      "returncode": 0,
+      "images": [
+        {
+          "name": "server-home-light.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "756919e0323e801c0f231282cbc9b59a1e84a5b4c900212faba551d164a2ad12"
+        },
+        {
+          "name": "server-statistics-empty-light.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "a7b2bf9e2012dd010aadb1eab6c446cfac2c83296c2fb16984bf76232d9b50f0"
+        },
+        {
+          "name": "server-statistics-error-light.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "3210834432eadb7335df06c5b43c5fa3b5123af93b6387eb2e4510d5fe57e66e"
+        },
+        {
+          "name": "server-statistics-loading-light.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "bf4776f2fb7ab89ff9644c493ae7df8e84597b7ad7edbed24d0b67d3287d6a91"
+        },
+        {
+          "name": "server-statistics-long-method-light.png",
+          "size": [
+            1080,
+            1920
+          ],
+          "sha256": "68dd59251a44036507c26200379a6e06d8407ef1df9efabbd8a9e6e1f66b5da9"
+        }
+      ]
+    }
+  ],
+  "completed": true,
+  "before": {
+    "font_scale": "1.0",
+    "density": "Physical density: 480",
+    "size": "Physical size: 1080x1920"
+  },
+  "tested_sources_unchanged": true,
+  "font_restored": true
+}

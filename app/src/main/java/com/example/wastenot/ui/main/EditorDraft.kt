@@ -45,6 +45,7 @@ class EditorDraft(original: EditorValues) {
     val retryBlocked: Boolean get() = submissionError == ApiFailureKind.IDEMPOTENCY_CONFLICT || submissionError == ApiFailureKind.DELETED
     val needsConflictResolution: Boolean get() = original.version != null &&
         submissionError in setOf(ApiFailureKind.VERSION_CONFLICT, ApiFailureKind.PRECONDITION_REQUIRED)
+    val outcomeUnknown: Boolean get() = locked && submissionError != null && !retryBlocked && !needsConflictResolution
 
     fun resolveConflict(latest: WasteLog, keepDraft: Boolean): Boolean {
         if (!needsConflictResolution || locked || latest.version <= (original.version ?: 0)) return false
@@ -89,8 +90,9 @@ class EditorDraft(original: EditorValues) {
     }
 
     fun submissionFailed(error: ApiFailureKind) {
+        val wasUnknown = outcomeUnknown
         submissionError = error
-        if (!error.saveOutcomeUnknown() && !retryBlocked) submittedValues = null
+        if (!error.saveOutcomeUnknown() && !retryBlocked && (!wasUnknown || needsConflictResolution)) submittedValues = null
     }
 
     private fun validationErrors(referenceDate: LocalDate): Map<EditorField, Int> {

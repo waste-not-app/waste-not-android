@@ -12,10 +12,41 @@ import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.model.Metadata
 import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteLog
+import com.example.wastenot.model.WasteGuide
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 class CoreRepository(private val network: WasteNotNetwork?, private val session: SessionRepository? = null) {
+    suspend fun guides(query: String, category: WasteCategory? = null, cursor: String? = null): ApiResult<List<WasteGuide>> {
+        val search = query.trim()
+        if (search.codePointCount(0, search.length) > 100 || cursor?.isBlank() == true) return invalidRequest()
+        val result = protected { credential ->
+            network?.executor?.executeWithStatus({ dtos, status ->
+                require(status == 200 && dtos.size <= 20)
+                val values = dtos.map { it.toModel() }
+                require(values.map { it.id.lowercase() }.distinct().size == values.size)
+                require(category == null || values.all { it.category == category })
+                values
+            }) { network.api.guides(search.takeIf { it.isNotEmpty() }, category?.name, cursor, credential = credential) }
+                ?: notConfigured()
+        }
+        if (result is ApiResult.Success && (result.page == null || result.page.hasMore != (result.page.nextCursor != null) ||
+            (result.page.hasMore && result.value.isEmpty()) || result.page.nextCursor?.let { it == cursor } == true)) {
+            return ApiResult.Failure(ApiFailure(ApiFailureKind.MALFORMED_RESPONSE, status = 200))
+        }
+        return result
+    }
+
+    suspend fun guide(id: String): ApiResult<WasteGuide> {
+        if (!uuid.matches(id)) return invalidRequest()
+        return protected { credential ->
+            network?.executor?.executeWithStatus({ dto, status ->
+                require(status == 200 && dto.id.equals(id, ignoreCase = true))
+                dto.toModel()
+            }) { network.api.guide(id, credential) } ?: notConfigured()
+        }
+    }
+
     suspend fun dashboard(): ApiResult<DashboardSnapshot> = protected { credential ->
         network?.executor?.executeWithStatus({ dto, status ->
             require(status == 200)

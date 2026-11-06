@@ -1,0 +1,21 @@
+{
+  "issues": 52,
+  "closed": 0,
+  "checkboxes": 417,
+  "checked": 140,
+  "fully_checked": 8,
+  "implementation": {
+    "checked": 94,
+    "total": 260
+  },
+  "acceptance": {
+    "checked": 46,
+    "total": 157
+  },
+  "percent_marked": 33.6,
+  "snapshot_at_utc": "2026-11-05T17:34:56.112050+00:00",
+  "metric": "checked original backlog checkboxes; not release readiness",
+  "source": "GitHub issues labelled Android",
+  "scope": "52 original tasks plus current visual/backend/AI acceptance work",
+  "all_assigned_to_oktavsm": true
+}

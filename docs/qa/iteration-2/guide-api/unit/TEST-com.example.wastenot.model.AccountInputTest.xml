@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.model.AccountInputTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:34:22.716Z" hostname="oktaavsm" time="0.072">
+  <properties/>
+  <testcase name="nameLengthUsesTrimmedUnicodeCharacters" classname="com.example.wastenot.model.AccountInputTest" time="0.005"/>
+  <testcase name="loginAcceptsTrimmedEmailAndPasswordLengthBoundaries" classname="com.example.wastenot.model.AccountInputTest" time="0.0"/>
+  <testcase name="emailNormalizationDoesNotDependOnTheDeviceLanguage" classname="com.example.wastenot.model.AccountInputTest" time="0.001"/>
+  <testcase name="passwordLengthCountsUnicodeCharactersWithoutTrimming" classname="com.example.wastenot.model.AccountInputTest" time="0.002"/>
+  <testcase name="reportsAllInvalidFieldsWithoutReturningTheirValues" classname="com.example.wastenot.model.AccountInputTest" time="0.003"/>
+  <testcase name="passwordConfirmationRequiresExactEqualityIncludingWhitespace" classname="com.example.wastenot.model.AccountInputTest" time="0.001"/>
+  <testcase name="registrationUsesAnAvailableDeviceTimezone" classname="com.example.wastenot.model.AccountInputTest" time="0.003"/>
+  <testcase name="unsupportedDeviceTimezoneFallsBackToJakarta" classname="com.example.wastenot.model.AccountInputTest" time="0.001"/>
+  <testcase name="rejectsEmptyMalformedAndInternallySpacedEmails" classname="com.example.wastenot.model.AccountInputTest" time="0.052"/>
+  <testcase name="emailLimitIsAppliedAfterOuterWhitespaceIsRemoved" classname="com.example.wastenot.model.AccountInputTest" time="0.002"/>
+  <testcase name="registrationNameBoundaryAlsoFitsTheReturnedProfile" classname="com.example.wastenot.model.AccountInputTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

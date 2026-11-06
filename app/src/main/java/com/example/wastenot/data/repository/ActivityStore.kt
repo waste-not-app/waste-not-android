@@ -5,6 +5,9 @@ import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.model.Quantity
 import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteLog
+import com.example.wastenot.model.ActivityDateRange
+import com.example.wastenot.model.DashboardSnapshot
+import com.example.wastenot.model.StatisticsSnapshot
 import java.time.LocalDate
 
 data class ActivityInput(
@@ -20,6 +23,8 @@ data class ActivityCreation(val log: WasteLog, val created: Boolean)
 interface ActivityStore {
     val isDemo: Boolean
     val referenceDate: LocalDate?
+    suspend fun dashboard(): ApiResult<DashboardSnapshot>
+    suspend fun statistics(range: ActivityDateRange): ApiResult<StatisticsSnapshot>
     suspend fun load(): ApiResult<List<WasteLog>>
     suspend fun get(id: String): ApiResult<WasteLog>
     suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation>
@@ -31,6 +36,8 @@ interface ActivityStore {
 class RemoteActivityStore(private val core: CoreRepository) : ActivityStore {
     override val isDemo = false
     override val referenceDate: LocalDate? = null
+    override suspend fun dashboard() = core.dashboard()
+    override suspend fun statistics(range: ActivityDateRange) = core.statistics(range)
     override suspend fun load() = core.wasteLogs()
     override suspend fun get(id: String) = core.wasteLog(id)
     override suspend fun create(input: ActivityInput, clientRequestId: String) = core.createLog(input, clientRequestId)

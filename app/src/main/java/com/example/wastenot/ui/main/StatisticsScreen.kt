@@ -18,44 +18,33 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
-import com.example.wastenot.data.dummy.StatisticsDay
-import com.example.wastenot.data.dummy.dummyStatistics
 import com.example.wastenot.model.*
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.*
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.time.LocalDate
 
 @Composable
 fun StatisticsScreen(
-    data: WorkspaceUiState,
-    demo: Boolean,
-    date: LocalDate,
+    data: SnapshotState<StatisticsSnapshot>,
+    days: Int,
     padding: PaddingValues,
     onRetry: () -> Unit,
     onRecord: () -> Unit,
+    onDays: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var days by rememberSaveable { mutableIntStateOf(7) }
     var expanded by rememberSaveable(days) { mutableStateOf(false) }
-    if (data.records.isEmpty() && (data.loading || data.error != null)) {
-        WorkspaceLoading(data, onRetry, padding, modifier)
-        return
-    }
-    val period = remember(data.records, date, days) { dummyStatistics(data.records, date, days) }
     ScrollPage(padding, modifier) {
-        RangeSelector(days, { days = it })
-        Text(stringResource(R.string.date_range, WasteFormat.activityDate(period.range.from), WasteFormat.activityDate(period.range.to)),
+        RangeSelector(days, onDays)
+        SummaryStatus(data.loading, data.error, data.value != null, onRetry)
+        val period = data.value ?: return@ScrollPage
+        val previousPeriod = period.daily.size != days
+        Text(if (previousPeriod) stringResource(R.string.summary_previous_period, period.daily.size,
+                WasteFormat.activityDate(period.range.from), WasteFormat.activityDate(period.range.to))
+            else stringResource(R.string.date_range, WasteFormat.activityDate(period.range.from), WasteFormat.activityDate(period.range.to)),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        if (data.error != null) {
-            MessageBanner(stringResource(R.string.refresh_failed), isError = true)
-            TextActionButton(stringResource(R.string.retry), onRetry)
-        }
-        if (data.loading) LinearProgressIndicator(Modifier.fillMaxWidth())
-        if (!demo) {
-            MessageBanner(stringResource(R.string.summary_pending))
-        } else if (period.summary.activityCount == 0L) {
+        if (period.summary.activityCount == 0L) {
             Text(stringResource(R.string.statistics_empty), style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.semantics { heading() })
             Text(stringResource(R.string.statistics_empty_hint), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -82,7 +71,7 @@ fun StatisticsScreen(
             val methodLabels = DisposalMethod.entries.map { stringResource(it.labelResource) }
             val percentages = DisposalMethod.entries.map { method ->
                 val count = period.methods.getValue(method)
-                val percent = BigDecimal(count * 100L).divide(BigDecimal(period.summary.activityCount), 1, RoundingMode.HALF_UP)
+                val percent = BigDecimal(count).multiply(BigDecimal(100)).divide(BigDecimal(period.summary.activityCount), 1, RoundingMode.HALF_UP)
                 stringResource(R.string.rate_value, checkNotNull(WasteFormat.percentage(percent)))
             }
             val measurer = rememberTextMeasurer()
@@ -134,7 +123,7 @@ private fun StatisticsHeading(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun DailyChart(daily: List<StatisticsDay>, count: Boolean, modifier: Modifier = Modifier) {
+private fun DailyChart(daily: List<StatisticsDayTotal>, count: Boolean, modifier: Modifier = Modifier) {
     val title = stringResource(if (count) R.string.daily_count_title else R.string.daily_weight_title)
     val unit = stringResource(if (count) R.string.unit_item else R.string.unit_gram)
     val values = daily.map { if (count) it.handled.itemCount else it.handled.weightGrams }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.data.dummy.DummyStatisticsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:33:32.961Z" hostname="oktaavsm" time="0.208">
+  <properties/>
+  <testcase name="emptyAndReduceOnlyDoNotInventAHandledRate" classname="com.example.wastenot.data.dummy.DummyStatisticsTest" time="0.194"/>
+  <testcase name="rangesAreInclusiveAndExcludeFutureAndOldDates" classname="com.example.wastenot.data.dummy.DummyStatisticsTest" time="0.003"/>
+  <testcase name="countSeriesAndReduceStaySeparateWithoutRoundingBeforeAggregation" classname="com.example.wastenot.data.dummy.DummyStatisticsTest" time="0.005"/>
+  <testcase name="canonicalWeekHasZeroFilledDaysAndAllMethodsAndCategories" classname="com.example.wastenot.data.dummy.DummyStatisticsTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

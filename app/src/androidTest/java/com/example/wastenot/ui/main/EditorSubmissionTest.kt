@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.*
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
@@ -45,6 +47,66 @@ class EditorSubmissionTest {
 
     @Test fun uncertainLightSubmissionRestoresAndRetriesTheSameInput() = uncertain(false)
     @Test fun uncertainDarkSubmissionRestoresAndRetriesTheSameInput() = uncertain(true)
+    @Test fun followupRejectionKeepsTheLightDraftFrozenAcrossRestoration() = followupRejection(false)
+    @Test fun followupRejectionKeepsTheDarkDraftFrozenAcrossRestoration() = followupRejection(true)
+
+    private fun followupRejection(dark: Boolean) {
+        val restoration = StateRestorationTester(compose)
+        val received = mutableListOf<ActivityInput>()
+        lateinit var current: EditorDraft
+        restoration.setContent {
+            current = rememberSaveable(saver = EditorDraft.Saver) { draft() }
+            EditorHost(dark) {
+                LogEditorScreen(current, today, "Asia/Jakarta", true, false, PaddingValues(), { input ->
+                    received.add(input)
+                    current.submissionFailed(when (received.size) {
+                        1 -> ApiFailureKind.TIMEOUT
+                        2 -> ApiFailureKind.RATE_LIMITED
+                        else -> ApiFailureKind.VALIDATION
+                    })
+                }, { fail("An unresolved write must retain its original request") }, {}, Modifier.fillMaxSize())
+            }
+        }
+        compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
+        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        assertReadableBanner("Percobaan terakhir: Terlalu banyak permintaan.",
+            "submission-followup-banner-${if (dark) "dark" else "light"}")
+        assertFrozen()
+        assertActionInViewport("Coba lagi")
+        capture("submission-followup-action-${if (dark) "dark" else "light"}")
+        restoration.emulateSavedInstanceStateRestore()
+        assertFrozen()
+        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        assertReadableBanner("Percobaan terakhir: Isian belum diterima.",
+            "submission-followup-validation-${if (dark) "dark" else "light"}")
+        assertFrozen()
+        assertActionInViewport("Coba lagi")
+        compose.runOnIdle {
+            assertEquals(3, received.size)
+            assertTrue(received.all { it == received.first() })
+            assertTrue(current.outcomeUnknown)
+            assertEquals(ApiFailureKind.VALIDATION, current.submissionError)
+        }
+    }
+
+    @Test fun confirmedSaveOffersCleanupWithoutClaimingTheWriteIsStillUnknown() {
+        val form = draft().apply {
+            prepareSubmission(today)
+            submissionFailed(ApiFailureKind.NETWORK)
+            submissionFailed(ApiFailureKind.RATE_LIMITED)
+        }
+        var writes = 0
+        var cleanups = 0
+        compose.setContent { EditorHost(false) {
+            LogEditorScreen(form, today, "Asia/Jakarta", true, false, PaddingValues(), { writes++ }, {}, {},
+                Modifier.fillMaxSize(), persistence = EditorPersistenceState(loading = false, ready = true, failure = DraftFailure.FINISH),
+                saveConfirmed = true, onRetryPersistence = { cleanups++ })
+        } }
+        compose.onNodeWithText("Hasil penyimpanan belum diketahui.", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Percobaan terakhir:", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        compose.runOnIdle { assertEquals(1, cleanups); assertEquals(0, writes) }
+    }
 
     private fun uncertain(dark: Boolean) {
         val restoration = StateRestorationTester(compose)
@@ -138,6 +200,15 @@ class EditorSubmissionTest {
         val bounds = action.fetchSemanticsNode().boundsInWindow
         val viewport = compose.onNodeWithTag("submission-viewport").fetchSemanticsNode().boundsInWindow
         assertTrue("CTA must stay inside the inset viewport", bounds.top >= viewport.top && bounds.bottom <= viewport.bottom)
+    }
+
+    private fun assertReadableBanner(text: String, name: String) {
+        val node = compose.onNodeWithText(text, substring = true).performScrollTo().assertIsDisplayed()
+        val layouts = mutableListOf<TextLayoutResult>()
+        node.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        assertTrue(layouts.isNotEmpty())
+        assertFalse(layouts.any { it.hasVisualOverflow })
+        capture(name)
     }
 
     private fun capture(name: String) {
