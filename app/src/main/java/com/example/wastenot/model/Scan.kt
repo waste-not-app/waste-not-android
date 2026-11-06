@@ -9,21 +9,16 @@ data class ScanBounds(val left: Float, val top: Float, val right: Float, val bot
     }
 }
 
-data class ScanObject(val id: String, val name: String, val score: Float, val bounds: ScanBounds,
-    val category: WasteCategory? = null, val specialHandling: Boolean = false) {
-    init { require(id.isNotBlank() && name.isNotBlank() && score.isFinite() && score in 0f..1f) }
-}
-
 enum class Cleanliness { UNKNOWN, CLEAN, DIRTY }
 enum class Integrity { UNKNOWN, INTACT, DAMAGED }
-enum class Reusability { UNKNOWN, YES, NO }
+typealias Reusability = AiAnswer
 data class ScanContext(val cleanliness: Cleanliness = Cleanliness.UNKNOWN,
     val integrity: Integrity = Integrity.UNKNOWN, val reusable: Reusability = Reusability.UNKNOWN,
-    val reuseIntention: Boolean? = null)
-
-data class ScanRecommendation(val method: DisposalMethod?, val reason: String,
-    val guideTitle: String, val guideVersion: String, val steps: List<String>, val cautions: List<String>) {
-    init { require(method != DisposalMethod.REDUCE) }
+    val reuseIntention: Boolean? = null, val cleanable: AiAnswer = AiAnswer.UNKNOWN,
+    val soiling: AiSoiling = AiSoiling.UNKNOWN, val formerContents: AiFormerContents = AiFormerContents.UNKNOWN,
+    val recyclingAccess: AiAnswer = AiAnswer.UNKNOWN, val riskFlag: Boolean = false,
+    val riskType: AiRiskType = AiRiskType.UNKNOWN) {
+    fun condition() = AiCondition(cleanliness, integrity, reusable, cleanable, soiling, formerContents)
 }
 
 data class ScanPrefill(val category: WasteCategory?, val method: DisposalMethod?, val aiProvenance: AiLogProvenance? = null) {
@@ -36,4 +31,5 @@ data class ScanPrefill(val category: WasteCategory?, val method: DisposalMethod?
 interface ScanPhotoStore {
     fun exists(photo: ScanPhoto): Boolean
     fun delete(photo: ScanPhoto)
+    fun read(photo: ScanPhoto): ByteArray
 }

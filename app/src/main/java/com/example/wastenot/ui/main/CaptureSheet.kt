@@ -15,8 +15,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.wastenot.data.local.ScanPhotoCache
-import com.example.wastenot.data.repository.DummyScanRepository
-import com.example.wastenot.data.repository.UnconfiguredScanRepository
+import com.example.wastenot.data.dummy.DummyScanRepository
+import com.example.wastenot.data.repository.RemoteScanRepository
+import com.example.wastenot.data.repository.AiRepository
 import com.example.wastenot.model.ScanPrefill
 import com.example.wastenot.ui.scan.*
 import kotlinx.coroutines.Dispatchers
@@ -77,12 +78,12 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CaptureSheet(userId: String, dummy: Boolean, session: String, onDismiss: () -> Unit,
+internal fun CaptureSheet(userId: String, dummy: Boolean, ai: AiRepository, session: String, onDismiss: () -> Unit,
     onPrefill: (ScanPrefill) -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val cache = remember(userId) { ScanPhotoCache.create(context, userId) }
-    val factory = remember(cache, dummy) { viewModelFactory { initializer {
-        ScanViewModel(if (dummy) DummyScanRepository() else UnconfiguredScanRepository(), cache)
+    val factory = remember(cache, dummy, ai) { viewModelFactory { initializer {
+        ScanViewModel(if (dummy) DummyScanRepository() else RemoteScanRepository(ai, cache), cache)
     } } }
     val model: ScanViewModel = viewModel(key = "scan-$userId", factory = factory)
     val state by model.state.collectAsStateWithLifecycle()
@@ -99,12 +100,12 @@ internal fun CaptureSheet(userId: String, dummy: Boolean, session: String, onDis
     fun dismiss() { model.close(session); onDismiss() }
     fun use(manual: Boolean) {
         if (model.state.value.session != session) return
-        val prefill = model.prefill(confirmRecommendation = !manual)
+        val prefill = model.handoff(confirmRecommendation = !manual) ?: return
         model.close(session); onPrefill(prefill)
     }
     ScanSheet(state, ::dismiss, { use(true) }, model::retake, model::detect, model::select, model::category,
         model::confirmObject, model::correctObject, model::context, model::recommend, model::method,
-        { use(false) }, model::retry, modifier) {
+        { use(false) }, model::retry, modifier, model::objectKey, model::reviewContext, model::confirmConditions) {
         ScanCamera(session, cache, { model.photo(session, it) }, { model.problem(session, it) })
     }
 }

@@ -1,6 +1,6 @@
 # AI transport and durable reference checkpoint
 
-This checkpoint adds the Android API and log-reference layer. The live scan flow is **not complete**: `CaptureSheet` still selects `UnconfiguredScanRepository` outside demo mode. No new AI APK or native visual acceptance is claimed here.
+This records the API/log-reference checkpoint at `e5fc51b`. The following [UI checkpoint](UI_SCAN_PREVIEW.md) wires `RemoteScanRepository` through AppContainer and CaptureSheet and adds the catalog/context/recommendation UI. Production AI execution and broad native acceptance remain incomplete; the UI preview uses explicit demo data.
 
 ## Implemented
 
@@ -18,4 +18,4 @@ The mandatory pre-commit hook also runs `lintDebug test`. The local `test --dry-
 
 ## Remaining for the scan checkpoint
 
-Wire the catalog and APIs through the scan repository, ViewModel and UI; collect the independent condition/access/risk fields; preserve server bands; handle missing context and conditional advice; show actual sources; transfer the reference to the editor without deleting the server detection before save; support explicit retry and cancellation/expiry handling. Verify the full public-backend flow on API 30 and the current Android runtime, inspect screenshots against S21–S25, produce a trial APK and pass exact-head GitHub CI. Broad screen/navigation acceptance remains open.
+The next UI checkpoint implements source wiring, independent context fields, server bands, missing-context/conditional/source rendering, explicit retry and detection-reference handoff. Verify those behaviors against the real public backend after the UI sequence is complete, including cancellation/expiry and an uncertain core write. Verify API 30 and the current Android runtime, finish S21–S25 and broad screen/navigation acceptance, and pass exact-head CI for the resulting live APK.

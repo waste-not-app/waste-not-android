@@ -39,6 +39,9 @@ class ScanPhotoCacheTest {
             assertTrue(Color.red(normalized.getPixel(30, 20)) > 200)
             assertTrue(Color.blue(normalized.getPixel(30, 80)) > 200); normalized.recycle()
             val other = ScanPhotoCache(root, "account-b") {}
+            assertArrayEquals(File(photo.path).readBytes(), cache.read(photo))
+            assertThrows(java.io.IOException::class.java) { other.read(photo) }
+            assertThrows(java.io.IOException::class.java) { cache.read(photo.copy(path = input.path)) }
             assertFalse(other.exists(photo)); other.delete(photo); assertTrue(cache.exists(photo))
             cache.delete(photo); assertFalse(File(photo.path).exists())
         } finally { root.deleteRecursively() }
@@ -54,6 +57,8 @@ class ScanPhotoCacheTest {
             val stream = ByteArrayOutputStream(); bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream); bitmap.recycle()
             val photo = cache.save(stream.toByteArray(), 0)
             val file = File(photo.path); val now = System.currentTimeMillis()
+            file.outputStream().use { it.write(ByteArray(5 * 1024 * 1024 + 1)) }
+            assertThrows(IllegalArgumentException::class.java) { cache.read(photo) }
             assertTrue(file.setLastModified(now - 3_600_000))
             cache.removeExpired(now); assertFalse(cache.exists(photo))
             assertThrows(IllegalArgumentException::class.java) { cache.save(stream.toByteArray(), 45) }

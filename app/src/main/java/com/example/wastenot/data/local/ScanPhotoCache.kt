@@ -50,6 +50,21 @@ class ScanPhotoCache(private val directory: File, owner: String, private val sch
 
     override fun exists(photo: ScanPhoto) = owned(photo)?.isFile == true
     override fun delete(photo: ScanPhoto) { owned(photo)?.delete() }
+    override fun read(photo: ScanPhoto): ByteArray {
+        val file = owned(photo) ?: throw IOException("Photo unavailable")
+        require(file.length() in 1..5 * 1024 * 1024)
+        return file.inputStream().use { input ->
+            val buffer = ByteArray(5 * 1024 * 1024 + 1)
+            var length = 0
+            while (length < buffer.size) {
+                val count = input.read(buffer, length, buffer.size - length)
+                if (count < 0) break
+                length += count
+            }
+            require(length in 1..5 * 1024 * 1024)
+            buffer.copyOf(length)
+        }
+    }
     private fun owned(photo: ScanPhoto): File? = File(photo.path).takeIf {
         it.name.startsWith(prefix) && it.name.endsWith(".jpg") && it.canonicalFile.parentFile == directory.canonicalFile
     }

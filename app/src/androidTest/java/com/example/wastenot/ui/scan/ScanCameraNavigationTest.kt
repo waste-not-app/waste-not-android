@@ -5,6 +5,7 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
@@ -78,6 +79,8 @@ class ScanCameraNavigationTest {
         compose.onNodeWithText("Konfirmasi objek").performScrollTo().assertIsNotEnabled()
         compose.onNodeWithText("Pilih material").performScrollTo().performClick()
         compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
+        compose.onNodeWithText("Pilih jenis benda").performScrollTo().performClick()
+        compose.onNode(hasText("Botol plastik (contoh)") and hasAnyAncestor(isPopup())).performClick()
         capture("camera-object-review")
         compose.onNodeWithText("Konfirmasi objek").performScrollTo().performClick()
         compose.onNodeWithText("Kondisi objek").assertIsDisplayed()
@@ -85,7 +88,7 @@ class ScanCameraNavigationTest {
         compose.onNodeWithText("Lihat saran").performScrollTo().performClick()
         waitFor("Periksa saran")
         capture("camera-recommendation")
-        compose.onNodeWithText("Gunakan pilihan").performScrollTo().performClick()
+        compose.onNodeWithText("Gunakan pilihan, isi jumlah").performScrollTo().performClick()
         compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
         compose.onNodeWithText("Recycle").performScrollTo().assertIsSelected()
         compose.onNodeWithContentDescription("Kategori").performScrollTo().assertTextContains("Plastik")
@@ -147,9 +150,16 @@ class ScanCameraNavigationTest {
         return null
     }
     private fun capture(name: String) {
+        compose.mainClock.advanceTimeByFrame()
         compose.waitForIdle()
+        instrumentation.waitForIdleSync()
         instrumentation.uiAutomation.waitForIdle(300, 5_000)
         val directory = File(context.getExternalFilesDir(null), "scan-camera-qa").apply { mkdirs() }
+        check(instrumentation.uiAutomation.rootInActiveWindow?.packageName?.toString() == context.packageName)
+        if (compose.onAllNodesWithTag("capture-sheet").fetchSemanticsNodes().isNotEmpty()) {
+            val panel = compose.onNodeWithTag("capture-sheet").captureToImage().asAndroidBitmap()
+            File(directory, "$name-panel.png").outputStream().use { check(panel.compress(Bitmap.CompressFormat.PNG, 100, it)) }
+        }
         val image = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
         File(directory, "$name.png").outputStream().use { check(image.compress(Bitmap.CompressFormat.PNG, 100, it)) }
         image.recycle()

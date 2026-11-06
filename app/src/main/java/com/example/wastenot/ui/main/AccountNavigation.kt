@@ -41,6 +41,7 @@ import com.example.wastenot.data.dummy.DummyActivityStore
 import com.example.wastenot.data.local.LocalEditorDraftStore
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.CoreRepository
+import com.example.wastenot.data.repository.AiRepository
 import com.example.wastenot.data.repository.RemoteActivityStore
 import com.example.wastenot.data.repository.GuideStore
 import com.example.wastenot.model.User
@@ -71,6 +72,7 @@ fun AccountNavigation(
     demo: Boolean,
     core: CoreRepository,
     guideStore: GuideStore,
+    aiRepository: AiRepository,
     theme: ThemeMode,
     onTheme: () -> Unit,
     onLogout: () -> Unit,
@@ -273,7 +275,7 @@ fun AccountNavigation(
         sessionFailed = (logoutState as? LogoutUiState.Complete)?.result?.localCleared == false,
     )
     if (resumingPrompt) ResumeDraftDialog({ resumingPrompt = false }, ::resumeDraft)
-    capture?.let { session -> CaptureSheet(user.id, demo, session, onDismiss = { capture = null }, onPrefill = { prefill ->
+    capture?.let { session -> CaptureSheet(user.id, demo, aiRepository, session, onDismiss = { capture = null }, onPrefill = { prefill ->
         capture = null
         openEditor(LogEditor(null, UUID.randomUUID().toString(), scanCategory = prefill.category?.name,
             scanMethod = prefill.method?.name, scanRecommendationId = prefill.aiProvenance?.recommendationId))

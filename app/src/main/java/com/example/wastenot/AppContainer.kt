@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import com.example.wastenot.data.local.KeystoreRefreshTokenStore
 import com.example.wastenot.data.network.WasteNotNetwork
 import com.example.wastenot.data.repository.CoreRepository
+import com.example.wastenot.data.repository.AiRepository
 import com.example.wastenot.data.repository.SessionRepository
 import com.example.wastenot.data.repository.RemoteAccountSession
 import com.example.wastenot.data.dummy.DummyAccountSession
@@ -20,5 +21,6 @@ class AppContainer(context: Context) {
         DummyAccountSession(context.getSharedPreferences("dummy_session", Context.MODE_PRIVATE))
     } else RemoteAccountSession(sessions) { connectivity?.activeNetwork != null }
     val core = CoreRepository(network, sessions)
+    val ai = AiRepository(network, sessions)
     val guides: GuideStore = if (BuildConfig.USE_DUMMY_DATA) DummyGuideStore() else RemoteGuideStore(core)
 }

@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
       WasteNotTheme(darkTheme = dark) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           val container = (application as WasteNotApplication).container
-          MainNavigation(container.accountSession, container.core, container.guides, mode, { mode = it; preferences.write(it) }, Modifier.fillMaxSize())
+          MainNavigation(container.accountSession, container.core, container.guides, container.ai, mode, { mode = it; preferences.write(it) }, Modifier.fillMaxSize())
         }
       }
     }

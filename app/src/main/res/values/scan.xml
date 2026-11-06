@@ -48,10 +48,10 @@
     <string name="scan_correct_object">Koreksi objek</string>
     <string name="scan_recommending">Menyiapkan saran…</string>
     <string name="scan_suggested_method">Saran penanganan</string>
-    <string name="scan_method_hint">Pilih tindakan yang benar-benar akan kamu lakukan. Saran ini bukan sertifikasi penanganan aman.</string>
+    <string name="scan_method_confirmation">Konfirmasi / ubah metode</string>
     <string name="scan_basis">Lihat dasar saran</string>
     <string name="scan_hide_basis">Tutup dasar saran</string>
-    <string name="scan_use">Gunakan pilihan</string>
+    <string name="scan_use">Gunakan pilihan, isi jumlah</string>
     <string name="scan_quantity_next">Berikutnya isi jumlah secara manual. Catatan belum disimpan.</string>
     <string name="scan_special">Objek memerlukan penanganan khusus. Pilih manual dan periksa panduan fasilitas setempat.</string>
     <string name="scan_no_guide">Belum ada panduan yang cocok. Lanjutkan dengan pilihan manual.</string>

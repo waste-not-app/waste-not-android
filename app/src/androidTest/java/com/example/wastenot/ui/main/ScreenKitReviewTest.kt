@@ -87,6 +87,47 @@ class ScreenKitReviewTest {
         }
     }
 
+    @Test fun remainingEditorFilterConfirmationAndDialogsHaveReviewCaptures() {
+        compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
+        for (dark in listOf(false, true)) {
+            theme(dark)
+            val suffix = if (dark) "dark" else "light"
+            tab("Riwayat")
+            compose.onNodeWithContentDescription("Filter riwayat").performClick()
+            compose.onNodeWithTag("history-filter-sheet").assertIsDisplayed()
+            captureUiPreview(compose, "S10-$suffix")
+            compose.onNodeWithText("Reset pilihan").performScrollTo().assertIsDisplayed()
+            captureUiPreview(compose, "S10-end-$suffix")
+            compose.onNodeWithText("Batal").performScrollTo().performClick()
+            compose.onNodeWithText("250 g").performScrollTo().performClick()
+            compose.onNodeWithText("Hapus catatan").performScrollTo().performClick()
+            compose.onNode(hasText("Hapus catatan?") and hasAnyAncestor(isDialog())).assertIsDisplayed()
+            captureUiPreview(compose, "D01-$suffix")
+            compose.onNodeWithText("Batal").performClick()
+            compose.onNodeWithText("Ubah catatan").performScrollTo().performClick()
+            compose.onNodeWithText("Cara pengelolaan").assertIsDisplayed()
+            captureUiPreview(compose, "S09-$suffix")
+            compose.onNodeWithText("Simpan perubahan").performScrollTo().assertIsDisplayed()
+            captureUiPreview(compose, "S09-end-$suffix")
+            compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Preview perbaikan catatan $suffix")
+            compose.onNodeWithContentDescription("Kembali").performClick()
+            compose.onNodeWithText("Buang perubahan?").assertIsDisplayed()
+            captureUiPreview(compose, "D03-$suffix")
+            compose.onNodeWithText("Lanjut mengisi").performClick()
+            compose.onNodeWithText("Simpan perubahan").performScrollTo().performClick()
+            compose.waitUntil(10_000) { compose.onAllNodesWithText("Catatan tersimpan").fetchSemanticsNodes().isNotEmpty() }
+            captureUiPreview(compose, "S06-$suffix")
+            compose.onNodeWithText("Kembali ke beranda").performScrollTo().assertIsDisplayed()
+            captureUiPreview(compose, "S06-end-$suffix")
+            compose.onNodeWithText("Kembali ke beranda").performClick()
+            tab("Profil")
+            compose.onNodeWithText("Keluar").performScrollTo().performClick()
+            compose.onNodeWithText("Keluar dari akun?").assertIsDisplayed()
+            captureUiPreview(compose, "D02-$suffix")
+            compose.onNodeWithText("Batal").performClick()
+        }
+    }
+
     @Test fun scrolledSectionsStayReachableAboveTheDock() {
         compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
         for (dark in listOf(false, true)) {

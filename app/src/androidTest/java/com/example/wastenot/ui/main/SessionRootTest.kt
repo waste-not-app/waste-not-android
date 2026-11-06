@@ -34,7 +34,8 @@ class SessionRootTest {
     private fun start(source: FixtureSession, restoration: StateRestorationTester? = null) {
         com.example.wastenot.clearEditorDraftFixtures(InstrumentationRegistry.getInstrumentation().targetContext)
         val content: @androidx.compose.runtime.Composable () -> Unit = { WasteNotTheme(darkTheme = false) {
-            MainNavigation(source, CoreRepository(null), com.example.wastenot.data.dummy.DummyGuideStore(), ThemeMode.LIGHT, {}, Modifier.fillMaxSize())
+            MainNavigation(source, CoreRepository(null), com.example.wastenot.data.dummy.DummyGuideStore(),
+                com.example.wastenot.data.repository.AiRepository(null), ThemeMode.LIGHT, {}, Modifier.fillMaxSize())
         } }
         if (restoration == null) compose.setContent(content) else restoration.setContent(content)
         compose.waitForIdle()
