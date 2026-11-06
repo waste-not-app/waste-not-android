@@ -13,6 +13,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.model.*
+import com.example.wastenot.data.dummy.dummyDashboard
 import com.example.wastenot.theme.WasteNotTheme
 import java.io.File
 import java.time.Instant
@@ -34,7 +35,7 @@ class OverviewTextActionDesignTest {
         var histories = 0
         compose.setContent { WasteNotTheme(dark) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                OverviewScreen(user, WorkspaceUiState(records = listOf(log), loading = false), true, date, PaddingValues(),
+                OverviewScreen(user, SnapshotState(dummyDashboard(listOf(log), date, zone), loading = false), PaddingValues(),
                     {}, { histories++ }, {}, {})
             }
         } }

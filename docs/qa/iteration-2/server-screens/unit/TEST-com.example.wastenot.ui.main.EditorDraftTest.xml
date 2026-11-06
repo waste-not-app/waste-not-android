@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.ui.main.EditorDraftTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-05T13:42:19.704Z" hostname="oktaavsm" time="0.043">
+  <properties/>
+  <testcase name="restoringAnUncertainSubmissionKeepsItsSnapshotAndError" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.002"/>
+  <testcase name="uncertainSubmissionFreezesRawValuesAndRetriesTheCanonicalSnapshotEvenAfterDateWindowMoves" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.004"/>
+  <testcase name="notesAreTrimmedBeforeTheLimitAndPayloadForCreateAndEdit" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.005"/>
+  <testcase name="createAndEditUseTheSameExactQuantityParser" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.005"/>
+  <testcase name="blankDraftDoesNotInventMethodOrCategory" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.001"/>
+  <testcase name="definiteRejectionAllowsCorrectionsButConflictAndDeletedRequestsNeverRetry" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.013"/>
+  <testcase name="restoringAnInterruptedActiveSubmissionRequiresAnExplicitRetry" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.002"/>
+  <testcase name="excessPrecisionAndFractionalItemsAreRejectedWithoutRounding" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.001"/>
+  <testcase name="oldDateMayStayButANewOutOfWindowDateFails" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.002"/>
+  <testcase name="savedDraftRetainsOriginalVersionAndDirtyFieldsAcrossRecreation" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.001"/>
+  <testcase name="blurValidatesOnlyTheVisitedFieldAndDoesNotRequestFocus" classname="com.example.wastenot.ui.main.EditorDraftTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -33,7 +33,7 @@ internal fun StoredEditorDraft.restoreForm(): EditorDraft {
     require(fields.size == 22 && origin in MainTab.entries.map { it.name })
     return EditorDraft.fromSnapshot(fields).also {
         require((logId != null) == (it.original.version != null))
-        require(!paused || (it.locked && it.submissionError?.saveOutcomeUnknown() == true))
+        require(!paused || it.outcomeUnknown)
     }
 }
 internal fun EditorDraft.stored(key: LogEditor, origin: MainTab) = StoredEditorDraft(
@@ -85,7 +85,7 @@ class EditorPersistenceViewModel(private val store: EditorDraftStore) : ViewMode
     }
 
     fun leave(draft: StoredEditorDraft, keepForReview: Boolean = false, onLeft: () -> Unit) {
-        require(!keepForReview || draft.restoreForm().submissionError?.saveOutcomeUnknown() == true)
+        require(!keepForReview || draft.restoreForm().outcomeUnknown)
         commit(draft.requestId, onLeft, {}, finishing = true) {
             if (keepForReview) {
                 val paused = draft.copy(paused = true)

@@ -1,0 +1,30 @@
+[
+  {
+    "offered_group": "default",
+    "result": "OK",
+    "cipher": "ECDHE-ECDSA-AES256-GCM-SHA384",
+    "certificate_key_type": "ECPublicKey",
+    "certificate_curve": "secp384r1",
+    "certificate_signature": "sha384",
+    "issuer": "CN=YE1,O=Let's Encrypt,C=US"
+  },
+  {
+    "offered_group": "prime256v1",
+    "result": "SSLError",
+    "error": "[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] ssl/tls alert handshake failure (_ssl.c:1081)"
+  },
+  {
+    "offered_group": "secp384r1",
+    "result": "OK",
+    "cipher": "ECDHE-ECDSA-AES256-GCM-SHA384",
+    "certificate_key_type": "ECPublicKey",
+    "certificate_curve": "secp384r1",
+    "certificate_signature": "sha384",
+    "issuer": "CN=YE1,O=Let's Encrypt,C=US"
+  },
+  {
+    "offered_group": "X25519",
+    "result": "SSLError",
+    "error": "[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] ssl/tls alert handshake failure (_ssl.c:1081)"
+  }
+]

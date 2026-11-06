@@ -92,7 +92,7 @@ class GuideStateDesignTest {
     @Test fun suppliedReviewMetadataShowsItsHostAndAPlatformFailureRemainsRecoverable() {
         val source = "https://example.org/materials/glass"
         val article = DummyGuideStore.fixtures[1].copy(cautions = listOf("Penerimaan material berbeda antar fasilitas."),
-            review = GuideReview(URI(source), LocalDate.of(2026, 1, 15)))
+            review = GuideReview(URI(source), LocalDate.of(2026, 1, 15), "Reviewer fixture"))
         var sourceError by mutableStateOf(false)
         val calls = mutableListOf<String>()
         compose.setContent { WasteNotTheme(true) {
@@ -106,6 +106,7 @@ class GuideStateDesignTest {
         compose.onNodeWithText("example.org").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(listOf(source), calls) }
         compose.onNodeWithText("Ditinjau 15 Jan 2026").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Ditinjau oleh Reviewer fixture").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Draf panduan").assertDoesNotExist()
         compose.onNodeWithText("Draf editorial").assertDoesNotExist()
         compose.onNodeWithText("Tautan sumber belum bisa dibuka. Coba lagi dari tautan di atas.").performScrollTo().assertIsDisplayed()
@@ -119,6 +120,8 @@ class GuideStateDesignTest {
         compose.waitForIdle()
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         instrumentation.uiAutomation.waitForIdle(300, 5_000)
+        assertEquals("Screenshot must show the app, without a system dialog", instrumentation.targetContext.packageName,
+            instrumentation.uiAutomation.rootInActiveWindow?.packageName?.toString())
         val bitmap = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
         val file = File(instrumentation.targetContext.cacheDir, "qa/iteration-2/$name.png")
         file.parentFile!!.mkdirs()

@@ -13,6 +13,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.data.demo.DemoActivityStore
+import com.example.wastenot.data.dummy.dummyStatistics
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.model.*
 import com.example.wastenot.theme.WasteNotTheme
@@ -32,8 +33,12 @@ class StatisticsDesignTest {
     private fun show(data: () -> WorkspaceUiState, onRetry: () -> Unit = {}, onRecord: () -> Unit = {}) {
         val dark = InstrumentationRegistry.getArguments().getString("statisticsDark") == "true"
         compose.setContent { WasteNotTheme(dark) {
+            var days by androidx.compose.runtime.saveable.rememberSaveable { mutableIntStateOf(7) }
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                StatisticsScreen(data(), true, today, PaddingValues(), onRetry, onRecord, Modifier.fillMaxSize())
+                val records = data()
+                StatisticsScreen(SnapshotState(dummyStatistics(records.records, ActivityDateRange.lastDays(today, days),
+                    ZoneId.of("Asia/Jakarta")), records.loading, records.error), days, PaddingValues(), onRetry, onRecord,
+                    onDays = { days = it }, modifier = Modifier.fillMaxSize())
             }
         } }
     }

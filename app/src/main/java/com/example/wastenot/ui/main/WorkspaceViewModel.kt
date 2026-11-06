@@ -9,6 +9,7 @@ import com.example.wastenot.data.repository.ActivityStore
 import com.example.wastenot.model.WasteLog
 import java.time.LocalDate
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,7 @@ data class WorkspaceUiState(
     val deletion: ActivityDeleteResult? = null,
     val detail: ActivityDetailState? = null,
     val conflict: ConflictReadState? = null,
+    val mutationRevision: Int = 0,
 )
 
 data class ConflictReadState(val requestId: String, val id: String, val loading: Boolean = false,
@@ -53,7 +55,8 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
     private var conflictLoading: Job? = null
     private var conflictGeneration = 0
     private var started = false
-    private val unresolvedCreates = mutableMapOf<String, ActivityInput>()
+    private data class PendingCreate(val input: ActivityInput, val outcomeUnknown: Boolean)
+    private val unresolvedCreates = mutableMapOf<String, PendingCreate>()
 
     fun loadConflict(requestId: String, id: String, version: Int) {
         if (mutableState.value.conflict?.let { it.requestId == requestId && it.loading } == true) return
@@ -134,15 +137,15 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
         }
     }
 
-    fun save(input: ActivityInput, id: String?, version: Int?, requestId: String) {
+    fun save(input: ActivityInput, id: String?, version: Int?, requestId: String, previousOutcomeUnknown: Boolean = false) {
         if (writing?.isActive == true) return
         if (id == null) {
             val pending = unresolvedCreates[requestId]
-            if (pending != null && pending != input) {
+            if (pending != null && pending.input != input) {
                 mutableState.update { it.copy(save = ActivitySaveResult(requestId, error = ApiFailureKind.IDEMPOTENCY_CONFLICT)) }
                 return
             }
-            unresolvedCreates[requestId] = input
+            unresolvedCreates[requestId] = PendingCreate(input, pending?.outcomeUnknown == true || previousOutcomeUnknown)
         }
         mutableState.update { it.copy(saving = true, save = null) }
         writing = viewModelScope.launch {
@@ -163,10 +166,19 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
                         mutableState.update { it.copy(save = ActivitySaveResult(requestId, id = result.value.id, created = created)) }
                     }
                     is ApiResult.Failure -> {
-                        if (id == null && !result.error.kind.saveOutcomeUnknown()) unresolvedCreates.remove(requestId)
+                        if (id == null) unresolvedCreates[requestId]?.let { pending ->
+                            val unknown = pending.outcomeUnknown || result.error.kind.saveOutcomeUnknown()
+                            if (unknown) unresolvedCreates[requestId] = pending.copy(outcomeUnknown = true)
+                            else unresolvedCreates.remove(requestId)
+                        }
                         mutableState.update { it.copy(save = ActivitySaveResult(requestId, error = result.error.kind)) }
                     }
                 }
+            } catch (error: CancellationException) {
+                if (id == null) unresolvedCreates[requestId]?.let {
+                    unresolvedCreates[requestId] = it.copy(outcomeUnknown = true)
+                }
+                throw error
             } finally {
                 mutableState.update { it.copy(saving = false) }
             }
@@ -204,7 +216,8 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
         currentCoroutineContext().ensureActive()
         val records = ((refreshed as? ApiResult.Success)?.value ?: fallback(mutableState.value.records))
             .sortedWith(compareByDescending<WasteLog> { it.activityDate }.thenByDescending { it.createdAt })
-        mutableState.update { it.copy(records = records, loading = false, error = (refreshed as? ApiResult.Failure)?.error?.kind, detail = null) }
+        mutableState.update { it.copy(records = records, loading = false, error = (refreshed as? ApiResult.Failure)?.error?.kind,
+            detail = null, mutationRevision = it.mutationRevision + 1) }
     }
 
     fun acknowledgeDelete(id: String) {

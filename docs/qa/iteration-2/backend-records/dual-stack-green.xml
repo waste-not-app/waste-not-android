@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.data.repository.RemoteActivityStoreTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-05T01:41:31.516Z" hostname="oktaavsm" time="2.006">
+  <properties/>
+  <testcase name="lostCreateResponseDoesNotRetryUntilTheCallerExplicitlyRetries" classname="com.example.wastenot.data.repository.RemoteActivityStoreTest" time="2.006"/>
+  <system-out><![CDATA[[I] HotSwanV2Desktop: installed desktop interpreter baseline: 386 class(es)
+[I] HotSwanV2: literal fast path: snapshot-observed invalidation ACTIVE (no whole-tree recompose)
+[I] HotSwanV2: v2 server listening on 127.0.0.1:8621 (no port file)
+[I] HotSwanV2Desktop: desktop reload server started (127.0.0.1:8621)
+]]></system-out>
+  <system-err><![CDATA[Nov 05, 2026 8:41:33 AM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[51585] connection from /127.0.0.1 didn't make a request
+]]></system-err>
+</testsuite>

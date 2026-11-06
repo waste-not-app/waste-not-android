@@ -22,8 +22,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import com.example.wastenot.R
-import com.example.wastenot.data.dummy.dummyProgress
-import com.example.wastenot.data.demo.demoSummary
+import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.model.*
 import com.example.wastenot.theme.*
 import com.example.wastenot.ui.auth.MessageBanner
@@ -55,38 +54,49 @@ internal fun ScrollPage(padding: PaddingValues, modifier: Modifier = Modifier, m
 }
 
 @Composable
-fun OverviewScreen(user: User, data: WorkspaceUiState, demo: Boolean, date: LocalDate, padding: PaddingValues,
+fun OverviewScreen(user: User, data: SnapshotState<DashboardSnapshot>, padding: PaddingValues,
     onRecord: () -> Unit, onHistory: () -> Unit, onDetail: (String) -> Unit, onRetry: () -> Unit, modifier: Modifier = Modifier,
     onProfile: () -> Unit = {}, onResumeDraft: (() -> Unit)? = null) {
-    if (data.records.isEmpty() && (data.loading || data.error != null)) {
-        WorkspaceLoading(data, onRetry, padding, modifier)
+    val snapshot = data.value
+    if (snapshot == null) {
+        ScrollPage(padding, modifier) { SummaryStatus(data.loading, data.error, false, onRetry) }
         return
     }
     ScrollPage(padding, modifier) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.forLanguageTag("id-ID"))),
+                Text(snapshot.date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.forLanguageTag("id-ID"))),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(stringResource(R.string.greeting, user.name), style = MaterialTheme.typography.headlineMedium)
             }
             IconActionButton(R.drawable.ic_profile, stringResource(R.string.open_profile), onProfile)
         }
-        if (data.error != null) MessageBanner(stringResource(R.string.refresh_failed), isError = true)
+        SummaryStatus(data.loading, data.error, true, onRetry)
         if (onResumeDraft != null) PausedDraftNotice(onResumeDraft)
-        if (demo) {
-            val today = demoSummary(data.records.filter { it.activityDate == date })
-            SummaryBlock(today, stringResource(R.string.handled_today), afterPrimary = {
-                SecondaryActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth())
-            }, personal = true)
-            ProgressMeter(dummyProgress(data.records, date))
-        } else MessageBanner(stringResource(R.string.summary_pending))
+        if (snapshot.summary.activityCount == 0L) MessageBanner(stringResource(R.string.home_empty_today))
+        SummaryBlock(snapshot.summary, stringResource(R.string.handled_today), afterPrimary = {
+            SecondaryActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth())
+        }, personal = true)
+        ProgressMeter(snapshot.progress)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.recent_activities), style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.weight(1f).semantics { heading() })
             TextActionButton(stringResource(R.string.see_history), onHistory)
         }
-        if (data.records.isEmpty()) Text(stringResource(R.string.logs_empty))
-        data.records.take(3).forEach { log -> ActivityRow(log, { onDetail(log.id) }, Modifier.fillMaxWidth()) }
+        if (snapshot.recentLogs.isEmpty()) Text(stringResource(R.string.logs_empty))
+        snapshot.recentLogs.forEach { log -> ActivityRow(log, { onDetail(log.id) }, Modifier.fillMaxWidth()) }
+    }
+}
+
+@Composable
+internal fun SummaryStatus(loading: Boolean, error: ApiFailureKind?, hasValue: Boolean, onRetry: () -> Unit) {
+    if (loading) {
+        LinearProgressIndicator(Modifier.fillMaxWidth())
+        if (!hasValue) Text(stringResource(R.string.summary_loading))
+    }
+    if (error != null || (!loading && !hasValue)) {
+        MessageBanner(stringResource(if (hasValue) R.string.summary_refresh_failed else R.string.summary_load_failed), isError = true)
+        TextActionButton(stringResource(R.string.retry), onRetry)
     }
 }
 

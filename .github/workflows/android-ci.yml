@@ -53,8 +53,8 @@ jobs:
           ./gradlew assembleDebug assembleDebugAndroidTest -Pwastenot.hotReload=false --no-daemon --max-workers=2
           python3 scripts/verify_minimum_sdk.py app/build/outputs/apk/debug/app-debug.apk
           mkdir -p app/build/outputs/apk/native-verification
-          cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/native-verification/app-native-api24.apk
-          cp app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk app/build/outputs/apk/native-verification/app-native-api24-androidTest.apk
+          cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/native-verification/app-native-api30.apk
+          cp app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk app/build/outputs/apk/native-verification/app-native-api30-androidTest.apk
 
       - name: Build Debug, Staging, Release and Instrumentation APKs
         run: ./gradlew assembleDebug assembleStaging assembleRelease assembleDebugAndroidTest --no-daemon --max-workers=2

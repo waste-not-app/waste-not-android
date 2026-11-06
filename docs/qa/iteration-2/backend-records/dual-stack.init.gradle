@@ -1,0 +1,9 @@
+allprojects {
+    tasks.withType(org.gradle.api.tasks.testing.Test).configureEach {
+        def hosts = rootProject.file('docs/qa/iteration-2/backend-records/dual-stack-hosts')
+        inputs.file(hosts)
+        systemProperty 'jdk.net.hosts.file', hosts.absolutePath
+        systemProperty 'java.net.preferIPv4Stack', 'false'
+        systemProperty 'java.net.preferIPv6Addresses', 'false'
+    }
+}

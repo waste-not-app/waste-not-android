@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.ui.main.EditorPersistenceViewModelTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:34:27.832Z" hostname="oktaavsm" time="0.484">
+  <properties/>
+  <testcase name="failedOrCorruptReadsBlockOverwritingAndCanBeExplicitlyCleared" classname="com.example.wastenot.ui.main.EditorPersistenceViewModelTest" time="0.143"/>
+  <testcase name="aFailedClearKeepsTheFormAndAllowsAnExplicitRetry" classname="com.example.wastenot.ui.main.EditorPersistenceViewModelTest" time="0.005"/>
+  <testcase name="leavingWaitsForAnAlreadyRunningCommitThenPreventsLateResurrection" classname="com.example.wastenot.ui.main.EditorPersistenceViewModelTest" time="0.004"/>
+  <testcase name="pausingKeepsTheExactDraftUntilTheUserResumesIt" classname="com.example.wastenot.ui.main.EditorPersistenceViewModelTest" time="0.323"/>
+  <testcase name="aSubmissionWaitsForADurableCheckpointAndFailureNeverCallsTheWrite" classname="com.example.wastenot.ui.main.EditorPersistenceViewModelTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
