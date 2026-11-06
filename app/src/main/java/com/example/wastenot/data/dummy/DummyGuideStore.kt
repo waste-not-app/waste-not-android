@@ -12,7 +12,7 @@ import com.example.wastenot.model.WasteGuide
 class DummyGuideStore(private val articles: List<WasteGuide> = fixtures) : GuideStore {
     override suspend fun search(query: String, category: WasteCategory?, cursor: String?): ApiResult<List<WasteGuide>> {
         val term = query.trim()
-        if (term.length > 100) return failure(ApiFailureKind.VALIDATION)
+        if (term.codePointCount(0, term.length) > 100) return failure(ApiFailureKind.VALIDATION)
         val offset = if (cursor == null) 0 else cursor.toIntOrNull()?.takeIf { it >= 0 }
             ?: return failure(ApiFailureKind.INVALID_REQUEST)
         val found = articles.filter { article ->

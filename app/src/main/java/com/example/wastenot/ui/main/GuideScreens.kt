@@ -90,7 +90,7 @@ fun GuideListScreen(
             }
             if (!data.loading && data.articles.isEmpty()) item(key = "empty") {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(stringResource(if (data.error != null) R.string.guide_error else R.string.guide_empty_title), style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(if (data.error != null) guideErrorText(data.error) else R.string.guide_empty_title), style = MaterialTheme.typography.headlineSmall)
                     if (data.error == null) Text(stringResource(R.string.guide_empty_message), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     ActionButton(stringResource(if (data.error != null) R.string.retry else R.string.guide_clear),
                         if (data.error != null) onSearch else ::clear)
@@ -102,7 +102,7 @@ fun GuideListScreen(
             }
             if (data.articles.isNotEmpty() && data.error != null) item(key = "page-error") {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    MessageBanner(stringResource(R.string.guide_error), isError = true)
+                    MessageBanner(stringResource(guideErrorText(data.error)), isError = true)
                     if (data.nextCursor == null) ActionButton(stringResource(R.string.retry), onSearch)
                 }
             }
@@ -172,7 +172,7 @@ fun GuideDetailScreen(
             }
             article == null || data.error != null -> {
                 val missing = data.error == ApiFailureKind.NOT_FOUND || data.error == ApiFailureKind.DELETED
-                Text(stringResource(if (missing) R.string.guide_unavailable else R.string.guide_error), style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(if (missing) R.string.guide_unavailable else guideErrorText(data.error)), style = MaterialTheme.typography.headlineSmall)
                 ActionButton(stringResource(if (missing) R.string.guide_back_list else R.string.retry), if (missing) onList else onRetry)
             }
             else -> {
@@ -203,6 +203,7 @@ fun GuideDetailScreen(
                     Text(stringResource(R.string.guide_sources), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
                     TextActionButton(review.source.host, onClick = { onSource(review.source.toASCIIString()) })
                     Text(stringResource(R.string.guide_reviewed, WasteFormat.activityDate(review.date)), style = MaterialTheme.typography.bodySmall)
+                    review.reviewer?.let { Text(stringResource(R.string.guide_reviewer, it), style = MaterialTheme.typography.bodySmall) }
                 }
                 if (sourceUnavailable) MessageBanner(stringResource(R.string.guide_source_error), isError = true)
                 ActionButton(stringResource(R.string.guide_record), onRecord, Modifier.fillMaxWidth())
@@ -221,3 +222,7 @@ private fun GuideEditorialNotice(message: String, modifier: Modifier = Modifier,
         }
     }
 }
+
+@androidx.annotation.StringRes
+private fun guideErrorText(error: ApiFailureKind?): Int =
+    if (error == ApiFailureKind.RATE_LIMITED) R.string.error_rate_limited else R.string.guide_error

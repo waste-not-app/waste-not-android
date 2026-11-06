@@ -1,0 +1,84 @@
+{
+  "run_id": "62d8aef8-3476-4f5c-9a0e-bc0c25bba1b7",
+  "channel": "public HTTPS",
+  "api_level": 37,
+  "completed": true,
+  "cleanup_complete": true,
+  "images": [
+    {
+      "file": "remote-guide-empty.png",
+      "sha256": "e1193318eca7fce4feffd922cc415d851aa4e9416bd1a599b21441f104b38155"
+    },
+    {
+      "file": "remote-home-counted.png",
+      "sha256": "b339a6c5e36f6695369174b640fe24408fadf0286b2a269ccd2a229b306209b9"
+    },
+    {
+      "file": "remote-home-created.png",
+      "sha256": "fc907eeb946741042fe6fcc5916a65d5416e72ddd1b11c2c893cf2d94796debb"
+    },
+    {
+      "file": "remote-home-empty.png",
+      "sha256": "7a404e790974c1ec87ba23de937c3f0d271af65fa4284bd40f6a3ba6fb1c75a5"
+    },
+    {
+      "file": "remote-profile-created.png",
+      "sha256": "35117edbb96f7c12f77fdba92d2947a4c8c6872c21596a3e3b3d2808c7e90d35"
+    },
+    {
+      "file": "remote-profile-deleted.png",
+      "sha256": "c6f62998337aae42d689b964c2be2b87300ee607795fa337f5dec9278aa85d69"
+    },
+    {
+      "file": "remote-statistics-counted.png",
+      "sha256": "0bd5fc224b10e7dd222a68165dc132de89adcb1d665bfe8d248cff25fc7a6fbd"
+    },
+    {
+      "file": "remote-statistics-deleted.png",
+      "sha256": "299b78a631b8d6a980eaf86b0bf247188cbe2b820e2d2900bd6cffd465d44490"
+    },
+    {
+      "file": "remote-statistics-month.png",
+      "sha256": "76dad52a91d9fd596282d45bd1ed3cc3d7d14c58956c2561168de59f6f011ba7"
+    }
+  ],
+  "device_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "before_count": 0,
+  "apks": {
+    "guide-native.apk": "d52a3693a4dc181463fceed2be7e431983564184f3678c4769e29af1c58fef99",
+    "guide-native-tests.apk": "ae1a7eab147c4f89690a0597f4ed9b209badfde67f26963b3871ac7692354bed"
+  },
+  "native_passed": true,
+  "native_returncode": 0,
+  "passed_steps": [
+    "register",
+    "ui_empty_published_guide_catalog",
+    "ui_create_updates_dashboard",
+    "ui_statistics_and_profile_use_server_progress",
+    "ui_edit_refreshes_units_without_extra_xp",
+    "ui_delete_refreshes_all_server_aggregates",
+    "ui_logout_returns_to_login"
+  ],
+  "removed_ids": [
+    "dcd54e54-7084-4ce1-9ffd-16d2f442465d"
+  ],
+  "session_ids_checked": [
+    "2b776417-9882-4c7f-a8bb-2133c7be2d26"
+  ],
+  "counts_after": {
+    "users": 0,
+    "sessions": 0,
+    "refresh_tokens": 0,
+    "waste_logs": 0,
+    "ai_operations": 0
+  },
+  "device_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  }
+}

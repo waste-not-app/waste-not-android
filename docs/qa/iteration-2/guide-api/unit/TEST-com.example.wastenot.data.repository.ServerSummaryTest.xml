@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.data.repository.ServerSummaryTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:33:59.862Z" hostname="oktaavsm" time="2.74">
+  <properties/>
+  <testcase name="malformedDashboardIdentityDatesAndProgressAreRejected" classname="com.example.wastenot.data.repository.ServerSummaryTest" time="1.738"/>
+  <testcase name="aggregateTotalsAndMethodCountsAreNotTruncatedToInt" classname="com.example.wastenot.data.repository.ServerSummaryTest" time="0.148"/>
+  <testcase name="incompleteOrMalformedStatisticsNeverBecomeAnEmptySuccess" classname="com.example.wastenot.data.repository.ServerSummaryTest" time="0.703"/>
+  <testcase name="dashboardKeepsServerTotalsIndependentFromTheThreeRecentRecords" classname="com.example.wastenot.data.repository.ServerSummaryTest" time="0.026"/>
+  <testcase name="statisticsUsesTheRequestedDatesAndKeepsReduceAndUnitsSeparate" classname="com.example.wastenot.data.repository.ServerSummaryTest" time="0.009"/>
+  <testcase name="failuresPreserveServerDiagnosticsAndMissingConfigurationStaysExplicit" classname="com.example.wastenot.data.repository.ServerSummaryTest" time="0.008"/>
+  <testcase name="anEmptyPeriodPreservesNullRateAndExplicitZeroDatesAndCategories" classname="com.example.wastenot.data.repository.ServerSummaryTest" time="0.011"/>
+  <testcase name="statisticsRejectsAResponseForAnotherRangeAndNon200Receipts" classname="com.example.wastenot.data.repository.ServerSummaryTest" time="0.095"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,14 +1,14 @@
 # Progres Android WasteNot
 
-Snapshot checklist GitHub: 2026-11-05T14:32:18.888143+00:00. Cakupan pekerjaan tetap seluruh backlog Android, kesesuaian design system/mockup termasuk navbar dan navigasi, integrasi backend serta AI. Sumber visual dan penerimaan menyeluruh berada pada [matriks Iteration 2](ITERATION_2_DESIGN.md); urutan integrasi pada [peta backend](BACKEND_INTEGRATION.md).
+Snapshot checklist GitHub: 2026-11-05T17:34:56.112050+00:00. Cakupan pekerjaan tetap seluruh backlog Android, kesesuaian design system/mockup termasuk navbar dan navigasi, integrasi backend serta AI. Sumber visual dan penerimaan menyeluruh berada pada [matriks Iteration 2](ITERATION_2_DESIGN.md); urutan integrasi pada [peta backend](BACKEND_INTEGRATION.md).
 
 ## Angka backlog yang dapat dihitung
 
 | Ukuran | Tercentang | Total | Persentase |
 |---|---:|---:|---:|
-| Seluruh butir checklist awal Android | 133 | 417 | 31,9% |
-| Checklist implementasi | 88 | 260 | 33,8% |
-| Checklist bukti penerimaan | 45 | 157 | 28,7% |
+| Seluruh butir checklist awal Android | 140 | 417 | 33,6% |
+| Checklist implementasi | 94 | 260 | 36,2% |
+| Checklist bukti penerimaan | 46 | 157 | 29,3% |
 
 Ada 52 issue Android; delapan memiliki checklist awal tercentang seluruhnya. Seluruh issue masih terbuka dan ditugaskan ke `oktavsm`. [Snapshot angka](android-progress-baseline.json) merekam dasar perhitungan.
 
@@ -21,7 +21,8 @@ Persentase dihitung dari checkbox pada bagian backlog awal, sebelum marker `wast
 | Transport catatan backend | [PR #97](https://github.com/waste-not-app/waste-not-android/pull/97), head `76f2b19`: CI push/PR termasuk upload APK/laporan lulus; 182 unit dan lifecycle API 24 ke Go/PostgreSQL lewat SSH | Screen remote dan rangkaian akun/draf lengkap; API 24 menjadi bukti historis setelah minimum dinaikkan ke API 30 |
 | Binding dashboard/statistik | [PR #98](https://github.com/waste-not-app/waste-not-android/pull/98), head `eae6345`: CI push/PR termasuk upload lulus; 190 unit dan 11 tahap lifecycle native ke database | Hubungkan Beranda/Statistik/Profil ke snapshot server dan refresh setelah mutasi |
 | Pemulihan write belum pasti | Branch `codex/android-write-outcome-recovery`: tiga regresi awal gagal; perbaikan lulus 196 unit dan 23 eksekusi native, termasuk PID berbeda sesudah force-stop serta font 200%; [QA](../qa/iteration-2/WRITE_RECOVERY.md) | CI push/PR #99 lulus; alur HTTP melalui screen masih diverifikasi per checkpoint |
-| Layar ringkasan server | Branch `codex/android-summary-screens`: 202 debug unit tests, MainActivity/HTTPS publik API 30 dan API 37, sembilan eksekusi komponen API 37 terang/gelap/font 200%; [QA](../qa/iteration-2/SERVER_SCREENS.md) | CI head layar dan penerimaan luas; pergantian hari otomatis, Riwayat, Panduan/AI tetap terbuka |
+| Layar ringkasan server | [PR #100](https://github.com/waste-not-app/waste-not-android/pull/100), head `90e04c5`: CI push/PR dan artifact lulus, 202 debug unit tests, MainActivity/HTTPS publik API 30 dan API 37, sembilan eksekusi komponen API 37 terang/gelap/font 200%; [QA](../qa/iteration-2/SERVER_SCREENS.md) | Penerimaan luas; pergantian hari otomatis, Riwayat, Panduan/AI tetap terbuka |
+| API Panduan | Branch `codex/android-guide-api`: daftar/detail terhubung ke CoreRepository; 212 unit tests, satu alur publik API 37 dengan katalog kosong dan 10 eksekusi komponen normal/font 200% lulus; [QA](../qa/iteration-2/GUIDE_API.md) | CI head Panduan, kurasi dan detail/prefill positif produksi; seluruh gate visual tetap terbuka |
 | Screen/navbar/navigasi | Bukti per checkpoint tertaut di matriks Iteration 2 | Seluruh state, scroll, tema, ukuran teks, perangkat dan alur tetap mengikuti matriks lengkap |
 
 ## Prioritas lanjutan
@@ -55,14 +56,14 @@ Persentase dihitung dari checkbox pada bagian backlog awal, sebelum marker `wast
 | [#40](https://github.com/waste-not-app/waste-not-android/issues/40) | [Android][A29] D02 Keluar, pencabutan sesi dan pembersihan lokal | 7/8 |
 | [#41](https://github.com/waste-not-app/waste-not-android/issues/41) | [Android][A30] S16 Pengaturan tema, informasi aplikasi dan privasi | 5/8 |
 | [#46](https://github.com/waste-not-app/waste-not-android/issues/46) | [Android][A13] S03 Daftar: aturan akun dan timezone yang terlihat | 7/9 |
-| [#47](https://github.com/waste-not-app/waste-not-android/issues/47) | [Android][A14] S04 Beranda: sambungkan HomeScreen awal ke data akun nyata | 0/8 |
+| [#47](https://github.com/waste-not-app/waste-not-android/issues/47) | [Android][A14] S04 Beranda: sambungkan HomeScreen awal ke data akun nyata | 5/8 |
 | [#48](https://github.com/waste-not-app/waste-not-android/issues/48) | [Android][A16] S05 Simpan idempoten dan pemulihan hasil POST yang belum pasti | 4/8 |
 | [#49](https://github.com/waste-not-app/waste-not-android/issues/49) | [Android][A19] S10 Filter Riwayat sebagai bottom sheet | 4/8 |
 | [#50](https://github.com/waste-not-app/waste-not-android/issues/50) | [Android][A21] S09 Ubah catatan dengan version dan aturan tanggal lama | 3/8 |
 | [#51](https://github.com/waste-not-app/waste-not-android/issues/51) | [Android][A22] D01 Hapus catatan, If-Match dan efek agregat | 1/8 |
 | [#52](https://github.com/waste-not-app/waste-not-android/issues/52) | [Android][A23] D03 Buang draf untuk Back dan pergantian alur | 0/8 |
 | [#53](https://github.com/waste-not-app/waste-not-android/issues/53) | [Android][A26] S12 Detail panduan, sumber dan prefill editor | 4/8 |
-| [#54](https://github.com/waste-not-app/waste-not-android/issues/54) | [Android][A27] S13 Statistik 7/30 hari, chart dan alternatif teks | 5/8 |
+| [#54](https://github.com/waste-not-app/waste-not-android/issues/54) | [Android][A27] S13 Statistik 7/30 hari, chart dan alternatif teks | 7/8 |
 | [#55](https://github.com/waste-not-app/waste-not-android/issues/55) | [Android][A28] S14 Profil, XP/level dan capability progres | 3/8 |
 | [#56](https://github.com/waste-not-app/waste-not-android/issues/56) | [Android][A33] Adaptasi ukuran, edge-to-edge dan keyboard | 0/8 |
 | [#57](https://github.com/waste-not-app/waste-not-android/issues/57) | [Android][A49] S17 Pengingat opt-in lokal dan pembatalan saat logout | 0/8 |
