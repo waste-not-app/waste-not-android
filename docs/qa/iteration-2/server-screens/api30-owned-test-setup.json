@@ -1,0 +1,25 @@
+{
+  "owned_avd": "wastenot_api30_core",
+  "steps": [
+    {
+      "namespace": "global",
+      "key": "device_provisioned",
+      "value": "1",
+      "returncode": 0
+    },
+    {
+      "namespace": "secure",
+      "key": "user_setup_complete",
+      "value": "1",
+      "returncode": 0
+    },
+    {
+      "namespace": "secure",
+      "key": "autofill_service",
+      "value": "null",
+      "returncode": 0
+    }
+  ],
+  "first_boot_os_restart": "watchdog during initialization before APK installed",
+  "password_manager_acceptance": false
+}

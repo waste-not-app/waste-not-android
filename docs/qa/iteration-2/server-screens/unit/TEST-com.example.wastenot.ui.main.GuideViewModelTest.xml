@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.ui.main.GuideViewModelTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-11-05T13:42:19.936Z" hostname="oktaavsm" time="0.126">
+  <properties/>
+  <testcase name="cancelledResponseCannotReplaceTheLatestSearchEvenIfStoreIgnoresCancellation" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.065"/>
+  <testcase name="repeatedPageCursorIsRejectedWithoutDiscardingPreviouslyLoadedArticles" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.007"/>
+  <testcase name="laterPageFailureKeepsTheFirstPageAndExplicitRetryUsesItsCursor" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.01"/>
+  <testcase name="debounceSendsOnlyTheNewestTrimmedQueryAndLimitsInput" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.012"/>
+  <testcase name="savedSearchRestoresAndMissingDetailDoesNotExposeThePreviousArticle" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.009"/>
+  <testcase name="mismatchedDetailIdentityCannotBecomeAnEditorPrefill" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.004"/>
+  <testcase name="reviewSourcesRejectExecutableAndCredentialBearingUrls" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.001"/>
+  <testcase name="refreshingTheSameSearchKeepsVisibleArticlesWhenTheRequestFails" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.01"/>
+  <testcase name="dummySearchTrimsMatchesKeywordsAndCombinesCategory" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.002"/>
+  <testcase name="guidePrefillHasNoQuantityOrVersionAndStillRequiresExplicitInput" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.001"/>
+  <testcase name="cursorPagesDoNotRepeatItemsAndInvalidCursorsAreRejected" classname="com.example.wastenot.ui.main.GuideViewModelTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

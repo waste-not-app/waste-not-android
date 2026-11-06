@@ -27,6 +27,14 @@ class DummyActivityStore(
     override val isDemo = true
     override val referenceDate: LocalDate get() = today()
 
+    override suspend fun dashboard(): ApiResult<DashboardSnapshot> = transact { records, _, _ ->
+        ApiResult.Success(dummyDashboard(records, today(), zone))
+    }
+
+    override suspend fun statistics(range: ActivityDateRange): ApiResult<StatisticsSnapshot> = transact { records, _, _ ->
+        ApiResult.Success(dummyStatistics(records, range, zone))
+    }
+
     override suspend fun load(): ApiResult<List<WasteLog>> = transact { records, _, _ -> ApiResult.Success(records) }
 
     override suspend fun get(id: String): ApiResult<WasteLog> = transact { records, _, _ ->

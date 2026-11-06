@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.data.repository.RemoteGuideStoreTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:33:58.302Z" hostname="oktaavsm" time="1.554">
+  <properties/>
+  <testcase name="httpErrorsRemainFailuresWithNoArticleFallback" classname="com.example.wastenot.data.repository.RemoteGuideStoreTest" time="0.499"/>
+  <testcase name="emptyPublishedCatalogIsEmptySuccessAndUnconfiguredStoreHasNoDummyFallback" classname="com.example.wastenot.data.repository.RemoteGuideStoreTest" time="0.008"/>
+  <testcase name="invalidQueriesIdsAndBlankCursorsDoNotReachTheServer" classname="com.example.wastenot.data.repository.RemoteGuideStoreTest" time="0.027"/>
+  <testcase name="differentDetailOrUnexpectedSuccessStatusIsMalformed" classname="com.example.wastenot.data.repository.RemoteGuideStoreTest" time="0.054"/>
+  <testcase name="brokenPagesDuplicateIdsAndMismatchedCategoriesAreRejected" classname="com.example.wastenot.data.repository.RemoteGuideStoreTest" time="0.278"/>
+  <testcase name="detailRetainsServerContentAndOptionalReviewerIsNotInvented" classname="com.example.wastenot.data.repository.RemoteGuideStoreTest" time="0.019"/>
+  <testcase name="listUsesAuthenticatedGuideRouteFiltersAndOpaqueCursor" classname="com.example.wastenot.data.repository.RemoteGuideStoreTest" time="0.008"/>
+  <testcase name="malformedOrUnpublishedArticlesFailInsteadOfShowingUnreviewedGuidance" classname="com.example.wastenot.data.repository.RemoteGuideStoreTest" time="0.658"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

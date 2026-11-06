@@ -96,9 +96,23 @@ data class StatisticsDto(
         require(categoryTotals.map { it.first }.toSet() == WasteCategory.entries.toSet())
         require(methodCounts.keys == DisposalMethod.entries.map { it.name }.toSet())
         require(methodCounts.values.all { it >= 0 })
-        return StatisticsSnapshot(range, accountZone(timezone), summary.toModel(), days,
+        val totals = summary.toModel()
+        require(methodCounts.values.exactSum() == totals.activityCount)
+        require(methodCounts.filterKeys { it != "REDUCE" }.values.exactSum() == totals.handledActivityCount)
+        require(methodCounts.getValue("RECYCLE") == totals.recycledActivityCount)
+        require(days.map { it.activityCount }.exactSum() == totals.activityCount)
+        require(days.map { it.handled.weightGrams }.exactSum() == totals.handled.weightGrams)
+        require(days.map { it.handled.itemCount }.exactSum() == totals.handled.itemCount)
+        require(categoryTotals.map { it.second.weightGrams }.exactSum() == totals.handled.weightGrams)
+        require(categoryTotals.map { it.second.itemCount }.exactSum() == totals.handled.itemCount)
+        return StatisticsSnapshot(range, accountZone(timezone), totals, days,
             categoryTotals.toMap(), methodCounts.mapKeys { DisposalMethod.valueOf(it.key) })
     }
+}
+
+private fun Collection<Long>.exactSum(): Long = fold(0L) { total, value ->
+    require(value <= Long.MAX_VALUE - total)
+    total + value
 }
 
 private fun accountZone(value: String): ZoneId {

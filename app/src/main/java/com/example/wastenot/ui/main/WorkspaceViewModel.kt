@@ -27,6 +27,7 @@ data class WorkspaceUiState(
     val deletion: ActivityDeleteResult? = null,
     val detail: ActivityDetailState? = null,
     val conflict: ConflictReadState? = null,
+    val mutationRevision: Int = 0,
 )
 
 data class ConflictReadState(val requestId: String, val id: String, val loading: Boolean = false,
@@ -215,7 +216,8 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
         currentCoroutineContext().ensureActive()
         val records = ((refreshed as? ApiResult.Success)?.value ?: fallback(mutableState.value.records))
             .sortedWith(compareByDescending<WasteLog> { it.activityDate }.thenByDescending { it.createdAt })
-        mutableState.update { it.copy(records = records, loading = false, error = (refreshed as? ApiResult.Failure)?.error?.kind, detail = null) }
+        mutableState.update { it.copy(records = records, loading = false, error = (refreshed as? ApiResult.Failure)?.error?.kind,
+            detail = null, mutationRevision = it.mutationRevision + 1) }
     }
 
     fun acknowledgeDelete(id: String) {

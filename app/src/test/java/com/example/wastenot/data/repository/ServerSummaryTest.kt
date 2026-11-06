@@ -121,6 +121,13 @@ class ServerSummaryTest {
             body.changed("summary", totals.changed("recycling_rate_percent", JsonNull)),
             body.changed("summary", totals.changed("recycling_rate_basis", JsonPrimitive("WEIGHT"))),
             body.changed("summary", totals.changed("total_handled_count", JsonPrimitive(-1))),
+            body.changed("method_counts", methods.changed("REDUCE", JsonPrimitive(2))),
+            body.changed("method_counts", methods.changed("RECYCLE", JsonPrimitive(Long.MAX_VALUE))),
+            body.changed("daily", buildJsonArray { add(day("2026-11-04", 250, 0, 1)); add(day("2026-11-05", 251, 3, 3)) }),
+            body.changed("daily", buildJsonArray { add(day("2026-11-04", 250, 0, 1)); add(day("2026-11-05", 250, 2, 3)) }),
+            body.changed("daily", buildJsonArray { add(day("2026-11-04", 250, 0, 1)); add(day("2026-11-05", 250, 3, 2)) }),
+            body.changed("categories", categories(501, 3)),
+            body.changed("categories", categories(500, 2)),
         )
         variants.forEachIndexed { index, invalid ->
             server.enqueue(reply(invalid))

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.data.repository.SessionRepositoryTest" tests="27" skipped="0" failures="0" errors="0" timestamp="2026-11-05T13:42:16.448Z" hostname="oktaavsm" time="2.734">
+  <properties/>
+  <testcase name="credentialDtosAndTokensNeverExposeTheirValuesInToString" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.01"/>
+  <testcase name="loginKeepsAccessOnlyInMemoryAndPreservesRawPassword" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.013"/>
+  <testcase name="uncertainRefreshTimeoutClearsCredential" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="1.014"/>
+  <testcase name="nonRotatedRefreshTokenIsRejectedRatherThanRetried" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.101"/>
+  <testcase name="uuidCaseDoesNotChangeTheIdentityOrSessionAcrossRotation" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.144"/>
+  <testcase name="lateRotationCannotRestoreAccountAOrEraseAccountB" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.168"/>
+  <testcase name="bootstrapPublishesIdentityOnlyAfterMeSucceeds" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.066"/>
+  <testcase name="knownOfflineBootstrapRetainsEncryptedCredentialWithoutPublishingIdentity" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.008"/>
+  <testcase name="signingIntoTheSameUserAgainCreatesANewAccountLifetime" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.064"/>
+  <testcase name="registerUsesServerIdentityAndNeverSendsConfirmationPassword" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.016"/>
+  <testcase name="second401EndsSessionWithoutAnotherRefresh" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.148"/>
+  <testcase name="refreshCannotReplaceTheVerifiedAccount" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.098"/>
+  <testcase name="rotationCanUpdateSessionIdWithoutChangingAccountLifetime" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.146"/>
+  <testcase name="canceledLoginCannotPublishCredentialsAfterStorageFinishes" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.014"/>
+  <testcase name="loginWithoutAnIssuedIdentityCannotPublishASession" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.009"/>
+  <testcase name="bootstrapWithoutCredentialAndWithInvalidatedCredentialDoesNotUseNetwork" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.007"/>
+  <testcase name="logoutCancelsAccountRequestsAndRevokesWithTheCapturedCredential" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.061"/>
+  <testcase name="malformedRefreshClearsCredentialAndCannotCreateAPhantomSession" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.101"/>
+  <testcase name="offlineRetryAfterKnownRotationDoesNotCallMeOrRotateAgain" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.061"/>
+  <testcase name="disconnectedLogoutWipesLocalCredentialWithoutClaimingRevocation" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.014"/>
+  <testcase name="bootstrapRejectsAnIdentityDifferentFromTheRefreshResponse" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.055"/>
+  <testcase name="revokedRefreshClearsOldCredentialWithoutLoop" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.102"/>
+  <testcase name="concurrent401sShareOneRotationAndEachRetryUsesTheNewToken" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.121"/>
+  <testcase name="simultaneousLoginDoesNotCreateAnotherServerSession" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.011"/>
+  <testcase name="storageFailureDoesNotPublishSuccessfulLoginOrLeaveTokens" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.01"/>
+  <testcase name="writeRetryReusesExactlyTheSamePayloadAndRequestId" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.148"/>
+  <testcase name="uiGatewayRechecksNetworkBeforeEveryBootstrapAttempt" classname="com.example.wastenot.data.repository.SessionRepositoryTest" time="0.015"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Nov 05, 2026 8:42:17 PM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[43471] connection from /127.0.0.1 didn't make a request
+]]></system-err>
+</testsuite>

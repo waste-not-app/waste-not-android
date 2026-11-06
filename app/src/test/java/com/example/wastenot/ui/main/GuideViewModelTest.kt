@@ -12,6 +12,7 @@ import com.example.wastenot.data.repository.GuideStore
 import com.example.wastenot.model.*
 import java.net.URI
 import java.time.LocalDate
+import java.time.Instant
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
 import org.junit.After
@@ -25,10 +26,11 @@ class GuideViewModelTest {
     private val owners = mutableListOf<ViewModelStoreOwner>()
     @Before fun setUp() { Dispatchers.setMain(dispatcher) }
     @After fun tearDown() { owners.forEach { it.viewModelStore.clear() }; Dispatchers.resetMain() }
-    private fun model(store: GuideStore, saved: SavedStateHandle = SavedStateHandle()): GuideViewModel {
+    private fun model(store: GuideStore, saved: SavedStateHandle = SavedStateHandle(),
+        now: () -> Instant = Instant::now): GuideViewModel {
         val owner = object : ViewModelStoreOwner { override val viewModelStore = ViewModelStore() }
         owners.add(owner)
-        return ViewModelProvider.create(owner, viewModelFactory { initializer { GuideViewModel(store, saved) } })[GuideViewModel::class]
+        return ViewModelProvider.create(owner, viewModelFactory { initializer { GuideViewModel(store, saved, now) } })[GuideViewModel::class]
     }
 
     @Test fun dummySearchTrimsMatchesKeywordsAndCombinesCategory() = runTest {
@@ -72,6 +74,59 @@ class GuideViewModelTest {
         vm.query("x".repeat(101)); advanceUntilIdle()
         assertEquals(100, vm.state.value.query.length)
         assertEquals(100, calls.last().length)
+    }
+
+    @Test fun unicodeQueryLimitMatchesServerCodePointsAndSurvivesRestoration() = runTest {
+        val source = DummyGuideStore()
+        val symbol = String(Character.toChars(0x1F331))
+        val expected = symbol.repeat(100)
+        val saved = SavedStateHandle(mapOf("guide_query" to symbol.repeat(101)))
+        val vm = model(source, saved)
+        assertEquals(expected, vm.state.value.query)
+        vm.load(); advanceUntilIdle()
+        assertNull(vm.state.value.error)
+        vm.query("x"); vm.query(symbol.repeat(101)); advanceUntilIdle()
+        assertEquals(expected, saved.get<String>("guide_query"))
+        assertNull(vm.state.value.error)
+        assertEquals(ApiFailureKind.VALIDATION, (source.search(symbol.repeat(101)) as ApiResult.Failure).error.kind)
+    }
+
+    @Test fun retryAfterBlocksNewQueriesDetailsAndRetryUntilDeadlineWithoutCrossingOwners() = runTest {
+        val entries = (0..40).map { DummyGuideStore.fixtures.first().copy(id = "guide-$it") }
+        val source = DummyGuideStore(entries)
+        var time = Instant.parse("2026-11-06T00:00:00Z")
+        val deadline = time.plusSeconds(60)
+        var reads = 0; var details = 0
+        val store = object : GuideStore by source {
+            override suspend fun search(query: String, category: WasteCategory?, cursor: String?): ApiResult<List<WasteGuide>> {
+                reads++
+                return if (reads == 2) ApiResult.Failure(ApiFailure(ApiFailureKind.RATE_LIMITED, retryAt = deadline))
+                    else source.search(query, category, cursor)
+            }
+            override suspend fun get(id: String): ApiResult<WasteGuide> { details++; return source.get(id) }
+        }
+        val vm = model(store, now = { time })
+        vm.load(); advanceUntilIdle()
+        assertNotNull(vm.state.value.nextCursor)
+        vm.search(more = true); advanceUntilIdle()
+        assertEquals(20, vm.state.value.articles.size)
+        vm.query("karton"); vm.search(); vm.detail(entries.first().id); advanceUntilIdle()
+        assertEquals(2, reads)
+        assertNull(vm.state.value.nextCursor)
+        assertEquals(0, details)
+        assertEquals(ApiFailureKind.RATE_LIMITED, vm.state.value.error)
+        assertEquals(ApiFailureKind.RATE_LIMITED, vm.state.value.detail!!.error)
+        val otherOwner = model(store, now = { time })
+        otherOwner.load(); advanceUntilIdle()
+        assertEquals(3, reads)
+        assertNull(otherOwner.state.value.error)
+        vm.search(); advanceUntilIdle(); assertEquals(3, reads)
+        time = deadline
+        vm.search(); vm.detail(entries.first().id, retry = true); advanceUntilIdle()
+        assertEquals(4, reads)
+        assertEquals(1, details)
+        assertNull(vm.state.value.error)
+        assertNotNull(vm.state.value.detail!!.article)
     }
 
     @Test fun cancelledResponseCannotReplaceTheLatestSearchEvenIfStoreIgnoresCancellation() = runTest {
