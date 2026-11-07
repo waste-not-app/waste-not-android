@@ -1,0 +1,12 @@
+{
+  "base_android": "561e369f879ba1dd7b36a1b8b52d63476c09d7c2",
+  "app_sha256": "eb3688bb344d5a88134b10340ddcd6eef67c1e0256e8bf62b86ff31f77d355e9",
+  "test_sha256": "d3e45a4c39732d6099259e066f2a9ce1367674f7f7c505b2d1cccac1c67732d9",
+  "source_sha256": {
+    "app/src/main/java/com/example/wastenot/ui/main/WorkspaceScreens.kt": "58b82360b46d22a404abf08d7db3675217cca0add1423a7bf03566470d2a6094",
+    "app/src/main/java/com/example/wastenot/ui/main/ProfileScreens.kt": "18bd074361832fc8fb8eb6a51f11dbdcf4f7fc386c3cf1ae1e0bcfa6f24d7261",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/CoreControlDesignTest.kt": "144b73722f0cf8badd8bca2a945555607c5739603436cd8120118acac6964c7a",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/RemainingUiPreviewTest.kt": "4b893733ea3e73fc5b58ac2a85208e212f5364b8b8e776ad053a344293c18d8c",
+    "app/src/androidTest/java/com/example/wastenot/ui/scan/ScanSheetTest.kt": "4ec94aa3ba99da34259fdf076d241c1be9a44b0e660e4fb79ba448c80a89e8a2"
+  }
+}

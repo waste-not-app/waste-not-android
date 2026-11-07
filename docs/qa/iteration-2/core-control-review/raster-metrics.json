@@ -1,0 +1,58 @@
+[
+  {
+    "phase": "baseline",
+    "theme": "light",
+    "density": 3,
+    "xp_paint_height_px": 21,
+    "xp_gap_background_pixels": 11,
+    "theme_height_px": 156,
+    "theme_border_rgb": [
+      217,
+      227,
+      216
+    ],
+    "theme_border_contrast_surface": 1.3183046328637131
+  },
+  {
+    "phase": "baseline",
+    "theme": "dark",
+    "density": 3,
+    "xp_paint_height_px": 21,
+    "xp_gap_background_pixels": 11,
+    "theme_height_px": 156,
+    "theme_border_rgb": [
+      52,
+      76,
+      60
+    ],
+    "theme_border_contrast_surface": 1.6451540195145566
+  },
+  {
+    "phase": "after",
+    "theme": "light",
+    "density": 3,
+    "xp_paint_height_px": 24,
+    "xp_gap_background_pixels": 0,
+    "theme_height_px": 168,
+    "theme_border_rgb": [
+      115,
+      132,
+      119
+    ],
+    "theme_border_contrast_surface": 3.9653652862134434
+  },
+  {
+    "phase": "after",
+    "theme": "dark",
+    "density": 3,
+    "xp_paint_height_px": 24,
+    "xp_gap_background_pixels": 0,
+    "theme_height_px": 168,
+    "theme_border_rgb": [
+      127,
+      148,
+      132
+    ],
+    "theme_border_contrast_surface": 4.742327030855873
+  }
+]

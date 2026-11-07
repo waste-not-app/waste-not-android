@@ -1,0 +1,70 @@
+{
+  "scope": "two prototype contract states, two themes, guidance and source viewports, panel and full display",
+  "count": 16,
+  "files": [
+    {
+      "file": "needs_context-dark-guidance-panel.png",
+      "sha256": "1a1b966a8638f9b2fef4cb5a2d74125451ca71049b731a529f060d456940c3c6"
+    },
+    {
+      "file": "needs_context-dark-guidance.png",
+      "sha256": "eeebe8b533387e1a4d979bd3569c44c3cae91bcce115196f1c80931b9798f8d6"
+    },
+    {
+      "file": "needs_context-dark-sources-panel.png",
+      "sha256": "0cdc34aaea53e4c7cbd1a9fa8a4fda0e5b0ee69e8ff03619ff9e3dcf88236a65"
+    },
+    {
+      "file": "needs_context-dark-sources.png",
+      "sha256": "8f7c13c92d526e6e08d7ca98f3904eb4e50337e63a8f3ee539521100b59b10a4"
+    },
+    {
+      "file": "needs_context-light-guidance-panel.png",
+      "sha256": "bf473b4c5a725af1347a59bfb8f5efc3dd9d0f7ce13e0b78881e87916b709e4f"
+    },
+    {
+      "file": "needs_context-light-guidance.png",
+      "sha256": "57de3ce8367c43d50a93a2e06481e4195360176dcc5fa4130e7fc1a05f94863d"
+    },
+    {
+      "file": "needs_context-light-sources-panel.png",
+      "sha256": "a0b91c27d8512a209ce08298db2c2a6cb0b8c7547be032630d12431d5e374211"
+    },
+    {
+      "file": "needs_context-light-sources.png",
+      "sha256": "de7fae53958aa0b31868704f079c30ce732b5762bc008a3f987dd5c5bfb42e33"
+    },
+    {
+      "file": "unavailable-dark-guidance-panel.png",
+      "sha256": "e97bb98dab216d3701603a23c913eb0dbfa5fe6e5bab39cd21897439e47ab938"
+    },
+    {
+      "file": "unavailable-dark-guidance.png",
+      "sha256": "dcff6ad4efed807f1ec0431681b726d2a5f26c80baaefe7a410d7dd4c8217129"
+    },
+    {
+      "file": "unavailable-dark-sources-panel.png",
+      "sha256": "1c15e28dd012923d9592f16997d3afea517e38e2635b4d77b5fb71bf0a6200d4"
+    },
+    {
+      "file": "unavailable-dark-sources.png",
+      "sha256": "c970808c3c41b05bc21494f8e015acb352c6a90c327f54dbc3fce8f5361f66c6"
+    },
+    {
+      "file": "unavailable-light-guidance-panel.png",
+      "sha256": "3ef782b880c1557e6729cc9b1f1611a9c7cb9943fd0a8ee69ab299f968c50752"
+    },
+    {
+      "file": "unavailable-light-guidance.png",
+      "sha256": "9d8ae22728b6335fc2dbe8aa10047d1336c8402615df5ce88339a2a4a73017ff"
+    },
+    {
+      "file": "unavailable-light-sources-panel.png",
+      "sha256": "08de869bbb35f83784ac33767152dc5da7271e98edc7ff75a8af59b5779acb8d"
+    },
+    {
+      "file": "unavailable-light-sources.png",
+      "sha256": "5dceb9d42c589948869e3584a76e7b10c47aa36aa24312c256ba690b2aa27be3"
+    }
+  ]
+}

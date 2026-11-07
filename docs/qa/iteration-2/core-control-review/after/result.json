@@ -1,0 +1,17 @@
+{
+  "phase": "after",
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "test_apk_sha256": "d3e45a4c39732d6099259e066f2a9ce1367674f7f7c505b2d1cccac1c67732d9",
+  "app_sha256": "eb3688bb344d5a88134b10340ddcd6eef67c1e0256e8bf62b86ff31f77d355e9",
+  "installed_app_sha256": "eb3688bb344d5a88134b10340ddcd6eef67c1e0256e8bf62b86ff31f77d355e9",
+  "result": "passed",
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  }
+}

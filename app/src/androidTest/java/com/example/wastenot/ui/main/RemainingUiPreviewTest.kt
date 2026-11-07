@@ -98,6 +98,9 @@ internal fun captureUiPreview(compose: ComposeTestRule, name: String, directoryN
     }
     instrumentation.waitForIdleSync()
     instrumentation.uiAutomation.waitForIdle(300, 5_000)
+    compose.waitUntil(5_000) {
+        instrumentation.uiAutomation.rootInActiveWindow?.packageName?.toString() == instrumentation.targetContext.packageName
+    }
     assertEquals(instrumentation.targetContext.packageName,
         instrumentation.uiAutomation.rootInActiveWindow?.packageName?.toString())
     // API 37 UiAutomation can retain an older display buffer across dialog/configuration changes.

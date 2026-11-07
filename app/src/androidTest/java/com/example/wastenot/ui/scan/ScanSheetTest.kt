@@ -1,6 +1,8 @@
 package com.example.wastenot.ui.scan
 
-import android.graphics.Bitmap
+import android.app.Activity
+import android.app.Instrumentation
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +16,6 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
 import com.example.wastenot.model.*
 import com.example.wastenot.data.local.ScanPhotoCache
 import com.example.wastenot.data.network.dto.AiCatalogDto
@@ -29,12 +29,25 @@ import java.time.Instant
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.ExternalResource
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.decodeFromString
 
 class ScanSheetTest {
-    @get:Rule val compose = createComposeRule()
+    private val openedSources = mutableListOf<String>()
+    private val sourceMonitor = object : Instrumentation.ActivityMonitor() {
+        override fun onStartActivity(intent: Intent): Instrumentation.ActivityResult? {
+            if (intent.action != Intent.ACTION_VIEW || intent.data?.scheme != "https") return null
+            openedSources.add(checkNotNull(intent.dataString))
+            return Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null)
+        }
+    }
+    @get:Rule(order = 0) val sources = object : ExternalResource() {
+        override fun before() { InstrumentationRegistry.getInstrumentation().addMonitor(sourceMonitor) }
+        override fun after() { InstrumentationRegistry.getInstrumentation().removeMonitor(sourceMonitor) }
+    }
+    @get:Rule(order = 1) val compose = createComposeRule()
     private val candidate = AiDetectionObject("bottle", 0, "bottle", .94, ScanBounds(.2f, .1f, .8f, .9f),
         AiConfidenceBand.OFFERED, true, true, listOf("plastic_bottle"), emptyList(), emptyList(), null)
     private val catalog = AiCatalog("native-fixture", listOf(AiCatalogItem("plastic_bottle", "Botol plastik",
@@ -238,23 +251,18 @@ class ScanSheetTest {
     }
 
     @Test fun conditionalAdviceRequiresAcknowledgementAndSourceMetadataOpensOnlyItsUri() {
-        val urls = mutableListOf<String>()
         var state by mutableStateOf(objects.copy(phase = ScanPhase.RECOMMENDATION, category = WasteCategory.PLASTIC,
             objectKey = "plastic_bottle", objectConfirmed = true, method = DisposalMethod.RECYCLE,
             recommendation = recommendation.copy(basis = AiRecommendationBasis.CONDITIONAL,
                 conditionsToVerify = listOf(AiContextField.CLEANLINESS), specialHandling = true)))
         compose.setContent { WasteNotTheme {
-            CompositionLocalProvider(LocalUriHandler provides object : UriHandler {
-                override fun openUri(uri: String) { urls.add(uri) }
-            }) {
-                Sheet(state, onConfirmConditions = { state = state.copy(conditionsConfirmed = it) })
-            }
+            Sheet(state, onConfirmConditions = { state = state.copy(conditionsConfirmed = it) })
         } }
         compose.onNodeWithText("Gunakan pilihan, isi jumlah").performScrollTo().assertIsNotEnabled()
         compose.onNodeWithText("Aku sudah memeriksa syarat saran ini").performScrollTo().performClick()
         compose.onNodeWithText("Gunakan pilihan, isi jumlah").performScrollTo().assertIsEnabled()
         compose.onNodeWithText("Sumber fixture").performScrollTo().performClick()
-        assertEquals(listOf("https://example.org/fixture"), urls)
+        compose.runOnIdle { assertEquals(listOf("https://example.org/fixture"), openedSources) }
         compose.onNodeWithText("Referensi diperiksa: 2026-10-20").performScrollTo().assertIsDisplayed()
         capture("scan-conditional-source")
     }
@@ -297,10 +305,8 @@ class ScanSheetTest {
         var dark by mutableStateOf(false)
         var manual = 0
         var reviews = 0
-        val urls = mutableListOf<String>()
         compose.setContent { WasteNotTheme(dark) {
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface,
-                LocalUriHandler provides object : UriHandler { override fun openUri(uri: String) { urls.add(uri) } }) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                 Sheet(ScanState(session = "policy08-ui", phase = ScanPhase.RECOMMENDATION,
                     catalog = currentCatalog, category = current.category, objectKey = current.objectKey,
                     objectConfirmed = true, recommendation = current), onManual = { manual++ }, onReviewContext = { reviews++ })
@@ -321,13 +327,13 @@ class ScanSheetTest {
                 .assertExists()
             val source = item.sourceDetails.first()
             compose.onNodeWithText(source.title).performScrollTo().assertIsDisplayed().performClick()
-            compose.runOnIdle { assertEquals(source.url.toString(), urls.last()) }
+            compose.runOnIdle { assertEquals(source.url.toString(), openedSources.lastOrNull()) }
             compose.onNodeWithText("Periksa kondisi benda").performScrollTo().assertIsDisplayed()
             captureUiPreview(compose, "$name-sources", "policy08-ui")
             compose.onNodeWithText("Periksa kondisi benda").performClick()
             compose.onNodeWithText("Input manual").assertIsDisplayed().performClick()
         }
-        compose.runOnIdle { assertEquals(4, manual); assertEquals(4, reviews); assertEquals(4, urls.size) }
+        compose.runOnIdle { assertEquals(4, manual); assertEquals(4, reviews); assertEquals(4, openedSources.size) }
     }
 
     @Composable
@@ -339,13 +345,6 @@ class ScanSheetTest {
             onObjectKey = onObjectKey, onReviewContext = onReviewContext, onConfirmConditions = onConfirmConditions, camera = camera)
     }
     private fun capture(name: String) {
-        compose.waitForIdle()
-        val instrumentation = InstrumentationRegistry.getInstrumentation()
-        assertEquals("Capture must show the tested app, not a system dialog", instrumentation.targetContext.packageName,
-            instrumentation.uiAutomation.rootInActiveWindow?.packageName?.toString())
-        val directory = File(instrumentation.targetContext.getExternalFilesDir(null), "scan-qa").apply { mkdirs() }
-        val bitmap = instrumentation.uiAutomation.takeScreenshot()
-        File(directory, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-        bitmap.recycle()
+        captureUiPreview(compose, name, "scan-qa")
     }
 }

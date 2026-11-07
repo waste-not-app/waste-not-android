@@ -1,0 +1,47 @@
+{
+  "apk": "WasteNot-preview-backend-latest.apk",
+  "size_bytes": 34969059,
+  "sha256": "274a051b6ed81c9c189fad675dd1bf0f12606a441354037b5f4f85d42cc5d9a2",
+  "package": "com.example.wastenot.staging",
+  "version_name": "1.0.0-staging",
+  "minimum_sdk": 30,
+  "remote_adapter": true,
+  "hot_reload": false,
+  "debuggable": false,
+  "base_url": "https://pred-autoscaler.bccdev.id/wastenot/api/v1/",
+  "configured_emulator_url_absent": true,
+  "runtime_smoke": "passed",
+  "source_binding": "../core-control-review/source-build.json",
+  "system_error_present_before_install": false,
+  "package_present_before_install": true,
+  "normal_app_before": {
+    "package_info": [
+      "versionCode=1 minSdk=30 targetSdk=36",
+      "lastUpdateTime=2026-11-08 03:22:33"
+    ],
+    "apk_sha256": "eb3688bb344d5a88134b10340ddcd6eef67c1e0256e8bf62b86ff31f77d355e9"
+  },
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "installed_apk_sha256": "274a051b6ed81c9c189fad675dd1bf0f12606a441354037b5f4f85d42cc5d9a2",
+  "api_level": 37,
+  "screen": "S02 signed-out login",
+  "editable_fields": 2,
+  "demo_absent": true,
+  "screenshot_sha256": "2b9df0215e760f928adde9c1447d0009d596fe64720acd179116f4905d6492ea",
+  "normal_app_after": {
+    "package_info": [
+      "versionCode=1 minSdk=30 targetSdk=36",
+      "lastUpdateTime=2026-11-08 03:22:33"
+    ],
+    "apk_sha256": "eb3688bb344d5a88134b10340ddcd6eef67c1e0256e8bf62b86ff31f77d355e9"
+  },
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  }
+}

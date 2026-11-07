@@ -1,0 +1,14 @@
+# APK preview backend, 8 November 2026
+
+APK lokal `WasteNot-preview-backend-latest.apk` kini memuat panduan awal policy-08, progress XP kontinu dan pilihan tema sesuai kit. Package `com.example.wastenot.staging` memungkinkan pemasangan berdampingan dengan aplikasi utama.
+
+- Ukuran 34.969.059 byte, sekitar 35 MB; SHA-256 `274a051b6ed81c9c189fad675dd1bf0f12606a441354037b5f4f85d42cc5d9a2`.
+- Base URL `https://pred-autoscaler.bccdev.id/wastenot/api/v1/`; adapter remote, dummy/hot reload mati, debuggable false. [Konfigurasi build](staging-preview-20261108/StagingBuildConfig.java) dan pemeriksaan DEX memastikan origin publik digunakan; URL emulator tidak menjadi origin build ini.
+- Minimum Android 11/API 30, target 36; signature v2 valid dengan sertifikat preview lokal. [Pemeriksaan minimum SDK/font](staging-preview-20261108/staging-minimum-sdk.log) meluluskan adjustResize, kelima TTF Jakarta dan OFL. Nama font staging yang dioptimalkan tetap diperiksa lewat tabel resource.
+- [Startup API 37](staging-preview-20261108/staging-launch.log) lulus setelah pembaruan preview sebelumnya. Layar S02 Masuk tampil dengan dua field, tanpa mode demo atau dialog error sistem. Checksum APK yang benar-benar terpasang sama dengan file di atas. [Metadata runtime](staging-preview-20261108/staging-checkpoint.json), [capture](staging-preview-20261108/staging-login.png), [hierarchy](staging-preview-20261108/staging-login.xml).
+- Identitas/checksum aplikasi utama sebelum dan sesudah tetap sama. Pengujian memulihkan ukuran display/font dan menghentikan preview serta emulator milik QA setelah selesai.
+- [Lint dan 239 unit tests](staging-preview-20261108/local-check-result.json) lulus, nol gagal/error/skip. Gate memakai konfigurasi debug default, termasuk test renderer; APK preview dibangun terpisah dengan konfigurasi native di atas.
+
+Source produk dibatasi pada dasar 561e369 dan hash file yang tercatat pada [build kontrol](core-control-review/source-build.json). Bukti UI terbaru: [tiga metode panduan AI](POLICY08_ANDROID.md), serta [dua metode progress/pilihan tema dan gambar pembanding](CORE_CONTROL_REVIEW.md). APK penguji dan aplikasi pada masing-masing bukti memiliki checksum sendiri; tidak disamakan dengan varian staging.
+
+Ini APK checkpoint untuk ditinjau, belum publikasi main atau rilis produksi. Smoke varian staging mencakup startup/login kosong; perjalanan backend/AI nyata tetap terikat pada [bukti source sebelumnya](AI_LIVE_UI.md), bukan diklaim dijalankan ulang pada staging ini. Review seluruh state/font serta CI masih memiliki status terpisah. CI terakhir meluluskan kode/build/paket tetapi gagal upload karena kuota storage; PR belum di-merge.

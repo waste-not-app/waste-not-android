@@ -1,0 +1,24 @@
+{
+  "api_level": 37,
+  "recovered_system_dialogs": [
+    "Pixel Launcher isn't responding",
+    "Pixel Launcher isn't responding"
+  ],
+  "system_error_before_install": false,
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "tests": [
+    "nonReadyGuidanceKeepsServerStepsSourcesAndManualWithoutOfferingAnAiSave",
+    "conditionalAdviceRequiresAcknowledgementAndSourceMetadataOpensOnlyItsUri",
+    "needsContextAndPrototypeRemainSeparateFromAUsableLiveRecommendation"
+  ],
+  "result": "passed",
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  }
+}

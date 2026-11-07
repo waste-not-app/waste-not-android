@@ -1,6 +1,7 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -111,15 +112,17 @@ fun ProfileScreen(
 fun SettingsScreen(user: User, theme: ThemeMode, padding: PaddingValues, onTheme: () -> Unit, modifier: Modifier = Modifier) {
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
         Text(stringResource(R.string.theme_title), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
-        Text(stringResource(R.string.theme_application), style = MaterialTheme.typography.bodySmall,
+        Text(stringResource(R.string.theme_application), style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
         val themeLabel = stringResource(R.string.theme_application)
-        OutlinedButton(onClick = onTheme, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
+        OutlinedButton(onClick = onTheme, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
             .semantics { contentDescription = themeLabel }, shape = MaterialTheme.shapes.small,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface,
                 containerColor = MaterialTheme.colorScheme.surface)) {
-            Text(stringResource(theme.label), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-            Icon(painterResource(R.drawable.ic_next), null, Modifier.size(20.dp).rotate(90f))
+            Text(stringResource(theme.label), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+            Icon(painterResource(R.drawable.ic_next), null, Modifier.size(24.dp).rotate(90f))
         }
         Text(stringResource(R.string.personal_data), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
         Text(stringResource(R.string.privacy_account), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)

@@ -170,9 +170,10 @@ internal fun ProgressMeter(progress: UserProgress, modifier: Modifier = Modifier
             Text(stringResource(R.string.xp_total, xp), Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.End,
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        LinearProgressIndicator(progress = { progress.xpIntoLevel / 100f }, modifier = Modifier.fillMaxWidth().height(7.dp),
+        LinearProgressIndicator(progress = { progress.xpIntoLevel / 100f }, modifier = Modifier.fillMaxWidth().height(8.dp)
+            .background(MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(8.dp)),
             color = MaterialTheme.colorScheme.primary, trackColor = MaterialTheme.colorScheme.outlineVariant,
-            drawStopIndicator = {})
+            gapSize = 0.dp, drawStopIndicator = {})
         Text(stringResource(R.string.xp_next, progress.xpToNextLevel, progress.level + 1), style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
     }

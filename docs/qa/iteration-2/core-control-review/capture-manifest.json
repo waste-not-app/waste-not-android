@@ -1,0 +1,69 @@
+{
+  "count": 16,
+  "files": [
+    {
+      "file": "after/settings-fixture-dark.png",
+      "sha256": "58492734ddbf24184629e14230cfe489c5039a2da8b8ed70402056de95410769"
+    },
+    {
+      "file": "after/settings-fixture-light.png",
+      "sha256": "b4335dcc095d8ca1556e345235243b994e1cb801ca661201cc0f1f6b122c3678"
+    },
+    {
+      "file": "after/theme-dark.png",
+      "sha256": "9a6b1d107694fd1eea087c4eb835a5bd4474c7c7f0f37f483db1a7773aa68b31"
+    },
+    {
+      "file": "after/theme-light.png",
+      "sha256": "e8540771c98fe04b7520c91c15f6280d2cf3f23aca628ce4412770f469facce0"
+    },
+    {
+      "file": "after/xp-dark.png",
+      "sha256": "1946e9114ea5a363719c27cc9c43af5b90678f3e2eec6d981f60f100a8f25d98"
+    },
+    {
+      "file": "after/xp-fixture-dark.png",
+      "sha256": "787e8dddb9d4fd0aa4cde27e3fc6ee1afd95eceefe5c7eba57f07cb6cc7afda5"
+    },
+    {
+      "file": "after/xp-fixture-light.png",
+      "sha256": "5dba4fd4fc4a14e5b0142ec5ec7eef314cf352a60f7fabcff27aba02fe2f6321"
+    },
+    {
+      "file": "after/xp-light.png",
+      "sha256": "52f21e84b69c56144597c2f7c315ba8bb4aa9de61406fbb04ce017e07cc0df59"
+    },
+    {
+      "file": "baseline/settings-fixture-dark.png",
+      "sha256": "2d04e4e3c747de75c2e615f306f7db9aafa013aec405b171dc48b7b6bd79d738"
+    },
+    {
+      "file": "baseline/settings-fixture-light.png",
+      "sha256": "31529b10e2a7b2dfaf35661afb17d121d0762f50cd3577f398c824298f8ffeb7"
+    },
+    {
+      "file": "baseline/theme-dark.png",
+      "sha256": "a65ff4f45404a081445486d9e09bd3527a66bcbb855ef4d3beceb0533c9ae3db"
+    },
+    {
+      "file": "baseline/theme-light.png",
+      "sha256": "466db4d656fb865c15e46a18c284a64367f3b8d3785650c2e7ce49575abcd286"
+    },
+    {
+      "file": "baseline/xp-dark.png",
+      "sha256": "75790508f05fec840701ee9a49c1a3bb5c31a67319121f73243826f9ce1f9e8e"
+    },
+    {
+      "file": "baseline/xp-fixture-dark.png",
+      "sha256": "eabd854e324b616c768c42b2fbc6171b217fedb7cd7bfcff66abeea7147118d5"
+    },
+    {
+      "file": "baseline/xp-fixture-light.png",
+      "sha256": "87211fd1f96c47ad5b697450dbd8a9c9a6bb4159c07937dc119e241e1cdcab03"
+    },
+    {
+      "file": "baseline/xp-light.png",
+      "sha256": "8808599631e1358f509a91bdde3f054d5f021f0b7a1a1b1fc2d4d806717fc881"
+    }
+  ]
+}
