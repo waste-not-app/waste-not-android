@@ -6,6 +6,10 @@ Checkpoint implementasi mengikuti prioritas UI dahulu pada 6 November 2026. Stru
 
 [Pasangan tema scan dan akhir scroll](SCAN_THEMES.md) kini tersedia: 40 PNG pada API 37, termasuk kamera sebelum aktivasi dan S21–S24 dengan fixture demo. Pilihan scan diseragamkan ke tinggi minimum input 56 dp. Checkpoint 67 PNG di bawah tetap dicatat pada sumber aslinya.
 
+## Tambahan 8 November
+
+[Review tujuh layar tambahan dan empat dialog](SECONDARY_SCREEN_REVIEW.md) meninjau 36 PNG lama tanpa mengubahnya. Delapan capture baru pada APK staging source 9c97812 melengkapi S02/S03, footer daftar, pemilih tema dan navigasi Daftar → Masuk/Back pada kedua tema. [Kontrol inti](CORE_CONTROL_REVIEW.md) serta [policy-08](POLICY08_ANDROID.md) mempunyai bukti perubahan/native terpisah; galeri historis di bawah bukan capture ulang source terbaru.
+
 ## Perubahan
 
 - Header scan dan indikator tahap mengikuti susunan kit; indikator tetap terlihat pada ponsel normal. Ruang vertikal sempit/font besar memakai indikator dalam area scroll agar isi tetap dapat dijangkau.
