@@ -2,6 +2,8 @@
 
 Dokumen ini berisi panduan lengkap implementasi CI/CD untuk aplikasi Android WasteNot, konfigurasi server distribusi pada domain `oktaavsm.bccdev.id`, serta langkah-langkah manual penyiapan **GitHub Repository Secrets**.
 
+Workflow publikasi memakai adapter remote dan build native (`wastenot.useDummyData=false`, `wastenot.hotReload=false`). Repository variable `WASTENOT_RELEASE_API_BASE_URL` wajib berisi URL HTTPS API, saat ini `https://pred-autoscaler.bccdev.id/wastenot/api/v1/`. Nilai kosong menghentikan build publikasi; secret signing/deployment tetap dikelola terpisah. Pemeriksaan shell memastikan flag remote dikirim dan URL kosong tidak menjalankan Gradle.
+
 ---
 
 ## 1. Arsitektur & Alur Kerja
@@ -13,8 +15,8 @@ Dokumen ini berisi panduan lengkap implementasi CI/CD untuk aplikasi Android Was
 [ GitHub Actions Runner ]
         ├── 1. Setup JDK 17 & Gradle
         ├── 2. Decode Release Keystore dari Secret
-        ├── 3. Jalankan Unit Tests (./gradlew test)
-        ├── 4. Build Signed Release APK (./gradlew assembleRelease)
+        ├── 3. Jalankan lintRelease dan testDebugUnitTest
+        ├── 4. Build Signed Release APK native dengan adapter remote
         ├── 5. Simpan Artifact di GitHub Actions
         │
         ▼ (SSH / SCP via port 11023 ke proxy.bccdev.id)

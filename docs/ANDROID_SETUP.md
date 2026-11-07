@@ -75,7 +75,7 @@ git push -u origin HEAD
 
 `Android CI` mencakup `codex/**`, lint tiga build type serta unit test debug, pengujian konfigurasi URL, APK debug/staging/release, serta artifact laporan. CI tidak memakai credential signing atau deployment. `Android Release & Deploy` tetap mengikuti trigger main/tag/manual yang sudah ada, memeriksa lint release dan unit test debug dari source bersama, dan menolak deployment jika APK tidak ditandatangani. Push branch tugas tidak menjalankan workflow deploy.
 
-Input versi manual diperlakukan sebagai environment value lalu diperiksa agar aman sebagai nama file. URL API release dapat disediakan lewat GitHub repository variable `WASTENOT_RELEASE_API_BASE_URL`. Lihat [panduan CI/CD](CICD_SETUP.md) untuk nama secrets dan operasi rilis.
+Input versi manual diperlakukan sebagai environment value lalu diperiksa agar aman sebagai nama file. Workflow rilis memakai adapter remote (`-Pwastenot.useDummyData=false`) dan mewajibkan GitHub repository variable `WASTENOT_RELEASE_API_BASE_URL` berisi origin API HTTPS. Nilai kosong menghentikan build publikasi; default demo untuk pengembangan UI tidak dipakai pada APK yang diterbitkan pipeline. Lihat [panduan CI/CD](CICD_SETUP.md) untuk nama secrets dan operasi rilis.
 
 ## Bukti dan keputusan yang masih perlu
 

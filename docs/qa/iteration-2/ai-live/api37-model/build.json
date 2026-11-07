@@ -1,0 +1,13 @@
+{
+  "use_dummy": false,
+  "base_url": "https://pred-autoscaler.bccdev.id/wastenot/api/v1/",
+  "source_commit": "ce2c19dded58b4fa276012bbacff5adb2d6dddf3",
+  "apks": {
+    "WasteNot-live-ai-debug.apk": "559d3f6e166f36e33bfb3cb8f41b140769c758886f3fce0863a0fb50a4d57bba",
+    "live-ai-androidTest.apk": "7ad36aa61d10afb08b6f2682b9fa2c624a99fb3b9a75b5ac8e3dfc8f2dedb580"
+  },
+  "test_source": {
+    "app/src/androidTest/java/com/example/wastenot/ui/scan/RemoteAiLifecycleTest.kt": "312906d9fedc1a6494227a3c6af80fcd7c235f3f84835693ea7404d2cec6fd9d",
+    "app/src/androidTest/assets/ai/pet-bottle.jpg": "1f8bd2c97dc5321a22e8a052c32f6ecabd6789632517f173c9799072a23cc9fa"
+  }
+}

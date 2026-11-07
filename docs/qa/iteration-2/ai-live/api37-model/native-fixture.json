@@ -1,0 +1,48 @@
+{
+  "run_id": "de4da8d5-b10d-44e1-90a0-598e232f153c",
+  "email": "android-de4da8d5-b10d-44e1-90a0-598e232f153c@example.test",
+  "name": "Android transport probe",
+  "context_is_fixture": true,
+  "user_id": "dc0b7a71-9aee-436e-a5a6-1d91ac560d46",
+  "passed_steps": [
+    "register_owned_fixture",
+    "live_capabilities_and_catalog",
+    "received_real_detector_candidates",
+    "real_yolo_band_preserved_before_explicit_user_material_confirmation",
+    "server_requested_former_contents_returns_to_context",
+    "received_live_recommendation_response",
+    "gemini_replay_does_not_auto_save_or_award_xp",
+    "handoff_keeps_detection_valid_until_explicit_core_save",
+    "disk_restored_unknown_save_replays_once_after_detection_deletion",
+    "delete_reverses_log_and_derived_xp"
+  ],
+  "published_objects": [
+    "pet_bottle",
+    "hdpe_bottle",
+    "aluminium_can",
+    "cardboard"
+  ],
+  "uploaded_photo_sha256": "5a9aae5d91644190d8e1c84fdfa76f9779f4bd6fdf8d58b7766730911e0b4210",
+  "detection_id": "6b07a7d2-3145-41cb-8a96-54834f5742b7",
+  "model_version": "candidate-0ebbc80d4a76",
+  "objects": [
+    {
+      "raw_class": "vase",
+      "band": "UNCERTAIN",
+      "confidence": 0.5781304836273193,
+      "supported": true
+    }
+  ],
+  "raw_class": "vase",
+  "band": "UNCERTAIN",
+  "confidence": 0.5781304836273193,
+  "user_corrected_candidate": true,
+  "recommendation_id": "7e330391-203c-494e-b414-3f4f290da161",
+  "provider": "gemini",
+  "prototype_only": false,
+  "recommendation_status": "READY",
+  "guide_refs": [
+    "pilot-pet-bottle:6"
+  ],
+  "log_id": "c51fbc21-822a-445e-a218-7c92929d088e"
+}

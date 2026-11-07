@@ -1,6 +1,6 @@
 # AI transport and durable reference checkpoint
 
-This records the API/log-reference checkpoint at `e5fc51b`. The following [UI checkpoint](UI_SCAN_PREVIEW.md) wires `RemoteScanRepository` through AppContainer and CaptureSheet and adds the catalog/context/recommendation UI. Production AI execution and broad native acceptance remain incomplete; the UI preview uses explicit demo data.
+This records the API/log-reference checkpoint at `e5fc51b`. The following [UI checkpoint](UI_SCAN_PREVIEW.md) wires `RemoteScanRepository` through AppContainer and CaptureSheet and adds the catalog/context/recommendation UI. The [live Android checkpoint](AI_LIVE_ANDROID.md) now verifies real YOLO/Gemini, provenance, disk restoration and create replay at the model/transport seam on API 37. The camera/navigation journey and broad native acceptance remain open; the initial UI preview uses explicit demo data.
 
 ## Implemented
 
@@ -18,4 +18,4 @@ The mandatory pre-commit hook also runs `lintDebug test`. The local `test --dry-
 
 ## Remaining for the scan checkpoint
 
-The next UI checkpoint implements source wiring, independent context fields, server bands, missing-context/conditional/source rendering, explicit retry and detection-reference handoff. Verify those behaviors against the real public backend after the UI sequence is complete, including cancellation/expiry and an uncertain core write. Verify API 30 and the current Android runtime, finish S21–S25 and broad screen/navigation acceptance, and pass exact-head CI for the resulting live APK.
+Source wiring, independent context fields, server bands, missing-context/conditional/source rendering, explicit retry and detection-reference handoff are implemented. API 37 live verification covers the model/transport path, including deletion of the parent detection after a successful core write and replay from a restored locked draft with simulated acknowledgement loss. Finish the camera/UI path, API 30, actual interrupted-network/cancellation/expiry UI, account transitions, broad screen/navigation acceptance and exact-head CI for the resulting live APK.

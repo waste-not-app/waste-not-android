@@ -1,6 +1,8 @@
 package com.example.wastenot.ui.main
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.ParcelFileDescriptor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.LocalContentColor
@@ -78,21 +80,27 @@ class RemainingUiPreviewTest {
     }
 }
 
-internal fun captureUiPreview(compose: ComposeTestRule, name: String) {
+internal fun captureUiPreview(compose: ComposeTestRule, name: String, directoryName: String = "remaining-ui-preview") {
+    compose.mainClock.advanceTimeByFrame()
     compose.waitForIdle()
     val instrumentation = InstrumentationRegistry.getInstrumentation()
-    // Read the Compose frame before the display capture so a prior modal cannot become evidence.
-    compose.onAllNodes(isRoot()).fetchSemanticsNodes().forEachIndexed { index, _ ->
-        compose.onAllNodes(isRoot())[index].captureToImage().asAndroidBitmap().recycle()
+    val directory = File(instrumentation.targetContext.getExternalFilesDir(null), directoryName).apply { mkdirs() }
+    val sheet = compose.onAllNodesWithTag("capture-sheet").fetchSemanticsNodes().isNotEmpty()
+    val target = when {
+        sheet -> compose.onNodeWithTag("capture-sheet")
+        compose.onAllNodes(isDialog()).fetchSemanticsNodes().isNotEmpty() -> compose.onNode(isDialog())
+        else -> compose.onAllNodes(isRoot()).onLast()
     }
+    val panel = target.captureToImage().asAndroidBitmap()
+    if (sheet) File(directory, "$name-panel.png").outputStream().use { check(panel.compress(Bitmap.CompressFormat.PNG, 100, it)) }
+    panel.recycle()
     instrumentation.waitForIdleSync()
     instrumentation.uiAutomation.waitForIdle(300, 5_000)
     assertEquals(instrumentation.targetContext.packageName,
         instrumentation.uiAutomation.rootInActiveWindow?.packageName?.toString())
-    instrumentation.uiAutomation.takeScreenshot()?.recycle()
-    android.os.SystemClock.sleep(150)
-    val image = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
-    val directory = File(instrumentation.targetContext.getExternalFilesDir(null), "remaining-ui-preview").apply { mkdirs() }
+    // API 37 UiAutomation can retain an older display buffer across dialog/configuration changes.
+    val image = ParcelFileDescriptor.AutoCloseInputStream(instrumentation.uiAutomation.executeShellCommand("screencap -p"))
+        .use { checkNotNull(BitmapFactory.decodeStream(it)) }
     File(directory, "$name.png").outputStream().use { check(image.compress(Bitmap.CompressFormat.PNG, 100, it)) }
     image.recycle()
 }

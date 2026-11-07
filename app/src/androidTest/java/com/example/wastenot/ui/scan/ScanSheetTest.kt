@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.*
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.compose.ui.platform.LocalUriHandler
@@ -89,8 +90,12 @@ class ScanSheetTest {
         compose.setContent { WasteNotTheme {
             Sheet(state, onContext = { state = state.copy(context = it) })
         } }
+        compose.onNodeWithContentDescription("Kebersihan")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Belum tahu"))
         compose.onAllNodesWithText("Belum tahu")[0].performScrollTo().performClick()
         compose.onNodeWithText("Bersih").performClick()
+        compose.onNodeWithContentDescription("Kebersihan")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Bersih"))
         assertEquals(Cleanliness.CLEAN, state.context.cleanliness)
         assertEquals(Integrity.UNKNOWN, state.context.integrity)
         assertEquals(Reusability.UNKNOWN, state.context.reusable); assertNull(state.context.reuseIntention)

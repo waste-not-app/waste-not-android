@@ -67,7 +67,14 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           WASTENOT_RELEASE_API_BASE_URL: ${{ vars.WASTENOT_RELEASE_API_BASE_URL }}
-        run: ./gradlew assembleRelease --no-daemon "-Pwastenot.releaseApiBaseUrl=$WASTENOT_RELEASE_API_BASE_URL"
+        run: |
+          set -euo pipefail
+          if [ -z "$WASTENOT_RELEASE_API_BASE_URL" ]; then
+            echo "Error: WASTENOT_RELEASE_API_BASE_URL must point to the HTTPS backend before publishing." >&2
+            exit 1
+          fi
+          ./gradlew assembleRelease --no-daemon -Pwastenot.hotReload=false -Pwastenot.useDummyData=false \
+            "-Pwastenot.releaseApiBaseUrl=$WASTENOT_RELEASE_API_BASE_URL"
 
       - name: Prepare APK Files
         id: prepare_apk

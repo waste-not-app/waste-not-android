@@ -1,6 +1,7 @@
-"""Run the actual release-packaging shell step against temporary APK fixtures."""
+"""Exercise the release-build invocation and packaging steps in temporary fixtures."""
 
 import os
+import json
 from pathlib import Path
 import subprocess
 import tempfile
@@ -8,6 +9,31 @@ import textwrap
 
 ROOT = Path(__file__).resolve().parents[1]
 workflow = (ROOT / ".github/workflows/android-release.yml").read_text()
+build_section = workflow.split("      - name: Build Release APK\n", 1)[1].split("\n      - name:", 1)[0]
+build_script = textwrap.dedent(build_section.split("        run: |\n", 1)[1])
+for label, url, expected in [
+    ("configured backend uses remote adapters", "https://api.example.invalid/v1/", True),
+    ("missing backend prevents publishing", "", False),
+]:
+    with tempfile.TemporaryDirectory(prefix="wastenot-release-build-") as directory:
+        fixture = Path(directory)
+        invocation = fixture / "gradle-args.json"
+        wrapper = fixture / "gradlew"
+        wrapper.write_text("#!/usr/bin/env python3\nimport json, os, sys\nfrom pathlib import Path\n"
+                           "Path(os.environ['GRADLE_ARGS_FILE']).write_text(json.dumps(sys.argv[1:]))\n")
+        wrapper.chmod(0o755)
+        result = subprocess.run(["bash", "-c", build_script], cwd=fixture,
+                                env={"PATH": os.environ["PATH"], "WASTENOT_RELEASE_API_BASE_URL": url,
+                                     "GRADLE_ARGS_FILE": str(invocation)}, text=True, capture_output=True, timeout=30)
+        assert (result.returncode == 0) == expected, label
+        assert invocation.exists() == expected, label
+        if expected:
+            args = json.loads(invocation.read_text())
+            assert "assembleRelease" in args and "-Pwastenot.useDummyData=false" in args, label
+            assert "-Pwastenot.hotReload=false" in args, label
+            assert f"-Pwastenot.releaseApiBaseUrl={url}" in args, label
+        print(f"PASS: release build {label}", flush=True)
+
 section = workflow.split("      - name: Prepare APK Files\n", 1)[1].split("\n      - name:", 1)[0]
 script = textwrap.dedent(section.split("        run: |\n", 1)[1])
 cases = [

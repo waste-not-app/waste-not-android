@@ -49,3 +49,5 @@ Permintaan merge PR yang aman tetap berlaku. Perubahan scan yang sedang dikerjak
 - Galeri dan batas bukti: [UI_SCAN_PREVIEW.md](qa/iteration-2/UI_SCAN_PREVIEW.md). S21–S24 baru direkam pada tema terang. Snapshot tidak mencakup seluruh state, semua bagian scroll, ukuran/font lain, TalkBack atau perangkat fisik.
 
 Tahap implementasi struktur dan penyesuaian tampilan awal sudah memiliki checkpoint lengkap. Berikutnya pengujian state/fungsi/backend/AI, dilanjutkan perbaikan berdasarkan temuan; jangan mengulang inventaris awal atau menganggap snapshot sebagai penerimaan akhir.
+
+7 November: [jalur data Android ke AI nyata](qa/iteration-2/AI_LIVE_ANDROID.md) lulus pada API 37, termasuk konteks tambahan, Gemini non-prototipe, provenance, pemulihan draf dan replay tanpa XP ganda. Alur kamera/UI masih diuji terpisah. Kesehatan SystemUI emulator dan ketepatan frame screenshot diperiksa agar gangguan alat tidak dilaporkan sebagai hasil aplikasi. Konfigurasi publikasi juga diperbarui untuk memakai adapter remote dan menolak origin API kosong.
