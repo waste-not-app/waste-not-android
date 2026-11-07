@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.data.repository.AiRepositoryTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-11-07T12:44:42.456Z" hostname="oktaavsm" time="8.894">
+  <properties/>
+  <testcase name="inconsistentDetectionClaimsAreRejectedInsteadOfPrefillingMaterial" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="7.687"/>
+  <testcase name="uploadUsesOneJpegAndStableRequestIdForCreatedAndExplicitReplay" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.061"/>
+  <testcase name="catalogRetainsServerKeysAndEditorialStatusWithoutInventingMaterial" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.189"/>
+  <testcase name="malformedUploadsAndPathsFailBeforeMakingAnyRequest" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.034"/>
+  <testcase name="specialHandlingDoesNotSuppressValidMethodAndStaleOrForeignRecommendationIsRejected" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.508"/>
+  <testcase name="noDetectionIsAnExplicitManualStateAndExpiredResponsesCannotBeUsed" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.06"/>
+  <testcase name="calibratedUncertainCandidateBelowOldFixedCutoffIsRetained" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.009"/>
+  <testcase name="typedFailuresNeverInventResultsOrAutomaticallyRepeatInference" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.21"/>
+  <testcase name="recommendationSendsIndependentUnknownConditionsAndKeepsPrototypeClearlyMarked" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.013"/>
+  <testcase name="cancellingKnownDetectionUsesDeleteAndRequiresNoContent" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.013"/>
+  <testcase name="unavailableAdviceKeepsSourcedHandlingStepsWithoutInventingATrackingMethod" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.011"/>
+  <testcase name="conditionalAndMissingContextAreDistinctStatesWithNoInventedConfirmation" classname="com.example.wastenot.data.repository.AiRepositoryTest" time="0.098"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

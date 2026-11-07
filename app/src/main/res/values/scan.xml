@@ -48,6 +48,8 @@
     <string name="scan_correct_object">Koreksi objek</string>
     <string name="scan_recommending">Menyiapkan saran…</string>
     <string name="scan_suggested_method">Saran penanganan</string>
+    <string name="scan_initial_guidance">Panduan penanganan awal</string>
+    <string name="scan_special_guidance">Panduan penanganan khusus</string>
     <string name="scan_object_label">Objek %1$d · %2$s</string>
     <string name="scan_method_confirmation">Konfirmasi / ubah metode</string>
     <string name="scan_basis">Lihat dasar saran</string>

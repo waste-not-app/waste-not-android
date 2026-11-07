@@ -43,9 +43,10 @@ class AiRepositoryTest {
     @Test fun catalogRetainsServerKeysAndEditorialStatusWithoutInventingMaterial() = runTest {
         server.enqueue(reply(fixture("catalog-response")))
         val catalog = success(repository.catalog())
-        assertEquals(78, catalog.items.size)
+        assertEquals(85, catalog.items.size)
         assertEquals(catalog.items.size, catalog.items.map { it.key }.distinct().size)
         assertTrue(catalog.items.any { it.guideStatus == AiGuideStatus.DRAFT })
+        assertEquals(7, catalog.items.count { it.key.startsWith("other_") })
         val request = server.takeRequest()
         assertEquals("/v1/ai/objects", request.path)
         assertEquals("Bearer ai-test-credential", request.getHeader("Authorization"))
@@ -168,6 +169,24 @@ class AiRepositoryTest {
         assertEquals(listOf(AiContextField.RISK_TYPE), missing.missingContext)
         assertNull(missing.method)
         assertFalse(missing.canUseForTracking)
+        assertTrue(missing.steps.isNotEmpty())
+        assertTrue(missing.sourceDetails.isNotEmpty())
+    }
+
+    @Test fun unavailableAdviceKeepsSourcedHandlingStepsWithoutInventingATrackingMethod() = runTest {
+        val input = AiRecommendationRequest(requestId, true, "glass_bottle", WasteCategory.GLASS, AiInputSource.MANUAL)
+        server.enqueue(reply(fixture("provider-unavailable-response")))
+        val result = success(repository.recommend(input))
+        assertEquals(AiRecommendationStatus.UNAVAILABLE, result.status)
+        assertEquals("pilot-policy-08", result.version)
+        assertEquals(4, result.steps.size)
+        assertTrue(result.sourceDetails.isNotEmpty())
+        assertTrue(result.sourceDetails.all { it.url in result.sources })
+        assertNull(result.method)
+        assertNull(result.scope)
+        assertNull(result.basis)
+        assertFalse(result.canUseForTracking)
+        assertEquals(1, server.requestCount)
     }
 
     @Test fun typedFailuresNeverInventResultsOrAutomaticallyRepeatInference() = runTest {

@@ -18,6 +18,8 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import com.example.wastenot.model.*
 import com.example.wastenot.data.local.ScanPhotoCache
+import com.example.wastenot.data.network.dto.AiCatalogDto
+import com.example.wastenot.data.network.dto.AiRecommendationDto
 import com.example.wastenot.theme.WasteNotTheme
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.ui.main.captureUiPreview
@@ -27,6 +29,9 @@ import java.time.Instant
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.decodeFromString
 
 class ScanSheetTest {
     @get:Rule val compose = createComposeRule()
@@ -271,6 +276,58 @@ class ScanSheetTest {
         compose.onNodeWithText("Hasil prototipe. Saran ini belum dapat digunakan untuk catatan AI.").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
         capture("scan-prototype-unusable")
+    }
+
+    @Test fun nonReadyGuidanceKeepsServerStepsSourcesAndManualWithoutOfferingAnAiSave() {
+        val context = InstrumentationRegistry.getInstrumentation().context
+        val json = Json { ignoreUnknownKeys = true }
+        fun data(name: String) = context.assets.open("ai/policy08/$name.json").bufferedReader().use {
+            Json.parseToJsonElement(it.readText()).jsonObject.getValue("data").toString()
+        }
+        val currentCatalog = json.decodeFromString<AiCatalogDto>(data("catalog-response")).toModel()
+        fun advice(name: String, key: String, category: WasteCategory) =
+            json.decodeFromString<AiRecommendationDto>(data(name)).toModel(AiRecommendationRequest(
+                "00000000-0000-0000-0000-000000000032", true, key, category, AiInputSource.MANUAL))
+                .copy(expiresAt = Instant.now().plusSeconds(3600))
+        val cases = listOf(
+            advice("needs-context-response", "ceramic_cup", WasteCategory.OTHER),
+            advice("provider-unavailable-response", "glass_bottle", WasteCategory.GLASS),
+        )
+        var current by mutableStateOf(cases.first())
+        var dark by mutableStateOf(false)
+        var manual = 0
+        var reviews = 0
+        val urls = mutableListOf<String>()
+        compose.setContent { WasteNotTheme(dark) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface,
+                LocalUriHandler provides object : UriHandler { override fun openUri(uri: String) { urls.add(uri) } }) {
+                Sheet(ScanState(session = "policy08-ui", phase = ScanPhase.RECOMMENDATION,
+                    catalog = currentCatalog, category = current.category, objectKey = current.objectKey,
+                    objectConfirmed = true, recommendation = current), onManual = { manual++ }, onReviewContext = { reviews++ })
+            }
+        } }
+        for (item in cases) for (theme in listOf(false, true)) {
+            compose.runOnIdle { current = item; dark = theme }
+            val name = "${item.status.name.lowercase()}-${if (theme) "dark" else "light"}"
+            compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
+            compose.onNodeWithText("Konfirmasi / ubah metode").assertDoesNotExist()
+            compose.onNodeWithText(if (item.specialHandling) "Panduan penanganan khusus" else "Panduan penanganan awal")
+                .performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("1. ${item.steps.first()}").performScrollTo().assertIsDisplayed()
+            captureUiPreview(compose, "$name-guidance", "policy08-ui")
+            for ((index, step) in item.steps.withIndex())
+                compose.onNodeWithText("${index + 1}. $step").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Hasil prototipe. Saran ini belum dapat digunakan untuk catatan AI.")
+                .assertExists()
+            val source = item.sourceDetails.first()
+            compose.onNodeWithText(source.title).performScrollTo().assertIsDisplayed().performClick()
+            compose.runOnIdle { assertEquals(source.url.toString(), urls.last()) }
+            compose.onNodeWithText("Periksa kondisi benda").performScrollTo().assertIsDisplayed()
+            captureUiPreview(compose, "$name-sources", "policy08-ui")
+            compose.onNodeWithText("Periksa kondisi benda").performClick()
+            compose.onNodeWithText("Input manual").assertIsDisplayed().performClick()
+        }
+        compose.runOnIdle { assertEquals(4, manual); assertEquals(4, reviews); assertEquals(4, urls.size) }
     }
 
     @Composable

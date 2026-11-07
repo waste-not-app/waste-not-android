@@ -244,13 +244,25 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                                 Text(stringResource(R.string.scan_quantity_next), color = MaterialTheme.colorScheme.onSurfaceVariant)
                             } else if (recommendation.scope == AiRecommendationScope.PREVENTION) Text(stringResource(R.string.ai_reduce_manual))
                         } else {
-                            Text(stringResource(if (recommendation?.status == AiRecommendationStatus.NEEDS_CONTEXT)
-                                R.string.scan_more_context else R.string.scan_no_guide),
+                            val guidanceTitle = if (recommendation?.specialHandling == true)
+                                R.string.scan_special_guidance else R.string.scan_initial_guidance
+                            Text(stringResource(when {
+                                recommendation?.status == AiRecommendationStatus.NEEDS_CONTEXT -> R.string.scan_more_context
+                                !recommendation?.steps.isNullOrEmpty() -> guidanceTitle
+                                else -> R.string.scan_no_guide
+                            }),
                                 style = MaterialTheme.typography.titleMedium)
                             recommendation?.reason?.takeIf { it.isNotBlank() }?.let { Text(it) }
+                            if (recommendation?.prototypeOnly == true) ScanWarning(stringResource(
+                                if (state.demo) R.string.scan_demo_advice else R.string.scan_prototype_advice))
                             if (recommendation?.specialHandling == true) ScanWarning(stringResource(R.string.scan_special_warning))
                             recommendation?.caution?.takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                             recommendation?.missingContext?.forEach { Text(stringResource(contextFieldLabel(it))) }
+                            if (!recommendation?.steps.isNullOrEmpty()) {
+                                if (recommendation.status == AiRecommendationStatus.NEEDS_CONTEXT)
+                                    Text(stringResource(guidanceTitle), Modifier.semantics { heading() }, style = MaterialTheme.typography.titleMedium)
+                                recommendation.steps.forEachIndexed { index, step -> Text("${index + 1}. $step") }
+                            }
                             recommendation?.let { ScanSources(it) }
                         }
                         ScanSecondary(R.string.scan_review_context, onReviewContext)
