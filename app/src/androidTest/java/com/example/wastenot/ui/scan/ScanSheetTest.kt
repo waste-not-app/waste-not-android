@@ -1,8 +1,15 @@
 package com.example.wastenot.ui.scan
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.*
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -10,7 +17,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import com.example.wastenot.model.*
+import com.example.wastenot.data.local.ScanPhotoCache
 import com.example.wastenot.theme.WasteNotTheme
+import com.example.wastenot.theme.LocalWasteNotGradients
+import com.example.wastenot.ui.main.captureUiPreview
 import java.io.File
 import java.net.URI
 import java.time.Instant
@@ -35,6 +45,72 @@ class ScanSheetTest {
         listOf(URI("https://example.org/fixture")), listOf(AiSourceReference(URI("https://example.org/fixture"),
             "Sumber fixture", "Penerbit fixture", "Wilayah fixture", "2026-10-20", "Cakupan fixture, bukan panduan produksi.")),
         emptyList(), listOf("Periksa material kemasan."))
+
+    @Test fun scanDesignViewportsLightAndDark() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val photoFile = File(instrumentation.targetContext.cacheDir, "scan-design-pet.jpg")
+        instrumentation.context.assets.open("ai/pet-bottle.jpg").use { input ->
+            photoFile.outputStream().use { output -> input.copyTo(output) }
+        }
+        val photo = ScanPhoto(photoFile.absolutePath, 1045, 2431, System.currentTimeMillis())
+        val cameraDirectory = File(instrumentation.targetContext.cacheDir, "scan-design-camera-${System.nanoTime()}")
+        val cameraCache = ScanPhotoCache(cameraDirectory, "preview") {}
+        val fixture = objects.copy(photo = photo, demo = true, category = WasteCategory.PLASTIC,
+            objectKey = "plastic_bottle", objectConfirmed = true)
+        var dark by mutableStateOf(false)
+        var state by mutableStateOf(fixture.copy(phase = ScanPhase.PHOTO))
+        compose.setContent { WasteNotTheme(dark) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                Box(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas)) {
+                    key(dark, state.phase) {
+                        Sheet(state, camera = { ScanCamera("design-preview", cameraCache, {}, {}) })
+                    }
+                }
+            }
+        } }
+        try {
+            val phases = listOf(
+                Triple("S21-camera", ScanPhase.CAMERA, "Aktifkan kamera"),
+                Triple("S21-photo", ScanPhase.PHOTO, "Ambil ulang"),
+                Triple("S22", ScanPhase.OBJECT, "Konfirmasi objek"),
+                Triple("S23", ScanPhase.CONTEXT, "Lihat saran"),
+                Triple("S24", ScanPhase.RECOMMENDATION, "Gunakan pilihan, isi jumlah"),
+            )
+            for (theme in listOf(false, true)) {
+                for ((id, phase, action) in phases) {
+                    compose.runOnIdle {
+                        dark = theme
+                        state = fixture.copy(phase = phase, recommendation = recommendation.copy(
+                            prototypeOnly = true, reason = "Contoh: periksa material dan penerimaan pengelola sebelum mendaur ulang.",
+                            caution = "", sourceDetails = emptyList(), sources = emptyList()), method = DisposalMethod.RECYCLE)
+                    }
+                    if (phase == ScanPhase.PHOTO || phase == ScanPhase.OBJECT) {
+                        val description = instrumentation.targetContext.getString(com.example.wastenot.R.string.scan_photo_description)
+                        compose.waitUntil(5_000) {
+                            compose.onAllNodesWithContentDescription(description).fetchSemanticsNodes().isNotEmpty()
+                        }
+                    }
+                    val name = "$id-${if (theme) "dark" else "light"}"
+                    captureUiPreview(compose, name, "scan-design-preview")
+                    if (phase == ScanPhase.CONTEXT) {
+                        compose.onNodeWithContentDescription("Kebersihan").assertHeightIsAtLeast(56.dp)
+                    }
+                    compose.onNodeWithText(action).performScrollTo().assertIsDisplayed()
+                    val tail = when (phase) {
+                        ScanPhase.OBJECT -> "Ambil ulang"
+                        ScanPhase.CONTEXT -> "Koreksi objek"
+                        ScanPhase.RECOMMENDATION -> "Periksa kondisi benda"
+                        else -> action
+                    }
+                    compose.onNodeWithText(tail).performScrollTo().assertIsDisplayed()
+                    captureUiPreview(compose, "$name-end", "scan-design-preview")
+                }
+            }
+        } finally {
+            photoFile.delete()
+            cameraDirectory.deleteRecursively()
+        }
+    }
 
     @Test fun everyPhaseKeepsManualVisibleAndThemesRenderWithoutSimulationControls() {
         var state by mutableStateOf(ScanState())
@@ -167,11 +243,10 @@ class ScanSheetTest {
     @Composable
     private fun Sheet(state: ScanState, onManual: () -> Unit = {}, onCategory: (WasteCategory) -> Unit = {},
         onConfirm: () -> Unit = {}, onContext: (ScanContext) -> Unit = {}, onMethod: (DisposalMethod) -> Unit = {}, onUse: () -> Unit = {},
-        onObjectKey: (String) -> Unit = {}, onReviewContext: () -> Unit = {}, onConfirmConditions: (Boolean) -> Unit = {}) {
+        onObjectKey: (String) -> Unit = {}, onReviewContext: () -> Unit = {}, onConfirmConditions: (Boolean) -> Unit = {},
+        camera: @Composable () -> Unit = { Text("Arahkan ke satu benda") }) {
         ScanSheet(state, {}, onManual, {}, {}, {}, onCategory, onConfirm, {}, onContext, {}, onMethod, onUse, {},
-            onObjectKey = onObjectKey, onReviewContext = onReviewContext, onConfirmConditions = onConfirmConditions) {
-            Text("Arahkan ke satu benda")
-        }
+            onObjectKey = onObjectKey, onReviewContext = onReviewContext, onConfirmConditions = onConfirmConditions, camera = camera)
     }
     private fun capture(name: String) {
         compose.waitForIdle()

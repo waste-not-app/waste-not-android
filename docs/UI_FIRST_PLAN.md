@@ -63,7 +63,7 @@ Urutan ini menggantikan prioritas pengujian integrasi panjang pada catatan sebel
 |---|---|---|
 | 1. Kelengkapan screen | Seluruh 20 ID wajib dan 4 dialog tersedia; placeholder dan aksi tanpa tujuan dicatat | Implementasi dan snapshot awal 20/20 + 4/4 tersedia; tidak perlu membuat ulang inventaris |
 | 2. Kesesuaian desain dan navigasi | Review setiap alur dari atas sampai bawah, tema terang/gelap, komponen kit, bottom nav, Back serta buka/tutup modal; selesaikan koreksi yang ditemukan | Berjalan; screenshot awal belum menutup seluruh scroll/state; scan S21–S24 tema gelap masih perlu review |
-| 3. Pengujian menyeluruh | Fungsi, backend/AI nyata, pemulihan draf, Android 11 dan versi terbaru, konfigurasi/font, aksesibilitas serta CI | Dilanjutkan setelah tahap 2; bukti parsial yang ada tetap sah dalam batas masing-masing |
+| 3. Pengujian menyeluruh | Fungsi, backend/AI nyata, pemulihan draf, perangkat Android baru, konfigurasi/font, aksesibilitas serta CI | Dilanjutkan setelah tahap 2; bukti parsial yang ada tetap sah dalam batas masing-masing |
 
 Pekerjaan terdekat tahap 2:
 
@@ -75,3 +75,7 @@ Pekerjaan terdekat tahap 2:
 Selama tahap 1–2, build, pemeriksaan render dan pemeriksaan wajib commit/CI tetap berjalan agar perubahan tidak rusak. Jangan menambah putaran pengujian integrasi/perangkat yang panjang sebelum checkpoint UI lengkap, kecuali diperlukan untuk membuka atau memperbaiki layar yang sedang dikerjakan.
 
 Laporan kemajuan dipisahkan menjadi **screen tersedia**, **review desain selesai**, dan **pengujian selesai**. Hanya hitungan dengan daftar bukti yang dipakai; 20/20 screen tersedia tidak berarti desain atau rilis 100% selesai. Fitur S15/S17/S18/S19 tetap mengikuti prioritas dan capability pada spesifikasi, bukan otomatis ditambahkan ke cakupan wajib.
+
+Penegasan goal terbaru, 7 November: utamakan penyelesaian screen dan integrasi backend/AI, dengan pengujian utama pada perangkat Android baru (checkpoint saat ini API 37). Pengujian perangkat lama tidak menjadi pekerjaan yang diperluas. Batas instalasi Android 11 yang sudah dipilih tetap berlaku; ini bukan kewajiban menambah matriks pengujian perangkat lama.
+
+Checkpoint visual 7 November: [scan dua tema](qa/iteration-2/SCAN_THEMES.md) melengkapi kamera sebelum aktivasi, foto dan S22–S24 hingga akhir scroll, 40 PNG pada API 37. Pilihan scan sudah minimum 56 dp dan preview native lulus. Celah pasangan tema normal tersebut tertutup; state kamera aktif, pertanyaan tambahan/bersyarat dan interaksi kontrol tetap perlu ditinjau sebelum penerimaan seluruh UI.
