@@ -1,6 +1,6 @@
 # Prioritas UI WasteNot
 
-Arahan pengguna, 6 November 2026: lengkapi screen yang dibutuhkan, cocokkan dengan design system/mockup dan navigasinya, lalu lakukan pengujian menyeluruh. Integrasi yang sudah tersedia dipertahankan. Build dasar dan pemeriksaan visual selama implementasi membantu memastikan layar dapat dibuka; pengujian backend, lintas perangkat dan regresi mendalam dilakukan setelah rangkaian UI lengkap.
+Arahan pengguna, ditegaskan kembali 7 November 2026: lengkapi screen yang dibutuhkan, cocokkan dengan design system/mockup dan navigasinya, lalu lakukan pengujian menyeluruh. Integrasi yang sudah tersedia dipertahankan. Build dasar dan pemeriksaan visual selama implementasi membantu memastikan layar dapat dibuka; pengujian backend, lintas perangkat dan regresi mendalam dilakukan setelah rangkaian UI lengkap.
 
 ## Cakupan inti dan AI
 
@@ -48,6 +48,30 @@ Permintaan merge PR yang aman tetap berlaku. Perubahan scan yang sedang dikerjak
 - S01–S03, S25 dan D04 juga dirender melalui fixture komponen untuk memeriksa tampilan tanpa menunggu jaringan. Bukti fixture tidak membuktikan pemulihan sesi atau konflik backend nyata.
 - Galeri dan batas bukti: [UI_SCAN_PREVIEW.md](qa/iteration-2/UI_SCAN_PREVIEW.md). S21–S24 baru direkam pada tema terang. Snapshot tidak mencakup seluruh state, semua bagian scroll, ukuran/font lain, TalkBack atau perangkat fisik.
 
-Tahap implementasi struktur dan penyesuaian tampilan awal sudah memiliki checkpoint lengkap. Berikutnya pengujian state/fungsi/backend/AI, dilanjutkan perbaikan berdasarkan temuan; jangan mengulang inventaris awal atau menganggap snapshot sebagai penerimaan akhir.
+Inventaris struktur dan snapshot awal sudah lengkap. Prioritas berikutnya adalah menuntaskan review dan koreksi visual seluruh alur sesuai kit, termasuk bagian scroll serta scan tema gelap yang belum memiliki pasangan gambar. Setelah checkpoint visual lengkap, lanjutkan pengujian state/fungsi/backend/AI. Snapshot awal tidak menjadi penerimaan akhir.
 
 7 November: [jalur data Android ke AI nyata](qa/iteration-2/AI_LIVE_ANDROID.md) lulus pada API 37, termasuk konteks tambahan, Gemini non-prototipe, provenance, pemulihan draf dan replay tanpa XP ganda. Alur kamera/UI masih diuji terpisah. Kesehatan SystemUI emulator dan ketepatan frame screenshot diperiksa agar gangguan alat tidak dilaporkan sebagai hasil aplikasi. Konfigurasi publikasi juga diperbarui untuk memakai adapter remote dan menolak origin API kosong.
+
+
+## Goal dan checkpoint yang berlaku, 7 November 2026
+
+**Goal utama:** memastikan semua screen wajib WasteNot Android tersedia, lalu menuntaskan tampilan dan navigasinya sesuai design system serta mockup. Setelah checkpoint UI lengkap, jalankan pengujian menyeluruh dan perbaiki temuan sampai APK siap ditinjau.
+
+Urutan ini menggantikan prioritas pengujian integrasi panjang pada catatan sebelumnya. Hasil integrasi yang sudah ada tetap dicatat pada commit buktinya.
+
+| Tahap | Kriteria selesai | Posisi saat ini |
+|---|---|---|
+| 1. Kelengkapan screen | Seluruh 20 ID wajib dan 4 dialog tersedia; placeholder dan aksi tanpa tujuan dicatat | Implementasi dan snapshot awal 20/20 + 4/4 tersedia; tidak perlu membuat ulang inventaris |
+| 2. Kesesuaian desain dan navigasi | Review setiap alur dari atas sampai bawah, tema terang/gelap, komponen kit, bottom nav, Back serta buka/tutup modal; selesaikan koreksi yang ditemukan | Berjalan; screenshot awal belum menutup seluruh scroll/state; scan S21–S24 tema gelap masih perlu review |
+| 3. Pengujian menyeluruh | Fungsi, backend/AI nyata, pemulihan draf, Android 11 dan versi terbaru, konfigurasi/font, aksesibilitas serta CI | Dilanjutkan setelah tahap 2; bukti parsial yang ada tetap sah dalam batas masing-masing |
+
+Pekerjaan terdekat tahap 2:
+
+1. Tinjau pasangan kit dan aplikasi per alur: masuk/daftar, beranda/catat/riwayat, panduan, statistik/profil/pengaturan, lalu scan sampai editor.
+2. Periksa bagian bawah konten, state loading/kosong/gagal dan dialog; tandai temuan pada screen terkait agar koreksinya terbatas dan dapat ditinjau.
+3. Lengkapi preview scan terang/gelap dengan data demo terkontrol. Pemeriksaan visual tidak harus menunggu deteksi positif kamera emulator atau respons Gemini.
+4. Tinjau bottom navigation, header, tombol utama, sheet dan transisi secara konsisten; siapkan APK serta galeri pembanding untuk checkpoint UI.
+
+Selama tahap 1–2, build, pemeriksaan render dan pemeriksaan wajib commit/CI tetap berjalan agar perubahan tidak rusak. Jangan menambah putaran pengujian integrasi/perangkat yang panjang sebelum checkpoint UI lengkap, kecuali diperlukan untuk membuka atau memperbaiki layar yang sedang dikerjakan.
+
+Laporan kemajuan dipisahkan menjadi **screen tersedia**, **review desain selesai**, dan **pengujian selesai**. Hanya hitungan dengan daftar bukti yang dipakai; 20/20 screen tersedia tidak berarti desain atau rilis 100% selesai. Fitur S15/S17/S18/S19 tetap mengikuti prioritas dan capability pada spesifikasi, bukan otomatis ditambahkan ke cakupan wajib.
