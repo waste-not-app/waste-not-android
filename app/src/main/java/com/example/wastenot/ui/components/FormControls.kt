@@ -1,6 +1,8 @@
 package com.example.wastenot.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -26,6 +28,7 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -65,16 +68,20 @@ fun ActionButton(
 ) {
     val actionable = enabled && !loading
     val colors = MaterialTheme.colorScheme
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusedAsState()
     Button(
         onClick = onClick,
         modifier = modifier
             .heightIn(min = 52.dp)
+            .focusOutline(actionable && focused, MaterialTheme.shapes.small, colors.primary, colors.surface)
             .then(if (actionable && !destructive) Modifier
                 .dropShadow(MaterialTheme.shapes.small, Shadow(12.dp, ActionShadow, spread = (-9).dp, offset = DpOffset(0.dp, 5.dp)))
                 .background(LocalWasteNotGradients.current.action, MaterialTheme.shapes.small)
                 .innerShadow(MaterialTheme.shapes.small, Shadow(0.dp, ActionHighlight, offset = DpOffset(0.dp, 1.dp)))
             else Modifier),
         enabled = actionable,
+        interactionSource = interactions,
         shape = MaterialTheme.shapes.small,
         colors = ButtonDefaults.buttonColors(
             containerColor = if (destructive) colors.error else Color.Transparent,

@@ -2,6 +2,8 @@ package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,14 +43,21 @@ import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.OnAccent
 import com.example.wastenot.theme.Pine900
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.focusOutline
 
 @Composable
 internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, vertical: Boolean = false) {
     val description = stringResource(R.string.scan_action_description)
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusedAsState()
+    val colors = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(26.dp)
     Surface(
         onClick = onClick,
-        modifier = modifier.widthIn(min = 136.dp).heightIn(min = 52.dp).semantics { contentDescription = description },
-        shape = RoundedCornerShape(26.dp),
+        modifier = modifier.widthIn(min = 136.dp).heightIn(min = 52.dp)
+            .focusOutline(focused, shape, colors.primary, colors.surface).semantics { contentDescription = description },
+        shape = shape,
+        interactionSource = interactions,
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(3.dp, MaterialTheme.colorScheme.surface),
         shadowElevation = 2.dp,

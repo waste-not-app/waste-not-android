@@ -1,0 +1,607 @@
+{
+  "comparisons": 50,
+  "inactive_comparisons": 40,
+  "inactive_unchanged": true,
+  "rows": [
+    {
+      "theme": "light",
+      "focused": "primary",
+      "control": "primary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        72,
+        1098,
+        228
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "primary",
+      "control": "secondary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        300,
+        1098,
+        456
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "primary",
+      "control": "text",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        528,
+        403,
+        672
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "primary",
+      "control": "icon",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        744,
+        216,
+        888
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "primary",
+      "control": "record",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        960,
+        482,
+        1116
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "secondary",
+      "control": "primary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        72,
+        1098,
+        228
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "secondary",
+      "control": "secondary",
+      "changed_pixels": 159048,
+      "box": [
+        72,
+        300,
+        1098,
+        456
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "secondary",
+      "control": "text",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        528,
+        403,
+        672
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "secondary",
+      "control": "icon",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        744,
+        216,
+        888
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "secondary",
+      "control": "record",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        960,
+        482,
+        1116
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "text",
+      "control": "primary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        72,
+        1098,
+        228
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "text",
+      "control": "secondary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        300,
+        1098,
+        456
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "text",
+      "control": "text",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        528,
+        403,
+        672
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "text",
+      "control": "icon",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        744,
+        216,
+        888
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "text",
+      "control": "record",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        960,
+        482,
+        1116
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "icon",
+      "control": "primary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        72,
+        1098,
+        228
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "icon",
+      "control": "secondary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        300,
+        1098,
+        456
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "icon",
+      "control": "text",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        528,
+        403,
+        672
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "icon",
+      "control": "icon",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        744,
+        216,
+        888
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "icon",
+      "control": "record",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        960,
+        482,
+        1116
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "record",
+      "control": "primary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        72,
+        1098,
+        228
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "record",
+      "control": "secondary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        300,
+        1098,
+        456
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "record",
+      "control": "text",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        528,
+        403,
+        672
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "record",
+      "control": "icon",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        744,
+        216,
+        888
+      ]
+    },
+    {
+      "theme": "light",
+      "focused": "record",
+      "control": "record",
+      "changed_pixels": 1252,
+      "box": [
+        72,
+        960,
+        482,
+        1116
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "primary",
+      "control": "primary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        72,
+        1098,
+        228
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "primary",
+      "control": "secondary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        300,
+        1098,
+        456
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "primary",
+      "control": "text",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        528,
+        403,
+        672
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "primary",
+      "control": "icon",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        744,
+        216,
+        888
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "primary",
+      "control": "record",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        960,
+        482,
+        1116
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "secondary",
+      "control": "primary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        72,
+        1098,
+        228
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "secondary",
+      "control": "secondary",
+      "changed_pixels": 159044,
+      "box": [
+        72,
+        300,
+        1098,
+        456
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "secondary",
+      "control": "text",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        528,
+        403,
+        672
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "secondary",
+      "control": "icon",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        744,
+        216,
+        888
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "secondary",
+      "control": "record",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        960,
+        482,
+        1116
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "text",
+      "control": "primary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        72,
+        1098,
+        228
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "text",
+      "control": "secondary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        300,
+        1098,
+        456
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "text",
+      "control": "text",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        528,
+        403,
+        672
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "text",
+      "control": "icon",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        744,
+        216,
+        888
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "text",
+      "control": "record",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        960,
+        482,
+        1116
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "icon",
+      "control": "primary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        72,
+        1098,
+        228
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "icon",
+      "control": "secondary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        300,
+        1098,
+        456
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "icon",
+      "control": "text",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        528,
+        403,
+        672
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "icon",
+      "control": "icon",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        744,
+        216,
+        888
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "icon",
+      "control": "record",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        960,
+        482,
+        1116
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "record",
+      "control": "primary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        72,
+        1098,
+        228
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "record",
+      "control": "secondary",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        300,
+        1098,
+        456
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "record",
+      "control": "text",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        528,
+        403,
+        672
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "record",
+      "control": "icon",
+      "changed_pixels": 0,
+      "box": [
+        72,
+        744,
+        216,
+        888
+      ]
+    },
+    {
+      "theme": "dark",
+      "focused": "record",
+      "control": "record",
+      "changed_pixels": 1252,
+      "box": [
+        72,
+        960,
+        482,
+        1116
+      ]
+    }
+  ]
+}

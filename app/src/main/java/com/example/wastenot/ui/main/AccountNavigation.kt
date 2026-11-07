@@ -1,6 +1,10 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -512,11 +516,16 @@ private fun TabRail(selected: MainTab, onSelect: (MainTab) -> Unit, onRecord: ()
 
 @Composable
 private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusedAsState()
+    val shape = androidx.compose.foundation.shape.RoundedCornerShape(19.dp)
     Column(
         modifier = modifier
             .heightIn(min = 54.dp)
-            .clip(androidx.compose.foundation.shape.RoundedCornerShape(19.dp))
-            .selectable(selected, role = Role.Tab, onClick = onClick)
+            .then(if (focused) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, shape) else Modifier)
+            .clip(shape)
+            .selectable(selected, role = Role.Tab, onClick = onClick,
+                interactionSource = interactions, indication = LocalIndication.current)
             .padding(horizontal = 2.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
