@@ -25,7 +25,7 @@ data class ScanState(val session: String = "", val phase: ScanPhase = ScanPhase.
     val problem: ScanProblem? = null, val catalog: AiCatalog? = null, val detection: AiDetection? = null,
     val objectKey: String? = null, val revision: Int = 1, val conditionsConfirmed: Boolean = false,
     val error: ApiFailure? = null, val demo: Boolean = false,
-    val requestedContext: List<AiContextField> = emptyList()) {
+    val requestedContext: List<AiContextField> = emptyList(), val confirmedMethod: DisposalMethod? = null) {
     val selected: AiDetectionObject? get() = objects.find { it.id == selectedId }
     val item: AiCatalogItem? get() = catalog?.items?.find { it.key == objectKey && it.category == category }
     val canChooseMethod: Boolean get() = recommendation?.let {
@@ -122,7 +122,7 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
         val current = state.value
         if (current.phase != ScanPhase.OBJECT || current.selectedId == id || current.objects.none { it.id == id }) return
         invalidate(); mutable.value = current.copy(selectedId = id, category = null, objectKey = null,
-            context = ScanContext(), objectConfirmed = false, recommendation = null, method = null,
+            context = ScanContext(), objectConfirmed = false, recommendation = null, method = null, confirmedMethod = null,
             conditionsConfirmed = false, requestedContext = emptyList(), revision = current.revision + 1)
     }
 
@@ -130,7 +130,7 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
         val current = state.value
         if (current.phase != ScanPhase.OBJECT || current.category == category) return
         invalidate(); mutable.value = current.copy(category = category, objectKey = null, context = ScanContext(),
-            objectConfirmed = false, recommendation = null, method = null, conditionsConfirmed = false,
+            objectConfirmed = false, recommendation = null, method = null, confirmedMethod = null, conditionsConfirmed = false,
             requestedContext = emptyList(), revision = current.revision + 1)
     }
 
@@ -139,7 +139,7 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
         if (current.phase != ScanPhase.OBJECT || current.objectKey == key ||
             current.catalog?.items?.none { it.key == key && it.category == current.category } != false) return
         invalidate(); mutable.value = current.copy(objectKey = key, context = ScanContext(), objectConfirmed = false,
-            recommendation = null, method = null, conditionsConfirmed = false,
+            recommendation = null, method = null, confirmedMethod = null, conditionsConfirmed = false,
             requestedContext = emptyList(), revision = current.revision + 1)
     }
 
@@ -152,13 +152,13 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
     fun correctObject() {
         if (!state.value.objectConfirmed) return
         invalidate(); mutable.value = state.value.copy(phase = ScanPhase.OBJECT, objectConfirmed = false,
-            recommendation = null, method = null, conditionsConfirmed = false)
+            recommendation = null, method = null, confirmedMethod = null, conditionsConfirmed = false)
     }
 
     fun context(context: ScanContext) {
         val current = state.value
         if (current.phase != ScanPhase.CONTEXT || current.context == context) return
-        invalidate(); mutable.value = current.copy(context = context, recommendation = null, method = null,
+        invalidate(); mutable.value = current.copy(context = context, recommendation = null, method = null, confirmedMethod = null,
             conditionsConfirmed = false, revision = current.revision + 1)
     }
 
@@ -166,7 +166,7 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
         if (state.value.phase != ScanPhase.RECOMMENDATION) return
         val requested = state.value.recommendation?.let { it.missingContext.ifEmpty { it.conditionsToVerify } }.orEmpty()
         invalidate(); mutable.value = state.value.copy(phase = ScanPhase.CONTEXT, recommendation = null,
-            method = null, conditionsConfirmed = false, requestedContext = requested)
+            method = null, confirmedMethod = null, conditionsConfirmed = false, requestedContext = requested)
     }
 
     fun recommend() {
@@ -197,7 +197,7 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
 
     fun method(method: DisposalMethod) {
         if (state.value.phase == ScanPhase.RECOMMENDATION && state.value.canChooseMethod && method != DisposalMethod.REDUCE)
-            mutable.value = state.value.copy(method = method)
+            mutable.value = state.value.copy(method = method, confirmedMethod = method)
     }
 
     fun confirmConditions(confirmed: Boolean) {
@@ -212,10 +212,12 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
             current.phase == ScanPhase.RECOMMENDATION && recommendation!!.expiresAt > instant() &&
             current.detection?.expiresAt?.let { it > instant() } == true }
         val provenance = if (method != null && !repository.isDemo) AiLogProvenance(recommendation!!.id, checkNotNull(category)) else null
-        return ScanPrefill(category, method, provenance)
+        return ScanPrefill(category, if (confirmRecommendation) method else current.confirmedMethod.takeIf { category != null }, provenance)
     }
 
     fun handoff(confirmRecommendation: Boolean): ScanPrefill? {
+        if (confirmRecommendation && state.value.phase == ScanPhase.RECOMMENDATION && state.value.canUseRecommendation)
+            mutable.value = state.value.copy(confirmedMethod = state.value.method)
         if (confirmRecommendation && (!validPhoto(state.value) || !validDetection(state.value))) return null
         if (confirmRecommendation && state.value.recommendation?.expiresAt?.let { it <= instant() } == true) {
             failed(state.value, ScanProblem.EXPIRED, expired()); return null

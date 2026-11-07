@@ -248,6 +248,42 @@ class ScanViewModelTest {
         assertEquals(WasteCategory.PLASTIC, prefill.category); assertEquals(listOf(id), fake.retired)
     }
 
+    @Test fun expiryRetainsExplicitChoicesOnlyForTheManualHandoff() = runTest {
+        for (expiry in listOf("photo", "detection", "recommendation")) {
+            for (corrected in listOf(false, true)) {
+                now = 10_000; deleted.clear()
+                val fake = Fake().apply {
+                    if (expiry == "recommendation") detector = {
+                        ApiResult.Success(detection(it).copy(expiresAt = Instant.ofEpochMilli(now + 600_000)))
+                    }
+                }
+                val vm = model(fake); confirm(vm); vm.recommend(); advanceUntilIdle()
+                if (corrected) vm.method(DisposalMethod.TRASH)
+                now += if (expiry == "photo") 3_600_000 else 60_000
+                assertNull(vm.handoff(true))
+                assertEquals(ScanProblem.EXPIRED, vm.state.value.problem)
+                assertNull(vm.prefill(true).aiProvenance)
+                val manual = vm.handoff(false)!!
+                assertEquals(WasteCategory.PLASTIC, manual.category)
+                assertEquals(if (corrected) DisposalMethod.TRASH else DisposalMethod.RECYCLE, manual.method)
+                assertNull(manual.aiProvenance)
+                vm.close(); advanceUntilIdle()
+                assertEquals(1, fake.retired.size)
+            }
+        }
+    }
+
+    @Test fun changingContextOrObjectClearsThePreviousManualChoice() = runTest {
+        val vm = model(); confirm(vm); vm.recommend(); advanceUntilIdle()
+        vm.method(DisposalMethod.TRASH)
+        assertEquals(DisposalMethod.TRASH, vm.prefill().method)
+        vm.reviewContext()
+        assertNull(vm.prefill().method)
+        vm.recommend(); advanceUntilIdle(); vm.method(DisposalMethod.REUSE)
+        vm.correctObject(); vm.category(WasteCategory.GLASS)
+        assertNull(vm.prefill().category); assertNull(vm.prefill().method)
+    }
+
     @Test fun duplicateObjectsAndInvalidRecommendationFailInsteadOfCrashingTheScreen() = runTest {
         val fake = Fake().apply { detector = { id -> ApiResult.Success(detection(id).copy(objects = listOf(candidate(), candidate()))) } }
         val vm = model(fake); vm.detect(); advanceUntilIdle()

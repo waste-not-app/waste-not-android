@@ -1,0 +1,42 @@
+[
+  {
+    "name": "expired-choice-dark-panel.png",
+    "sha256": "f02cd7cb0ddcdf54d801e66cecf71cde2bcf99385406ca53e7883f8cb47c4659",
+    "bytes": 128932
+  },
+  {
+    "name": "expired-choice-dark.png",
+    "sha256": "9503a2727ebd98c4bdd74667399e2587f8110e5ad87cda913610b2b8d452d953",
+    "bytes": 140340
+  },
+  {
+    "name": "expired-choice-light-panel.png",
+    "sha256": "de38b4ef597dc2a0a9e224c3774bbe57b6c45e492c7a37876ede7646c2ef5e08",
+    "bytes": 129688
+  },
+  {
+    "name": "expired-choice-light.png",
+    "sha256": "6c0504af26b992ba7e33890d18ed4b7ac50650cae44acb5f7bd7a5be98b4803a",
+    "bytes": 140706
+  },
+  {
+    "name": "guide-revision-dark-panel.png",
+    "sha256": "8b8519893190e7511899b0be90549472f58796668c93eb8616579c16b09dfb01",
+    "bytes": 297518
+  },
+  {
+    "name": "guide-revision-dark.png",
+    "sha256": "4833cb223ee38c705e75ce369998dc5d0c6b224d8d57d8fdae5ce4aef3629cd9",
+    "bytes": 308599
+  },
+  {
+    "name": "guide-revision-light-panel.png",
+    "sha256": "c4b296e31bd7c94fd6b099c29093a31c1d4b752f45d3bfff87b5fa59d6f0c796",
+    "bytes": 315466
+  },
+  {
+    "name": "guide-revision-light.png",
+    "sha256": "98e6b452593bbc9e051567bca9dc0dbd9d494ea5023f8213062648a29abb0728",
+    "bytes": 323156
+  }
+]

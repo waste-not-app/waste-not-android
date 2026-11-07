@@ -44,7 +44,7 @@ class ScanSheetTest {
         false, "Pisahkan dari sampah lain.", "native-fixture", false, "fixture", listOf("fixture-evidence"),
         listOf(URI("https://example.org/fixture")), listOf(AiSourceReference(URI("https://example.org/fixture"),
             "Sumber fixture", "Penerbit fixture", "Wilayah fixture", "2026-10-20", "Cakupan fixture, bukan panduan produksi.")),
-        emptyList(), listOf("Periksa material kemasan."))
+        listOf(AiGuideReference("fixture-pet", 6)), listOf("Periksa material kemasan."))
 
     @Test fun scanDesignViewportsLightAndDark() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -182,21 +182,44 @@ class ScanSheetTest {
     }
 
     @Test fun recommendationAllowsThreeMethodsShowsBasisAndRequiresUseAction() {
+        var dark by mutableStateOf(false)
         var state by mutableStateOf(objects.copy(phase = ScanPhase.RECOMMENDATION, category = WasteCategory.PLASTIC,
             objectKey = "plastic_bottle", objectConfirmed = true, recommendation = recommendation, method = DisposalMethod.RECYCLE))
         var used = 0
-        compose.setContent { WasteNotTheme {
+        compose.setContent { WasteNotTheme(dark) {
             Sheet(state, onMethod = { state = state.copy(method = it) }, onUse = { used++ })
         } }
         compose.onNodeWithText("Pisahkan dari sampah lain.").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Lihat dasar saran").performScrollTo().performClick()
         compose.onNodeWithText("Botol plastik").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Referensi panduan: fixture-pet · versi 6").performScrollTo().assertIsDisplayed()
+        captureUiPreview(compose, "guide-revision-light", "scan-review-fixes")
+        compose.runOnIdle { dark = true }
+        compose.onNodeWithText("Referensi panduan: fixture-pet · versi 6").assertIsDisplayed()
+        captureUiPreview(compose, "guide-revision-dark", "scan-review-fixes")
         compose.onNode(hasText("Recycle") and hasClickAction()).performScrollTo().performClick()
         compose.onNodeWithText("Reduce").assertDoesNotExist()
         compose.onNodeWithText("Trash").performClick()
         assertEquals(DisposalMethod.TRASH, state.method); assertEquals(0, used)
         compose.onNodeWithText("Gunakan pilihan, isi jumlah").performScrollTo().performClick()
         assertEquals(1, used)
+    }
+
+    @Test fun expiredChoicesExplainTheManualHandoffInBothThemes() {
+        var dark by mutableStateOf(false)
+        var manual = 0
+        val state = objects.copy(phase = ScanPhase.FAILURE, problem = ScanProblem.EXPIRED,
+            category = WasteCategory.PLASTIC, objectConfirmed = true, confirmedMethod = DisposalMethod.TRASH)
+        compose.setContent { WasteNotTheme(dark) { Sheet(state, onManual = { manual++ }) } }
+        for (theme in listOf(false, true)) {
+            compose.runOnIdle { dark = theme }
+            compose.onNodeWithText("Kategori dan metode yang sudah kamu pilih tetap dibawa ke input manual tanpa referensi AI.")
+                .performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
+            captureUiPreview(compose, "expired-choice-${if (theme) "dark" else "light"}", "scan-review-fixes")
+            compose.onNodeWithText("Input manual").assertIsDisplayed().performClick()
+        }
+        assertEquals(2, manual)
     }
 
     @Test fun conditionalAdviceRequiresAcknowledgementAndSourceMetadataOpensOnlyItsUri() {

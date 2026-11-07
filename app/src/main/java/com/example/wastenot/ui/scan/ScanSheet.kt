@@ -259,7 +259,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                     ScanPhase.FAILURE -> {
                         Text(stringResource(when (state.problem) {
                             ScanProblem.NO_OBJECT -> R.string.scan_no_object
-                            ScanProblem.EXPIRED -> R.string.scan_photo_expired
+                            ScanProblem.EXPIRED -> R.string.scan_session_expired
                             ScanProblem.PHOTO -> R.string.scan_photo_error
                             ScanProblem.PERMISSION -> R.string.scan_permission_denied
                             ScanProblem.CAMERA -> R.string.scan_camera_error
@@ -267,6 +267,8 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                             ScanProblem.RECOMMENDATION -> R.string.scan_recommendation_error
                             else -> R.string.scan_detection_error
                         }), style = MaterialTheme.typography.bodyLarge)
+                        if (state.problem == ScanProblem.EXPIRED && state.objectConfirmed && state.confirmedMethod != null)
+                            Text(stringResource(R.string.scan_manual_choice_retained), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         ScanSecondary(R.string.retry, onRetry)
                     }
                 }
@@ -380,6 +382,9 @@ private fun ScanSources(recommendation: AiRecommendation) {
         catch (_: android.content.ActivityNotFoundException) { failed = true }
         catch (_: IllegalArgumentException) { failed = true }
         catch (_: SecurityException) { failed = true }
+    }
+    recommendation.guideRefs.forEach { guide ->
+        Text(stringResource(R.string.scan_guide_revision, guide.id, guide.version), style = MaterialTheme.typography.bodySmall)
     }
     if (recommendation.sources.isNotEmpty()) Text(stringResource(R.string.guide_sources), style = MaterialTheme.typography.titleMedium)
     recommendation.sources.forEach { url ->

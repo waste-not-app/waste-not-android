@@ -62,7 +62,7 @@ Urutan ini menggantikan prioritas pengujian integrasi panjang pada catatan sebel
 | Tahap | Kriteria selesai | Posisi saat ini |
 |---|---|---|
 | 1. Kelengkapan screen | Seluruh 20 ID wajib dan 4 dialog tersedia; placeholder dan aksi tanpa tujuan dicatat | Implementasi dan snapshot awal 20/20 + 4/4 tersedia; tidak perlu membuat ulang inventaris |
-| 2. Kesesuaian desain dan navigasi | Review setiap alur dari atas sampai bawah, tema terang/gelap, komponen kit, bottom nav, Back serta buka/tutup modal; selesaikan koreksi yang ditemukan | Berjalan; screenshot awal belum menutup seluruh scroll/state; scan S21–S24 tema gelap masih perlu review |
+| 2. Kesesuaian desain dan navigasi | Review setiap alur dari atas sampai bawah, tema terang/gelap, komponen kit, bottom nav, Back serta buka/tutup modal; selesaikan koreksi yang ditemukan | Berjalan; pasangan scan dua tema dan akhir scroll tersedia; state/kontrol serta perjalanan UI nyata masih ditinjau |
 | 3. Pengujian menyeluruh | Fungsi, backend/AI nyata, pemulihan draf, perangkat Android baru, konfigurasi/font, aksesibilitas serta CI | Dilanjutkan setelah tahap 2; bukti parsial yang ada tetap sah dalam batas masing-masing |
 
 Pekerjaan terdekat tahap 2:
@@ -79,3 +79,5 @@ Laporan kemajuan dipisahkan menjadi **screen tersedia**, **review desain selesai
 Penegasan goal terbaru, 7 November: utamakan penyelesaian screen dan integrasi backend/AI, dengan pengujian utama pada perangkat Android baru (checkpoint saat ini API 37). Pengujian perangkat lama tidak menjadi pekerjaan yang diperluas. Batas instalasi Android 11 yang sudah dipilih tetap berlaku; ini bukan kewajiban menambah matriks pengujian perangkat lama.
 
 Checkpoint visual 7 November: [scan dua tema](qa/iteration-2/SCAN_THEMES.md) melengkapi kamera sebelum aktivasi, foto dan S22–S24 hingga akhir scroll, 40 PNG pada API 37. Pilihan scan sudah minimum 56 dp dan preview native lulus. Celah pasangan tema normal tersebut tertutup; state kamera aktif, pertanyaan tambahan/bersyarat dan interaksi kontrol tetap perlu ditinjau sebelum penerimaan seluruh UI.
+
+Checkpoint review berikutnya: [versi panduan dan fallback expiry](qa/iteration-2/SCAN_REVIEW_FIXES.md) diperbaiki sesudah dua review independen, dengan 24 unit tests dan dua metode UI pada perangkat API37 lulus. Jalur AI positif dari kamera tetap terbuka; hasil deteksi kosong dari fixture terpotong bukan bukti saran AI berhasil.

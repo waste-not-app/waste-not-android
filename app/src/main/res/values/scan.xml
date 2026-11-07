@@ -57,6 +57,9 @@
     <string name="scan_no_guide">Belum ada panduan yang cocok. Lanjutkan dengan pilihan manual.</string>
     <string name="scan_no_object">Belum ada objek dengan skor yang cukup. Ambil ulang foto yang lebih jelas atau gunakan input manual.</string>
     <string name="scan_photo_expired">Foto sementara sudah tidak tersedia. Ambil ulang untuk melanjutkan scan.</string>
+    <string name="scan_session_expired">Sesi scan sudah kedaluwarsa. Ambil ulang untuk meminta saran baru, atau lanjutkan manual.</string>
+    <string name="scan_manual_choice_retained">Kategori dan metode yang sudah kamu pilih tetap dibawa ke input manual tanpa referensi AI.</string>
+    <string name="scan_guide_revision">Referensi panduan: %1$s · versi %2$d</string>
     <string name="scan_photo_error">Foto belum bisa digunakan. Coba ambil ulang dengan ukuran lebih kecil.</string>
     <string name="scan_permission_denied">Izin kamera belum diberikan. Kamu tetap bisa menggunakan input manual.</string>
     <string name="scan_camera_error">Kamera belum bisa dibuka. Coba lagi atau gunakan input manual.</string>

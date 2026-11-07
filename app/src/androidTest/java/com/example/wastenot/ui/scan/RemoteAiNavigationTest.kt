@@ -65,7 +65,7 @@ class RemoteAiNavigationTest {
         val core = container.core
         val steps = JSONArray()
         val evidence = JSONObject().put("run_id", runId).put("email", email).put("name", name)
-            .put("context_is_fixture", true).put("camera_source", "emulator virtual scene with public PET poster")
+            .put("context_is_fixture", true).put("camera_source", args.getString("fixtureCameraSource") ?: "emulator camera; inspect captured frame")
         val output = File(context.cacheDir, "qa/backend/ai-fixture.json")
         fun record(step: String) {
             output.parentFile!!.mkdirs()
@@ -234,7 +234,7 @@ class RemoteAiNavigationTest {
         compose.waitForIdle()
     }
 
-    private fun capture(name: String) = captureUiPreview(compose, name, "live-ai-ui")
+    private fun capture(name: String) = captureUiPreview(compose, name, "live-ai-ui", capturePanel = false)
     private fun visibleHeading(label: String): Boolean {
         fun contains(node: AccessibilityNodeInfo?, depth: Int): Boolean {
             if (node == null || depth > 30) return false

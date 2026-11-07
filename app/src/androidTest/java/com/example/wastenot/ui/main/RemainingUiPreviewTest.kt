@@ -80,20 +80,22 @@ class RemainingUiPreviewTest {
     }
 }
 
-internal fun captureUiPreview(compose: ComposeTestRule, name: String, directoryName: String = "remaining-ui-preview") {
+internal fun captureUiPreview(compose: ComposeTestRule, name: String, directoryName: String = "remaining-ui-preview", capturePanel: Boolean = true) {
     compose.mainClock.advanceTimeByFrame()
     compose.waitForIdle()
     val instrumentation = InstrumentationRegistry.getInstrumentation()
     val directory = File(instrumentation.targetContext.getExternalFilesDir(null), directoryName).apply { mkdirs() }
-    val sheet = compose.onAllNodesWithTag("capture-sheet").fetchSemanticsNodes().isNotEmpty()
-    val target = when {
-        sheet -> compose.onNodeWithTag("capture-sheet")
-        compose.onAllNodes(isDialog()).fetchSemanticsNodes().isNotEmpty() -> compose.onNode(isDialog())
-        else -> compose.onAllNodes(isRoot()).onLast()
+    if (capturePanel) {
+        val sheet = compose.onAllNodesWithTag("capture-sheet").fetchSemanticsNodes().isNotEmpty()
+        val target = when {
+            sheet -> compose.onNodeWithTag("capture-sheet")
+            compose.onAllNodes(isDialog()).fetchSemanticsNodes().isNotEmpty() -> compose.onNode(isDialog())
+            else -> compose.onAllNodes(isRoot()).onLast()
+        }
+        val panel = target.captureToImage().asAndroidBitmap()
+        if (sheet) File(directory, "$name-panel.png").outputStream().use { check(panel.compress(Bitmap.CompressFormat.PNG, 100, it)) }
+        panel.recycle()
     }
-    val panel = target.captureToImage().asAndroidBitmap()
-    if (sheet) File(directory, "$name-panel.png").outputStream().use { check(panel.compress(Bitmap.CompressFormat.PNG, 100, it)) }
-    panel.recycle()
     instrumentation.waitForIdleSync()
     instrumentation.uiAutomation.waitForIdle(300, 5_000)
     assertEquals(instrumentation.targetContext.packageName,

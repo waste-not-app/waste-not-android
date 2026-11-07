@@ -1,0 +1,18 @@
+{
+  "source_commit": "1c0274c88ba10120db16858bba4c46ac66f3a866",
+  "use_dummy": false,
+  "hot_reload": false,
+  "base_url": "https://pred-autoscaler.bccdev.id/wastenot/api/v1/",
+  "apks": {
+    "WasteNot-live-ai-debug.apk": "af16fca305cc3a69a9ece4af20268cdce60ea0e8022c06a44d3eeaee59ee6e2e",
+    "live-ai-androidTest.apk": "e843bc9b33405e3a5f9453a32141bb129d12daecaeb73bb2618d9a261f119835"
+  },
+  "test_source": {
+    "/home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/src/androidTest/java/com/example/wastenot/ui/scan/RemoteAiNavigationTest.kt": "feb1ed229bc63423b5720af435776bd5bc33b792692782382b87602ff5f1f906",
+    "/home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/src/androidTest/java/com/example/wastenot/ui/scan/ScanSheetTest.kt": "01d9567ae5039c7ebd462d947790e99c7864742f6557828102a6766cfcee2b2e",
+    "/home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/src/androidTest/java/com/example/wastenot/ui/main/RemainingUiPreviewTest.kt": "a624f366bef85b7667605b6a6510d78ea23f0d3e003cc8b676252145e7d9c3ca",
+    "/home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/src/main/java/com/example/wastenot/ui/scan/ScanSheet.kt": "f1a8ef8494e636f6159cd27fb89f39d0474b4a6289eff271682be93e4300316a",
+    "/home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/src/main/java/com/example/wastenot/ui/scan/ScanViewModel.kt": "8861fe7ed5372a61527fa2442f2550ade4a1e81a563434c8a0770717401fe411",
+    "/home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/src/main/res/values/scan.xml": "dee50866ebebbcbecf1fda7eef306adac4bf5cf472b1baf77fba321d788ef089"
+  }
+}
