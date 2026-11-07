@@ -37,7 +37,6 @@
     <string name="ai_provenance_attached">Catatan ini menyertakan saran AI yang kamu konfirmasi. Metode dapat dikoreksi sesuai tindakanmu.</string>
     <string name="ai_use_manual">Lanjutkan sebagai catatan manual</string>
     <string name="ai_reference_rejected">Saran AI sudah kedaluwarsa atau tidak dapat dipakai untuk catatan ini. Periksa riwayat sebelum membuat catatan manual.</string>
-    <string name="scan_object_number">Objek %1$d</string>
     <string name="scan_overlapping">Ada dugaan objek lain pada area yang sama. Periksa benda yang dipilih.</string>
     <string name="scan_object_type">Jenis benda dan material</string>
     <string name="scan_choose_object_type">Pilih jenis benda</string>

@@ -1,0 +1,20 @@
+{
+  "count": 15,
+  "sha256": {
+    "S05-ai-prefill-light.png": "db6b4cd047cb21a7f26afd34c304d1d4d74655426783f645358bc74668698eac",
+    "S06-created-light.png": "9f4ed501ecf184d8844cc69bf0e976cd012da8853b0da55effda6ebd04f476c4",
+    "S08-created-light.png": "63a78e8e773967e0d32dfacf4ea4d884f62b639dd1bddda6d073b6b713704745",
+    "S14-after-delete-light.png": "24bc423d5c059380c31a761dbef4499e7fbb5535ff7f40078adaf0d168cdffd6",
+    "S21-camera-light.png": "35516682b7c948d0324446c62ace65662cba36fc2fb82c417f72abc7b2cdd164",
+    "S21-photo-before-theme.png": "8759f99198232694b8b249f1e67be1a380d179437aa2055e77f5571c847f6a05",
+    "S21-photo-dark.png": "301a47e1683d59c12e2abec3508557c180555175c1ebdb4d6c90e6139d08115b",
+    "S21-photo-light.png": "8759f99198232694b8b249f1e67be1a380d179437aa2055e77f5571c847f6a05",
+    "S22-object-dark.png": "3a5c1238cd0657152fbf23f322651a8b303034ca1729a2ec769b0989cd100537",
+    "S22-object-light.png": "372109f6cbdd419b4b9d792956c99c72432dd43b19b88fe91d69799c50a48fba",
+    "S23-context-dark.png": "bdb1c6dd18b2ebebb6f1f2921efe87943494714179c42024e633ebf96ea3c9ce",
+    "S23-context-light.png": "c95b0dbb7314554f2b370f75af140bf70f210c6fd3874316a9638c1496120c34",
+    "S24-needs-context-light.png": "dff92961ac6fdeff1e7d8d216eb2dd47aca86affc9214ab7df7198cb9922bf2f",
+    "S24-recommendation-dark.png": "3eb44649ec003d88ce1c1bf861696115b934d68761ae2c70c344031656cd7a35",
+    "S24-recommendation-light.png": "99afca6c9c3625a5b3924215e4875445991ce42440c141e2871b81647e85a6f6"
+  }
+}

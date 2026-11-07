@@ -215,10 +215,12 @@ class RemoteAiNavigationTest {
                     .put("window_id", instrumentation.uiAutomation.rootInActiveWindow?.windowId)
                     .put("visible_heading", visibleHeading(heading)))
             }
-            val scroll = SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange) and hasAnyAncestor(hasTestTag("capture-sheet"))
-            compose.onAllNodes(scroll).fetchSemanticsNodes().indices.forEach { index ->
-                compose.onAllNodes(scroll)[index].performSemanticsAction(SemanticsActions.ScrollBy) { it(0f, -100_000f) }
+            when (id) {
+                "S21-photo", "S22-object" -> compose.onNodeWithContentDescription("Foto sampah yang akan diperiksa").performScrollTo()
+                "S23-context" -> compose.onNodeWithContentDescription(context.getString(R.string.scan_cleanliness)).performScrollTo()
+                "S24-recommendation" -> compose.onNodeWithText(context.getString(R.string.scan_suggested_method)).performScrollTo()
             }
+            compose.onNodeWithText(heading).assertIsDisplayed()
             capture("$id-${if (dark) "dark" else "light"}")
         }
         setNight(false)

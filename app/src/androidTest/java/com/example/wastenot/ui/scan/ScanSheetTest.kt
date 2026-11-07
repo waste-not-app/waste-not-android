@@ -161,6 +161,16 @@ class ScanSheetTest {
         assertEquals(WasteCategory.PLASTIC, state.category); assertEquals(1, confirmed)
     }
 
+    @Test fun rawDetectionLabelStaysVisibleWhenTheCatalogHasNoTranslatedName() {
+        compose.setContent { WasteNotTheme {
+            Sheet(objects.copy(catalog = catalog.copy(supportedObjectLabels = emptyMap())))
+        } }
+        compose.onNodeWithText("Objek 1 · bottle").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Pilih material").assertExists()
+        compose.onNodeWithText("Konfirmasi objek").performScrollTo().assertIsNotEnabled()
+        captureUiPreview(compose, "S22-raw-label", "backend-contract-preview")
+    }
+
     @Test fun contextFieldsAreIndependentAndUnknownDoesNotImplyNo() {
         var state by mutableStateOf(objects.copy(phase = ScanPhase.CONTEXT, category = WasteCategory.PLASTIC, objectConfirmed = true))
         compose.setContent { WasteNotTheme {

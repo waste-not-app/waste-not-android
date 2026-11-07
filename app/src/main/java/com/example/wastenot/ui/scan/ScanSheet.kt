@@ -135,7 +135,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                                     RadioButton(candidate.id == state.selectedId, null)
                                     Column(Modifier.weight(1f).padding(start = 8.dp)) {
                                         Text(state.catalog?.supportedObjectLabels?.get(candidate.rawClass)
-                                            ?: stringResource(R.string.scan_object_number, state.objects.indexOf(candidate) + 1),
+                                            ?: stringResource(R.string.scan_object_label, state.objects.indexOf(candidate) + 1, candidate.rawClass),
                                             style = MaterialTheme.typography.titleMedium)
                                         Text(stringResource(R.string.scan_detection_score, (candidate.confidence * 100).roundToInt()), style = MaterialTheme.typography.bodySmall)
                                         if (candidate.band == AiConfidenceBand.UNCERTAIN) Text(stringResource(R.string.scan_uncertain), color = MaterialTheme.colorScheme.onSurfaceVariant)

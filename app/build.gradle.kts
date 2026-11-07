@@ -1,5 +1,7 @@
 import java.net.URI
 import com.skydoves.compose.hotswan.interpreter.compiler.gradle.InterpreterExtension
+import org.gradle.api.tasks.testing.Test
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   alias(libs.plugins.android.application)
@@ -123,6 +125,11 @@ android {
 
 kotlin {
     jvmToolchain(17)
+}
+
+tasks.withType<Test>().configureEach {
+    systemProperty("robolectric.dependency.repo.url", "https://repo.maven.apache.org/maven2")
+    testLogging.exceptionFormat = TestExceptionFormat.FULL
 }
 
 dependencies {

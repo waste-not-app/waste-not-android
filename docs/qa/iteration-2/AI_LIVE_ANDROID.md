@@ -25,6 +25,8 @@ The previous publication command inherited demo adapters and allowed an empty AP
 
 The actual release shell step passed two invocation cases (configured origin/remote adapters and missing-origin refusal), alongside five packaging/version/input cases. Signed publication still requires the resulting commit's CI and main/tag/manual release run.
 
-## Still open
+## Camera/UI follow-up and remaining acceptance
 
-The camera/editor navigation journey with real services is being verified separately, including scan light/dark and configuration changes. API 30, interrupted-network/cancellation/expiry UI, account transitions, broader accessibility/device/font coverage and the remaining visual-state acceptance are not proven by this model test. General guide articles remain a separate Go catalog, empty at the last backend check; the four AI policies do not fill that catalog.
+The [camera/editor navigation journey with real services](AI_LIVE_UI.md) subsequently passed on API 37, including scan light/dark, Activity recreation, explicit save, edit, delete, server summaries and logout. It has separate APK/source bindings and database cleanup evidence. The model test above remains the checkpoint for replay and simulated acknowledgement loss; the UI journey does not imply an interrupted-network test.
+
+Interrupted-network/cancellation/expiry UI, account transitions, broader accessibility/device/font coverage and the remaining visual-state acceptance are not all proven by these two positive paths. The user's current testing priority is newer Android devices, with API 30 retained as the installation floor rather than an expanded old-device matrix. General guide articles remain a separate Go catalog, empty at the last backend check; the four AI policies do not fill that catalog.

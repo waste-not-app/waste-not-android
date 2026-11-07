@@ -14,6 +14,7 @@ import com.example.wastenot.BuildConfig
 import com.example.wastenot.data.dummy.dummyProgress
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.model.User
+import com.example.wastenot.model.UserProgress
 import com.example.wastenot.theme.*
 import java.io.File
 import java.time.ZoneId
@@ -48,6 +49,32 @@ class ProfileDesignTest {
         compose.onNodeWithText("wulan@example.com").assertDoesNotExist()
         compose.onNodeWithText("nadia@example.com").assertExists()
         capture("profile-error")
+    }
+
+    @Test fun reportedStreaksRenderInBothThemesAndMissingValuesStayUnknown() {
+        var dark by mutableStateOf(false)
+        var progress by mutableStateOf<UserProgress?>(UserProgress(9, 90, 1, 90, 10, 3, 7, true))
+        compose.setContent { WasteNotTheme(dark) {
+            Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                ProfileScreen(user, progress, false, null, PaddingValues(), {}, {}, {}, {})
+            }
+        } }
+        for (theme in listOf(false, true)) {
+            compose.runOnIdle { dark = theme }
+            compose.onNodeWithText("3 hari").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("7 hari").performScrollTo().assertIsDisplayed()
+            captureUiPreview(compose, "S14-streak-${if (theme) "dark" else "light"}", "backend-contract-preview")
+        }
+        compose.runOnIdle { progress = progress!!.copy(currentStreak = null) }
+        compose.onNodeWithText("Saat ini").assertDoesNotExist()
+        compose.onNodeWithText("7 hari").assertExists()
+        compose.runOnIdle { progress = UserProgress(0, 0, 1, 0, 100, 0, 0, false) }
+        compose.onAllNodesWithText("0 hari").assertCountEquals(2)
+        captureUiPreview(compose, "S14-streak-zero", "backend-contract-preview")
+        compose.runOnIdle { progress = progress!!.copy(currentStreak = null, bestStreak = null) }
+        compose.onNodeWithText("Hari berturut-turut").assertDoesNotExist()
+        compose.onAllNodesWithText("0 hari").assertCountEquals(0)
+        captureUiPreview(compose, "S14-streak-unknown", "backend-contract-preview")
     }
 
     @Test fun settingsHasTheRealVersionReadOnlyZoneAndNoInactiveFeatureLinks() {

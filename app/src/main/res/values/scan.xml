@@ -48,6 +48,7 @@
     <string name="scan_correct_object">Koreksi objek</string>
     <string name="scan_recommending">Menyiapkan saran…</string>
     <string name="scan_suggested_method">Saran penanganan</string>
+    <string name="scan_object_label">Objek %1$d · %2$s</string>
     <string name="scan_method_confirmation">Konfirmasi / ubah metode</string>
     <string name="scan_basis">Lihat dasar saran</string>
     <string name="scan_hide_basis">Tutup dasar saran</string>
@@ -56,7 +57,6 @@
     <string name="scan_special">Objek memerlukan penanganan khusus. Pilih manual dan periksa panduan fasilitas setempat.</string>
     <string name="scan_no_guide">Belum ada panduan yang cocok. Lanjutkan dengan pilihan manual.</string>
     <string name="scan_no_object">Belum ada objek dengan skor yang cukup. Ambil ulang foto yang lebih jelas atau gunakan input manual.</string>
-    <string name="scan_photo_expired">Foto sementara sudah tidak tersedia. Ambil ulang untuk melanjutkan scan.</string>
     <string name="scan_session_expired">Sesi scan sudah kedaluwarsa. Ambil ulang untuk meminta saran baru, atau lanjutkan manual.</string>
     <string name="scan_manual_choice_retained">Kategori dan metode yang sudah kamu pilih tetap dibawa ke input manual tanpa referensi AI.</string>
     <string name="scan_guide_revision">Referensi panduan: %1$s · versi %2$d</string>

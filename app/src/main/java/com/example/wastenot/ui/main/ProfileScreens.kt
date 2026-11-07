@@ -75,6 +75,25 @@ fun ProfileScreen(
                     WasteFormat.integer(progress.activeLogCount.toLong())), color = SummarySecondaryText)
             }
             ProgressMeter(progress, Modifier.fillMaxWidth())
+            val streaks = listOfNotNull(
+                progress.currentStreak?.let { R.string.profile_current_streak to it },
+                progress.bestStreak?.let { R.string.profile_best_streak to it },
+            )
+            if (streaks.isNotEmpty()) {
+                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.profile_streak_title), style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.semantics { heading() })
+                    streaks.forEach { (label, days) ->
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Text(stringResource(label), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(R.string.profile_streak_days, WasteFormat.integer(days.toLong())),
+                                style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
+                    Text(stringResource(R.string.profile_streak_basis), style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
             if (progress.activeLogCount == 0) {
                 Text(stringResource(R.string.profile_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 ActionButton(stringResource(R.string.record_activity), onRecord, Modifier.fillMaxWidth())
