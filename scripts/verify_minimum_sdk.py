@@ -20,10 +20,13 @@ manifest = subprocess.check_output([str(aapt), "dump", "xmltree", "--file", "And
 activities = re.findall(r"(?m)^([ ]*)E: activity\b[^\n]*\n((?:\1  A:[^\n]*\n)*)", manifest)
 main = next((attributes for _, attributes in activities if '="com.example.wastenot.MainActivity"' in attributes), "")
 assert re.search(r"android:windowSoftInputMode[^\n]*=0x0*10\b", main), "MainActivity must declare adjustResize; an application attribute is ignored"
+resources = subprocess.check_output([str(aapt), "dump", "resources", str(args.apk)], text=True)
 with zipfile.ZipFile(args.apk) as apk:
     assert not any(name.startswith("assets/hotswan-v2/") for name in apk.namelist()), "Native APK must not contain hot-reload interpreter assets"
     for weight in ["regular", "medium", "semibold", "bold", "extrabold"]:
-        assert len(apk.read(f"res/font/plus_jakarta_sans_{weight}.ttf")) > 0, weight
+        font = re.search(rf"\bfont/plus_jakarta_sans_{weight}\n\s+\(\) \(file\) (\S+)", resources)
+        assert font and font[1].endswith(".ttf"), f"Bundled TTF missing: {weight}"
+        assert len(apk.read(font[1])) > 0, weight
     license_text = apk.read("assets/licenses/OFL-PlusJakartaSans.txt").decode()
     assert "SIL OPEN FONT LICENSE Version 1.1" in license_text
 print(f"PASS: {args.apk.name} supports API {args.expected}, MainActivity adjustResize, five font weights and OFL license packaged")
