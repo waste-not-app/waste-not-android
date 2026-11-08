@@ -95,31 +95,44 @@ class CoreAsyncStateDesignTest {
     @Test fun historyUnknownIsNotZeroAndRecoveryKeepsCachedRecords() {
         val dark = mutableStateOf(false)
         val page = mutableStateOf("loading")
-        var data by mutableStateOf(WorkspaceUiState())
+        var data by mutableStateOf(HistoryUiState())
         var retries = 0
+        var moreRetries = 0
         var records = 0
         show(dark, page) {
-            HistoryScreen(data, PaddingValues(), { records++ }, {}, { retries++ }, Modifier.fillMaxSize(), date)
+            HistoryScreen(data, PaddingValues(), { records++ }, {}, { retries++ }, {}, { moreRetries++ }, Modifier.fillMaxSize(), date)
         }
         for (theme in listOf(false, true)) {
             val suffix = if (theme) "dark" else "light"
-            compose.runOnIdle { dark.value = theme; page.value = "loading"; data = WorkspaceUiState() }
+            compose.runOnIdle { dark.value = theme; page.value = "loading"; data = HistoryUiState() }
             inspect("history-loading-$suffix", "Memuat catatan…")
-            if (compose.onAllNodesWithText("0 aktivitas tercatat.").fetchSemanticsNodes().isNotEmpty())
+            if (compose.onAllNodesWithText("0 catatan dimuat.").fetchSemanticsNodes().isNotEmpty())
                 problems.add("history-loading-$suffix: unresolved data presented as zero")
-            compose.runOnIdle { page.value = "error"; data = WorkspaceUiState(loading = false, error = ApiFailureKind.NETWORK) }
+            compose.runOnIdle { page.value = "error"; data = HistoryUiState(loading = false, error = ApiFailureKind.NETWORK) }
             inspect("history-error-$suffix", "Catatan belum bisa dimuat.")
             compose.onNodeWithText("Coba lagi").performScrollTo().assertIsEnabled().performClick()
-            compose.runOnIdle { page.value = "empty"; data = WorkspaceUiState(loading = false) }
+            compose.runOnIdle { page.value = "empty"; data = HistoryUiState(loading = false) }
             inspect("history-empty-$suffix", "Belum ada catatan")
             compose.onNodeWithText("Input manual").performScrollTo().assertIsEnabled().performClick()
-            compose.runOnIdle { page.value = "cached"; data = WorkspaceUiState(listOf(log), false, error = ApiFailureKind.NETWORK) }
+            compose.runOnIdle { page.value = "cached"; data = HistoryUiState(listOf(log), false, error = ApiFailureKind.NETWORK) }
             compose.onNodeWithText("250 g").assertExists()
             captureUiPreview(compose, "history-cached-error-$suffix", "core-async-review")
             compose.onNodeWithTag("async-state-symbol").assertDoesNotExist()
             compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+            compose.runOnIdle { page.value = "paging"; data = HistoryUiState(listOf(log), false, loadingMore = true) }
+            compose.onNodeWithTag("history-list").performScrollToNode(hasText("Memuat catatan berikutnya…"))
+            compose.onNodeWithText("Memuat catatan berikutnya…").assertIsDisplayed()
+            captureUiPreview(compose, "history-paging-$suffix", "core-async-review")
+            compose.runOnIdle { page.value = "page-error"; data = HistoryUiState(listOf(log), false,
+                nextCursor = "next", pageError = ApiFailureKind.NETWORK) }
+            compose.onNodeWithText("Catatan berikutnya belum bisa dimuat.").assertIsDisplayed()
+            compose.onNodeWithText("250 g").assertExists()
+            captureUiPreview(compose, "history-page-error-$suffix", "core-async-review")
+            compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+            compose.runOnIdle { page.value = "page-restart"; data = data.copy(nextCursor = null, pageRestartRequired = true) }
+            compose.onNodeWithText("Muat ulang riwayat").performScrollTo().assertIsEnabled().performClick()
         }
-        compose.runOnIdle { assertEquals(4, retries); assertEquals(2, records) }
+        compose.runOnIdle { assertEquals(6, retries); assertEquals(2, moreRetries); assertEquals(2, records) }
         assertTrue(problems.joinToString("; "), problems.isEmpty())
     }
 

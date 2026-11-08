@@ -21,13 +21,12 @@ data class HistoryFilter(
 
     val active: Boolean get() = category != null || method != null || from != null || to != null
 
+    fun matches(log: WasteLog): Boolean =
+        (category == null || category == log.category) && (method == null || method == log.method) &&
+            (from == null || log.activityDate >= from) && (to == null || log.activityDate <= to)
+
     fun apply(records: List<WasteLog>): List<WasteLog> {
         require(dateError == null)
-        return records.filter {
-            (category == null || category == it.category) &&
-                (method == null || method == it.method) &&
-                (from == null || it.activityDate >= from) &&
-                (to == null || it.activityDate <= to)
-        }.sortedWith(compareByDescending<WasteLog> { it.activityDate }.thenByDescending { it.id })
+        return records.filter(::matches).sortedWith(compareByDescending<WasteLog> { it.activityDate }.thenByDescending { it.id })
     }
 }

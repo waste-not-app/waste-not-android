@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "staging_sha256": "09c5327dfbe3f9b8985842d2762c03ad94b4cdd8b36c99b1bb48d8e6d8077aea",
+  "normal_package_unchanged": "ce2d92666ca6580688f11ecbda37a2ce1f3b002c691d9d36219c2febf25f5b2c",
+  "launch": "cold startup to real sign-in form",
+  "outside_instrumentation": true
+}

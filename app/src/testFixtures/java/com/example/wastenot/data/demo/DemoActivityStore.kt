@@ -14,6 +14,8 @@ import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteLog
 import com.example.wastenot.model.WasteSummary
 import com.example.wastenot.model.ActivityDateRange
+import com.example.wastenot.model.LogDateRange
+import com.example.wastenot.data.dummy.fixtureLogPage
 import com.example.wastenot.data.dummy.dummyDashboard
 import com.example.wastenot.data.dummy.dummyStatistics
 import java.math.BigDecimal
@@ -46,6 +48,9 @@ class DemoActivityStore(private val zone: ZoneId) : ActivityStore {
     }
 
     override suspend fun load() = ApiResult.Success(records.values.sortedWith(compareByDescending<WasteLog> { it.activityDate }.thenByDescending { it.createdAt }))
+
+    override suspend fun page(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, cursor: String?) =
+        fixtureLogPage(records.values.toList(), category, method, dates, cursor)
 
     override suspend fun dashboard() = ApiResult.Success(dummyDashboard(records.values.toList(), referenceDate, zone))
     override suspend fun statistics(range: ActivityDateRange) = ApiResult.Success(dummyStatistics(records.values.toList(), range, zone))

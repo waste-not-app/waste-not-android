@@ -5,6 +5,10 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
+data class LogDateRange(val from: LocalDate, val to: LocalDate) {
+    init { require(!from.isAfter(to)) }
+}
+
 data class ActivityDateRange(val from: LocalDate, val to: LocalDate) {
     init {
         require(!from.isAfter(to))

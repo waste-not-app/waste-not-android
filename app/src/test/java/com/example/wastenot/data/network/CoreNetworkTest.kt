@@ -2,6 +2,7 @@ package com.example.wastenot.data.network
 
 import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.model.ActivityDateRange
+import com.example.wastenot.model.LogDateRange
 import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.model.Quantity
 import com.example.wastenot.model.WasteCategory
@@ -71,7 +72,7 @@ class CoreNetworkTest {
     fun listMapsBothQuantityKindsAndOpaquePaginationWithEncodedFilters() = runTest {
         server.enqueue(jsonResponse(fixture("waste-logs-page")))
         val result = repository.wasteLogs(WasteCategory.PLASTIC, DisposalMethod.RECYCLE,
-            ActivityDateRange.lastDays(LocalDate.parse("2026-09-21"), 7), "page +/=") as ApiResult.Success
+            LogDateRange(LocalDate.parse("2026-09-15"), LocalDate.parse("2026-09-21")), "page +/=") as ApiResult.Success
         assertEquals(Quantity.Weight.of(250), result.value[0].quantity)
         assertEquals(Quantity.Count.of(2), result.value[1].quantity)
         assertEquals(DisposalMethod.REDUCE, result.value[1].method)

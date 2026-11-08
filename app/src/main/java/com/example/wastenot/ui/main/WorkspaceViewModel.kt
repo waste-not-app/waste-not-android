@@ -28,6 +28,7 @@ data class WorkspaceUiState(
     val detail: ActivityDetailState? = null,
     val conflict: ConflictReadState? = null,
     val mutationRevision: Int = 0,
+    val confirmedChange: ConfirmedActivityChange? = null,
 )
 
 data class ConflictReadState(val requestId: String, val id: String, val loading: Boolean = false,
@@ -162,7 +163,7 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
                 when (result) {
                     is ApiResult.Success -> {
                         if (id == null) unresolvedCreates.remove(requestId)
-                        refreshAfterMutation { records -> records.filterNot { it.id == result.value.id } + result.value }
+                        refreshAfterMutation(log = result.value) { records -> records.filterNot { it.id == result.value.id } + result.value }
                         mutableState.update { it.copy(save = ActivitySaveResult(requestId, id = result.value.id, created = created)) }
                     }
                     is ApiResult.Failure -> {
@@ -194,7 +195,7 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
                 currentCoroutineContext().ensureActive()
                 when (result) {
                     is ApiResult.Success -> {
-                        refreshAfterMutation { records -> records.filterNot { it.id == id } }
+                        refreshAfterMutation(deletedId = id) { records -> records.filterNot { it.id == id } }
                         mutableState.update { it.copy(deletion = ActivityDeleteResult(id, deleted = true),
                             detail = ActivityDetailState(id, error = ApiFailureKind.NOT_FOUND)) }
                     }
@@ -206,7 +207,7 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
         }
     }
 
-    private suspend fun refreshAfterMutation(fallback: (List<WasteLog>) -> List<WasteLog>) {
+    private suspend fun refreshAfterMutation(log: WasteLog? = null, deletedId: String? = null, fallback: (List<WasteLog>) -> List<WasteLog>) {
         loading?.cancel()
         loading = null
         detailLoading?.cancel()
@@ -217,7 +218,8 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
         val records = ((refreshed as? ApiResult.Success)?.value ?: fallback(mutableState.value.records))
             .sortedWith(compareByDescending<WasteLog> { it.activityDate }.thenByDescending { it.createdAt })
         mutableState.update { it.copy(records = records, loading = false, error = (refreshed as? ApiResult.Failure)?.error?.kind,
-            detail = null, mutationRevision = it.mutationRevision + 1) }
+            detail = null, mutationRevision = it.mutationRevision + 1,
+            confirmedChange = ConfirmedActivityChange(it.mutationRevision + 1, log, deletedId)) }
     }
 
     fun acknowledgeDelete(id: String) {

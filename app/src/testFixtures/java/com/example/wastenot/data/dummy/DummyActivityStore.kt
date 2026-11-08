@@ -37,6 +37,9 @@ class DummyActivityStore(
 
     override suspend fun load(): ApiResult<List<WasteLog>> = transact { records, _, _ -> ApiResult.Success(records) }
 
+    override suspend fun page(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, cursor: String?): ApiResult<List<WasteLog>> =
+        transact { records, _, _ -> fixtureLogPage(records, category, method, dates, cursor) }
+
     override suspend fun get(id: String): ApiResult<WasteLog> = transact { records, _, _ ->
         records.find { it.id == id }?.let { ApiResult.Success(it) } ?: failure(ApiFailureKind.NOT_FOUND)
     }

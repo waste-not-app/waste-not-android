@@ -1,0 +1,66 @@
+[
+  {
+    "file": "filter-dark.png",
+    "sha256": "a5a6fb0c8c04b16828d070313f8c7b5b58ddb8fbe5edba3bdf4ad1465a89c44a"
+  },
+  {
+    "file": "filter-light.png",
+    "sha256": "2c961b6a12b9dceedc32c36f2dad0155cece7f58c57f2bf7a5fd51a547c75735"
+  },
+  {
+    "file": "history-cached-error-dark.png",
+    "sha256": "2b565d22b7446d558ea8c1e40adde051570ed85ce9b2a6b9a01d6349089be64f"
+  },
+  {
+    "file": "history-cached-error-light.png",
+    "sha256": "cf1922a20b7d5b6521f3104d3e6178f91808c26ebd9ad0f30d6e0491df5f750e"
+  },
+  {
+    "file": "history-dark.png",
+    "sha256": "3cad3b1ca83cb15452c3171493eed88f3ad8babccc18538060f3af0841e24f13"
+  },
+  {
+    "file": "history-empty-dark.png",
+    "sha256": "d1e796f4409f39294fcb809615d29c076163ba08dcab94bf2fbb7d52a32e17bc"
+  },
+  {
+    "file": "history-empty-light.png",
+    "sha256": "396966585e1e885a3e15081f5ec660a4694527989a2788984c59c679294ead69"
+  },
+  {
+    "file": "history-error-dark.png",
+    "sha256": "54506a9acfec10ae71b9ebe67fcc68b30f2d26954612d95a05de6892cc6185f0"
+  },
+  {
+    "file": "history-error-light.png",
+    "sha256": "2478f6d4496858a1342bf2038df4d5c3b693d3deacf7226fae83c279100f81c9"
+  },
+  {
+    "file": "history-light.png",
+    "sha256": "8a6ce66a991d4db3e482ef6d07e4cbe2fb93730d3af2468438ed45ea063e6555"
+  },
+  {
+    "file": "history-loading-dark.png",
+    "sha256": "193940b2b0cc0088b879f0738542d884ac7f3710f5ff46c56a24bddf3c7f7071"
+  },
+  {
+    "file": "history-loading-light.png",
+    "sha256": "801fda4e6e81b4ba234e050a9bbf7afd768196e286fb4d17cf1a5c89bf523f61"
+  },
+  {
+    "file": "history-page-error-dark.png",
+    "sha256": "42ad8ab1e328ef38c5dd217a21fca23cad680a4282d715c5211c81d4d7650e9e"
+  },
+  {
+    "file": "history-page-error-light.png",
+    "sha256": "67fd03236afcbc2fa99d2e356aa1e65c698096c764b5f11e57631a5925fe1df6"
+  },
+  {
+    "file": "history-paging-dark.png",
+    "sha256": "ce5ed5129ac53f8476078b87c9d2150b89680044a84bc3760ea0389dfd6758b3"
+  },
+  {
+    "file": "history-paging-light.png",
+    "sha256": "3bb92f9055160bd247467069d8c04ed65f763ee325dfd4cd621b4296bc4a8ff2"
+  }
+]

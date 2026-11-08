@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,13 +42,16 @@ private val FilterSaver = listSaver<HistoryFilter, String>(
         it[2].takeIf(String::isNotEmpty)?.let(LocalDate::parse), it[3].takeIf(String::isNotEmpty)?.let(LocalDate::parse)) },
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
-    data: WorkspaceUiState,
+    data: HistoryUiState,
     padding: PaddingValues,
     onRecord: () -> Unit,
     onDetail: (String) -> Unit,
     onRetry: () -> Unit,
+    onFilter: (HistoryFilter) -> Unit,
+    onMore: () -> Unit,
     modifier: Modifier = Modifier,
     today: LocalDate = LocalDate.now(),
     filterOpen: Boolean = false,
@@ -56,17 +60,15 @@ fun HistoryScreen(
     deletedNotice: Boolean = false,
     onDismissNotice: () -> Unit = {},
 ) {
-    var filter by rememberSaveable(stateSaver = FilterSaver) { mutableStateOf(HistoryFilter()) }
-    // shortcut: paginates the loaded snapshot; replace with repository cursors for A18.
-    var limit by rememberSaveable { mutableIntStateOf(20) }
+    val filter = data.filter
     val list = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    val visible = remember(data.records, filter) { filter.apply(data.records) }
-    val groups = remember(visible, limit) { visible.take(limit).groupBy { it.activityDate } }
+    val groups = remember(data.records) { data.records.groupBy { it.activityDate } }
     fun applyFilter(next: HistoryFilter) {
-        filter = next
-        limit = 20
-        scope.launch { list.scrollToItem(0) }
+        if (next != filter) {
+            onFilter(next)
+            scope.launch { list.scrollToItem(0) }
+        }
     }
     if (filterOpen) HistoryFilterSheet(filter, today, onDismissFilter, {
         applyFilter(it)
@@ -78,17 +80,16 @@ fun HistoryScreen(
             MessageBanner(stringResource(R.string.log_deleted_notice), Modifier.weight(1f))
             TextActionButton(stringResource(R.string.close), onDismissNotice)
         }
+        PullToRefreshBox(isRefreshing = data.refreshing, onRefresh = onRetry,
+            modifier = Modifier.weight(1f).widthIn(max = 840.dp).fillMaxWidth()) {
         LazyColumn(
-            modifier = Modifier.weight(1f).widthIn(max = 840.dp).fillMaxWidth().testTag("history-list"),
+            modifier = Modifier.fillMaxSize().testTag("history-list"),
             state = list,
             contentPadding = pagePadding(padding),
         ) {
             if (data.records.isNotEmpty() || (!data.loading && data.error == null)) item(key = "count") {
                 Text(stringResource(if (filter.active) R.string.history_filtered_count else R.string.history_count,
-                    WasteFormat.integer(visible.size.toLong())), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            if (data.records.isNotEmpty()) item(key = "partial") {
-                Text(stringResource(R.string.loaded_records_only), style = MaterialTheme.typography.bodySmall)
+                    WasteFormat.integer(data.records.size.toLong())), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             if (filter.active) item(key = "filters") {
                 FlowRow(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -115,7 +116,7 @@ fun HistoryScreen(
                     TextActionButton(stringResource(R.string.retry), onRetry)
                 }
             }
-            if (!data.loading && data.error == null && visible.isEmpty()) item(key = "empty") {
+            if (!data.loading && !data.refreshing && data.error == null && data.records.isEmpty()) item(key = "empty") {
                 AsyncStatePanel(
                     title = stringResource(if (filter.active) R.string.history_filter_empty_title else R.string.history_empty_title),
                     icon = if (filter.active) R.drawable.ic_filter else R.drawable.ic_history,
@@ -137,16 +138,29 @@ fun HistoryScreen(
                 }
                 items(records, key = { "log:${it.id}" }) { log -> ActivityRow(log, { onDetail(log.id) }, Modifier.fillMaxWidth()) }
             }
-            if (visible.isNotEmpty()) item(key = "pages") {
+            if (data.records.isNotEmpty() || data.pageError != null) item(key = "pages") {
                 Column(Modifier.fillMaxWidth().padding(top = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(stringResource(R.string.history_shown, WasteFormat.integer(minOf(limit, visible.size).toLong()), WasteFormat.integer(visible.size.toLong())),
-                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    if (limit < visible.size) TextActionButton(stringResource(R.string.load_more_logs), onClick = { limit += 20 })
+                    when {
+                        data.loadingMore -> {
+                            CircularProgressIndicator(Modifier.padding(12.dp))
+                            Text(stringResource(R.string.history_loading_more), style = MaterialTheme.typography.bodySmall)
+                        }
+                        data.pageError != null -> {
+                            MessageBanner(stringResource(R.string.history_page_failed), isError = true)
+                            Text(loadFailureHint(data.pageError), style = MaterialTheme.typography.bodySmall)
+                            TextActionButton(stringResource(if (data.pageRestartRequired) R.string.history_reload else R.string.retry),
+                                if (data.pageRestartRequired) onRetry else onMore)
+                        }
+                        data.nextCursor != null -> TextActionButton(stringResource(R.string.load_more_logs), onMore)
+                        data.error == null && !data.refreshing -> Text(stringResource(R.string.history_all_loaded),
+                            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
-            if (visible.isNotEmpty()) item(key = "manual") {
+            if (data.records.isNotEmpty()) item(key = "manual") {
                 SecondaryActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth().padding(top = 20.dp))
             }
+        }
         }
     }
 }

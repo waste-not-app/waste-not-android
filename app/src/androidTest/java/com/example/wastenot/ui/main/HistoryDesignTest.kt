@@ -1,6 +1,5 @@
 package com.example.wastenot.ui.main
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -10,14 +9,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.wastenot.data.demo.DemoActivityStore
+import com.example.wastenot.data.dummy.fixtureLogPage
+import com.example.wastenot.data.network.ApiResult
+import com.example.wastenot.data.repository.ActivityStore
 import com.example.wastenot.model.*
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.WasteNotTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import java.io.File
+import org.junit.After
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -25,6 +33,8 @@ import java.time.ZoneId
 class HistoryDesignTest {
     @get:Rule val compose = createComposeRule()
     private val today = LocalDate.of(2026, 9, 21)
+    private val owner = object : ViewModelStoreOwner { override val viewModelStore = ViewModelStore() }
+    @After fun clear() { owner.viewModelStore.clear() }
     private val records = (1..25).map { index ->
         WasteLog("record-${index.toString().padStart(2, '0')}", if (index % 2 == 0) WasteCategory.PLASTIC else WasteCategory.PAPER,
             if (index % 3 == 0) DisposalMethod.REDUCE else DisposalMethod.RECYCLE, Quantity.Count.of(index),
@@ -33,14 +43,21 @@ class HistoryDesignTest {
 
     @OptIn(ExperimentalMaterial3Api::class)
     private fun show(restoration: StateRestorationTester? = null, dark: State<Boolean>? = null, notice: MutableState<Boolean>? = null, onDetail: (String) -> Unit = {}) {
+        val source = object : ActivityStore by DemoActivityStore(ZoneId.of("Asia/Jakarta")) {
+            override suspend fun page(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, cursor: String?): ApiResult<List<WasteLog>> =
+                fixtureLogPage(records, category, method, dates, cursor)
+        }
+        val vm = ViewModelProvider.create(owner, viewModelFactory { initializer { HistoryViewModel(source, SavedStateHandle()) } })[HistoryViewModel::class]
         val content: @Composable () -> Unit = {
+            val data by vm.state.collectAsState()
+            LaunchedEffect(vm) { vm.load() }
             WasteNotTheme(darkTheme = dark?.value ?: false) {
                 var open by rememberSaveable { mutableStateOf(false) }
                 Column(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas).systemBarsPadding()) {
                     TopAppBar(title = { Text("Riwayat") }, actions = {
                         TextButton(onClick = { open = true }) { Text("Filter riwayat") }
                     })
-                    HistoryScreen(WorkspaceUiState(records, loading = false), PaddingValues(), {}, onDetail, {},
+                    HistoryScreen(data, PaddingValues(), {}, onDetail, vm::refresh, vm::filter, vm::more,
                         Modifier.weight(1f).fillMaxWidth(), today, open, { open = true }, { open = false },
                         deletedNotice = notice?.value ?: false, onDismissNotice = { notice?.value = false })
                 }
@@ -66,21 +83,21 @@ class HistoryDesignTest {
     @Test fun draftCancelResetApplyAndRotationKeepTheirSeparateMeaning() {
         val restoration = StateRestorationTester(compose)
         show(restoration)
-        compose.onNodeWithText("25 aktivitas tercatat.").assertIsDisplayed()
+        compose.onNodeWithText("20 catatan dimuat.").assertIsDisplayed()
         open(); chooseCategory("Plastik")
         restoration.emulateSavedInstanceStateRestore()
         compose.onNode(hasText("Plastik") and hasAnyAncestor(hasTestTag("history-filter-sheet"))).assertExists()
         compose.onNodeWithText("Batal").performScrollTo().performClick()
-        compose.onNodeWithText("25 aktivitas tercatat.").assertIsDisplayed()
+        compose.onNodeWithText("20 catatan dimuat.").assertIsDisplayed()
         open(); chooseCategory("Plastik"); apply()
-        compose.onNodeWithText("12 aktivitas sesuai filter.").assertIsDisplayed()
+        compose.onNodeWithText("12 catatan sesuai filter dimuat.").assertIsDisplayed()
         open(); compose.onNodeWithText("Reset pilihan").performScrollTo().performClick()
         compose.onNodeWithText("Batal").performScrollTo().performClick()
-        compose.onNodeWithText("12 aktivitas sesuai filter.").assertIsDisplayed()
+        compose.onNodeWithText("12 catatan sesuai filter dimuat.").assertIsDisplayed()
         restoration.emulateSavedInstanceStateRestore()
-        compose.onNodeWithText("12 aktivitas sesuai filter.").assertIsDisplayed()
+        compose.onNodeWithText("12 catatan sesuai filter dimuat.").assertIsDisplayed()
         open(); compose.onNodeWithText("Reset pilihan").performScrollTo().performClick(); apply()
-        compose.onNodeWithText("25 aktivitas tercatat.").assertIsDisplayed()
+        compose.onNodeWithText("20 catatan dimuat.").assertIsDisplayed()
     }
 
     @Test fun incompleteAndReversedDatesStayInSheetUntilCorrected() {
@@ -91,7 +108,7 @@ class HistoryDesignTest {
         compose.onNodeWithText("Tanggal mulai tidak boleh melewati tanggal akhir.").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Reset pilihan").performScrollTo().performClick()
         chooseDate(0, "21"); chooseDate(0, "21"); apply()
-        compose.onNodeWithText("20 aktivitas sesuai filter.").assertIsDisplayed()
+        compose.onNodeWithText("20 catatan sesuai filter dimuat.").assertIsDisplayed()
         compose.onNodeWithText("Hari ini").assertIsDisplayed()
         listText("Input manual")
         compose.onNodeWithText("Kemarin").assertDoesNotExist()
@@ -103,18 +120,18 @@ class HistoryDesignTest {
         var selected: String? = null
         show(restoration, dark) { selected = it }
         capture("history-light")
-        listText("20 dari 25 catatan ditampilkan")
+        listText("Muat catatan berikutnya")
         compose.onNodeWithText("Muat catatan berikutnya").performScrollTo().performClick()
         listText("Catatan 21")
         compose.onNodeWithText("Catatan 21").performClick()
         assertEquals("record-21", selected)
         restoration.emulateSavedInstanceStateRestore()
         compose.onNodeWithText("Catatan 21").assertIsDisplayed()
-        listText("25 dari 25 catatan ditampilkan")
+        listText("Semua catatan sudah dimuat.")
         compose.onNodeWithText("Muat catatan berikutnya").assertDoesNotExist()
         listText("Kemarin")
         compose.onNodeWithText("Kemarin").assertIsDisplayed()
-        listText("25 aktivitas tercatat.")
+        listText("25 catatan dimuat.")
         compose.runOnIdle { dark.value = true }
         capture("history-dark")
         open(); capture("filter-dark")
@@ -136,13 +153,6 @@ class HistoryDesignTest {
     }
 
     private fun capture(name: String) {
-        compose.waitForIdle()
-        val instrumentation = InstrumentationRegistry.getInstrumentation()
-        instrumentation.uiAutomation.waitForIdle(300, 5_000)
-        val file = File(instrumentation.targetContext.cacheDir, "qa/iteration-2/$name.png")
-        file.parentFile!!.mkdirs()
-        val bitmap = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
-        file.outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) }
-        bitmap.recycle()
+        captureUiPreview(compose, name, "history-pagination", capturePanel = false)
     }
 }
