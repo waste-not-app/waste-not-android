@@ -1,0 +1,114 @@
+[
+  {
+    "file": "after/permission-blocked-dark-panel.png",
+    "sha256": "99b1d6457d642885ec51c089abb70e35ac5da5fed19e988fa2cd715c8e0719f2"
+  },
+  {
+    "file": "after/permission-blocked-dark.png",
+    "sha256": "d68c8cc60e77cbd174c999d43db51f17e150ba5160e818bcdfc775b0080e45da"
+  },
+  {
+    "file": "after/permission-blocked-light-panel.png",
+    "sha256": "bf021fcb8d6128d491131c5ede49e99562664c33497f1e6d2c05fa4b710be95a"
+  },
+  {
+    "file": "after/permission-blocked-light.png",
+    "sha256": "d0b0ceb46af5b13f96282bdc9b9a75d6b4e899eed7cfce7fa29240150f4f0a6e"
+  },
+  {
+    "file": "after/permission-granted-return-dark-panel.png",
+    "sha256": "f66ef5de1d72bf1e1a5d553f4b01e4fee884022e663ffedf8cd34fbd50e388aa"
+  },
+  {
+    "file": "after/permission-granted-return-dark.png",
+    "sha256": "d4a9bcb9fb3f9430c74e0c57a61e56a8fb1cf85d1483a6bb8aa874b6ae568bb8"
+  },
+  {
+    "file": "after/permission-granted-return-light-panel.png",
+    "sha256": "06a5c47257d6a0e7a0ab2c4293e976967ffd86c0b693341b5fcdaaab1eaa439d"
+  },
+  {
+    "file": "after/permission-granted-return-light.png",
+    "sha256": "b31914e0cc5af03fddf0dbbf138fa17a018d7dcf20ed5a2ef4c7895397492e73"
+  },
+  {
+    "file": "after/photo-review-dark-panel.png",
+    "sha256": "69defc9251b38b7b483cb68054be6f8f4b202170c5448dbe8f2bcc5ce7ad9cef"
+  },
+  {
+    "file": "after/photo-review-dark.png",
+    "sha256": "48b34fde5c7d1e05c24d1444f3632130911c9bd28ccf39b91f6a55c3d546fa21"
+  },
+  {
+    "file": "after/photo-review-light-panel.png",
+    "sha256": "3ddfef2e46341369a97054bdae82fcb1aabdbea6b1c7daeaebee44e3ff46a91d"
+  },
+  {
+    "file": "after/photo-review-light.png",
+    "sha256": "528f3349e7ba49b6a3c4fbfb0f8b9039ecd1308e4a3a47a1f1afa268032065de"
+  },
+  {
+    "file": "after/preview-before-close-dark-panel.png",
+    "sha256": "69a621084a600cf727a89cdcc9702f53ceeecf423861cb8f9835d231aeaeb470"
+  },
+  {
+    "file": "after/preview-before-close-dark.png",
+    "sha256": "9fbd0987b4c7e8de3fad2651d325cec71d779bb9fdd22aa6a0cb4c1ae802c02e"
+  },
+  {
+    "file": "after/preview-before-close-light-panel.png",
+    "sha256": "1dda45f5afe480ffdcd8d937fdca4f8037401ea19f156c124bcc8564529a5958"
+  },
+  {
+    "file": "after/preview-before-close-light.png",
+    "sha256": "551fd650c8b4b52a3edf767b352592352291a6b9f2d0a34818185ecf924f9ad5"
+  },
+  {
+    "file": "after/preview-idle-dark-panel.png",
+    "sha256": "b8b62e2bc1eefc4d85fcaf9e75a1de8cd24851835308e902f102a2e4387c24f2"
+  },
+  {
+    "file": "after/preview-idle-dark.png",
+    "sha256": "edb30d23ffa4152be42cf62c9396914d81baad6b3336e85e568578cbfd17b2bb"
+  },
+  {
+    "file": "after/preview-idle-light-panel.png",
+    "sha256": "4fcc5e8b78ef9f1124210ea5795108620bc073c69b69c18a1b323cd0995ce238"
+  },
+  {
+    "file": "after/preview-idle-light.png",
+    "sha256": "799506747cbcfe2b5f6829e794b979a106d88eb4136ebfd8ef2683a26464ce2d"
+  },
+  {
+    "file": "after/preview-streaming-dark-panel.png",
+    "sha256": "740966442ac780362c0b653fd38cd600d55f84e31aefba4f904bff388aad136f"
+  },
+  {
+    "file": "after/preview-streaming-dark.png",
+    "sha256": "31933bf74e10710e4c0a7a731fda13d5d1fe5e7db01f43e0dee471b1851322c5"
+  },
+  {
+    "file": "after/preview-streaming-light-panel.png",
+    "sha256": "c88486acb47d1c4f4b0bea368ef5992c59ec77a7532c80b8eb83f55bd30fd958"
+  },
+  {
+    "file": "after/preview-streaming-light.png",
+    "sha256": "d6288e6c09f14e361746eb30b3f4a99e72350a56a7447fa8c80b7f59e0bebe50"
+  },
+  {
+    "file": "before-permission/permission-blocked-light-panel.png",
+    "sha256": "bf021fcb8d6128d491131c5ede49e99562664c33497f1e6d2c05fa4b710be95a"
+  },
+  {
+    "file": "before-permission/permission-blocked-light.png",
+    "sha256": "fb30780635595a94d2ade39ef8678e4e3d8eb5c640d9e17935d03f6e21d722dd"
+  },
+  {
+    "file": "before-permission/permission-granted-return-light-panel.png",
+    "sha256": "bf021fcb8d6128d491131c5ede49e99562664c33497f1e6d2c05fa4b710be95a"
+  },
+  {
+    "file": "before-permission/permission-granted-return-light.png",
+    "sha256": "fb30780635595a94d2ade39ef8678e4e3d8eb5c640d9e17935d03f6e21d722dd"
+  }
+]

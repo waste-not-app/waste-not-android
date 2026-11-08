@@ -25,8 +25,13 @@ for arg in sys.argv[1:]:
     apk = Path(arg)
     with zipfile.ZipFile(apk) as archive:
         dex = b"".join(archive.read(name) for name in archive.namelist() if name.endswith(".dex"))
-    for package in [b"Lcom/example/wastenot/data/demo/", b"Lcom/example/wastenot/data/dummy/"]:
-        assert package not in dex, (apk, package)
+        for name in archive.namelist():
+            if not (name.endswith(".dex") or name.startswith("assets/")):
+                continue
+            payload = archive.read(name)
+            for package in [b"com/example/wastenot/data/demo/", b"com/example/wastenot/data/dummy/",
+                            b"com.example.wastenot.data.demo", b"com.example.wastenot.data.dummy"]:
+                assert package not in payload, (apk, name, package)
     assert b"USE_DUMMY_DATA" not in dex, apk
     for adapter in [b"RemoteAccountSession;", b"RemoteActivityStore;", b"RemoteScanRepository;"]:
         assert adapter in dex, (apk, adapter)

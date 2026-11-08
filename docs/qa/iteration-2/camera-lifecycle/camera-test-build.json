@@ -1,0 +1,5 @@
+{
+  "test_apk_sha256": "d5196ab4969ddff5aa2b75f3a12fb5f12f9382dc687025f3072c679f03faa4a3",
+  "test_source_sha256": "579eab16fc42128a36137880510e8687c97d3453abf914d2867b10ad1c7c2861",
+  "change": "Assert the always-visible manual footer directly instead of trying to scroll it."
+}

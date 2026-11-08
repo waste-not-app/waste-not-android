@@ -1,0 +1,112 @@
+{
+  "plan": {
+    "run_id": "f6d49234-64d4-404a-9d5a-5f0e7b080636",
+    "email": "android-f6d49234-64d4-404a-9d5a-5f0e7b080636@example.test",
+    "name": "Android transport probe"
+  },
+  "complete": true,
+  "cleanup_complete": true,
+  "api": 37,
+  "runs": [
+    {
+      "label": "configuration-and-https",
+      "tests": 2,
+      "result": "passed"
+    },
+    {
+      "label": "isolated-navigation-fixture",
+      "tests": 1,
+      "result": "passed"
+    },
+    {
+      "label": "live-account-ui",
+      "tests": 1,
+      "result": "passed"
+    }
+  ],
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "passed_steps": [
+    "register",
+    "ui_create_updates_dashboard",
+    "ui_statistics_and_profile_use_server_progress",
+    "ui_edit_refreshes_units_without_extra_xp",
+    "ui_delete_refreshes_all_server_aggregates",
+    "ui_logout_returns_to_login"
+  ],
+  "owned_users_before_cleanup": [
+    "647e985f-1552-41ac-9e45-677013f50f89"
+  ],
+  "database_before_cleanup": {
+    "user_id": "647e985f-1552-41ac-9e45-677013f50f89",
+    "logs": 1,
+    "sessions": 1
+  },
+  "database_after_cleanup": {
+    "users": 0,
+    "sessions": 0,
+    "logs": 0
+  },
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "captures": [
+    {
+      "file": "remote-home-counted.png",
+      "sha256": "567aa381e5f7e9de7cc83f96632cd46dbb8fde77bf66c5f35d7641febe2771e1"
+    },
+    {
+      "file": "remote-home-created.png",
+      "sha256": "9bf6f993cb31db41dac8d9f42e27ea2a72826f56ad23199f819d21d83bc00854"
+    },
+    {
+      "file": "remote-home-empty.png",
+      "sha256": "74c7180fe9d794a561b8c6544710332e8e6429e78715ff8f987b6697d90ea5f5"
+    },
+    {
+      "file": "remote-profile-created.png",
+      "sha256": "5fbf77179e0fb74e1cc0f68ced5bba724300fbfad67d83cbe973d7bd1f1bd899"
+    },
+    {
+      "file": "remote-profile-deleted.png",
+      "sha256": "afcfbbf3f707700d00822f6da6eedee7a6befec9f6ebbf6b1615ac17c2a2b910"
+    },
+    {
+      "file": "remote-statistics-counted.png",
+      "sha256": "50376632b5e6b452e1791f5871cba50d3cc3c11769c21552ef5eb25664ad3173"
+    },
+    {
+      "file": "remote-statistics-deleted.png",
+      "sha256": "0ecb6e9eaf8ea3b3ee11e9db7646b04c1a3bb69cdc6b397b01f66bbdbe6d0baa"
+    },
+    {
+      "file": "remote-statistics-month.png",
+      "sha256": "bf4139a586e7a651b586df12976a2400c5f6f747698558aa484f1200d300c436"
+    }
+  ],
+  "reconciliation": "Selected the exact eight frames produced by the passing test. A prior remote-guide-empty.png in the cache caused the host count assertion. No application tests were rerun.",
+  "apks": {
+    "debug": {
+      "file": "WasteNot-live-debug.apk",
+      "sha256": "d0301632d89f950e20b1bebbb1811a22931d72dca7880f684e24e34c68e0af49",
+      "bytes": 46599162
+    },
+    "androidTest": {
+      "file": "WasteNot-live-androidTest.apk",
+      "sha256": "7eaddb9036fcc7834e508ed0a9c825352720cbdd3772510e364182b463d01332",
+      "bytes": 4721147
+    },
+    "staging": {
+      "file": "WasteNot-live-staging.apk",
+      "sha256": "73031bb2905063f10c23220faba71c89d6f6a7a9ac264143a82b18caec9f422c",
+      "bytes": 34922163
+    }
+  }
+}

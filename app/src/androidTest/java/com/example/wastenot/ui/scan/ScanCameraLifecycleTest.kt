@@ -118,7 +118,7 @@ class ScanCameraLifecycleTest {
         if (compose.onAllNodesWithText("Buka pengaturan kamera").fetchSemanticsNodes().isNotEmpty())
             problems.add("The blocked Settings action must disappear after permission is granted")
         assertNull("Permission grant alone must not start the camera", preview())
-        compose.onNodeWithText("Input manual").performScrollTo().performClick()
+        compose.onNodeWithText("Input manual").assertIsDisplayed().performClick()
         compose.onNodeWithText("Scan ditutup").assertIsDisplayed()
         assertEquals(1, manuals)
         assertEquals(0, photos)
@@ -130,12 +130,12 @@ class ScanCameraLifecycleTest {
         show()
         activate()
         val view = checkNotNull(preview())
-        val controller = checkNotNull(view.controller as? LifecycleCameraController)
+        val controller = compose.runOnIdle { checkNotNull(view.controller as? LifecycleCameraController) }
         awaitStream(view)
         compose.onNodeWithText("Ambil foto").performScrollTo().assertIsEnabled()
         capture("preview-streaming")
         compose.runOnIdle { controller.unbind() }
-        compose.waitUntil(15_000) { view.previewStreamState.value == PreviewView.StreamState.IDLE }
+        compose.waitUntil(15_000) { compose.runOnIdle { view.previewStreamState.value == PreviewView.StreamState.IDLE } }
         capture("preview-idle")
         if (compose.onAllNodes(hasText("Ambil foto") and isEnabled()).fetchSemanticsNodes().isNotEmpty())
             problems.add("Capture must be disabled while the actual preview is IDLE")
@@ -182,7 +182,7 @@ class ScanCameraLifecycleTest {
     }
 
     private fun awaitStream(view: PreviewView) {
-        compose.waitUntil(30_000) { view.previewStreamState.value == PreviewView.StreamState.STREAMING }
+        compose.waitUntil(30_000) { compose.runOnIdle { view.previewStreamState.value == PreviewView.StreamState.STREAMING } }
         compose.waitUntil(20_000) { compose.runOnIdle {
             view.bitmap?.let { image ->
                 try { visiblePixels(image) } finally { image.recycle() }
@@ -197,9 +197,11 @@ class ScanCameraLifecycleTest {
     }
 
     private fun awaitReleased(view: PreviewView) {
-        compose.waitUntil(15_000) { view.previewStreamState.value == PreviewView.StreamState.IDLE }
-        if (view.controller != null) problems.add("Released preview must detach its controller")
-        if (view.previewStreamState.hasObservers()) problems.add("Released preview must remove its stream observer")
+        compose.waitUntil(15_000) { compose.runOnIdle { view.previewStreamState.value == PreviewView.StreamState.IDLE } }
+        compose.runOnIdle {
+            if (view.controller != null) problems.add("Released preview must detach its controller")
+            if (view.previewStreamState.hasObservers()) problems.add("Released preview must remove its stream observer")
+        }
     }
 
     private fun capture(name: String) {
@@ -207,7 +209,7 @@ class ScanCameraLifecycleTest {
         val info = JSONObject().put("theme", suffix).put("photoCallbacks", photos).put("manualCallbacks", manuals)
             .put("cameraPermission", context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
         val view = preview()
-        info.put("previewState", view?.previewStreamState?.value?.name ?: "absent")
+        info.put("previewState", compose.runOnIdle { view?.previewStreamState?.value?.name ?: "absent" })
         info.put("captureEnabled", compose.onAllNodes(hasText("Ambil foto") and isEnabled()).fetchSemanticsNodes().isNotEmpty())
         File(context.getExternalFilesDir(null), "camera-lifecycle-review/$name-$suffix.json").writeText(info.toString(2))
     }

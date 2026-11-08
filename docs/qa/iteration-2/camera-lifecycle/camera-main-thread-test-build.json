@@ -1,0 +1,5 @@
+{
+  "sha256": "9377b24fcbc83ca25a3a3ead26fbd426d78be5ff8bfbb8fa78b1154bd8c443de",
+  "test_source_sha256": "bc783bbf410c778dc22456bee9bc448a21485f5f67adddaf181830e9f81d0644",
+  "scope": "Read CameraX controller and stream state through the Android main thread."
+}
