@@ -1,0 +1,8 @@
+Stopping: com.example.wastenot.staging
+Starting: Intent { cmp=com.example.wastenot.staging/com.example.wastenot.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: com.example.wastenot.staging/com.example.wastenot.MainActivity
+TotalTime: 1694
+WaitTime: 1697
+Complete

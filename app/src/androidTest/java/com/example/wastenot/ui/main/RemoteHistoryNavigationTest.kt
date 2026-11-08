@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.BuildConfig
 import com.example.wastenot.MainActivity
+import com.example.wastenot.ThemeFixtureRule
 import com.example.wastenot.WasteNotApplication
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.repository.ActivityInput
@@ -22,7 +23,8 @@ import org.junit.Rule
 import org.junit.Test
 
 class RemoteHistoryNavigationTest {
-    @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    @get:Rule(order = 0) val appearance = ThemeFixtureRule()
+    @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
 
     @Test fun serverFiltersFindUnloadedRowsAndPagesSurviveDetailAndRefresh() = runTest(timeout = 4.minutes) {
         val args = InstrumentationRegistry.getArguments()

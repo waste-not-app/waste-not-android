@@ -13,6 +13,7 @@ Read the applicable skill before matching work:
 - Android architecture and delivery: `/home/oktaavsm/.codex/skills/android-dev/SKILL.md`
 - Jetpack Compose: `/home/oktaavsm/.codex/skills/android-jetpack-compose-expert/SKILL.md`
 - State ownership: `/home/oktaavsm/.agents/skills/compose-state-hoisting/SKILL.md`
+- Kotlin Flow state and events: `/home/oktaavsm/.agents/skills/kotlin-flow-state-event-modeling/SKILL.md`
 - UI, screenshot and navigation testing: `/home/oktaavsm/.agents/skills/compose-ui-testing-patterns/SKILL.md`
 
 Keep the existing Kotlin/Compose/Navigation 3 stack and WasteNot kit. Skill examples do not authorize dependency downgrades, navigation migrations or unverified stability annotations. Screen data and queries belong to account-scoped state holders; scrolling and sheet drafts stay in composition. Render checks and backend integration checks provide different evidence.

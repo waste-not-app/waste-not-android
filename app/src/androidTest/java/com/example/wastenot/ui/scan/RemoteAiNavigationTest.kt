@@ -1,6 +1,5 @@
 package com.example.wastenot.ui.scan
 
-import android.content.Context
 import android.content.res.Configuration
 import android.os.ParcelFileDescriptor
 import android.view.WindowInsets
@@ -13,6 +12,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.BuildConfig
 import com.example.wastenot.MainActivity
+import com.example.wastenot.ThemeFixtureRule
 import com.example.wastenot.R
 import com.example.wastenot.WasteNotApplication
 import com.example.wastenot.data.local.KeystoreRefreshTokenStore
@@ -31,24 +31,13 @@ import org.junit.Assert.*
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExternalResource
 
 class RemoteAiNavigationTest {
     private val instrumentation get() = InstrumentationRegistry.getInstrumentation()
     private val context get() = instrumentation.targetContext
-    private var originalTheme: String? = null
     private val captureChecks = JSONArray()
-    @get:Rule(order = 0) val appearance = object : ExternalResource() {
-        override fun before() {
-            if (InstrumentationRegistry.getArguments().getString("verifyLiveAiUi") != "true") return
-            val prefs = context.getSharedPreferences("appearance", Context.MODE_PRIVATE)
-            originalTheme = prefs.getString("theme", null)
-            check(prefs.edit().putString("theme", "SYSTEM").commit())
-        }
-        override fun after() {
-            if (InstrumentationRegistry.getArguments().getString("verifyLiveAiUi") != "true") return
-            check(context.getSharedPreferences("appearance", Context.MODE_PRIVATE).edit().putString("theme", originalTheme).commit())
-        }
+    @get:Rule(order = 0) val appearance = ThemeFixtureRule {
+        InstrumentationRegistry.getArguments().getString("verifyLiveAiUi") == "true"
     }
     @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
 

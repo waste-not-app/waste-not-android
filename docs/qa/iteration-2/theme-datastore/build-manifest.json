@@ -1,0 +1,20 @@
+{
+  "apks": {
+    "debug": {
+      "file": "WasteNot-theme-debug.apk",
+      "size_bytes": 47037509,
+      "sha256": "6861ba45bb8f9d9b50b25cf4c9e84679130ca75f4dbf30e09a9fa80f704e6dbe"
+    },
+    "staging": {
+      "file": "WasteNot-theme-staging.apk",
+      "size_bytes": 36408131,
+      "sha256": "07ba9daeec34f0006e5d7bc4eb641dabda697cf8389d04e9d2383e82b6611199"
+    },
+    "androidTest": {
+      "file": "WasteNot-theme-androidTest.apk",
+      "size_bytes": 5766407,
+      "sha256": "f89a1842093f6b68d3ce561da6b3b56bc72ba2de251667d7dcd20953a4d021bb"
+    }
+  },
+  "production_source_fingerprint": "8e2fb6a076805fa6087ca0bacb871a2346b1dafdf6d215bc3f0921c2c81db5e1"
+}

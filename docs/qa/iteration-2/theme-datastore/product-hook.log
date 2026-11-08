@@ -1,0 +1,16 @@
+▶ Pre-commit: lint + unit test...
+Wrote HTML report to file:///home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/build/reports/lint-results-debug.html
+✔ Pre-commit check lulus.
+[feat/41-theme-datastore c368eed] feat(android): persist theme choices with DataStore
+ 22 files changed, 716 insertions(+), 68 deletions(-)
+ create mode 100644 app/src/androidTest/java/com/example/wastenot/ThemeFixtureRule.kt
+ create mode 100644 app/src/androidTest/java/com/example/wastenot/theme/ThemeFailureStartupTest.kt
+ create mode 100644 app/src/androidTest/java/com/example/wastenot/theme/ThemeMigrationTest.kt
+ create mode 100644 app/src/androidTest/java/com/example/wastenot/theme/ThemeNavigationTest.kt
+ create mode 100644 app/src/main/java/com/example/wastenot/data/local/ThemePreferences.kt
+ create mode 100644 app/src/main/java/com/example/wastenot/data/repository/ThemeStore.kt
+ create mode 100644 app/src/main/java/com/example/wastenot/theme/AppearanceProblemBanner.kt
+ create mode 100644 app/src/main/java/com/example/wastenot/theme/ThemeViewModel.kt
+ create mode 100644 app/src/main/res/values/appearance.xml
+ create mode 100644 app/src/test/java/com/example/wastenot/data/local/ThemePreferencesTest.kt
+ create mode 100644 app/src/test/java/com/example/wastenot/theme/ThemeViewModelTest.kt

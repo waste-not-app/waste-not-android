@@ -1,0 +1,19 @@
+▶ Pre-commit: lint + unit test...
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+Wrote HTML report to file:///home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/build/reports/lint-results-debug.html
+hotswan-extract: read=33ms merge=1678ms extraDirs=3ms outDir=1473ms mirror=82ms tail=23ms classes=786
+
+264 tests completed, 1 failed
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (Powered by Develocity).
+
+BUILD FAILED in 5m 58s
+✗ Lint atau test gagal. Commit dibatalkan.
+  Jalankan 'make check' untuk detail.

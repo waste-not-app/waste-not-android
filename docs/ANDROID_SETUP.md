@@ -20,6 +20,8 @@ Baseline dukungan diperbarui atas pilihan pengguna pada 5 November 2026: **Andro
 
 Pemeriksaan dokumentasi resmi pada tanggal tersebut mengidentifikasi Android 17 / API 37 sebagai versi stabil terbaru: [referensi API AOSP](https://source.android.com/docs/setup/reference/build-numbers) dan [panduan pengujian Android 17](https://developer.android.com/about/versions/17). Bukti runtime API 36 yang sudah ada adalah Android 16; jangan menyebutnya pengujian Android terbaru. Penerimaan API 30 dan API 37 masih perlu dijalankan.
 
+Build native menjadi default sejak checkpoint DataStore 9 November. Mode ini dipakai perintah biasa, unit test dan hook/CI. Hot reload dapat dipilih khusus pengembangan dengan `-Pwastenot.hotReload=true`; lihat batas interpreter di [panduan plugin](DEV_PLUGINS.md#25-troubleshooting-hotswan).
+
 Pasang JDK 17 dan Android SDK Platform 36. Arahkan `ANDROID_HOME` ke SDK, atau isi `sdk.dir` dalam `local.properties` yang diabaikan Git.
 
 ```sh

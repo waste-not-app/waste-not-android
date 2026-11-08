@@ -56,9 +56,11 @@ Jika Anda perlu mereferensikan kembali bagaimana plugin ini dikonfigurasi di fil
 3. **`app/build.gradle.kts`**:
    ```kotlin
    plugins {
-       alias(libs.plugins.hotswan.compiler)
+       alias(libs.plugins.hotswan.compiler) apply false
    }
    ```
+
+Plugin hanya diterapkan ketika properti `wastenot.hotReload=true`. Build biasa memakai native; aktifkan opsi tersebut melalui Gradle Run Configuration untuk sesi hot reload.
 
 > **Catatan Penting**: Versi Gradle plugin HotSwan **harus sama persis** dengan versi IDE Plugin di Android Studio (saat ini menggunakan `2.0.1`).
 
@@ -70,7 +72,7 @@ Jika Anda perlu mereferensikan kembali bagaimana plugin ini dikonfigurasi di fil
 5. Klik **Install**, lalu klik **Restart IDE** setelah instalasi selesai.
 
 ### 2.4 Cara Penggunaan Harian
-1. Jalankan aplikasi ke emulator atau device fisik seperti biasa dengan tombol **Run** (`Shift + F10`).
+1. Aktifkan `-Pwastenot.hotReload=true` untuk sesi pengembangan, lalu jalankan aplikasi ke emulator atau device fisik dengan tombol **Run** (`Shift + F10`).
 2. Buka tool window HotSwan: **View** > **Tool Windows** > **HotSwan** (biasanya ada di bilah kanan atau bawah IDE).
 3. Periksa status pada tool window:
    - Jika status berwarna hijau dan bertuliskan **`WATCHING`**, koneksi hot-reload telah aktif.
@@ -79,6 +81,8 @@ Jika Anda perlu mereferensikan kembali bagaimana plugin ini dikonfigurasi di fil
 6. Perubahan akan langsung terlihat di layar device dalam hitungan milidetik tanpa merestart aplikasi.
 
 ### 2.5 Troubleshooting HotSwan
+
+Checkpoint DataStore 9 November menemukan bahwa reflection HotSwan 2.0.1 membungkus IOException dari pembacaan suspend sebelum catch ThemeViewModel. Pemulihan baca pada mode interpreter gagal di unit test; kombinasi dua pola pengecualian juga gagal pada parser opsi Kotlin. Build native kini default dan pemulihan I/O diterima melalui unit/native Android. Jalur hot reload eksplisit tetap untuk pengembangan tampilan; pakai native saat memeriksa perilaku data/pemulihan. [Bukti dan batasnya](qa/iteration-2/THEME_DATASTORE.md#build-native-sebagai-default).
 
 `SessionTokens` dikecualikan secara spesifik melalui `hotSwanCompiler.exclude` di app Gradle. HotSwan 2.0.1 gagal membuat dispatch bridge `component2` untuk `RefreshToken` value class lintas file (`B3: ... has no primary constructor`). Dengan pengecualian DTO tersebut, build kembali lulus dan tipe credential tetap tervalidasi. Perubahan pada DTO ini memerlukan rebuild; hot reload UI tetap tersedia. Opsi pengecualian mengikuti [konfigurasi resmi HotSwan](https://hotswan.dev/docs/gradle-configuration#excluding-classes).
 

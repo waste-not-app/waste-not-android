@@ -12,8 +12,8 @@ plugins {
   alias(libs.plugins.skydoves.navgraph)
 }
 
-// Native verification and hot reload both use the Android 11 baseline.
-if (providers.gradleProperty("wastenot.hotReload").orElse("true").get().toBooleanStrict()) {
+// Native builds are the default; hot reload is an explicit development option.
+if (providers.gradleProperty("wastenot.hotReload").orElse("false").get().toBooleanStrict()) {
     pluginManager.apply("com.github.skydoves.compose.hotswan.compiler")
     extensions.configure<InterpreterExtension> {
         // HotSwan 2.0.1 cannot bridge this DTO's cross-file credential value classes.
@@ -137,6 +137,7 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+  implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.camera.core)
   implementation(libs.androidx.camera.camera2)
   implementation(libs.androidx.camera.lifecycle)

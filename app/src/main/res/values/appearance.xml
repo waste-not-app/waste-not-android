@@ -1,0 +1,4 @@
+<resources>
+    <string name="theme_read_failed">Pilihan tampilan belum bisa dibaca. Coba lagi.</string>
+    <string name="theme_write_failed">Pilihan tampilan belum bisa dipastikan tersimpan. Coba lagi.</string>
+</resources>
