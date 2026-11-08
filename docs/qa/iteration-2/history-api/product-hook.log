@@ -1,0 +1,5 @@
+▶ Pre-commit: lint + unit test...
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+Wrote HTML report to file:///home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/build/reports/lint-results-debug.html
+hotswan-extract: read=34ms merge=990ms extraDirs=1ms outDir=1274ms mirror=174ms tail=96ms classes=758
+✔ Pre-commit check lulus.

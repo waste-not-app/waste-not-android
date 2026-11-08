@@ -1,0 +1,22 @@
+{
+  "apks": {
+    "debug": {
+      "file": "WasteNot-history-debug.apk",
+      "size_bytes": 46631070,
+      "sha256": "ce2d92666ca6580688f11ecbda37a2ce1f3b002c691d9d36219c2febf25f5b2c"
+    },
+    "staging": {
+      "file": "WasteNot-history-staging.apk",
+      "size_bytes": 34939375,
+      "sha256": "09c5327dfbe3f9b8985842d2762c03ad94b4cdd8b36c99b1bb48d8e6d8077aea"
+    },
+    "androidTest": {
+      "file": "WasteNot-history-androidTest-v4.apk",
+      "sha256": "22c7edde274ae14bd6e9462e4785b66f3a270ae4e0505c82b268f9f2bd8c4e0a",
+      "size_bytes": 4758123
+    }
+  },
+  "instrumentation_has_current_history_capture_and_live_probe": true,
+  "production_source_fingerprint": "ca58251557d73ecc325dcad7ce39c24f1d6faee043012135b3c6b2b8aaa02e1c",
+  "test_driver_correction": "v2 updates the count label; v3 records failed UI semantics; v4 actively scrolls to virtualized rows after asynchronous pagination"
+}

@@ -1,0 +1,38 @@
+{
+  "run_id": "17d9ec52-bac0-4bf2-9695-3dc5e50d7ed1",
+  "email": "history-17d9ec52-bac0-4bf2-9695-3dc5e50d7ed1@example.test",
+  "name": "Android history probe",
+  "user_id": "7c55a3ac-da4c-4281-947e-603bb2a60817",
+  "passed_steps": [
+    "register_real_account",
+    "https_cursor_pages_20_and_2",
+    "ui_filter_finds_record_beyond_first_page",
+    "ui_paging_and_back_keep_second_page",
+    "ui_pull_refresh_restarts_first_page"
+  ],
+  "log_ids": [
+    "9bc65816-9eaa-4535-a5b5-2e089dc2d7a4",
+    "de99604a-5ab3-460b-b2dc-e0b6a8dd79af",
+    "3a28f945-bf29-43f0-b106-b9a36dfc8a2e",
+    "8c292a96-80f4-485f-ba7a-2c82580283a9",
+    "bca86da4-eb60-4a20-83a9-4d707ab949c6",
+    "a80cf745-e155-42ae-9ad2-3e29a6c1b5ab",
+    "b2c3bcd8-dbb6-4c35-8c67-f03751102fa5",
+    "94fc9a6d-7bdf-4900-9d07-7371325ba891",
+    "559cc122-d419-4a16-9a8d-adb8a4648276",
+    "ec7114ea-5027-49a9-8327-31789f6151d1",
+    "61dae3bb-8452-450d-a26f-31d5813ada43",
+    "0bb88d05-946b-4f3d-accd-6cb883f38332",
+    "61699860-106d-4e55-a9fd-c90d89598c69",
+    "e2a241eb-53c4-4d91-a340-29e6c14ba9e1",
+    "4aad6ce7-56c1-4ecb-b106-3215e84f0e07",
+    "073e044e-e270-4a3a-a55c-cee73bc90f70",
+    "3134fd45-c4e1-4ff1-88a3-31bd38fc6aa8",
+    "d42ab168-1d9d-47ec-a3aa-a043846e6583",
+    "eb114fae-46a9-4122-ac22-fa624387e923",
+    "e672e21a-7ee2-45e5-a6f4-bbf0c1ab8d13",
+    "30e06d8a-da18-4b9c-9935-544f85f4d422",
+    "ed2ed0ad-7332-4f3c-992f-008927575a0c"
+  ],
+  "header_composed_at_last_record": false
+}

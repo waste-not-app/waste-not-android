@@ -1,0 +1,275 @@
+Printing with useUnmergedTree = 'true'
+Node #1 at (l=0.0, t=0.0, r=1170.0, b=2532.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=1170.0, b=2532.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #3 at (l=0.0, t=0.0, r=1170.0, b=2532.0)px
+      Shape = 'RectangleShape'
+       |-Node #108 at (l=0.0, t=0.0, r=1170.0, b=2532.0)px
+          |-Node #258 at (l=0.0, t=0.0, r=1170.0, b=2532.0)px
+             |-Node #259 at (l=0.0, t=0.0, r=1170.0, b=2532.0)px
+               Shape = 'RectangleShape'
+                |-Node #260 at (l=0.0, t=0.0, r=1170.0, b=2532.0)px
+                  IsContainer = 'true'
+                  Shape = 'RectangleShape'
+                   |-Node #314 at (l=0.0, t=264.0, r=1170.0, b=2070.0)px, Tag: 'history-list'
+                   | CollectionInfo = 'CollectionInfo(rowCount=27, columnCount=1)'
+                   | IsTraversalGroup = 'true'
+                   | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@3a09235'
+                   | VerticalScrollAxisRange = 'ScrollAxisRange(value=7696.0, maxValue=7796.0, reverseScrolling=false)'
+                   | Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+                   |  |-Node #720 at (l=60.0, t=128.0, r=1110.0, b=378.0)px
+                   |  | Focused = 'false'
+                   |  | Shape = 'RectangleShape'
+                   |  | Actions = [OnClick, RequestFocus]
+                   |  | MergeDescendants = 'true'
+                   |  |  |-Node #723 at (l=60.0, t=186.0, r=192.0, b=318.0)px
+                   |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+                   |  |  |-Node #726 at (l=228.0, t=164.0, r=382.0, b=225.0)px
+                   |  |  | Text = '[Plastik]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #727 at (l=228.0, t=237.0, r=579.0, b=282.0)px
+                   |  |  | Text = '[Recycle · 9 Nov 2026]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #728 at (l=228.0, t=294.0, r=522.0, b=339.0)px
+                   |  |  | Text = '[History record 17]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #730 at (l=922.0, t=225.0, r=1110.0, b=278.0)px
+                   |  |    Text = '[17 benda]'
+                   |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |-Node #732 at (l=60.0, t=378.0, r=1110.0, b=628.0)px
+                   |  | Focused = 'false'
+                   |  | Shape = 'RectangleShape'
+                   |  | Actions = [OnClick, RequestFocus]
+                   |  | MergeDescendants = 'true'
+                   |  |  |-Node #735 at (l=60.0, t=436.0, r=192.0, b=568.0)px
+                   |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+                   |  |  |-Node #738 at (l=228.0, t=414.0, r=382.0, b=475.0)px
+                   |  |  | Text = '[Plastik]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #739 at (l=228.0, t=487.0, r=579.0, b=532.0)px
+                   |  |  | Text = '[Recycle · 9 Nov 2026]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #740 at (l=228.0, t=544.0, r=522.0, b=589.0)px
+                   |  |  | Text = '[History record 21]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #742 at (l=922.0, t=475.0, r=1110.0, b=528.0)px
+                   |  |    Text = '[21 benda]'
+                   |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |-Node #744 at (l=60.0, t=628.0, r=1110.0, b=878.0)px
+                   |  | Focused = 'false'
+                   |  | Shape = 'RectangleShape'
+                   |  | Actions = [OnClick, RequestFocus]
+                   |  | MergeDescendants = 'true'
+                   |  |  |-Node #747 at (l=60.0, t=686.0, r=192.0, b=818.0)px
+                   |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+                   |  |  |-Node #750 at (l=228.0, t=664.0, r=382.0, b=725.0)px
+                   |  |  | Text = '[Plastik]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #751 at (l=228.0, t=737.0, r=579.0, b=782.0)px
+                   |  |  | Text = '[Recycle · 9 Nov 2026]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #752 at (l=228.0, t=794.0, r=500.0, b=839.0)px
+                   |  |  | Text = '[History record 6]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #754 at (l=947.0, t=725.0, r=1110.0, b=778.0)px
+                   |  |    Text = '[6 benda]'
+                   |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |-Node #756 at (l=60.0, t=878.0, r=1110.0, b=1128.0)px
+                   |  | Focused = 'false'
+                   |  | Shape = 'RectangleShape'
+                   |  | Actions = [OnClick, RequestFocus]
+                   |  | MergeDescendants = 'true'
+                   |  |  |-Node #759 at (l=60.0, t=936.0, r=192.0, b=1068.0)px
+                   |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+                   |  |  |-Node #762 at (l=228.0, t=914.0, r=382.0, b=975.0)px
+                   |  |  | Text = '[Plastik]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #763 at (l=228.0, t=987.0, r=579.0, b=1032.0)px
+                   |  |  | Text = '[Recycle · 9 Nov 2026]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #764 at (l=228.0, t=1044.0, r=522.0, b=1089.0)px
+                   |  |  | Text = '[History record 12]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #766 at (l=922.0, t=975.0, r=1110.0, b=1028.0)px
+                   |  |    Text = '[12 benda]'
+                   |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |-Node #768 at (l=60.0, t=1128.0, r=1110.0, b=1378.0)px
+                   |  | Focused = 'false'
+                   |  | Shape = 'RectangleShape'
+                   |  | Actions = [OnClick, RequestFocus]
+                   |  | MergeDescendants = 'true'
+                   |  |  |-Node #771 at (l=60.0, t=1186.0, r=192.0, b=1318.0)px
+                   |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+                   |  |  |-Node #774 at (l=228.0, t=1164.0, r=382.0, b=1225.0)px
+                   |  |  | Text = '[Plastik]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #775 at (l=228.0, t=1237.0, r=579.0, b=1282.0)px
+                   |  |  | Text = '[Recycle · 9 Nov 2026]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #776 at (l=228.0, t=1294.0, r=522.0, b=1339.0)px
+                   |  |  | Text = '[History record 13]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #778 at (l=922.0, t=1225.0, r=1110.0, b=1278.0)px
+                   |  |    Text = '[13 benda]'
+                   |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |-Node #780 at (l=60.0, t=1378.0, r=1110.0, b=1628.0)px
+                   |  | Focused = 'false'
+                   |  | Shape = 'RectangleShape'
+                   |  | Actions = [OnClick, RequestFocus]
+                   |  | MergeDescendants = 'true'
+                   |  |  |-Node #783 at (l=60.0, t=1436.0, r=192.0, b=1568.0)px
+                   |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+                   |  |  |-Node #786 at (l=228.0, t=1414.0, r=382.0, b=1475.0)px
+                   |  |  | Text = '[Plastik]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #787 at (l=228.0, t=1487.0, r=579.0, b=1532.0)px
+                   |  |  | Text = '[Recycle · 9 Nov 2026]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #788 at (l=228.0, t=1544.0, r=500.0, b=1589.0)px
+                   |  |  | Text = '[History record 4]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #790 at (l=947.0, t=1475.0, r=1110.0, b=1528.0)px
+                   |  |    Text = '[4 benda]'
+                   |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |-Node #792 at (l=60.0, t=1628.0, r=1110.0, b=1878.0)px
+                   |  | Focused = 'false'
+                   |  | Shape = 'RectangleShape'
+                   |  | Actions = [OnClick, RequestFocus]
+                   |  | MergeDescendants = 'true'
+                   |  |  |-Node #795 at (l=60.0, t=1686.0, r=192.0, b=1818.0)px
+                   |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+                   |  |  |-Node #798 at (l=228.0, t=1664.0, r=382.0, b=1725.0)px
+                   |  |  | Text = '[Plastik]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #799 at (l=228.0, t=1737.0, r=579.0, b=1782.0)px
+                   |  |  | Text = '[Recycle · 9 Nov 2026]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #800 at (l=228.0, t=1794.0, r=522.0, b=1839.0)px
+                   |  |  | Text = '[History record 20]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #802 at (l=922.0, t=1725.0, r=1110.0, b=1778.0)px
+                   |  |    Text = '[20 benda]'
+                   |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |-Node #815 at (l=60.0, t=1878.0, r=1110.0, b=2128.0)px
+                   |  | Focused = 'false'
+                   |  | Shape = 'RectangleShape'
+                   |  | Actions = [OnClick, RequestFocus]
+                   |  | MergeDescendants = 'true'
+                   |  |  |-Node #818 at (l=60.0, t=1936.0, r=192.0, b=2068.0)px
+                   |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+                   |  |  |-Node #821 at (l=228.0, t=1914.0, r=382.0, b=1975.0)px
+                   |  |  | Text = '[Plastik]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #822 at (l=228.0, t=1987.0, r=579.0, b=2032.0)px
+                   |  |  | Text = '[Recycle · 9 Nov 2026]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #823 at (l=228.0, t=2044.0, r=500.0, b=2089.0)px
+                   |  |  | Text = '[History record 8]'
+                   |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |  |-Node #825 at (l=947.0, t=1975.0, r=1110.0, b=2028.0)px
+                   |  |    Text = '[8 benda]'
+                   |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |-Node #808 at (l=0.0, t=264.0, r=1050.0, b=420.0)px
+                   |  | Focused = 'false'
+                   |  | Role = 'Button'
+                   |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+                   |  | Actions = [OnClick, RequestFocus]
+                   |  | MergeDescendants = 'true'
+                   |  |  |-Node #811 at (l=0.0, t=264.0, r=262.0, b=324.0)px
+                   |  |    Text = '[Input manual]'
+                   |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |  |-Node #827 at (l=0.0, t=264.0, r=167.0, b=317.0)px
+                   |    Text = '[Kemarin]'
+                   |    [Heading]
+                   |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |-Node #315 at (l=525.0, t=144.0, r=645.0, b=264.0)px
+                   | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+                   |  |-Node #317 at (l=561.0, t=180.0, r=609.0, b=228.0)px
+                   |     |-Node #318 at (l=561.0, t=180.0, r=609.0, b=228.0)px
+                   |       ClearAndSetSemantics = 'true'
+                   |-Node #264 at (l=0.0, t=0.0, r=1170.0, b=264.0)px
+                   | IsTraversalGroup = 'true'
+                   |  |-Node #265 at (l=0.0, t=72.0, r=1170.0, b=264.0)px
+                   |    Shape = 'RectangleShape'
+                   |     |-Node #267 at (l=48.0, t=122.0, r=323.0, b=213.0)px
+                   |     |  |-Node #268 at (l=48.0, t=122.0, r=323.0, b=213.0)px
+                   |     |    Text = '[Riwayat]'
+                   |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |     |-Node #271 at (l=978.0, t=96.0, r=1122.0, b=240.0)px
+                   |       Focused = 'false'
+                   |       Role = 'Button'
+                   |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+                   |       Actions = [OnClick, RequestFocus]
+                   |       MergeDescendants = 'true'
+                   |        |-Node #273 at (l=1014.0, t=132.0, r=1086.0, b=204.0)px
+                   |          ContentDescription = '[Filter riwayat]'
+                   |          Role = 'Image'
+                   |-Node #282 at (l=21.0, t=2151.0, r=1149.0, b=2433.0)px
+                   | IsContainer = 'true'
+                   | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 26.0.dp), topEnd = CornerSize(size = 26.0.dp), bottomEnd = CornerSize(size = 26.0.dp), bottomStart = CornerSize(size = 26.0.dp))'
+                   |  |-Node #283 at (l=27.0, t=2247.0, r=1143.0, b=2412.0)px
+                   |    [SelectableGroup]
+                   |     |-Node #285 at (l=27.0, t=2247.0, r=251.0, b=2412.0)px
+                   |     | Focused = 'false'
+                   |     | Role = 'Tab'
+                   |     | Selected = 'false'
+                   |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 19.0.dp), topEnd = CornerSize(size = 19.0.dp), bottomEnd = CornerSize(size = 19.0.dp), bottomStart = CornerSize(size = 19.0.dp))'
+                   |     | Actions = [OnClick, RequestFocus]
+                   |     | MergeDescendants = 'true'
+                   |     |  |-Node #288 at (l=33.0, t=2355.0, r=245.0, b=2400.0)px
+                   |     |    Text = '[Beranda]'
+                   |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |     |-Node #289 at (l=251.0, t=2247.0, r=474.0, b=2412.0)px
+                   |     | Focused = 'false'
+                   |     | Role = 'Tab'
+                   |     | Selected = 'true'
+                   |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 19.0.dp), topEnd = CornerSize(size = 19.0.dp), bottomEnd = CornerSize(size = 19.0.dp), bottomStart = CornerSize(size = 19.0.dp))'
+                   |     | Actions = [OnClick, RequestFocus]
+                   |     | MergeDescendants = 'true'
+                   |     |  |-Node #290 at (l=294.0, t=2259.0, r=432.0, b=2343.0)px
+                   |     |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 9.0.dp), topEnd = CornerSize(size = 9.0.dp), bottomEnd = CornerSize(size = 9.0.dp), bottomStart = CornerSize(size = 9.0.dp))'
+                   |     |  |-Node #292 at (l=257.0, t=2355.0, r=468.0, b=2400.0)px
+                   |     |    Text = '[Riwayat]'
+                   |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |     |-Node #293 at (l=474.0, t=2247.0, r=697.0, b=2412.0)px
+                   |     | Focused = 'false'
+                   |     | Role = 'Tab'
+                   |     | Selected = 'false'
+                   |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 19.0.dp), topEnd = CornerSize(size = 19.0.dp), bottomEnd = CornerSize(size = 19.0.dp), bottomStart = CornerSize(size = 19.0.dp))'
+                   |     | Actions = [OnClick, RequestFocus]
+                   |     | MergeDescendants = 'true'
+                   |     |  |-Node #296 at (l=480.0, t=2355.0, r=691.0, b=2400.0)px
+                   |     |    Text = '[Panduan]'
+                   |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |     |-Node #297 at (l=697.0, t=2247.0, r=920.0, b=2412.0)px
+                   |     | Focused = 'false'
+                   |     | Role = 'Tab'
+                   |     | Selected = 'false'
+                   |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 19.0.dp), topEnd = CornerSize(size = 19.0.dp), bottomEnd = CornerSize(size = 19.0.dp), bottomStart = CornerSize(size = 19.0.dp))'
+                   |     | Actions = [OnClick, RequestFocus]
+                   |     | MergeDescendants = 'true'
+                   |     |  |-Node #300 at (l=703.0, t=2355.0, r=914.0, b=2400.0)px
+                   |     |    Text = '[Statistik]'
+                   |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |     |-Node #301 at (l=920.0, t=2247.0, r=1143.0, b=2412.0)px
+                   |       Focused = 'false'
+                   |       Role = 'Tab'
+                   |       Selected = 'false'
+                   |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 19.0.dp), topEnd = CornerSize(size = 19.0.dp), bottomEnd = CornerSize(size = 19.0.dp), bottomStart = CornerSize(size = 19.0.dp))'
+                   |       Actions = [OnClick, RequestFocus]
+                   |       MergeDescendants = 'true'
+                   |        |-Node #304 at (l=926.0, t=2355.0, r=1137.0, b=2400.0)px
+                   |          Text = '[Profil]'
+                   |          Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |-Node #305 at (l=380.0, t=2070.0, r=790.0, b=2226.0)px
+                     ContentDescription = '[Catat atau scan sampah]'
+                     Focused = 'false'
+                     Shape = 'RoundedCornerShape(topStart = CornerSize(size = 26.0.dp), topEnd = CornerSize(size = 26.0.dp), bottomEnd = CornerSize(size = 26.0.dp), bottomStart = CornerSize(size = 26.0.dp))'
+                     Actions = [OnClick, RequestFocus]
+                     MergeDescendants = 'true'
+                      |-Node #306 at (l=428.0, t=2100.0, r=742.0, b=2196.0)px
+                        Shape = 'RectangleShape'
+                         |-Node #308 at (l=524.0, t=2126.0, r=742.0, b=2171.0)px
+                           Text = '[Catat / Scan]'
+                           Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]

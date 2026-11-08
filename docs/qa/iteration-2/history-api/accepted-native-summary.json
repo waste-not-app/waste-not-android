@@ -1,0 +1,38 @@
+{
+  "unique_methods_accepted": 6,
+  "native_executions": 9,
+  "passed_executions": 6,
+  "harness_failures": 3,
+  "product_apks_constant": true,
+  "phase1_completed": [
+    {
+      "class": "com.example.wastenot.ui.main.HistoryDesignTest",
+      "test": "incompleteAndReversedDatesStayInSheetUntilCorrected",
+      "code": 0
+    },
+    {
+      "class": "com.example.wastenot.ui.main.HistoryDesignTest",
+      "test": "draftCancelResetApplyAndRotationKeepTheirSeparateMeaning",
+      "code": -2
+    },
+    {
+      "class": "com.example.wastenot.ui.main.HistoryDesignTest",
+      "test": "deletionNoticeStaysVisibleAboveAScrolledHistory",
+      "code": 0
+    },
+    {
+      "class": "com.example.wastenot.ui.main.HistoryDesignTest",
+      "test": "paginationRestoresScrollAndShowsGroupedRowsInBothThemes",
+      "code": 0
+    },
+    {
+      "class": "com.example.wastenot.ui.main.CoreAsyncStateDesignTest",
+      "test": "historyUnknownIsNotZeroAndRecoveryKeepsCachedRecords",
+      "code": 0
+    }
+  ],
+  "phase2": "corrected draft/rotation label passes; live journey times out querying an offscreen header",
+  "phase3": "live journey confirms 27 list elements but times out waiting for an offscreen footer after insertion",
+  "phase4": "live journey scrolls to the last record, verifies detail/back, all-loaded footer, count and pull-refresh; passes",
+  "scope": "API37 390dp/100 percent; 1000 records verified in ViewModel unit tests, 22 real server records in native UI; no new AI generation"
+}

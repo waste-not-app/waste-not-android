@@ -1,0 +1,45 @@
+{
+  "complete": false,
+  "cleanup_complete": true,
+  "plan": {
+    "run_id": "17d9ec52-bac0-4bf2-9695-3dc5e50d7ed1",
+    "email": "history-17d9ec52-bac0-4bf2-9695-3dc5e50d7ed1@example.test",
+    "name": "Android history probe"
+  },
+  "runs": [
+    {
+      "name": "history-restored-label",
+      "tests": 1,
+      "passed": true
+    }
+  ],
+  "api": 37,
+  "started_at_utc": "2026-11-08T17:37:45.621549+00:00",
+  "preflight_owned_users": 0,
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "owned_users_before_cleanup": [
+    "cba5d45d-0a35-4d5d-8a41-404b1a14d09a"
+  ],
+  "database_before_cleanup": {
+    "users": 1,
+    "logs": 22,
+    "sessions": 1
+  },
+  "database_after_cleanup": {
+    "users": 0,
+    "sessions": 0,
+    "logs": 0
+  },
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "finished_at_utc": "2026-11-08T17:39:03.301619+00:00"
+}

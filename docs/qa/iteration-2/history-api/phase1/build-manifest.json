@@ -1,0 +1,20 @@
+{
+  "apks": {
+    "debug": {
+      "file": "WasteNot-history-debug.apk",
+      "size_bytes": 46631070,
+      "sha256": "ce2d92666ca6580688f11ecbda37a2ce1f3b002c691d9d36219c2febf25f5b2c"
+    },
+    "staging": {
+      "file": "WasteNot-history-staging.apk",
+      "size_bytes": 34939375,
+      "sha256": "09c5327dfbe3f9b8985842d2762c03ad94b4cdd8b36c99b1bb48d8e6d8077aea"
+    },
+    "androidTest": {
+      "file": "WasteNot-history-androidTest.apk",
+      "size_bytes": 4755931,
+      "sha256": "7aad8e43884b64cecb5ff085831f4b597cde78c8d686c48165f5c730ca123492"
+    }
+  },
+  "instrumentation_has_current_history_capture_and_live_probe": true
+}
