@@ -1,0 +1,17 @@
+{
+  "phase": "baseline",
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "test_apk_sha256": "d3e45a4c39732d6099259e066f2a9ce1367674f7f7c505b2d1cccac1c67732d9",
+  "app_sha256": "8a35548c5dfb3b59c00c1af88c8fd1b5c9df3e597db67aec7da1ef1035680413",
+  "installed_app_sha256": "8a35548c5dfb3b59c00c1af88c8fd1b5c9df3e597db67aec7da1ef1035680413",
+  "result": "expected design failures reproduced",
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  }
+}

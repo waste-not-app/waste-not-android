@@ -1,0 +1,151 @@
+{
+  "theme": "dark",
+  "font_scale": 2,
+  "buttons": [
+    {
+      "label": "Simpan catatan",
+      "foreground": -15586276,
+      "expected_foreground": -15586276,
+      "width_px": 1008,
+      "height_px": 95,
+      "text_lines": 1,
+      "layout_width": 352,
+      "layout_height": 67,
+      "widest_line_px": 352,
+      "paragraph_width": 352,
+      "paragraph_height": 67,
+      "overflow_width": false,
+      "overflow_height": false,
+      "image": "dark-0.png",
+      "samples": [
+        {
+          "fraction": 0.15,
+          "background": -3413569,
+          "expected": -3479362,
+          "contrast": 11.368429818814787
+        },
+        {
+          "fraction": 0.5,
+          "background": -4201799,
+          "expected": -4267591,
+          "contrast": 10.546612604981734
+        },
+        {
+          "fraction": 0.85,
+          "background": -4990028,
+          "expected": -5055821,
+          "contrast": 9.772448849063098
+        }
+      ]
+    },
+    {
+      "label": "Simpan perubahan",
+      "foreground": -5061450,
+      "expected_foreground": -5061450,
+      "width_px": 1008,
+      "height_px": 95,
+      "text_lines": 1,
+      "layout_width": 420,
+      "layout_height": 67,
+      "widest_line_px": 420,
+      "paragraph_width": 420,
+      "paragraph_height": 67,
+      "overflow_width": false,
+      "overflow_height": false,
+      "image": "dark-1.png",
+      "samples": [
+        {
+          "fraction": 0.15,
+          "background": -14272211,
+          "expected": -14272211,
+          "contrast": 6.721819146075649
+        },
+        {
+          "fraction": 0.5,
+          "background": -14272211,
+          "expected": -14272211,
+          "contrast": 6.721819146075649
+        },
+        {
+          "fraction": 0.85,
+          "background": -14272211,
+          "expected": -14272211,
+          "contrast": 6.721819146075649
+        }
+      ]
+    },
+    {
+      "label": "Menyimpan perubahan catatan…",
+      "foreground": -5061450,
+      "expected_foreground": -5061450,
+      "width_px": 1008,
+      "height_px": 95,
+      "text_lines": 1,
+      "layout_width": 731,
+      "layout_height": 67,
+      "widest_line_px": 731,
+      "paragraph_width": 731,
+      "paragraph_height": 67,
+      "overflow_width": false,
+      "overflow_height": false,
+      "image": "dark-2.png",
+      "samples": [
+        {
+          "fraction": 0.15,
+          "background": -14272211,
+          "expected": -14272211,
+          "contrast": 6.721819146075649
+        },
+        {
+          "fraction": 0.5,
+          "background": -14272211,
+          "expected": -14272211,
+          "contrast": 6.721819146075649
+        },
+        {
+          "fraction": 0.85,
+          "background": -14272211,
+          "expected": -14272211,
+          "contrast": 6.721819146075649
+        }
+      ]
+    },
+    {
+      "label": "Hapus catatan",
+      "foreground": -13104366,
+      "expected_foreground": -13104366,
+      "width_px": 1008,
+      "height_px": 95,
+      "text_lines": 1,
+      "layout_width": 325,
+      "layout_height": 67,
+      "widest_line_px": 325,
+      "paragraph_width": 325,
+      "paragraph_height": 67,
+      "overflow_width": false,
+      "overflow_height": false,
+      "image": "dark-3.png",
+      "samples": [
+        {
+          "fraction": 0.15,
+          "background": -19270,
+          "expected": -19270,
+          "contrast": 10.197588938831268
+        },
+        {
+          "fraction": 0.5,
+          "background": -19270,
+          "expected": -19270,
+          "contrast": 10.197588938831268
+        },
+        {
+          "fraction": 0.85,
+          "background": -19270,
+          "expected": -19270,
+          "contrast": 10.197588938831268
+        }
+      ]
+    }
+  ],
+  "violations": []
+}

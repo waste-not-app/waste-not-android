@@ -1,0 +1,8 @@
+{
+  "test_apk_sha256": "72c25a4f10090626a262ee116b68e64a8684c385c7ee3d26c25830cd965ab1f7",
+  "app_source": "561e369f879ba1dd7b36a1b8b52d63476c09d7c2",
+  "test_source_sha256": {
+    "app/src/androidTest/java/com/example/wastenot/ui/scan/ScanSheetTest.kt": "4ec94aa3ba99da34259fdf076d241c1be9a44b0e660e4fb79ba448c80a89e8a2",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/RemainingUiPreviewTest.kt": "4b893733ea3e73fc5b58ac2a85208e212f5364b8b8e776ad053a344293c18d8c"
+  }
+}

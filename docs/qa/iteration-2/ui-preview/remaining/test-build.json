@@ -1,0 +1,15 @@
+{
+  "sha256": "86e87afc42a6f899b9c66bd7ca50a2f0962cd60062ea180319c9d1e07b5110d1",
+  "source": {
+    "app/src/androidTest/java/com/example/wastenot/ui/main/RemainingUiPreviewTest.kt": "e27ba9de6c0f2f0806f3e77ddbd24acd27fc03427bfd524ae1af3eb15b9bfee5",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/ScreenKitReviewTest.kt": "ebda462ab2d72cc8b0c009074c66cc900fcfaf86fa9404223317ea86dc8d380c"
+  },
+  "scope": "Corrected session/auth/fallback/conflict fixture capture, inherited theme content color; app APK unchanged.",
+  "route_capture_test_build": {
+    "sha256": "d8ab346aa4ef2c5deedf90d58d7f45590a9283bbc83052c29637257736cdba03",
+    "source": {
+      "app/src/androidTest/java/com/example/wastenot/ui/main/RemainingUiPreviewTest.kt": "473c7ebc781b179310b3c3860a2841825c6bc8f2682dbf72509e3c8b540fe7bd",
+      "app/src/androidTest/java/com/example/wastenot/ui/main/ScreenKitReviewTest.kt": "ebda462ab2d72cc8b0c009074c66cc900fcfaf86fa9404223317ea86dc8d380c"
+    }
+  }
+}

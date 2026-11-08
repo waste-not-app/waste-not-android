@@ -1,0 +1,31 @@
+{
+  "api": 37,
+  "complete": true,
+  "source_head": "3db2eb1b8dec745c6ecd48a671e21c79387b4592",
+  "apks": {
+    "app/build/outputs/apk/debug/app-debug.apk": "da0f89ea38484bb4ba778de133c4d9f3d4308b120e375f3a82e45500923ab9de",
+    "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "2fd9093053b41ba44e4a1de56a6b3bc6b1d328c7e44a22517582da8362e16a01"
+  },
+  "source": {
+    "app/src/main/java/com/example/wastenot/ui/components/FormControls.kt": "d2856f9613ebedf172e6e6d059901e24b33f41d4a2b0cb57966a82a77db65ac0",
+    "app/src/main/java/com/example/wastenot/ui/components/SecondaryActionButton.kt": "9494ad84504f277341dbbb1e3fd0053b48093bc001b54864f6125cb301d05338",
+    "app/src/main/java/com/example/wastenot/ui/components/TextActionButton.kt": "11dbf2ae3385f54d7ffa5faa14b0eed52204c229ace9baa038273488cb98e462",
+    "app/src/main/java/com/example/wastenot/ui/components/IconActionButton.kt": "640a7dba60f68068e75374381dd17730de79dac32db160d8811bf81febd13749",
+    "app/src/main/java/com/example/wastenot/ui/components/FocusOutline.kt": "8a73032303b02af22f88c5964d9ad9104b2480f08623c9abdf811b1894c695f4",
+    "app/src/main/java/com/example/wastenot/ui/main/CaptureSheet.kt": "f0743726556bb9610760d20f630fd75fd40cc63e6b3ee2a04ae2b3d45eb309ed",
+    "app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt": "0d36b5de31164465887674752c48af722bdcc3ba2fa633e245f7ffeab5a2bb9e",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/KeyboardFocusDesignTest.kt": "ad101b9d41f99b7be884871b318101d420d7806830cbf7120a3dfdfae2781db7"
+  },
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0",
+    "night": "no"
+  },
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0",
+    "night": "Night mode: no"
+  }
+}

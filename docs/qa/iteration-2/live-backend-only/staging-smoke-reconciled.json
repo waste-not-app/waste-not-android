@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "staging_sha256": "73031bb2905063f10c23220faba71c89d6f6a7a9ac264143a82b18caec9f422c",
+  "normal_debug_matches_manifest": "d0301632d89f950e20b1bebbb1811a22931d72dca7880f684e24e34c68e0af49",
+  "outside_instrumentation": true,
+  "viewport_dp": [
+    360,
+    640
+  ],
+  "startup": "real sign-in form",
+  "registration_footer": "reachable by scrolling",
+  "reconciliation": "The initial host driver waited for an offscreen registration footer. Initial login, scrolling and the footer were inspected without repeating installation or cold startup."
+}

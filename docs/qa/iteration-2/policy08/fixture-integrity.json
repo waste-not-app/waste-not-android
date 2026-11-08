@@ -1,0 +1,44 @@
+[
+  {
+    "file": "app/src/test/resources/ai-contract/catalog-response.json",
+    "sha256": "485e5ad8811904f31c0688c3e7d18f3317e5fd63a3b3095c61269d3f2b7c8376",
+    "upstream": "ai/contracts/v1/examples/catalog-response.json",
+    "identical": true
+  },
+  {
+    "file": "app/src/test/resources/ai-contract/conditional-cup-response.json",
+    "sha256": "cd3fe83153300938f8116722800bee538eaf0fc1e9b86030c8322989e59c8b1e",
+    "upstream": "ai/contracts/v1/examples/conditional-cup-response.json",
+    "identical": true
+  },
+  {
+    "file": "app/src/test/resources/ai-contract/detected-recycle-response.json",
+    "sha256": "af767f8ac224f2736ab4c3f214411897a1e2a94006591f1719f3a4ace81ed4c9",
+    "upstream": "ai/contracts/v1/examples/detected-recycle-response.json",
+    "identical": true
+  },
+  {
+    "file": "app/src/test/resources/ai-contract/detection-response.json",
+    "sha256": "933084fd61e0ec06a59a45f2c175799f54d19787c2597bdebd9524f5b1a64cec",
+    "upstream": "ai/contracts/v1/examples/detection-response.json",
+    "identical": true
+  },
+  {
+    "file": "app/src/test/resources/ai-contract/needs-context-response.json",
+    "sha256": "b8a4ff9224e399307c1f18575313d2aaa00abd9e919aface162d5aeab832d451",
+    "upstream": "ai/contracts/v1/examples/needs-context-response.json",
+    "identical": true
+  },
+  {
+    "file": "app/src/test/resources/ai-contract/no-detections-response.json",
+    "sha256": "4d67ea67638c035f7e2d8dbbf7137831a46b4c422412c92d823371858b7bd381",
+    "upstream": "ai/contracts/v1/examples/no-detections-response.json",
+    "identical": true
+  },
+  {
+    "file": "app/src/test/resources/ai-contract/provider-unavailable-response.json",
+    "sha256": "4742d21d4e338c38a294e454cbe1eedc1ca01a47bd90c4e64f340f321e64362b",
+    "upstream": "ai/contracts/v1/examples/provider-unavailable-response.json",
+    "identical": true
+  }
+]

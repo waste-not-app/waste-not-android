@@ -12,21 +12,28 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
+import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.ActivityInput
 import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.CategoryPicker
 import com.example.wastenot.ui.components.DateField
 import com.example.wastenot.ui.components.MethodSelector
@@ -38,26 +45,45 @@ import java.time.LocalDate
 fun LogEditorScreen(
     draft: EditorDraft,
     referenceDate: LocalDate,
-    demo: Boolean,
+    accountTimezone: String,
     saving: Boolean,
-    saveError: Boolean,
     padding: PaddingValues,
     onSave: (ActivityInput) -> Unit,
+    onHistory: () -> Unit,
+    onResolveConflict: () -> Unit,
     modifier: Modifier = Modifier,
+    persistence: EditorPersistenceState? = null,
+    onRetryPersistence: () -> Unit = {},
+    saveConfirmed: Boolean = false,
+    restored: Boolean = false,
 ) {
     val focus = remember { EditorField.entries.associateWith { FocusRequester() } }
     val reveal = remember { EditorField.entries.associateWith { BringIntoViewRequester() } }
+    val focused = remember(draft) { mutableSetOf<EditorField>() }
     val value = draft.values
-    LaunchedEffect(draft.focusRequest) {
+    val enabled = !saving && !draft.locked && !saveConfirmed
+    val focusManager = LocalFocusManager.current
+    val submissionReveal = remember(draft) { BringIntoViewRequester() }
+    LaunchedEffect(draft.submissionError) {
+        if (draft.submissionError != null) submissionReveal.bringIntoView()
+    }
+    LaunchedEffect(draft, draft.focusRequest) {
         draft.errors.keys.firstOrNull()?.let { field ->
             reveal.getValue(field).bringIntoView()
             focus.getValue(field).requestFocus()
         }
     }
-    fun fieldModifier(field: EditorField) = Modifier
-        .fillMaxWidth()
+    fun inputModifier(field: EditorField) = Modifier
         .bringIntoViewRequester(reveal.getValue(field))
         .focusRequester(focus.getValue(field))
+    fun fieldModifier(field: EditorField) = Modifier
+        .fillMaxWidth()
+        .then(if (field == EditorField.METHOD || field == EditorField.QUANTITY) Modifier else inputModifier(field))
+        .onFocusChanged {
+            if (it.hasFocus) focused.add(field)
+            else if (focused.remove(field)) draft.validateField(field, referenceDate)
+        }
+        .then(if (field == EditorField.METHOD || field == EditorField.QUANTITY) Modifier.focusGroup() else Modifier)
     Box(modifier, contentAlignment = Alignment.TopCenter) {
         Column(
             modifier = Modifier
@@ -70,27 +96,82 @@ fun LogEditorScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            MessageBanner(stringResource(if (demo) R.string.demo_write_message else R.string.remote_write_message))
-            if (value.version != null) MessageBanner(stringResource(R.string.edit_progress_message))
+            if (restored) Text(stringResource(R.string.draft_restored), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (value.aiProvenance != null) {
+                Text(stringResource(R.string.ai_provenance_attached), style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                SecondaryActionButton(stringResource(R.string.ai_use_manual), draft::useManualEntry,
+                    Modifier.fillMaxWidth(), enabled = enabled)
+            }
             MethodSelector(value.method, { draft.change(EditorField.METHOD, value.copy(method = it)) }, fieldModifier(EditorField.METHOD),
-                draft.errors[EditorField.METHOD]?.let { stringResource(it) }, enabled = !saving)
+                draft.errors[EditorField.METHOD]?.let { stringResource(it) }, enabled = enabled,
+                initialFocusModifier = inputModifier(EditorField.METHOD))
             CategoryPicker(value.category, { draft.change(EditorField.CATEGORY, value.copy(category = it)) }, fieldModifier(EditorField.CATEGORY),
-                draft.errors[EditorField.CATEGORY]?.let { stringResource(it) }, enabled = !saving)
+                draft.errors[EditorField.CATEGORY]?.let { stringResource(it) }, enabled = enabled)
             QuantityField(value.quantity, { draft.change(EditorField.QUANTITY, value.copy(quantity = it)) },
-                Modifier.fillMaxWidth().bringIntoViewRequester(reveal.getValue(EditorField.QUANTITY)),
-                error = draft.errors[EditorField.QUANTITY]?.let { stringResource(it) }, avoided = value.method == DisposalMethod.REDUCE, enabled = !saving,
-                inputModifier = Modifier.focusRequester(focus.getValue(EditorField.QUANTITY)))
+                fieldModifier(EditorField.QUANTITY),
+                error = draft.errors[EditorField.QUANTITY]?.let { stringResource(it) }, avoided = value.method == DisposalMethod.REDUCE, enabled = enabled,
+                inputModifier = inputModifier(EditorField.QUANTITY),
+            )
             DateField(value.date, referenceDate.minusDays(30), referenceDate,
-                { draft.change(EditorField.DATE, value.copy(date = it)) }, fieldModifier(EditorField.DATE), enabled = !saving,
-                error = draft.errors[EditorField.DATE]?.let { stringResource(it) })
+                { draft.change(EditorField.DATE, value.copy(date = it)) }, fieldModifier(EditorField.DATE), enabled = enabled,
+                error = draft.errors[EditorField.DATE]?.let { stringResource(it) },
+                preservedDate = draft.original.date.takeIf { draft.original.version != null })
             WasteTextField(value.notes, { draft.change(EditorField.NOTES, value.copy(notes = it)) }, stringResource(R.string.notes_optional),
                 fieldModifier(EditorField.NOTES), helper = stringResource(R.string.notes_helper), singleLine = false,
-                errorText = draft.errors[EditorField.NOTES]?.let { stringResource(it) }, enabled = !saving)
-            if (saveError) MessageBanner(stringResource(R.string.save_failed_message), isError = true)
+                errorText = draft.errors[EditorField.NOTES]?.let { stringResource(it) }, enabled = enabled, labelAbove = true,
+                placeholder = stringResource(R.string.notes_placeholder))
+            Text(if (value.version != null) stringResource(R.string.edit_progress_message) else stringResource(R.string.editor_date_helper, accountTimezone),
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            draft.submissionError?.takeUnless { saveConfirmed }?.let { error ->
+                val latestError = stringResource(when {
+                    draft.needsConflictResolution -> R.string.conflict_form_message
+                    error.saveOutcomeUnknown() -> R.string.save_outcome_unknown
+                    error == ApiFailureKind.IDEMPOTENCY_CONFLICT -> R.string.save_request_conflict
+                    error == ApiFailureKind.DELETED -> R.string.save_record_deleted
+                    error in setOf(ApiFailureKind.AI_EXPIRED, ApiFailureKind.AI_REFERENCE_INVALID,
+                        ApiFailureKind.AI_ALREADY_LINKED) -> R.string.ai_reference_rejected
+                    error == ApiFailureKind.VALIDATION || error == ApiFailureKind.INVALID_REQUEST -> R.string.save_rejected
+                    error == ApiFailureKind.RATE_LIMITED -> R.string.save_rate_limited
+                    error == ApiFailureKind.STORAGE -> R.string.save_storage_failed
+                    else -> R.string.save_failed_message
+                })
+                val message = if (draft.outcomeUnknown && !error.saveOutcomeUnknown()) {
+                    stringResource(R.string.save_outcome_retry_error, stringResource(R.string.save_outcome_unknown), latestError)
+                } else latestError
+                MessageBanner(message, Modifier.bringIntoViewRequester(submissionReveal), isError = true)
+            }
+            if (persistence != null) {
+                if (persistence.failure == DraftFailure.WRITE || persistence.failure == DraftFailure.FINISH) {
+                    MessageBanner(stringResource(when {
+                        saveConfirmed -> R.string.draft_saved_cleanup_failed
+                        persistence.failure == DraftFailure.FINISH -> R.string.draft_cleanup_failed
+                        else -> R.string.draft_write_failed
+                    }), isError = true)
+                    SecondaryActionButton(stringResource(R.string.retry), onRetryPersistence,
+                        Modifier.fillMaxWidth(), enabled = !persistence.busy)
+                } else Text(stringResource(when {
+                    saveConfirmed -> R.string.draft_completing
+                    persistence.persisted?.fields == draft.snapshot() && !persistence.writing -> R.string.draft_saved
+                    else -> R.string.draft_saving
+                }), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             ActionButton(
-                stringResource(if (value.version != null) R.string.save_changes else if (demo) R.string.save_example else R.string.save_activity),
-                { draft.validate(referenceDate)?.let(onSave) }, Modifier.fillMaxWidth(), loading = saving,
-                loadingLabel = stringResource(R.string.saving), enabled = value.version == null || draft.dirty,
+                stringResource(when {
+                    saveConfirmed -> R.string.draft_record_saved
+                    draft.needsConflictResolution -> R.string.load_latest_log
+                    draft.retryBlocked -> R.string.see_history
+                    draft.locked && !saving -> R.string.retry
+                    value.version != null -> R.string.save_changes
+                    else -> R.string.save_activity
+                }),
+                { if (draft.needsConflictResolution) onResolveConflict() else if (draft.retryBlocked) onHistory() else draft.prepareSubmission(referenceDate)?.let {
+                    focusManager.clearFocus()
+                    onSave(it)
+                } }, Modifier.fillMaxWidth(), loading = saving && !saveConfirmed,
+                loadingLabel = stringResource(R.string.saving), enabled = !saveConfirmed &&
+                    (draft.needsConflictResolution || draft.retryBlocked || draft.locked || value.version == null || draft.dirty),
             )
         }
     }

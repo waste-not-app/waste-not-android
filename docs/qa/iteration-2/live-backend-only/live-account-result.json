@@ -1,0 +1,60 @@
+{
+  "plan": {
+    "run_id": "f6d49234-64d4-404a-9d5a-5f0e7b080636",
+    "email": "android-f6d49234-64d4-404a-9d5a-5f0e7b080636@example.test",
+    "name": "Android transport probe"
+  },
+  "complete": false,
+  "cleanup_complete": true,
+  "api": 37,
+  "runs": [
+    {
+      "label": "configuration-and-https",
+      "tests": 2,
+      "result": "passed"
+    },
+    {
+      "label": "isolated-navigation-fixture",
+      "tests": 1,
+      "result": "passed"
+    },
+    {
+      "label": "live-account-ui",
+      "tests": 1,
+      "result": "passed"
+    }
+  ],
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "passed_steps": [
+    "register",
+    "ui_create_updates_dashboard",
+    "ui_statistics_and_profile_use_server_progress",
+    "ui_edit_refreshes_units_without_extra_xp",
+    "ui_delete_refreshes_all_server_aggregates",
+    "ui_logout_returns_to_login"
+  ],
+  "owned_users_before_cleanup": [
+    "647e985f-1552-41ac-9e45-677013f50f89"
+  ],
+  "database_before_cleanup": {
+    "user_id": "647e985f-1552-41ac-9e45-677013f50f89",
+    "logs": 1,
+    "sessions": 1
+  },
+  "database_after_cleanup": {
+    "users": 0,
+    "sessions": 0,
+    "logs": 0
+  },
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  }
+}

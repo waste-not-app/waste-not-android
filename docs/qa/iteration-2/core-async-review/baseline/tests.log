@@ -1,0 +1,101 @@
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.CoreAsyncStateDesignTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.main.CoreAsyncStateDesignTest:
+INSTRUMENTATION_STATUS: test=historyUnknownIsNotZeroAndRecoveryKeepsCachedRecords
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.CoreAsyncStateDesignTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: history-loading-light: missing state heading 'Memuat catatan…'; history-loading-light: missing functional state symbol; history-loading-light: unresolved data presented as zero; history-error-light: missing state heading 'Catatan belum bisa dimuat.'; history-error-light: missing functional state symbol; history-empty-light: missing state heading 'Belum ada catatan'; history-empty-light: missing functional state symbol; history-loading-dark: missing state heading 'Memuat catatan…'; history-loading-dark: missing functional state symbol; history-loading-dark: unresolved data presented as zero; history-error-dark: missing state heading 'Catatan belum bisa dimuat.'; history-error-dark: missing functional state symbol; history-empty-dark: missing state heading 'Belum ada catatan'; history-empty-dark: missing functional state symbol
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreAsyncStateDesignTest.historyUnknownIsNotZeroAndRecoveryKeepsCachedRecords(CoreAsyncStateDesignTest.kt:123)
+
+INSTRUMENTATION_STATUS: stream=
+Error in historyUnknownIsNotZeroAndRecoveryKeepsCachedRecords(com.example.wastenot.ui.main.CoreAsyncStateDesignTest):
+java.lang.AssertionError: history-loading-light: missing state heading 'Memuat catatan…'; history-loading-light: missing functional state symbol; history-loading-light: unresolved data presented as zero; history-error-light: missing state heading 'Catatan belum bisa dimuat.'; history-error-light: missing functional state symbol; history-empty-light: missing state heading 'Belum ada catatan'; history-empty-light: missing functional state symbol; history-loading-dark: missing state heading 'Memuat catatan…'; history-loading-dark: missing functional state symbol; history-loading-dark: unresolved data presented as zero; history-error-dark: missing state heading 'Catatan belum bisa dimuat.'; history-error-dark: missing functional state symbol; history-empty-dark: missing state heading 'Belum ada catatan'; history-empty-dark: missing functional state symbol
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreAsyncStateDesignTest.historyUnknownIsNotZeroAndRecoveryKeepsCachedRecords(CoreAsyncStateDesignTest.kt:123)
+
+INSTRUMENTATION_STATUS: test=historyUnknownIsNotZeroAndRecoveryKeepsCachedRecords
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.CoreAsyncStateDesignTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=summariesAndMissingLogsKeepTheirDestinationsWithoutInventingValues
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.CoreAsyncStateDesignTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: home-loading-light: missing state heading 'Memuat ringkasan…'; home-loading-light: missing functional state symbol; home-error-light: missing state heading 'Ringkasan belum bisa dimuat'; home-error-light: missing functional state symbol; statistics-loading-light: missing state heading 'Memuat ringkasan…'; statistics-loading-light: missing functional state symbol; statistics-empty-light: missing functional state symbol; log-loading-light: missing state heading 'Memuat catatan…'; log-loading-light: missing functional state symbol; log-error-light: missing state heading 'Catatan belum bisa dimuat.'; log-error-light: missing functional state symbol; log-missing-light: missing state heading 'Catatan tidak tersedia'; log-missing-light: missing functional state symbol; home-loading-dark: missing state heading 'Memuat ringkasan…'; home-loading-dark: missing functional state symbol; home-error-dark: missing state heading 'Ringkasan belum bisa dimuat'; home-error-dark: missing functional state symbol; statistics-loading-dark: missing state heading 'Memuat ringkasan…'; statistics-loading-dark: missing functional state symbol; statistics-empty-dark: missing functional state symbol; log-loading-dark: missing state heading 'Memuat catatan…'; log-loading-dark: missing functional state symbol; log-error-dark: missing state heading 'Catatan belum bisa dimuat.'; log-error-dark: missing functional state symbol; log-missing-dark: missing state heading 'Catatan tidak tersedia'; log-missing-dark: missing functional state symbol
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreAsyncStateDesignTest.summariesAndMissingLogsKeepTheirDestinationsWithoutInventingValues(CoreAsyncStateDesignTest.kt:214)
+
+INSTRUMENTATION_STATUS: stream=
+Error in summariesAndMissingLogsKeepTheirDestinationsWithoutInventingValues(com.example.wastenot.ui.main.CoreAsyncStateDesignTest):
+java.lang.AssertionError: home-loading-light: missing state heading 'Memuat ringkasan…'; home-loading-light: missing functional state symbol; home-error-light: missing state heading 'Ringkasan belum bisa dimuat'; home-error-light: missing functional state symbol; statistics-loading-light: missing state heading 'Memuat ringkasan…'; statistics-loading-light: missing functional state symbol; statistics-empty-light: missing functional state symbol; log-loading-light: missing state heading 'Memuat catatan…'; log-loading-light: missing functional state symbol; log-error-light: missing state heading 'Catatan belum bisa dimuat.'; log-error-light: missing functional state symbol; log-missing-light: missing state heading 'Catatan tidak tersedia'; log-missing-light: missing functional state symbol; home-loading-dark: missing state heading 'Memuat ringkasan…'; home-loading-dark: missing functional state symbol; home-error-dark: missing state heading 'Ringkasan belum bisa dimuat'; home-error-dark: missing functional state symbol; statistics-loading-dark: missing state heading 'Memuat ringkasan…'; statistics-loading-dark: missing functional state symbol; statistics-empty-dark: missing functional state symbol; log-loading-dark: missing state heading 'Memuat catatan…'; log-loading-dark: missing functional state symbol; log-error-dark: missing state heading 'Catatan belum bisa dimuat.'; log-error-dark: missing functional state symbol; log-missing-dark: missing state heading 'Catatan tidak tersedia'; log-missing-dark: missing functional state symbol
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreAsyncStateDesignTest.summariesAndMissingLogsKeepTheirDestinationsWithoutInventingValues(CoreAsyncStateDesignTest.kt:214)
+
+INSTRUMENTATION_STATUS: test=summariesAndMissingLogsKeepTheirDestinationsWithoutInventingValues
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.CoreAsyncStateDesignTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=guideCatalogAndSearchHaveDifferentRecoveryAndMissingDetailsCannotPrefill
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.CoreAsyncStateDesignTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=3
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: guide-loading-light: missing state heading 'Memuat panduan…'; guide-loading-light: missing functional state symbol; guide-catalog-empty-light: missing state heading 'Panduan belum ditemukan'; guide-catalog-empty-light: missing functional state symbol; guide-catalog-empty-light: no reload action for an unfiltered empty catalog; guide-search-empty-light: missing state heading 'Panduan belum ditemukan'; guide-search-empty-light: missing functional state symbol; guide-error-light: missing state heading 'Panduan belum bisa dimuat'; guide-error-light: missing functional state symbol; guide-detail-loading-light: missing state heading 'Memuat panduan…'; guide-detail-loading-light: missing functional state symbol; guide-detail-missing-light: missing state heading 'Panduan sudah tidak tersedia'; guide-detail-missing-light: missing functional state symbol; guide-loading-dark: missing state heading 'Memuat panduan…'; guide-loading-dark: missing functional state symbol; guide-catalog-empty-dark: missing state heading 'Panduan belum ditemukan'; guide-catalog-empty-dark: missing functional state symbol; guide-catalog-empty-dark: no reload action for an unfiltered empty catalog; guide-search-empty-dark: missing state heading 'Panduan belum ditemukan'; guide-search-empty-dark: missing functional state symbol; guide-error-dark: missing state heading 'Panduan belum bisa dimuat'; guide-error-dark: missing functional state symbol; guide-detail-loading-dark: missing state heading 'Memuat panduan…'; guide-detail-loading-dark: missing functional state symbol; guide-detail-missing-dark: missing state heading 'Panduan sudah tidak tersedia'; guide-detail-missing-dark: missing functional state symbol; guide recovery callbacks: expected 4, actual 2
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreAsyncStateDesignTest.guideCatalogAndSearchHaveDifferentRecoveryAndMissingDetailsCannotPrefill(CoreAsyncStateDesignTest.kt:168)
+
+INSTRUMENTATION_STATUS: stream=
+Error in guideCatalogAndSearchHaveDifferentRecoveryAndMissingDetailsCannotPrefill(com.example.wastenot.ui.main.CoreAsyncStateDesignTest):
+java.lang.AssertionError: guide-loading-light: missing state heading 'Memuat panduan…'; guide-loading-light: missing functional state symbol; guide-catalog-empty-light: missing state heading 'Panduan belum ditemukan'; guide-catalog-empty-light: missing functional state symbol; guide-catalog-empty-light: no reload action for an unfiltered empty catalog; guide-search-empty-light: missing state heading 'Panduan belum ditemukan'; guide-search-empty-light: missing functional state symbol; guide-error-light: missing state heading 'Panduan belum bisa dimuat'; guide-error-light: missing functional state symbol; guide-detail-loading-light: missing state heading 'Memuat panduan…'; guide-detail-loading-light: missing functional state symbol; guide-detail-missing-light: missing state heading 'Panduan sudah tidak tersedia'; guide-detail-missing-light: missing functional state symbol; guide-loading-dark: missing state heading 'Memuat panduan…'; guide-loading-dark: missing functional state symbol; guide-catalog-empty-dark: missing state heading 'Panduan belum ditemukan'; guide-catalog-empty-dark: missing functional state symbol; guide-catalog-empty-dark: no reload action for an unfiltered empty catalog; guide-search-empty-dark: missing state heading 'Panduan belum ditemukan'; guide-search-empty-dark: missing functional state symbol; guide-error-dark: missing state heading 'Panduan belum bisa dimuat'; guide-error-dark: missing functional state symbol; guide-detail-loading-dark: missing state heading 'Memuat panduan…'; guide-detail-loading-dark: missing functional state symbol; guide-detail-missing-dark: missing state heading 'Panduan sudah tidak tersedia'; guide-detail-missing-dark: missing functional state symbol; guide recovery callbacks: expected 4, actual 2
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreAsyncStateDesignTest.guideCatalogAndSearchHaveDifferentRecoveryAndMissingDetailsCannotPrefill(CoreAsyncStateDesignTest.kt:168)
+
+INSTRUMENTATION_STATUS: test=guideCatalogAndSearchHaveDifferentRecoveryAndMissingDetailsCannotPrefill
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 55.912
+There were 3 failures:
+1) historyUnknownIsNotZeroAndRecoveryKeepsCachedRecords(com.example.wastenot.ui.main.CoreAsyncStateDesignTest)
+java.lang.AssertionError: history-loading-light: missing state heading 'Memuat catatan…'; history-loading-light: missing functional state symbol; history-loading-light: unresolved data presented as zero; history-error-light: missing state heading 'Catatan belum bisa dimuat.'; history-error-light: missing functional state symbol; history-empty-light: missing state heading 'Belum ada catatan'; history-empty-light: missing functional state symbol; history-loading-dark: missing state heading 'Memuat catatan…'; history-loading-dark: missing functional state symbol; history-loading-dark: unresolved data presented as zero; history-error-dark: missing state heading 'Catatan belum bisa dimuat.'; history-error-dark: missing functional state symbol; history-empty-dark: missing state heading 'Belum ada catatan'; history-empty-dark: missing functional state symbol
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreAsyncStateDesignTest.historyUnknownIsNotZeroAndRecoveryKeepsCachedRecords(CoreAsyncStateDesignTest.kt:123)
+2) summariesAndMissingLogsKeepTheirDestinationsWithoutInventingValues(com.example.wastenot.ui.main.CoreAsyncStateDesignTest)
+java.lang.AssertionError: home-loading-light: missing state heading 'Memuat ringkasan…'; home-loading-light: missing functional state symbol; home-error-light: missing state heading 'Ringkasan belum bisa dimuat'; home-error-light: missing functional state symbol; statistics-loading-light: missing state heading 'Memuat ringkasan…'; statistics-loading-light: missing functional state symbol; statistics-empty-light: missing functional state symbol; log-loading-light: missing state heading 'Memuat catatan…'; log-loading-light: missing functional state symbol; log-error-light: missing state heading 'Catatan belum bisa dimuat.'; log-error-light: missing functional state symbol; log-missing-light: missing state heading 'Catatan tidak tersedia'; log-missing-light: missing functional state symbol; home-loading-dark: missing state heading 'Memuat ringkasan…'; home-loading-dark: missing functional state symbol; home-error-dark: missing state heading 'Ringkasan belum bisa dimuat'; home-error-dark: missing functional state symbol; statistics-loading-dark: missing state heading 'Memuat ringkasan…'; statistics-loading-dark: missing functional state symbol; statistics-empty-dark: missing functional state symbol; log-loading-dark: missing state heading 'Memuat catatan…'; log-loading-dark: missing functional state symbol; log-error-dark: missing state heading 'Catatan belum bisa dimuat.'; log-error-dark: missing functional state symbol; log-missing-dark: missing state heading 'Catatan tidak tersedia'; log-missing-dark: missing functional state symbol
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreAsyncStateDesignTest.summariesAndMissingLogsKeepTheirDestinationsWithoutInventingValues(CoreAsyncStateDesignTest.kt:214)
+3) guideCatalogAndSearchHaveDifferentRecoveryAndMissingDetailsCannotPrefill(com.example.wastenot.ui.main.CoreAsyncStateDesignTest)
+java.lang.AssertionError: guide-loading-light: missing state heading 'Memuat panduan…'; guide-loading-light: missing functional state symbol; guide-catalog-empty-light: missing state heading 'Panduan belum ditemukan'; guide-catalog-empty-light: missing functional state symbol; guide-catalog-empty-light: no reload action for an unfiltered empty catalog; guide-search-empty-light: missing state heading 'Panduan belum ditemukan'; guide-search-empty-light: missing functional state symbol; guide-error-light: missing state heading 'Panduan belum bisa dimuat'; guide-error-light: missing functional state symbol; guide-detail-loading-light: missing state heading 'Memuat panduan…'; guide-detail-loading-light: missing functional state symbol; guide-detail-missing-light: missing state heading 'Panduan sudah tidak tersedia'; guide-detail-missing-light: missing functional state symbol; guide-loading-dark: missing state heading 'Memuat panduan…'; guide-loading-dark: missing functional state symbol; guide-catalog-empty-dark: missing state heading 'Panduan belum ditemukan'; guide-catalog-empty-dark: missing functional state symbol; guide-catalog-empty-dark: no reload action for an unfiltered empty catalog; guide-search-empty-dark: missing state heading 'Panduan belum ditemukan'; guide-search-empty-dark: missing functional state symbol; guide-error-dark: missing state heading 'Panduan belum bisa dimuat'; guide-error-dark: missing functional state symbol; guide-detail-loading-dark: missing state heading 'Memuat panduan…'; guide-detail-loading-dark: missing functional state symbol; guide-detail-missing-dark: missing state heading 'Panduan sudah tidak tersedia'; guide-detail-missing-dark: missing functional state symbol; guide recovery callbacks: expected 4, actual 2
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreAsyncStateDesignTest.guideCatalogAndSearchHaveDifferentRecoveryAndMissingDetailsCannotPrefill(CoreAsyncStateDesignTest.kt:168)
+
+FAILURES!!!
+Tests run: 3,  Failures: 3
+
+
+INSTRUMENTATION_CODE: -1

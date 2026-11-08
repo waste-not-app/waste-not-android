@@ -1,0 +1,16 @@
+{
+  "backend_sha": "9a6aefdb76b246e06b20546243f6c1dd69e16ac5",
+  "android_main": "c1258596cb71bc7b95dc9a4f140f55f759815c4e",
+  "metadata": {
+    "url": "https://pred-autoscaler.bccdev.id/wastenot/api/v1/metadata",
+    "error": "HTTP Error 401: Unauthorized"
+  },
+  "readiness": {
+    "url": "https://pred-autoscaler.bccdev.id/wastenot/api/health/ready",
+    "status": 200,
+    "body": {
+      "ready": true
+    },
+    "checked_at": "2026-11-04T15:30:11.205526+00:00"
+  }
+}

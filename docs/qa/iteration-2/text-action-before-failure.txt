@@ -1,0 +1,59 @@
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.auth.AuthTextActionDesignTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=pendingFormsKeepSwitchActionsReadableAndOnlyAnExplicitIdleClickSwitches
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.auth.AuthTextActionDesignTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stream=
+Error in pendingFormsKeepSwitchActionsReadableAndOnlyAnExplicitIdleClickSwitches(com.example.wastenot.ui.auth.AuthTextActionDesignTest):
+java.lang.AssertionError: Pending form switch must use the opaque kit muted label expected:<Color(0.32156864, 0.39215687, 0.34117648, 1.0, sRGB IEC61966-2.1)> but was:<Color(0.32156864, 0.39215687, 0.34117648, 0.38039216, sRGB IEC61966-2.1)>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.example.wastenot.ui.auth.AuthTextActionDesignTest.pendingFormsKeepSwitchActionsReadableAndOnlyAnExplicitIdleClickSwitches(AuthTextActionDesignTest.kt:43)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=pendingFormsKeepSwitchActionsReadableAndOnlyAnExplicitIdleClickSwitches
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.auth.AuthTextActionDesignTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Pending form switch must use the opaque kit muted label expected:<Color(0.32156864, 0.39215687, 0.34117648, 1.0, sRGB IEC61966-2.1)> but was:<Color(0.32156864, 0.39215687, 0.34117648, 0.38039216, sRGB IEC61966-2.1)>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.example.wastenot.ui.auth.AuthTextActionDesignTest.pendingFormsKeepSwitchActionsReadableAndOnlyAnExplicitIdleClickSwitches(AuthTextActionDesignTest.kt:43)
+
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.main.OverviewTextActionDesignTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=recentActivitiesAndItsHistoryActionKeepReadableSpaceInBothThemes
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.OverviewTextActionDesignTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=recentActivitiesAndItsHistoryActionKeepReadableSpaceInBothThemes
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.OverviewTextActionDesignTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 7.852
+There was 1 failure:
+1) pendingFormsKeepSwitchActionsReadableAndOnlyAnExplicitIdleClickSwitches(com.example.wastenot.ui.auth.AuthTextActionDesignTest)
+java.lang.AssertionError: Pending form switch must use the opaque kit muted label expected:<Color(0.32156864, 0.39215687, 0.34117648, 1.0, sRGB IEC61966-2.1)> but was:<Color(0.32156864, 0.39215687, 0.34117648, 0.38039216, sRGB IEC61966-2.1)>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.example.wastenot.ui.auth.AuthTextActionDesignTest.pendingFormsKeepSwitchActionsReadableAndOnlyAnExplicitIdleClickSwitches(AuthTextActionDesignTest.kt:43)
+
+FAILURES!!!
+Tests run: 2,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

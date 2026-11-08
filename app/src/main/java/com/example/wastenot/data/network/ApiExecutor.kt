@@ -16,7 +16,20 @@ import kotlinx.serialization.json.Json
 import retrofit2.Response
 
 class ApiExecutor(private val json: Json, private val clock: Clock = Clock.systemUTC()) {
-    suspend fun <D, T> execute(map: (D) -> T, call: suspend () -> Response<DataEnvelope<D>>): ApiResult<T> {
+    suspend fun <D, T> execute(map: (D) -> T, call: suspend () -> Response<DataEnvelope<D>>): ApiResult<T> =
+        executeWithStatus({ data, _ -> map(data) }, call)
+
+    suspend fun <D, T> executeWithStatus(map: (D, Int) -> T, call: suspend () -> Response<DataEnvelope<D>>): ApiResult<T> =
+        respond(call) { response ->
+            val envelope = response.body() ?: return@respond malformed(response)
+            ApiResult.Success(map(envelope.data, response.code()), envelope.page?.toModel())
+        }
+
+    suspend fun executeEmpty(call: suspend () -> Response<Unit>): ApiResult<Unit> = respond(call) { response ->
+        if (response.code() == 204) ApiResult.Success(Unit) else malformed(response)
+    }
+
+    private suspend fun <D, T> respond(call: suspend () -> Response<D>, map: (Response<D>) -> ApiResult<T>): ApiResult<T> {
         try {
             val response = call()
             if (!response.isSuccessful) {
@@ -33,10 +46,8 @@ class ApiExecutor(private val json: Json, private val clock: Clock = Clock.syste
                     retryAt = retryAfter(response.headers()["Retry-After"], clock.instant()),
                 ))
             }
-            val envelope = response.body()
-                ?: return ApiResult.Failure(ApiFailure(ApiFailureKind.MALFORMED_RESPONSE, response.code()))
             return try {
-                ApiResult.Success(map(envelope.data), envelope.page?.toModel())
+                map(response)
             } catch (_: IllegalArgumentException) {
                 malformed(response)
             } catch (_: DateTimeException) {
@@ -80,12 +91,13 @@ private fun classify(status: Int, code: String?): ApiFailureKind = when (status)
         "EMAIL_EXISTS" -> ApiFailureKind.EMAIL_EXISTS
         "VERSION_CONFLICT" -> ApiFailureKind.VERSION_CONFLICT
         "IDEMPOTENCY_CONFLICT" -> ApiFailureKind.IDEMPOTENCY_CONFLICT
+        "AI_ALREADY_LINKED" -> ApiFailureKind.AI_ALREADY_LINKED
         else -> ApiFailureKind.CONFLICT
     }
-    410 -> ApiFailureKind.DELETED
+    410 -> if (code == "AI_SESSION_EXPIRED") ApiFailureKind.AI_EXPIRED else ApiFailureKind.DELETED
     413 -> ApiFailureKind.FILE_TOO_LARGE
     415 -> ApiFailureKind.UNSUPPORTED_MEDIA
-    422 -> ApiFailureKind.VALIDATION
+    422 -> if (code == "AI_REFERENCE_INVALID") ApiFailureKind.AI_REFERENCE_INVALID else ApiFailureKind.VALIDATION
     428 -> ApiFailureKind.PRECONDITION_REQUIRED
     429 -> ApiFailureKind.RATE_LIMITED
     in 500..599 -> ApiFailureKind.SERVER

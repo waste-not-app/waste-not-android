@@ -16,6 +16,10 @@ Staging tidak debuggable dan memakai debug certificate untuk instalasi uji. HotS
 
 ## Build dari checkout baru
 
+Baseline dukungan diperbarui atas pilihan pengguna pada 5 November 2026: **Android 11 / API 30 ke atas**. Native, staging, release dan hot reload memakai minimum yang sama; CI memeriksa manifest APK native dengan `verify_minimum_sdk.py` dan menyimpan artifact `app-native-api30`. Angka SDK 24 pada audit starter dan bukti QA lama adalah riwayat pengujian, bukan batas instalasi saat ini. Pengujian utama menggunakan Android terbaru; compile/target SDK yang terpasang pada checkpoint ini masih 36.
+
+Pemeriksaan dokumentasi resmi pada tanggal tersebut mengidentifikasi Android 17 / API 37 sebagai versi stabil terbaru: [referensi API AOSP](https://source.android.com/docs/setup/reference/build-numbers) dan [panduan pengujian Android 17](https://developer.android.com/about/versions/17). Bukti runtime API 36 yang sudah ada adalah Android 16; jangan menyebutnya pengujian Android terbaru. Penerimaan API 30 dan API 37 masih perlu dijalankan.
+
 Pasang JDK 17 dan Android SDK Platform 36. Arahkan `ANDROID_HOME` ke SDK, atau isi `sdk.dir` dalam `local.properties` yang diabaikan Git.
 
 ```sh
@@ -28,22 +32,24 @@ Starter menyediakan task unit test debug (termasuk renderer Navigation Graph); t
 
 ## Konfigurasi lingkungan
 
+Semua build aplikasi menggunakan akun dan data backend nyata. Instalasi baru menampilkan Masuk/Daftar. Tidak ada akun otomatis, penyimpanan aktivitas lokal pengganti server atau pilihan sumber buatan. Sumber pengujian berada di `src/testFixtures`/`src/androidTest` dan tidak ikut APK aplikasi.
+
 | Build type | Property Gradle | Default | Kebijakan |
 |---|---|---|---|
-| debug | `wastenot.debugApiBaseUrl` | `http://10.0.2.2:8080/v1/` | HTTP hanya untuk emulator/localhost |
-| staging | `wastenot.stagingApiBaseUrl` | kosong | HTTPS; application ID `.staging` |
-| release | `wastenot.releaseApiBaseUrl` | kosong | HTTPS; tidak membawa URL debug |
+| debug | `wastenot.debugApiBaseUrl` | `https://pred-autoscaler.bccdev.id/wastenot/api/v1/` | HTTPS; HTTP localhost/emulator hanya melalui override eksplisit |
+| staging | `wastenot.stagingApiBaseUrl` | alamat HTTPS yang sama | HTTPS; application ID `.staging` |
+| release | `wastenot.releaseApiBaseUrl` | alamat HTTPS yang sama | HTTPS; memerlukan signing untuk distribusi |
 
-Nilai kosong berarti backend belum dikonfigurasi; bukan alamat layanan produksi. Repository HTTP pada A03 harus menampilkan kegagalan konfigurasi secara terarah sebelum mengirim request jika nilainya kosong. Base URL adalah konfigurasi publik dalam `BuildConfig.API_BASE_URL`, bukan tempat menyimpan credential atau API key.
+Nilai kosong ditolak saat konfigurasi build. Base URL adalah konfigurasi publik dalam `BuildConfig.API_BASE_URL`, bukan tempat menyimpan credential atau API key.
 
 ```sh
-# Backend lokal di host emulator
-./gradlew assembleDebug
+# Build native yang langsung menggunakan backend HTTPS
+./gradlew assembleDebug assembleStaging -Pwastenot.hotReload=false
 
-# HTTPS staging: isi URL nyata dari tim melalui environment lokal
-./gradlew assembleStaging "-Pwastenot.stagingApiBaseUrl=$WASTENOT_STAGING_API_BASE_URL"
+# Override backend lokal untuk pengembangan transport
+./gradlew assembleDebug -Pwastenot.debugApiBaseUrl=http://10.0.2.2:8080/v1/
 
-# HTTPS release: isi URL nyata dari tim melalui environment lokal
+# Backend release yang ditetapkan lingkungan
 ./gradlew assembleRelease "-Pwastenot.releaseApiBaseUrl=$WASTENOT_RELEASE_API_BASE_URL"
 ```
 
@@ -56,16 +62,16 @@ Backup cloud/device-transfer data internal dinonaktifkan pada baseline. Aturan y
 Repo yang diaudit baru memiliki branch remote `main`. Gunakan branch tugas dari commit dasar yang sudah diverifikasi; `develop` dapat menjadi keputusan workflow tim berikutnya.
 
 ```sh
-git switch -c codex/A01-nama-perubahan
+git switch -c chore/3-android-foundation
 ./gradlew lintDebug lintStaging lintRelease testDebugUnitTest assembleDebug assembleStaging assembleRelease
 git add <file-yang-terkait-tugas>
 git commit -m "chore(android): describe the completed change (#3)"
 git push -u origin HEAD
 ```
 
-`Android CI` mencakup `codex/**`, lint tiga build type serta unit test debug, pengujian konfigurasi URL, APK debug/staging/release, serta artifact laporan. CI tidak memakai credential signing atau deployment. `Android Release & Deploy` tetap mengikuti trigger main/tag/manual yang sudah ada, memeriksa lint release dan unit test debug dari source bersama, dan menolak deployment jika APK tidak ditandatangani. Push branch tugas tidak menjalankan workflow deploy.
+`Android CI` mencakup `feat/**`, `fix/**` dan branch tugas standar lainnya, lint tiga build type serta unit test debug, pengujian konfigurasi URL, APK debug/staging/release, serta artifact laporan. CI tidak memakai credential signing atau deployment. `Android Release & Deploy` tetap mengikuti trigger main/tag/manual yang sudah ada, memeriksa lint release dan unit test debug dari source bersama, dan menolak deployment jika APK tidak ditandatangani. Push branch tugas tidak menjalankan workflow deploy.
 
-Input versi manual diperlakukan sebagai environment value lalu diperiksa agar aman sebagai nama file. URL API release dapat disediakan lewat GitHub repository variable `WASTENOT_RELEASE_API_BASE_URL`. Lihat [panduan CI/CD](CICD_SETUP.md) untuk nama secrets dan operasi rilis.
+Input versi manual diperlakukan sebagai environment value lalu diperiksa agar aman sebagai nama file. Workflow rilis memakai adapter remote dan mewajibkan GitHub repository variable `WASTENOT_RELEASE_API_BASE_URL` berisi origin API HTTPS. Nilai kosong menghentikan build publikasi; seluruh varian aplikasi memakai sumber remote. Lihat [panduan CI/CD](CICD_SETUP.md) untuk nama secrets dan operasi rilis.
 
 ## Bukti dan keputusan yang masih perlu
 

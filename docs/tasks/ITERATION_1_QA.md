@@ -1,5 +1,7 @@
 # Iteration 1: bukti Android
 
+> Koreksi penerimaan visual, 19 Oktober 2026: hasil fungsi/perangkat di bawah tetap merupakan bukti historis, tetapi label Purpose/Craft PASS tidak membuktikan kesesuaian mockup. Pengguna mengonfirmasi komposisi layar dan navbar belum sesuai. Penerimaan visual dibuka kembali dan dilanjutkan pada [Iteration 2](ITERATION_2_DESIGN.md).
+
 Tanggal pengujian: 15 Oktober 2026. Branch: `codex/android-auth-navigation`, ditumpuk di atas `codex/android-theme-forms` (PR #94). Dua belas task berada di Iteration 1, 13–26 Oktober. Seluruh issue Android ditugaskan kepada `oktavsm`.
 
 ## Batas penerimaan

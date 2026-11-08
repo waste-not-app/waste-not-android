@@ -1,0 +1,108 @@
+{
+  "run_id": "9143256f-6e8e-4a05-93bb-84d782e8d9e2",
+  "channel": "public HTTPS from Android",
+  "api_level": 37,
+  "complete": true,
+  "cleanup_complete": true,
+  "system_anr_dialog_absent": true,
+  "before_count": 0,
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "night_mode_before": "no",
+  "instrumentation_returncode": 0,
+  "passed_steps": [
+    "ui_registration_and_live_catalog",
+    "real_camerax_photo_survives_theme_changes",
+    "real_ai_ui_context_and_recommendation_do_not_auto_save",
+    "ui_explicit_save_keeps_ai_reference_and_awards_ten_xp",
+    "ui_edit_updates_existing_record_without_more_xp",
+    "ui_delete_refreshes_server_profile_and_summary",
+    "ui_logout_clears_device_credential"
+  ],
+  "owned_ai_operations_before_cleanup": [
+    {
+      "operation": "RECOMMENDATION",
+      "state": "COMPLETED",
+      "http_status": 201,
+      "error_code": "",
+      "result_status": "READY",
+      "objects": null
+    },
+    {
+      "operation": "DETECTION",
+      "state": "COMPLETED",
+      "http_status": 201,
+      "error_code": "",
+      "result_status": "REVIEW_REQUIRED",
+      "objects": [
+        {
+          "bbox": [
+            0.6852180361747742,
+            0.043276023119688034,
+            0.9989410638809204,
+            0.9638006091117859
+          ],
+          "category": null,
+          "class_id": 39,
+          "object_id": "object-1",
+          "raw_class": "bottle",
+          "confidence": 0.7272477746009827,
+          "object_key": null,
+          "ambiguous_with": [],
+          "review_reasons": [],
+          "confidence_band": "OFFERED",
+          "review_thresholds": {
+            "lower": 0.5,
+            "offered": 0.7
+          },
+          "supported_for_review": true,
+          "suggested_object_keys": [
+            "pet_bottle",
+            "glass_bottle"
+          ],
+          "requires_material_confirmation": true
+        }
+      ]
+    },
+    {
+      "operation": "RECOMMENDATION",
+      "state": "COMPLETED",
+      "http_status": 200,
+      "error_code": "",
+      "result_status": "NEEDS_CONTEXT",
+      "objects": null
+    }
+  ],
+  "owned_ai_snapshots_before_cleanup": [
+    {
+      "accepted": true,
+      "final_category": "PLASTIC",
+      "final_method": "RECYCLE",
+      "provider": "gemini",
+      "prototype_only": "false",
+      "model_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1"
+    }
+  ],
+  "removed_ids": [
+    "e03ac2bc-2480-491f-8053-5aaea29466e3"
+  ],
+  "counts_after": {
+    "users": 0,
+    "sessions": 0,
+    "refresh_tokens": 0,
+    "waste_logs": 0,
+    "ai_operations": 0,
+    "ai_log_metadata": 0
+  },
+  "database_provenance_verified": true,
+  "night_mode_after": "no",
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "captures_pulled": true
+}

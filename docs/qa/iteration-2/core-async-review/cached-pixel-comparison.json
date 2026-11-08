@@ -1,0 +1,42 @@
+[
+  {
+    "name": "home-cached-error-light.png",
+    "crop_bounds": [
+      0,
+      90,
+      1170,
+      2470
+    ],
+    "identical": true
+  },
+  {
+    "name": "home-cached-error-dark.png",
+    "crop_bounds": [
+      0,
+      90,
+      1170,
+      2470
+    ],
+    "identical": true
+  },
+  {
+    "name": "history-cached-error-light.png",
+    "crop_bounds": [
+      0,
+      90,
+      1170,
+      2470
+    ],
+    "identical": true
+  },
+  {
+    "name": "history-cached-error-dark.png",
+    "crop_bounds": [
+      0,
+      90,
+      1170,
+      2470
+    ],
+    "identical": true
+  }
+]

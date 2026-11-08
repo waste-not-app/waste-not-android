@@ -1,0 +1,8 @@
+{
+  "theme": "dark",
+  "photoCallbacks": 0,
+  "manualCallbacks": 0,
+  "cameraPermission": true,
+  "previewState": "IDLE",
+  "captureEnabled": false
+}

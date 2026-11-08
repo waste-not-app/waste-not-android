@@ -30,6 +30,7 @@ import com.example.wastenot.model.QuantityUnit
 import com.example.wastenot.model.parseQuantity
 import com.example.wastenot.theme.WasteNotTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import java.time.LocalDate
@@ -40,13 +41,23 @@ class FormControlsTest {
     @Test fun unitChangesUseExactParserAndClearOtherQuantityKind() {
         val input = mutableStateOf(QuantityInput("250"))
         compose.setContent { WasteNotTheme { QuantityField(input.value, { input.value = it }) } }
-        compose.onNodeWithText("kg").performClick().assertIsSelected()
+        val unitLabel = compose.onNodeWithText("Satuan").fetchSemanticsNode().boundsInWindow
+        val unitField = compose.onNodeWithContentDescription("Satuan").fetchSemanticsNode().boundsInWindow
+        assertEquals("Unit label must align with its control", unitField.left, unitLabel.left, 1f)
+        compose.onNodeWithContentDescription("Satuan").performClick()
+        compose.onNodeWithText("kg").performClick()
+        compose.onNodeWithContentDescription("Satuan").assertTextContains("kg")
         compose.onNode(hasSetTextAction()).assertTextContains("0.25")
         compose.runOnIdle {
             assertEquals(Quantity.Weight.of(250), (parseQuantity(input.value.rawText, input.value.unit) as QuantityParseResult.Valid).quantity)
         }
-        compose.onNodeWithText("benda").performClick()
+        compose.onNodeWithContentDescription("Satuan").performClick()
+        compose.onNodeWithText("Benda").performClick()
         compose.runOnIdle { assertEquals(QuantityInput(unit = QuantityUnit.ITEM), input.value) }
+        val layouts = mutableListOf<TextLayoutResult>()
+        compose.onNodeWithContentDescription("Satuan").performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        assertEquals(1, layouts.single().lineCount)
+        assertFalse(layouts.single().hasVisualOverflow)
         compose.onNode(hasSetTextAction()).performTextReplacement("2,5")
         compose.runOnIdle { assertEquals(QuantityParseResult.Invalid.FORMAT, parseQuantity(input.value.rawText, input.value.unit)) }
     }
@@ -117,5 +128,32 @@ class FormControlsTest {
         visibleCalendarDay("Monday, August 31, 2026").performClick()
         compose.onNodeWithText("Terapkan").performClick()
         compose.runOnIdle { assertEquals(LocalDate.of(2026, 8, 31), selected.value) }
+    }
+
+    @Test fun editCalendarAllowsOnlyOriginalOldDateOutsideCreateWindow() {
+        val today = LocalDate.of(2026, 9, 21)
+        val original = today.minusDays(90)
+        val selected = mutableStateOf(original)
+        compose.setContent { WasteNotTheme {
+            DateField(selected.value, today.minusDays(30), today, { selected.value = it }, preservedDate = original)
+        } }
+        compose.onNodeWithText("23 Jun 2026").performClick()
+        compose.onNodeWithText("Monday, June 22, 2026").assertIsNotEnabled()
+        visibleCalendarDay("Tuesday, June 23, 2026").performClick()
+        compose.onNodeWithText("Terapkan").performClick()
+        compose.runOnIdle { assertEquals(original, selected.value) }
+    }
+
+    @Test fun staleCreateDateCanBeReviewedWithoutAllowingItOutsideTheWindow() {
+        val today = LocalDate.of(2026, 9, 21)
+        val stale = today.minusYears(2)
+        var changes = 0
+        compose.setContent { WasteNotTheme {
+            DateField(stale, today.minusDays(30), today, { changes++ })
+        } }
+        compose.onNodeWithText("21 Sep 2024").performClick()
+        compose.onNodeWithText("Terapkan").assertIsNotEnabled()
+        compose.onNodeWithText("Batal").performClick()
+        compose.runOnIdle { assertEquals(0, changes) }
     }
 }

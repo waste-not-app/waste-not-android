@@ -1,0 +1,25 @@
+{
+  "api": 37,
+  "complete": true,
+  "source_head": "4984b556ec6fab156897f771b72ac957aeb6f79d",
+  "apks": {
+    "app/build/outputs/apk/debug/app-debug.apk": "518552a20628b26a7bb4ef04712bfcaeb27e8854730c3d34272501ee2bcec0d0",
+    "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "6d666b7b26f1eb8dc6616a6b0781b79cc660b784b25e4163a2d901fe776d352b"
+  },
+  "source": {
+    "app/src/main/java/com/example/wastenot/ui/main/ProfileScreens.kt": "84581525887f13453433fcddccc6bf3c147b79ed8a8876ce108da74d80d52bb3",
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanSheet.kt": "fff517e83737ae41273ee7271f7254619e23e1b1f9958776237a1e99d86df76a",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/ProfileDesignTest.kt": "383fe9ad7134731098add464a9aa43942e7887f1656de39b30e81b81ff44e9be",
+    "app/src/androidTest/java/com/example/wastenot/ui/scan/ScanSheetTest.kt": "73b9928c684f9f01bdbd6387c3969adeed4995dd8d3fbda4c304ceddc90cb3fa"
+  },
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0",
+    "night": "no"
+  },
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480"
+  }
+}

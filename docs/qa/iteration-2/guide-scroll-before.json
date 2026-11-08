@@ -1,0 +1,53 @@
+{
+  "sampled_paper_top": 1038,
+  "before": {
+    "ime_visible": false,
+    "viewport_top": 264,
+    "viewport_bottom": 1359,
+    "paper_top": 1038,
+    "paper_bottom": 1359,
+    "scroll_value": 92
+  },
+  "outgoing": [
+    {
+      "ime_visible": false,
+      "viewport_top": 264,
+      "viewport_bottom": 1776,
+      "paper_top": 1130,
+      "paper_bottom": 1451,
+      "scroll_value": 0
+    },
+    {
+      "ime_visible": false,
+      "viewport_top": 264,
+      "viewport_bottom": 1776,
+      "paper_top": 1130,
+      "paper_bottom": 1451,
+      "scroll_value": 0
+    },
+    {
+      "ime_visible": false,
+      "viewport_top": 264,
+      "viewport_bottom": 1776,
+      "paper_top": 1130,
+      "paper_bottom": 1451,
+      "scroll_value": 0
+    },
+    {
+      "ime_visible": false,
+      "viewport_top": 264,
+      "viewport_bottom": 1776,
+      "paper_top": 1130,
+      "paper_bottom": 1451,
+      "scroll_value": 0
+    }
+  ],
+  "after": {
+    "ime_visible": false,
+    "viewport_top": 264,
+    "viewport_bottom": 1359,
+    "paper_top": 1130,
+    "paper_bottom": 1359,
+    "scroll_value": 0
+  }
+}

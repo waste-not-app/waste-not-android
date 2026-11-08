@@ -1,0 +1,113 @@
+{
+  "measurement": "calculated theme token pairs; not pixel measurements",
+  "pairs": [
+    {
+      "mode": "light",
+      "role": "body",
+      "minimum_ratio": 12.375276382226787,
+      "samples": 256
+    },
+    {
+      "mode": "light",
+      "role": "muted",
+      "minimum_ratio": 5.239210796491128,
+      "samples": 256
+    },
+    {
+      "mode": "light",
+      "role": "source link",
+      "minimum_ratio": 6.675347930888171,
+      "samples": 256
+    },
+    {
+      "mode": "light",
+      "role": "editorial",
+      "minimum_ratio": 6.342740157608409,
+      "samples": 1
+    },
+    {
+      "mode": "light",
+      "role": "method badge",
+      "minimum_ratio": 8.056027362011994,
+      "samples": 1
+    },
+    {
+      "mode": "light",
+      "role": "search input",
+      "minimum_ratio": 14.944005852968267,
+      "samples": 1
+    },
+    {
+      "mode": "light",
+      "role": "placeholder",
+      "minimum_ratio": 6.326710967049102,
+      "samples": 1
+    },
+    {
+      "mode": "light",
+      "role": "filter label",
+      "minimum_ratio": 5.402308037662863,
+      "samples": 1
+    },
+    {
+      "mode": "light",
+      "role": "error",
+      "minimum_ratio": 6.106840519033427,
+      "samples": 1
+    },
+    {
+      "mode": "dark",
+      "role": "body",
+      "minimum_ratio": 10.765926715615514,
+      "samples": 256
+    },
+    {
+      "mode": "dark",
+      "role": "muted",
+      "minimum_ratio": 6.499870060482874,
+      "samples": 256
+    },
+    {
+      "mode": "dark",
+      "role": "source link",
+      "minimum_ratio": 8.024795822662478,
+      "samples": 256
+    },
+    {
+      "mode": "dark",
+      "role": "editorial",
+      "minimum_ratio": 8.565639362381116,
+      "samples": 1
+    },
+    {
+      "mode": "dark",
+      "role": "method badge",
+      "minimum_ratio": 7.77522718823765,
+      "samples": 1
+    },
+    {
+      "mode": "dark",
+      "role": "search input",
+      "minimum_ratio": 13.91498177729452,
+      "samples": 1
+    },
+    {
+      "mode": "dark",
+      "role": "placeholder",
+      "minimum_ratio": 8.4010950320899,
+      "samples": 1
+    },
+    {
+      "mode": "dark",
+      "role": "filter label",
+      "minimum_ratio": 6.721819146075649,
+      "samples": 1
+    },
+    {
+      "mode": "dark",
+      "role": "error",
+      "minimum_ratio": 7.973068902689188,
+      "samples": 1
+    }
+  ]
+}

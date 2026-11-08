@@ -1,0 +1,53 @@
+{
+  "api_version": "1.0.0",
+  "data": {
+    "category": "OTHER",
+    "caution": "Ada risiko khusus. Ikuti petunjuk pengemasan dan pengelola yang sesuai; jangan membuang benda berbahaya sembarangan. Cuci dahulu sebelum dipakai kembali. Jangan gunakan aturan cuci biasa untuk kontaminasi kimia/biologis. Kaca/keramik retak atau pecah tidak dipakai ulang.",
+    "conditions_to_verify": [],
+    "confirmed_object_key": "ceramic_cup",
+    "context_revision": 1,
+    "detection_id": null,
+    "evidence_ids": [],
+    "expires_at": "2026-10-21T08:00:00Z",
+    "guide_refs": [
+      {
+        "guide_id": "demo-ceramic_cup",
+        "version": 4
+      }
+    ],
+    "missing_context": [
+      "risk_type"
+    ],
+    "object_id": null,
+    "prototype_only": true,
+    "provider": "fixture",
+    "reason": "Risiko khusus dicentang, tetapi jenisnya belum dijelaskan. Pilih jenis risiko agar kotor biasa tidak disamakan dengan kontaminasi berbahaya.",
+    "reason_code": "RISK_DETAILS_REQUIRED",
+    "recommendation_basis": null,
+    "recommendation_id": "00000000-0000-0000-0000-000000000006",
+    "recommendation_scope": null,
+    "recommendation_version": "pilot-policy-08",
+    "recommended_method": null,
+    "source_details": [
+      {
+        "checked_at": "2026-11-04",
+        "publisher": "US EPA",
+        "region": "Amerika Serikat",
+        "scope_note": "Jangan mencampur atau membuang limbah kimia sembarangan; ikuti label dan tanyakan pengelola setempat.",
+        "title": "Household Hazardous Waste: safe management",
+        "url": "https://www.epa.gov/hw/household-hazardous-waste-hhw"
+      }
+    ],
+    "source_urls": [
+      "https://www.epa.gov/hw/household-hazardous-waste-hhw"
+    ],
+    "special_handling": true,
+    "status": "NEEDS_CONTEXT",
+    "steps": [
+      "Periksa label dan jenis risiko tanpa membongkar, mencampur isi, atau mencoba mengolah barang.",
+      "Jangan gunakan ulang atau campurkan barang berisiko dengan aliran sampah umum sebelum jenis bahayanya jelas.",
+      "Hubungi pengelola sampah atau DLH setempat dengan menjelaskan jenis barang serta risiko yang diketahui."
+    ]
+  },
+  "request_id": "00000000-0000-0000-0000-000000000063"
+}

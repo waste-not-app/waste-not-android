@@ -94,26 +94,17 @@ class SessionViewModelTest {
         assertEquals("", model().auth.value.password)
     }
 
-    @Test fun previewIsExplicitAndEveryDemoLifetimeIsDifferent() = runTest {
+    @Test fun bootstrapKeepsTheInjectedAccountSourceWithoutPreviewSwitching() = runTest {
         val source = FakeSession()
         val vm = model(source)
         runCurrent()
-        assertFalse(vm.session.value.isDemo)
-        vm.preview()
-        advanceUntilIdle()
-        val first = vm.session.value.phase as SessionState.Authenticated
-        assertTrue(vm.session.value.isDemo)
-        assertEquals("Pengguna Demo", first.user.name)
-        assertEquals(0, source.loginCalls)
-        assertEquals(0, source.registerCalls)
-        vm.logout()
+        assertEquals(source.state.value, vm.session.value.phase)
+        vm.bootstrap()
         advanceUntilIdle()
         assertTrue(vm.session.value.phase is SessionState.SignedOut)
-        vm.preview()
-        advanceUntilIdle()
-        val second = vm.session.value.phase as SessionState.Authenticated
-        assertEquals(first.user.id, second.user.id)
-        assertTrue(second.epoch > first.epoch)
+        assertEquals(source.state.value, vm.session.value.phase)
+        assertEquals(0, source.loginCalls)
+        assertEquals(0, source.registerCalls)
     }
 
     @Test fun serverFieldErrorsOnlyFocusFieldsPresentInTheSubmittedForm() = runTest {
@@ -213,7 +204,7 @@ class SessionViewModelTest {
 
     private class FakeSession : AccountSession {
         override val state = MutableStateFlow<SessionState>(SessionState.SignedOut())
-        override val isDemo = false
+
         val user = User("00000000-0000-4000-8000-000000000002", "Sample User", "sample@example.invalid", ZoneId.of("Asia/Jakarta"), null)
         var bootstrapCalls = 0
         var loginCalls = 0

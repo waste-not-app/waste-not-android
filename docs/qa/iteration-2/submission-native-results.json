@@ -1,0 +1,165 @@
+{
+  "date": "2026-10-20",
+  "units": {
+    "tests": 120,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native_executions": 22,
+  "unique_cases": 10,
+  "apks": {
+    "native-submission-api24.apk": "25e0ef37fbaf53d0f37bc9892b7a2ca5e458c9561d5bd81349b71ddb3e74eb30",
+    "native-submission-api24-tests.apk": "e8aff935f2cfecd18bd8fdcd0b3d842356eecfbb08e817e3274c2c432d919675"
+  },
+  "regression_before": "java.lang.AssertionError: Changed payload must never reach the store expected:<1> but was:<2>",
+  "regression_after": "passed",
+  "suites": [
+    {
+      "suite": "submission-normal-compact",
+      "api": 24,
+      "width_dp": 360,
+      "font_scale": 1.0,
+      "density": "Physical density: 480",
+      "passed": 9,
+      "skipped": 0,
+      "seconds": 94.858,
+      "cases": [
+        {
+          "test": "conflictingRequestOffersHistoryWithoutRetryingOrReplacingItsInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "rejectedSubmissionKeepsAnEditableDraft",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "uncertainDarkSubmissionRestoresAndRetriesTheSameInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "uncertainLightSubmissionRestoresAndRetriesTheSameInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "deletedRequestOffersHistoryWithoutRetryingOrReplacingItsInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "lightEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest"
+        },
+        {
+          "test": "darkEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest"
+        },
+        {
+          "test": "confirmedCreateSurvivesRecreationAndEditNeverAnnouncesNewXp",
+          "class": "com.example.wastenot.ui.main.SaveConfirmationNavigationTest"
+        },
+        {
+          "test": "directDummyHomeDockAndManualFallbackRetainAllFiveStacks",
+          "class": "com.example.wastenot.ui.main.Iteration2DesignTest"
+        }
+      ],
+      "screenshots": [
+        "submission-unknown-light-360.png",
+        "submission-unknown-dark-360.png",
+        "submission-deleted-light-360.png",
+        "submission-conflict-dark-360.png"
+      ]
+    },
+    {
+      "suite": "submission-phone200-compact",
+      "api": 24,
+      "width_dp": 360,
+      "font_scale": 2.0,
+      "density": "Physical density: 480",
+      "passed": 7,
+      "skipped": 0,
+      "seconds": 72.3,
+      "cases": [
+        {
+          "test": "conflictingRequestOffersHistoryWithoutRetryingOrReplacingItsInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "rejectedSubmissionKeepsAnEditableDraft",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "uncertainDarkSubmissionRestoresAndRetriesTheSameInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "uncertainLightSubmissionRestoresAndRetriesTheSameInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "deletedRequestOffersHistoryWithoutRetryingOrReplacingItsInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "lightEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest"
+        },
+        {
+          "test": "darkEditorValidatesOnBlurRestoresDraftAndSavesThroughDetail",
+          "class": "com.example.wastenot.ui.main.EditorDesignNavigationTest"
+        }
+      ],
+      "screenshots": [
+        "submission-unknown-light-360-font200.png",
+        "submission-unknown-dark-360-font200.png",
+        "submission-deleted-light-360-font200.png",
+        "submission-conflict-dark-360-font200.png"
+      ]
+    },
+    {
+      "suite": "submission-wide200-compact",
+      "api": 24,
+      "width_dp": 600,
+      "font_scale": 2.0,
+      "density": "Physical density: 480\nOverride density: 288",
+      "passed": 6,
+      "skipped": 0,
+      "seconds": 46.886,
+      "cases": [
+        {
+          "test": "conflictingRequestOffersHistoryWithoutRetryingOrReplacingItsInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "rejectedSubmissionKeepsAnEditableDraft",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "uncertainDarkSubmissionRestoresAndRetriesTheSameInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "uncertainLightSubmissionRestoresAndRetriesTheSameInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "deletedRequestOffersHistoryWithoutRetryingOrReplacingItsInput",
+          "class": "com.example.wastenot.ui.main.EditorSubmissionTest"
+        },
+        {
+          "test": "railScrollsAndManualEditorFitsWideWindow",
+          "class": "com.example.wastenot.ui.main.WideNavigationTest"
+        }
+      ],
+      "screenshots": [
+        "submission-unknown-light-600-font200.png",
+        "submission-unknown-dark-600-font200.png",
+        "submission-deleted-light-600-font200.png",
+        "submission-conflict-dark-600-font200.png"
+      ]
+    }
+  ],
+  "error_text_contrast": {
+    "light": 6.11,
+    "dark": 7.97
+  }
+}

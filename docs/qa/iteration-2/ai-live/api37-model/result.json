@@ -1,0 +1,43 @@
+{
+  "run_id": "de4da8d5-b10d-44e1-90a0-598e232f153c",
+  "channel": "public HTTPS from Android",
+  "api_level": 37,
+  "complete": true,
+  "cleanup_complete": true,
+  "before_count": 0,
+  "instrumentation_returncode": 0,
+  "passed_steps": [
+    "register_owned_fixture",
+    "live_capabilities_and_catalog",
+    "received_real_detector_candidates",
+    "real_yolo_band_preserved_before_explicit_user_material_confirmation",
+    "server_requested_former_contents_returns_to_context",
+    "received_live_recommendation_response",
+    "gemini_replay_does_not_auto_save_or_award_xp",
+    "handoff_keeps_detection_valid_until_explicit_core_save",
+    "disk_restored_unknown_save_replays_once_after_detection_deletion",
+    "delete_reverses_log_and_derived_xp"
+  ],
+  "owned_ai_snapshots_before_cleanup": [
+    {
+      "accepted": true,
+      "final_category": "PLASTIC",
+      "final_method": "RECYCLE",
+      "provider": "gemini",
+      "prototype_only": "false",
+      "model_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1"
+    }
+  ],
+  "removed_ids": [
+    "dc0b7a71-9aee-436e-a5a6-1d91ac560d46"
+  ],
+  "counts_after": {
+    "users": 0,
+    "sessions": 0,
+    "refresh_tokens": 0,
+    "waste_logs": 0,
+    "ai_operations": 0,
+    "ai_log_metadata": 0
+  },
+  "database_provenance_verified": true
+}

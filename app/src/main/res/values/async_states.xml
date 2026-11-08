@@ -1,0 +1,10 @@
+<resources>
+    <string name="async_retry_hint">Coba muat ulang untuk melanjutkan.</string>
+    <string name="history_empty_title">Belum ada catatan</string>
+    <string name="history_empty_hint">Mulai dari aktivitas hari ini.</string>
+    <string name="history_filter_empty_title">Tidak ada catatan yang cocok</string>
+    <string name="history_filter_empty_hint">Coba hapus atau ubah filter yang dipilih.</string>
+    <string name="guide_catalog_empty_hint">Belum ada panduan yang diterbitkan. Coba muat ulang nanti.</string>
+    <string name="guide_reload">Muat ulang panduan</string>
+    <string name="guide_unavailable_hint">Kembali ke daftar untuk memilih panduan lain.</string>
+</resources>

@@ -1,5 +1,7 @@
 import java.net.URI
 import com.skydoves.compose.hotswan.interpreter.compiler.gradle.InterpreterExtension
+import org.gradle.api.tasks.testing.Test
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   alias(libs.plugins.android.application)
@@ -10,7 +12,7 @@ plugins {
   alias(libs.plugins.skydoves.navgraph)
 }
 
-// HotSwan 2.0.1 raises debug minSdk to 26; native verification covers API 24.
+// Native verification and hot reload both use the Android 11 baseline.
 if (providers.gradleProperty("wastenot.hotReload").orElse("true").get().toBooleanStrict()) {
     pluginManager.apply("com.github.skydoves.compose.hotswan.compiler")
     extensions.configure<InterpreterExtension> {
@@ -21,7 +23,7 @@ if (providers.gradleProperty("wastenot.hotReload").orElse("true").get().toBoolea
 
 fun apiBaseUrl(property: String, defaultValue: String = "", allowLocalHttp: Boolean = false): String {
     val value = providers.gradleProperty(property).orElse(defaultValue).get().trim()
-    if (value.isEmpty()) return ""
+    require(value.isNotEmpty()) { "$property must not be empty." }
     val uri = runCatching { URI(value) }.getOrElse {
         error("$property must be an absolute API URL.")
     }
@@ -44,11 +46,11 @@ android {
     compileSdk = 36
     defaultConfig {
         applicationId = "com.example.wastenot"
-        minSdk = 24
+        minSdk = 30
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.wastenot.WasteNotTestRunner"
     }
 
     val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull?.takeIf { it.isNotBlank() }
@@ -81,7 +83,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.debugApiBaseUrl", "http://10.0.2.2:8080/v1/", allowLocalHttp = true)}\"")
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.debugApiBaseUrl", "https://pred-autoscaler.bccdev.id/wastenot/api/v1/", allowLocalHttp = true)}\"")
         }
         create("staging") {
             initWith(getByName("debug"))
@@ -90,10 +92,10 @@ android {
             applicationIdSuffix = ".staging"
             versionNameSuffix = "-staging"
             matchingFallbacks += listOf("debug")
-            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.stagingApiBaseUrl")}\"")
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.stagingApiBaseUrl", "https://pred-autoscaler.bccdev.id/wastenot/api/v1/")}\"")
         }
         release {
-            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.releaseApiBaseUrl")}\"")
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.releaseApiBaseUrl", "https://pred-autoscaler.bccdev.id/wastenot/api/v1/")}\"")
             isMinifyEnabled = false
             signingConfigs.findByName("release")?.let {
                 signingConfig = it
@@ -101,6 +103,11 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+    sourceSets {
+        getByName("test").kotlin.srcDir("src/testFixtures/java")
+        getByName("androidTest").kotlin.srcDir("src/testFixtures/java")
+    }
+
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
@@ -124,7 +131,17 @@ kotlin {
     jvmToolchain(17)
 }
 
+tasks.withType<Test>().configureEach {
+    systemProperty("robolectric.dependency.repo.url", "https://repo.maven.apache.org/maven2")
+    testLogging.exceptionFormat = TestExceptionFormat.FULL
+}
+
 dependencies {
+  implementation(libs.androidx.camera.core)
+  implementation(libs.androidx.camera.camera2)
+  implementation(libs.androidx.camera.lifecycle)
+  implementation(libs.androidx.camera.view)
+  implementation(libs.androidx.work.runtime)
   coreLibraryDesugaring(libs.desugar.jdk.libs)
   implementation(libs.retrofit)
   implementation(libs.retrofit.serialization)

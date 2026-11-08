@@ -34,6 +34,7 @@ val ActionStart = Color(0xFF226948)
 val ActionEnd = Color(0xFF164B35)
 val CanvasStart = Color(0xFFFCFDF9)
 val CanvasEnd = Color(0xFFDFEEDB)
+val DockEdge = Color(0xF2FFFFFF)
 
 // WasteNot Design System v1.3: Dark
 val BackgroundDark = Color(0xFF101B15)
@@ -56,3 +57,12 @@ val ActionStartDark = Color(0xFFD0EBC1)
 val ActionEndDark = Color(0xFFADD8B1)
 val CanvasStartDark = Color(0xFF17261D)
 val CanvasEndDark = Color(0xFF203D2B)
+val DockEdgeDark = Color(0x3DD0EDD6)
+
+// Material edges and shadows are shared by both themes in the kit.
+val SummaryBorder = Color(0x26FFFFFF)
+val SummaryHighlight = Color(0x35FFFFFF)
+val SummaryShadow = Color(0x80123F30)
+val SummaryDecoration = Color(0x0CFFFFFF)
+val ActionHighlight = Color(0x30FFFFFF)
+val ActionShadow = Color(0x70123F30)

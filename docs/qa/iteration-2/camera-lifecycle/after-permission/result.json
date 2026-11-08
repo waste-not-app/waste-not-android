@@ -1,0 +1,80 @@
+{
+  "phase": "after",
+  "api_level": 37,
+  "viewport_dp": [
+    390,
+    844
+  ],
+  "font_scale": 1,
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "permission_before": {
+    "line": "android.permission.CAMERA: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]",
+    "granted": true,
+    "user_set": true,
+    "user_fixed": false
+  },
+  "runs": [
+    {
+      "method": "settingsGrantRemovesTheBlockedStateWithoutActivatingCamera",
+      "theme": "light",
+      "result": "passed"
+    },
+    {
+      "method": "settingsGrantRemovesTheBlockedStateWithoutActivatingCamera",
+      "theme": "dark",
+      "result": "passed"
+    }
+  ],
+  "app_sha256": "d0301632d89f950e20b1bebbb1811a22931d72dca7880f684e24e34c68e0af49",
+  "test_sha256": "d5196ab4969ddff5aa2b75f3a12fb5f12f9382dc687025f3072c679f03faa4a3",
+  "captures": [
+    {
+      "name": "permission-blocked-dark-panel.png",
+      "sha256": "99b1d6457d642885ec51c089abb70e35ac5da5fed19e988fa2cd715c8e0719f2"
+    },
+    {
+      "name": "permission-blocked-dark.png",
+      "sha256": "d68c8cc60e77cbd174c999d43db51f17e150ba5160e818bcdfc775b0080e45da"
+    },
+    {
+      "name": "permission-blocked-light-panel.png",
+      "sha256": "bf021fcb8d6128d491131c5ede49e99562664c33497f1e6d2c05fa4b710be95a"
+    },
+    {
+      "name": "permission-blocked-light.png",
+      "sha256": "d0b0ceb46af5b13f96282bdc9b9a75d6b4e899eed7cfce7fa29240150f4f0a6e"
+    },
+    {
+      "name": "permission-granted-return-dark-panel.png",
+      "sha256": "f66ef5de1d72bf1e1a5d553f4b01e4fee884022e663ffedf8cd34fbd50e388aa"
+    },
+    {
+      "name": "permission-granted-return-dark.png",
+      "sha256": "d4a9bcb9fb3f9430c74e0c57a61e56a8fb1cf85d1483a6bb8aa874b6ae568bb8"
+    },
+    {
+      "name": "permission-granted-return-light-panel.png",
+      "sha256": "06a5c47257d6a0e7a0ab2c4293e976967ffd86c0b693341b5fcdaaab1eaa439d"
+    },
+    {
+      "name": "permission-granted-return-light.png",
+      "sha256": "b31914e0cc5af03fddf0dbbf138fa17a018d7dcf20ed5a2ef4c7895397492e73"
+    }
+  ],
+  "result": "passed",
+  "permission_after": {
+    "line": "android.permission.CAMERA: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]",
+    "granted": true,
+    "user_set": true,
+    "user_fixed": false
+  },
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  }
+}

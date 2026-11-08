@@ -1,0 +1,203 @@
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.components.PickerAvailabilityTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lockingDateClosesTheCalendarAndNeverAppliesAnUnconfirmedChoice
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.PickerAvailabilityTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+Error in lockingDateClosesTheCalendarAndNeverAppliesAnUnconfirmedChoice(com.example.wastenot.ui.components.PickerAvailabilityTest):
+java.lang.AssertionError: Failed to assert count of nodes.
+Reason: Did not expect any node but found '1' node that satisfies: (IsDialog is defined)
+Node found:
+Node #10 at (l=0.0, t=0.0, r=1080.0, b=1704.0)px
+[IsDialog]
+Has 1 child
+
+	at androidx.compose.ui.test.AssertionsKt.assertCountEquals(Assertions.kt:282)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.lockingDateClosesTheCalendarAndNeverAppliesAnUnconfirmedChoice(PickerAvailabilityTest.kt:138)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lockingDateClosesTheCalendarAndNeverAppliesAnUnconfirmedChoice
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.PickerAvailabilityTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Failed to assert count of nodes.
+Reason: Did not expect any node but found '1' node that satisfies: (IsDialog is defined)
+Node found:
+Node #10 at (l=0.0, t=0.0, r=1080.0, b=1704.0)px
+[IsDialog]
+Has 1 child
+
+	at androidx.compose.ui.test.AssertionsKt.assertCountEquals(Assertions.kt:282)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.lockingDateClosesTheCalendarAndNeverAppliesAnUnconfirmedChoice(PickerAvailabilityTest.kt:138)
+
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=disabledCategoryKeepsItsValuePlaceholderBorderAndArrowReadable
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.PickerAvailabilityTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+Error in disabledCategoryKeepsItsValuePlaceholderBorderAndArrowReadable(com.example.wastenot.ui.components.PickerAvailabilityTest):
+java.lang.AssertionError: Category value/placeholder must use opaque muted
+Category border -3156017 != -9206665
+Category arrow has 0 muted pixels
+Category border -3156017 != -9206665
+Category arrow has 0 muted pixels
+Category value/placeholder must use opaque muted
+Category border -12627900 != -8416124
+Category arrow has 0 muted pixels
+Category border -12627900 != -8416124
+Category arrow has 0 muted pixels
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.disabledCategoryKeepsItsValuePlaceholderBorderAndArrowReadable(PickerAvailabilityTest.kt:82)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=disabledCategoryKeepsItsValuePlaceholderBorderAndArrowReadable
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.PickerAvailabilityTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Category value/placeholder must use opaque muted
+Category border -3156017 != -9206665
+Category arrow has 0 muted pixels
+Category border -3156017 != -9206665
+Category arrow has 0 muted pixels
+Category value/placeholder must use opaque muted
+Category border -12627900 != -8416124
+Category arrow has 0 muted pixels
+Category border -12627900 != -8416124
+Category arrow has 0 muted pixels
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.disabledCategoryKeepsItsValuePlaceholderBorderAndArrowReadable(PickerAvailabilityTest.kt:82)
+
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lockingQuantityClosesTheUnitMenuAndKeepsTheOriginalAmount
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.PickerAvailabilityTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+Error in lockingQuantityClosesTheUnitMenuAndKeepsTheOriginalAmount(com.example.wastenot.ui.components.PickerAvailabilityTest):
+java.lang.AssertionError: Failed to assert count of nodes.
+Reason: Did not expect any node but found '1' node that satisfies: (IsPopup is defined)
+Node found:
+Node #231 at (l=0.0, t=0.0, r=336.0, b=480.0)px
+[IsPopup]
+Has 1 child
+
+	at androidx.compose.ui.test.AssertionsKt.assertCountEquals(Assertions.kt:282)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.lockingQuantityClosesTheUnitMenuAndKeepsTheOriginalAmount(PickerAvailabilityTest.kt:116)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lockingQuantityClosesTheUnitMenuAndKeepsTheOriginalAmount
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.PickerAvailabilityTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Failed to assert count of nodes.
+Reason: Did not expect any node but found '1' node that satisfies: (IsPopup is defined)
+Node found:
+Node #231 at (l=0.0, t=0.0, r=336.0, b=480.0)px
+[IsPopup]
+Has 1 child
+
+	at androidx.compose.ui.test.AssertionsKt.assertCountEquals(Assertions.kt:282)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.lockingQuantityClosesTheUnitMenuAndKeepsTheOriginalAmount(PickerAvailabilityTest.kt:116)
+
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lockingCategoryClosesItsOpenMenuWithoutSelectingOrReopeningIt
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.PickerAvailabilityTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+Error in lockingCategoryClosesItsOpenMenuWithoutSelectingOrReopeningIt(com.example.wastenot.ui.components.PickerAvailabilityTest):
+java.lang.AssertionError: Failed to assert count of nodes.
+Reason: Did not expect any node but found '1' node that satisfies: (IsPopup is defined)
+Node found:
+Node #261 at (l=0.0, t=0.0, r=1080.0, b=1056.0)px
+[IsPopup]
+Has 1 child
+
+	at androidx.compose.ui.test.AssertionsKt.assertCountEquals(Assertions.kt:282)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.lockingCategoryClosesItsOpenMenuWithoutSelectingOrReopeningIt(PickerAvailabilityTest.kt:96)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lockingCategoryClosesItsOpenMenuWithoutSelectingOrReopeningIt
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.PickerAvailabilityTest
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Failed to assert count of nodes.
+Reason: Did not expect any node but found '1' node that satisfies: (IsPopup is defined)
+Node found:
+Node #261 at (l=0.0, t=0.0, r=1080.0, b=1056.0)px
+[IsPopup]
+Has 1 child
+
+	at androidx.compose.ui.test.AssertionsKt.assertCountEquals(Assertions.kt:282)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.lockingCategoryClosesItsOpenMenuWithoutSelectingOrReopeningIt(PickerAvailabilityTest.kt:96)
+
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 13.032
+There were 4 failures:
+1) lockingDateClosesTheCalendarAndNeverAppliesAnUnconfirmedChoice(com.example.wastenot.ui.components.PickerAvailabilityTest)
+java.lang.AssertionError: Failed to assert count of nodes.
+Reason: Did not expect any node but found '1' node that satisfies: (IsDialog is defined)
+Node found:
+Node #10 at (l=0.0, t=0.0, r=1080.0, b=1704.0)px
+[IsDialog]
+Has 1 child
+
+	at androidx.compose.ui.test.AssertionsKt.assertCountEquals(Assertions.kt:282)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.lockingDateClosesTheCalendarAndNeverAppliesAnUnconfirmedChoice(PickerAvailabilityTest.kt:138)
+2) disabledCategoryKeepsItsValuePlaceholderBorderAndArrowReadable(com.example.wastenot.ui.components.PickerAvailabilityTest)
+java.lang.AssertionError: Category value/placeholder must use opaque muted
+Category border -3156017 != -9206665
+Category arrow has 0 muted pixels
+Category border -3156017 != -9206665
+Category arrow has 0 muted pixels
+Category value/placeholder must use opaque muted
+Category border -12627900 != -8416124
+Category arrow has 0 muted pixels
+Category border -12627900 != -8416124
+Category arrow has 0 muted pixels
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.disabledCategoryKeepsItsValuePlaceholderBorderAndArrowReadable(PickerAvailabilityTest.kt:82)
+3) lockingQuantityClosesTheUnitMenuAndKeepsTheOriginalAmount(com.example.wastenot.ui.components.PickerAvailabilityTest)
+java.lang.AssertionError: Failed to assert count of nodes.
+Reason: Did not expect any node but found '1' node that satisfies: (IsPopup is defined)
+Node found:
+Node #231 at (l=0.0, t=0.0, r=336.0, b=480.0)px
+[IsPopup]
+Has 1 child
+
+	at androidx.compose.ui.test.AssertionsKt.assertCountEquals(Assertions.kt:282)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.lockingQuantityClosesTheUnitMenuAndKeepsTheOriginalAmount(PickerAvailabilityTest.kt:116)
+4) lockingCategoryClosesItsOpenMenuWithoutSelectingOrReopeningIt(com.example.wastenot.ui.components.PickerAvailabilityTest)
+java.lang.AssertionError: Failed to assert count of nodes.
+Reason: Did not expect any node but found '1' node that satisfies: (IsPopup is defined)
+Node found:
+Node #261 at (l=0.0, t=0.0, r=1080.0, b=1056.0)px
+[IsPopup]
+Has 1 child
+
+	at androidx.compose.ui.test.AssertionsKt.assertCountEquals(Assertions.kt:282)
+	at com.example.wastenot.ui.components.PickerAvailabilityTest.lockingCategoryClosesItsOpenMenuWithoutSelectingOrReopeningIt(PickerAvailabilityTest.kt:96)
+
+FAILURES!!!
+Tests run: 4,  Failures: 4
+
+
+INSTRUMENTATION_CODE: -1

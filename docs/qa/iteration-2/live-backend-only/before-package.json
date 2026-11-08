@@ -1,0 +1,8 @@
+{
+  "sha256": "d25a6e874f1076d22a0d93549687e80a5f8abbaebd616878080e3a63364c5aab",
+  "bytes": 34988887,
+  "sample_packages_present": [
+    "Lcom/example/wastenot/data/demo/",
+    "Lcom/example/wastenot/data/dummy/"
+  ]
+}

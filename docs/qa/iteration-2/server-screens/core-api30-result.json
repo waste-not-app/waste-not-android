@@ -1,0 +1,75 @@
+{
+  "run_id": "cf26f7d5-585e-41d5-9d3b-d5405bac47fc",
+  "channel": "public HTTPS",
+  "api_level": 30,
+  "completed": false,
+  "cleanup_complete": true,
+  "images": [
+    {
+      "file": "remote-home-counted.png",
+      "sha256": "8ab376c01f48c38908fa0a870a3a4a7d2d74e6bb6af8b3cbf2259f95b13db2a0"
+    },
+    {
+      "file": "remote-home-created.png",
+      "sha256": "b937fb554a62fb4b1a7b3d03201039dd3efe81a9df02c037cc9db144377eb21b"
+    },
+    {
+      "file": "remote-home-empty.png",
+      "sha256": "96b7cfeec32bb36708c89e6e5942a61951628d2cfaced36646ace84446e5afa2"
+    },
+    {
+      "file": "remote-profile-created.png",
+      "sha256": "4416d42fee7396833756b6328b46bfc9d0d4f93f3f250d124dd333731ac4f59a"
+    },
+    {
+      "file": "remote-profile-deleted.png",
+      "sha256": "0ed8b9de58c11fcb90868f3f10d53592a985924305e4c26c8fb568dcf0fb0ee1"
+    },
+    {
+      "file": "remote-statistics-counted.png",
+      "sha256": "8ad1d9b03dbd8d11ab3f0019b9fae07fce0dfe9a64f269125298e6d706fff892"
+    },
+    {
+      "file": "remote-statistics-deleted.png",
+      "sha256": "f65ad141f266efebb7598e72a0f65ee88f3b7ee3fb303055e3915319af7a9f9f"
+    },
+    {
+      "file": "remote-statistics-month.png",
+      "sha256": "2ed0477a23593ea6a5ecca730d884b7cfa83d2bf763b0b7ef49b558b5f65b85f"
+    }
+  ],
+  "device_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "null"
+  },
+  "before_count": 0,
+  "apks": {
+    "core-final.apk": "3fe1cb6260c86f3a2d559e71d8fc623525a419cc7922a126e3dcc84ba56baa26",
+    "core-final-tests.apk": "16bfbf75d5cc3c8db8459c5e1d0a736dd1c877956cbd080ab998887f66496c59"
+  },
+  "native_passed": true,
+  "native_returncode": 0,
+  "passed_steps": [
+    "register",
+    "ui_create_updates_dashboard",
+    "ui_statistics_and_profile_use_server_progress",
+    "ui_edit_refreshes_units_without_extra_xp",
+    "ui_delete_refreshes_all_server_aggregates",
+    "ui_logout_returns_to_login"
+  ],
+  "removed_ids": [
+    "a2a31d09-d992-42bf-9340-9b6e2011c0f5"
+  ],
+  "session_ids_checked": [
+    "0c880592-44eb-42f2-94cc-b8b6c993f856"
+  ],
+  "counts_after": {
+    "users": 0,
+    "sessions": 0,
+    "refresh_tokens": 0,
+    "waste_logs": 0,
+    "ai_operations": 0
+  },
+  "restore_error": "ADB failed: \nException occurred while executing 'put':\njava.lang.IllegalArgumentException: Invalid value: null for setting: font_scale\n\tat com.android.providers.settings.SettingsProvider.validateSystemSettingValue(SettingsProvider.java:1829)\n\tat com.android.providers.settings.SettingsProvider.mutateSystemSetting(SettingsProvider.java:1793)\n\tat com.android.providers.settings.SettingsProvider.insertSystemSettin"
+}

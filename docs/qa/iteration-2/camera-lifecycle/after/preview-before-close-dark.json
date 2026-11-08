@@ -1,0 +1,8 @@
+{
+  "theme": "dark",
+  "photoCallbacks": 1,
+  "manualCallbacks": 0,
+  "cameraPermission": true,
+  "previewState": "STREAMING",
+  "captureEnabled": true
+}

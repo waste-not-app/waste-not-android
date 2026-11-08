@@ -1,0 +1,49 @@
+{
+  "apk": "WasteNot-preview-backend-async.apk",
+  "size_bytes": 34988887,
+  "sha256": "d25a6e874f1076d22a0d93549687e80a5f8abbaebd616878080e3a63364c5aab",
+  "package": "com.example.wastenot.staging",
+  "source_binding": "after-build.json",
+  "remote_adapter": true,
+  "hot_reload": false,
+  "base_url": "https://pred-autoscaler.bccdev.id/wastenot/api/v1/",
+  "minimum_sdk": 30,
+  "target_sdk": 36,
+  "debuggable": false,
+  "configured_emulator_url_absent": true,
+  "cleartext_forbidden": true,
+  "summary_heading_verified_in_apk": true,
+  "system_error_present_before_install": false,
+  "package_present_before_install": true,
+  "normal_app_before": {
+    "package_info": [
+      "versionCode=1 minSdk=30 targetSdk=36",
+      "lastUpdateTime=2026-11-08 12:58:09"
+    ],
+    "apk_sha256": "55448ce0bcbd0e2aad44a811c5961f55e4e33510cff7f081641b7954686328f9"
+  },
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "installed_apk_sha256": "d25a6e874f1076d22a0d93549687e80a5f8abbaebd616878080e3a63364c5aab",
+  "runtime_smoke": "passed",
+  "api_level": 37,
+  "screen": "S02 signed-out login",
+  "editable_fields": 2,
+  "demo_absent": true,
+  "screenshot_sha256": "7b054ff0dacb59c211ec79b01bf8ee5525768f9b2a011b897fa14610b1ccc048",
+  "normal_app_after": {
+    "package_info": [
+      "versionCode=1 minSdk=30 targetSdk=36",
+      "lastUpdateTime=2026-11-08 12:58:09"
+    ],
+    "apk_sha256": "55448ce0bcbd0e2aad44a811c5961f55e4e33510cff7f081641b7954686328f9"
+  },
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  }
+}

@@ -1,6 +1,7 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.runtime.saveable.SaverScope
+import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.model.*
 import java.time.Instant
 import java.time.LocalDate
@@ -10,6 +11,68 @@ import org.junit.Test
 
 class EditorDraftTest {
     private val today = LocalDate.of(2026, 9, 21)
+
+    @Test fun aiReferenceSurvivesUnknownWriteAndProcessRestoreWithoutChangingTheReplayPayload() {
+        val draft = aiDraft()
+        val submitted = draft.prepareSubmission(today)!!
+        assertNotNull(submitted.aiProvenance)
+        draft.submissionFailed(ApiFailureKind.TIMEOUT)
+        draft.useManualEntry()
+        assertEquals(submitted.aiProvenance, draft.values.aiProvenance)
+        val restored = EditorDraft.fromSnapshot(draft.snapshot())
+        assertEquals(28, draft.snapshot().size)
+        assertEquals(draft.values, restored.values)
+        assertEquals(submitted, restored.prepareSubmission(today.plusDays(31)))
+        restored.submissionFailed(ApiFailureKind.AI_EXPIRED)
+        assertTrue(restored.locked)
+        assertEquals(submitted, restored.prepareSubmission(today.plusDays(31)))
+    }
+
+    @Test fun methodCorrectionRetainsInitialAiReferenceButCategoryAndReduceRequireExplicitManualEntry() {
+        val draft = aiDraft()
+        val source = draft.values.aiProvenance
+        draft.change(EditorField.METHOD, draft.values.copy(method = DisposalMethod.TRASH))
+        assertEquals(source, draft.validate(today)!!.aiProvenance)
+        draft.change(EditorField.CATEGORY, draft.values.copy(category = WasteCategory.METAL))
+        assertNull(draft.validate(today))
+        assertTrue(EditorField.CATEGORY in draft.errors)
+        assertEquals(source, draft.values.aiProvenance)
+        draft.change(EditorField.METHOD, draft.values.copy(method = DisposalMethod.REDUCE))
+        assertNull(draft.validate(today))
+        assertTrue(EditorField.METHOD in draft.errors)
+        draft.useManualEntry()
+        assertNull(draft.validate(today)!!.aiProvenance)
+        assertEquals(22, draft.snapshot().size)
+    }
+
+    @Test fun rejectedAiReferenceCanBeRemovedExplicitlyBeforeAFirstKnownSuccessfulWrite() {
+        for (error in listOf(ApiFailureKind.AI_EXPIRED, ApiFailureKind.AI_REFERENCE_INVALID, ApiFailureKind.AI_ALREADY_LINKED)) {
+            val draft = aiDraft()
+            draft.prepareSubmission(today)
+            draft.submissionFailed(error)
+            assertFalse(draft.locked)
+            assertNotNull(draft.values.aiProvenance)
+            draft.useManualEntry()
+            assertNull(draft.prepareSubmission(today)!!.aiProvenance)
+        }
+    }
+
+    @Test fun malformedAiDraftCannotRestoreAnUnconfirmedOrDifferentCategorySubmission() {
+        val draft = aiDraft()
+        draft.prepareSubmission(today)
+        val snapshot = draft.snapshot()
+        for (bad in listOf(snapshot.toMutableList().apply { this[26] = "not-a-uuid" },
+            snapshot.toMutableList().apply { this[27] = "METAL" },
+            snapshot.toMutableList().apply { this[24] = "" })) {
+            assertThrows(IllegalArgumentException::class.java) { EditorDraft.fromSnapshot(bad) }
+        }
+    }
+
+    private fun aiDraft() = EditorDraft.from(null, today).apply {
+        applyScan(com.example.wastenot.LogEditor(null, "draft-test", scanCategory = "GLASS", scanMethod = "RECYCLE",
+            scanRecommendationId = "00000000-0000-4000-8000-000000000002"))
+        change(EditorField.QUANTITY, values.copy(quantity = QuantityInput("1", QuantityUnit.ITEM)))
+    }
 
     @Test fun blankDraftDoesNotInventMethodOrCategory() {
         val draft = EditorDraft.from(null, today)
@@ -33,6 +96,22 @@ class EditorDraftTest {
         assertNull(edit.validate(today))
         edit.change(EditorField.QUANTITY, edit.values.copy(quantity = QuantityInput("2", QuantityUnit.ITEM)))
         assertEquals(Quantity.Count.of(2), edit.validate(today)!!.quantity)
+    }
+
+    @Test fun blurValidatesOnlyTheVisitedFieldAndDoesNotRequestFocus() {
+        val draft = EditorDraft.from(null, today)
+        assertTrue(draft.errors.isEmpty())
+        draft.validateField(EditorField.QUANTITY, today)
+        assertEquals(setOf(EditorField.QUANTITY), draft.errors.keys)
+        assertEquals(0, draft.focusRequest)
+        draft.change(EditorField.QUANTITY, draft.values.copy(quantity = QuantityInput("250")))
+        draft.validateField(EditorField.QUANTITY, today)
+        assertTrue(draft.errors.isEmpty())
+        draft.validateField(EditorField.NOTES, today)
+        assertTrue(draft.errors.isEmpty())
+        assertNull(draft.validate(today))
+        assertEquals(EditorField.METHOD, draft.errors.keys.first())
+        assertEquals(1, draft.focusRequest)
     }
 
     @Test fun excessPrecisionAndFractionalItemsAreRejectedWithoutRounding() {
@@ -77,6 +156,76 @@ class EditorDraftTest {
             draft.change(EditorField.NOTES, draft.values.copy(notes = " $note! "))
             assertNull(draft.validate(today))
             assertTrue(EditorField.NOTES in draft.errors)
+        }
+    }
+
+    @Test fun uncertainSubmissionFreezesRawValuesAndRetriesTheCanonicalSnapshotEvenAfterDateWindowMoves() {
+        val draft = EditorDraft.from(null, today)
+        draft.change(EditorField.QUANTITY, draft.values.copy(category = WasteCategory.PLASTIC, method = DisposalMethod.RECYCLE,
+            quantity = QuantityInput("0,25", QuantityUnit.KILOGRAM), notes = "  awal  "))
+        val submitted = draft.prepareSubmission(today)!!
+        assertEquals(Quantity.Weight.of(250), submitted.quantity)
+        assertEquals("awal", submitted.notes)
+        assertTrue(draft.locked)
+        val raw = draft.values
+        draft.change(EditorField.NOTES, raw.copy(notes = "koreksi"))
+        assertEquals(raw, draft.values)
+        listOf(ApiFailureKind.TIMEOUT, ApiFailureKind.NETWORK, ApiFailureKind.SERVER,
+            ApiFailureKind.HTTP, ApiFailureKind.MALFORMED_RESPONSE).forEach { error ->
+            draft.submissionFailed(error)
+            assertTrue(draft.locked)
+            assertEquals(submitted, draft.prepareSubmission(today.plusDays(31)))
+            assertEquals(raw, draft.values)
+            assertTrue(draft.errors.isEmpty())
+        }
+    }
+
+    @Test fun restoringAnUncertainSubmissionKeepsItsSnapshotAndError() {
+        val draft = EditorDraft.from(log(), today)
+        draft.change(EditorField.NOTES, draft.values.copy(notes = "  awal  "))
+        val input = draft.prepareSubmission(today)!!
+        draft.submissionFailed(ApiFailureKind.TIMEOUT)
+        val scope = object : SaverScope { override fun canBeSaved(value: Any) = true }
+        val saved = with(EditorDraft.Saver) { scope.save(draft) }!!
+        val restored = EditorDraft.Saver.restore(saved)!!
+        assertEquals(draft.values, restored.values)
+        assertEquals(draft.submittedValues, restored.submittedValues)
+        assertEquals(ApiFailureKind.TIMEOUT, restored.submissionError)
+        assertEquals(input, restored.prepareSubmission(today.plusDays(31)))
+        val oldFormat = EditorDraft.Saver.restore((saved as List<*>).take(14))!!
+        assertFalse(oldFormat.locked)
+        assertNull(oldFormat.submissionError)
+    }
+
+    @Test fun restoringAnInterruptedActiveSubmissionRequiresAnExplicitRetry() {
+        val draft = EditorDraft.from(log(), today)
+        val input = draft.prepareSubmission(today)!!
+        val scope = object : SaverScope { override fun canBeSaved(value: Any) = true }
+        val saved = with(EditorDraft.Saver) { scope.save(draft) }!!
+        val restored = EditorDraft.Saver.restore(saved)!!
+        assertTrue(restored.locked)
+        assertEquals(ApiFailureKind.TIMEOUT, restored.submissionError)
+        assertEquals(input, restored.prepareSubmission(today))
+    }
+
+    @Test fun definiteRejectionAllowsCorrectionsButConflictAndDeletedRequestsNeverRetry() {
+        listOf(ApiFailureKind.VALIDATION, ApiFailureKind.NOT_CONFIGURED, ApiFailureKind.STORAGE,
+            ApiFailureKind.RATE_LIMITED).forEach { error ->
+            val draft = EditorDraft.from(log(), today)
+            draft.prepareSubmission(today)
+            draft.submissionFailed(error)
+            assertFalse(draft.locked)
+            draft.change(EditorField.NOTES, draft.values.copy(notes = "koreksi"))
+            assertNull(draft.submissionError)
+            assertEquals("koreksi", draft.prepareSubmission(today)!!.notes)
+        }
+        listOf(ApiFailureKind.IDEMPOTENCY_CONFLICT, ApiFailureKind.DELETED).forEach { error ->
+            val draft = EditorDraft.from(log(), today)
+            draft.prepareSubmission(today)
+            draft.submissionFailed(error)
+            assertTrue(draft.locked)
+            assertTrue(draft.retryBlocked)
+            assertNull(draft.prepareSubmission(today))
         }
     }
 

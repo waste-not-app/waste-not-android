@@ -1,0 +1,20 @@
+{
+  "base_android": "05a34090af47db7769a1ce7eb5dd29c2a83e7ef8",
+  "backend": "c1e81c25d2bd24fc5e8a010cfd72217560418756",
+  "ai": "baadd773aac01f7ef48c8beb15f62875c56f6b3f",
+  "source_sha256": {
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanSheet.kt": "781684b00c45cac868c3250d280cfee8cad754287fdc5e8df57250f883e88306",
+    "app/src/main/res/values/scan.xml": "820e3127e500d4a28675402bd51bd2317e5c7f3d5735320290099edc221a19d3",
+    "app/src/androidTest/java/com/example/wastenot/ui/scan/ScanSheetTest.kt": "47fdb6c4f34de18c5292ba80ea33459697f66a10cd2504050c6fc75bb852ae36",
+    "app/src/test/java/com/example/wastenot/data/repository/AiRepositoryTest.kt": "b1931fae075ad05dcf3837ac009a3d12b0461a16ea34da25dd382840e4ad7a8d"
+  },
+  "apks": {
+    "WasteNot-policy08-debug.apk": "8a35548c5dfb3b59c00c1af88c8fd1b5c9df3e597db67aec7da1ef1035680413",
+    "WasteNot-policy08-androidTest.apk": "b4d240ca8d6ec58880463530396dd52c701233a38507ad41c4b4b30d381a645b"
+  },
+  "config": {
+    "hotReload": false,
+    "useDummyData": false,
+    "apiBaseUrl": "https://pred-autoscaler.bccdev.id/wastenot/api/v1/"
+  }
+}

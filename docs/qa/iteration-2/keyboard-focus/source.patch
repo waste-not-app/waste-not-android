@@ -1,0 +1,241 @@
+diff --git a/app/src/main/java/com/example/wastenot/ui/components/FormControls.kt b/app/src/main/java/com/example/wastenot/ui/components/FormControls.kt
+index f5f987e..236cc9d 100644
+--- a/app/src/main/java/com/example/wastenot/ui/components/FormControls.kt
++++ b/app/src/main/java/com/example/wastenot/ui/components/FormControls.kt
+@@ -1,6 +1,8 @@
+ package com.example.wastenot.ui.components
+ 
+ import androidx.compose.foundation.background
++import androidx.compose.foundation.interaction.MutableInteractionSource
++import androidx.compose.foundation.interaction.collectIsFocusedAsState
+ import androidx.compose.foundation.layout.Arrangement
+ import androidx.compose.foundation.layout.Column
+ import androidx.compose.foundation.layout.IntrinsicSize
+@@ -26,6 +28,7 @@ import androidx.compose.material3.TextFieldColors
+ import androidx.compose.runtime.Composable
+ import androidx.compose.runtime.getValue
+ import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
+ import androidx.compose.runtime.saveable.rememberSaveable
+ import androidx.compose.runtime.setValue
+ import androidx.compose.ui.Alignment
+@@ -65,16 +68,20 @@ fun ActionButton(
+ ) {
+     val actionable = enabled && !loading
+     val colors = MaterialTheme.colorScheme
++    val interactions = remember { MutableInteractionSource() }
++    val focused by interactions.collectIsFocusedAsState()
+     Button(
+         onClick = onClick,
+         modifier = modifier
+             .heightIn(min = 52.dp)
++            .focusOutline(actionable && focused, MaterialTheme.shapes.small, colors.primary, colors.surface)
+             .then(if (actionable && !destructive) Modifier
+                 .dropShadow(MaterialTheme.shapes.small, Shadow(12.dp, ActionShadow, spread = (-9).dp, offset = DpOffset(0.dp, 5.dp)))
+                 .background(LocalWasteNotGradients.current.action, MaterialTheme.shapes.small)
+                 .innerShadow(MaterialTheme.shapes.small, Shadow(0.dp, ActionHighlight, offset = DpOffset(0.dp, 1.dp)))
+             else Modifier),
+         enabled = actionable,
++        interactionSource = interactions,
+         shape = MaterialTheme.shapes.small,
+         colors = ButtonDefaults.buttonColors(
+             containerColor = if (destructive) colors.error else Color.Transparent,
+diff --git a/app/src/main/java/com/example/wastenot/ui/components/IconActionButton.kt b/app/src/main/java/com/example/wastenot/ui/components/IconActionButton.kt
+index 7d2e8fb..1a242f4 100644
+--- a/app/src/main/java/com/example/wastenot/ui/components/IconActionButton.kt
++++ b/app/src/main/java/com/example/wastenot/ui/components/IconActionButton.kt
+@@ -1,12 +1,16 @@
+ package com.example.wastenot.ui.components
+ 
+ import androidx.annotation.DrawableRes
++import androidx.compose.foundation.interaction.MutableInteractionSource
++import androidx.compose.foundation.interaction.collectIsFocusedAsState
+ import androidx.compose.foundation.layout.size
+ import androidx.compose.material3.FilledTonalIconButton
+ import androidx.compose.material3.Icon
+ import androidx.compose.material3.IconButtonDefaults
+ import androidx.compose.material3.MaterialTheme
+ import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.remember
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.res.painterResource
+ import androidx.compose.ui.unit.dp
+@@ -20,10 +24,14 @@ fun IconActionButton(
+     enabled: Boolean = true,
+ ) {
+     val colors = MaterialTheme.colorScheme
++    val interactions = remember { MutableInteractionSource() }
++    val focused by interactions.collectIsFocusedAsState()
+     FilledTonalIconButton(
+         onClick = onClick,
+-        modifier = modifier.size(48.dp),
++        modifier = modifier.size(48.dp)
++            .focusOutline(enabled && focused, MaterialTheme.shapes.small, colors.primary, colors.surface),
+         enabled = enabled,
++        interactionSource = interactions,
+         shape = MaterialTheme.shapes.small,
+         colors = IconButtonDefaults.filledTonalIconButtonColors(
+             containerColor = colors.surfaceContainer,
+diff --git a/app/src/main/java/com/example/wastenot/ui/components/SecondaryActionButton.kt b/app/src/main/java/com/example/wastenot/ui/components/SecondaryActionButton.kt
+index a8048ec..91a5e70 100644
+--- a/app/src/main/java/com/example/wastenot/ui/components/SecondaryActionButton.kt
++++ b/app/src/main/java/com/example/wastenot/ui/components/SecondaryActionButton.kt
+@@ -2,6 +2,8 @@ package com.example.wastenot.ui.components
+ 
+ import androidx.annotation.DrawableRes
+ import androidx.compose.foundation.BorderStroke
++import androidx.compose.foundation.interaction.MutableInteractionSource
++import androidx.compose.foundation.interaction.collectIsFocusedAsState
+ import androidx.compose.foundation.layout.Arrangement
+ import androidx.compose.foundation.layout.IntrinsicSize
+ import androidx.compose.foundation.layout.Row
+@@ -14,6 +16,8 @@ import androidx.compose.material3.MaterialTheme
+ import androidx.compose.material3.OutlinedButton
+ import androidx.compose.material3.Text
+ import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.remember
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.res.painterResource
+@@ -29,18 +33,26 @@ fun SecondaryActionButton(
+     @DrawableRes icon: Int? = null,
+ ) {
+     val colors = MaterialTheme.colorScheme
++    val interactions = remember { MutableInteractionSource() }
++    val focused by interactions.collectIsFocusedAsState()
+     OutlinedButton(
+         onClick = onClick,
+-        modifier = modifier.heightIn(min = 52.dp),
++        modifier = modifier.heightIn(min = 52.dp)
++            .focusOutline(enabled && focused, MaterialTheme.shapes.small, colors.primary, colors.surface),
+         enabled = enabled,
++        interactionSource = interactions,
+         shape = MaterialTheme.shapes.small,
+         colors = ButtonDefaults.outlinedButtonColors(
+-            containerColor = colors.surface,
+-            contentColor = colors.onSurface,
++            containerColor = if (enabled && focused) colors.primaryContainer else colors.surface,
++            contentColor = if (enabled && focused) colors.onPrimaryContainer else colors.onSurface,
+             disabledContainerColor = colors.surfaceContainer,
+             disabledContentColor = colors.onSurfaceVariant,
+         ),
+-        border = BorderStroke(1.dp, if (enabled) colors.outline else colors.outlineVariant),
++        border = BorderStroke(1.dp, when {
++            !enabled -> colors.outlineVariant
++            focused -> colors.primary
++            else -> colors.outline
++        }),
+     ) {
+         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+             if (icon != null) Icon(painterResource(icon), null, Modifier.size(20.dp))
+diff --git a/app/src/main/java/com/example/wastenot/ui/components/TextActionButton.kt b/app/src/main/java/com/example/wastenot/ui/components/TextActionButton.kt
+index f72d4bd..12f31f2 100644
+--- a/app/src/main/java/com/example/wastenot/ui/components/TextActionButton.kt
++++ b/app/src/main/java/com/example/wastenot/ui/components/TextActionButton.kt
+@@ -1,6 +1,8 @@
+ package com.example.wastenot.ui.components
+ 
+ import androidx.compose.foundation.BorderStroke
++import androidx.compose.foundation.interaction.MutableInteractionSource
++import androidx.compose.foundation.interaction.collectIsFocusedAsState
+ import androidx.compose.foundation.layout.IntrinsicSize
+ import androidx.compose.foundation.layout.heightIn
+ import androidx.compose.foundation.layout.width
+@@ -9,6 +11,8 @@ import androidx.compose.material3.MaterialTheme
+ import androidx.compose.material3.Text
+ import androidx.compose.material3.TextButton
+ import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.remember
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.text.style.TextAlign
+@@ -22,10 +26,14 @@ fun TextActionButton(
+     enabled: Boolean = true,
+ ) {
+     val colors = MaterialTheme.colorScheme
++    val interactions = remember { MutableInteractionSource() }
++    val focused by interactions.collectIsFocusedAsState()
+     TextButton(
+         onClick = onClick,
+-        modifier = modifier.heightIn(min = 48.dp),
++        modifier = modifier.heightIn(min = 48.dp)
++            .focusOutline(enabled && focused, MaterialTheme.shapes.small, colors.primary, colors.surface),
+         enabled = enabled,
++        interactionSource = interactions,
+         shape = MaterialTheme.shapes.small,
+         colors = ButtonDefaults.textButtonColors(
+             containerColor = Color.Transparent,
+diff --git a/app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt b/app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt
+index a1c1e99..a69de59 100644
+--- a/app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt
++++ b/app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt
+@@ -1,6 +1,10 @@
+ package com.example.wastenot.ui.main
+ 
+ import androidx.compose.foundation.background
++import androidx.compose.foundation.border
++import androidx.compose.foundation.LocalIndication
++import androidx.compose.foundation.interaction.MutableInteractionSource
++import androidx.compose.foundation.interaction.collectIsFocusedAsState
+ import androidx.compose.animation.fadeIn
+ import androidx.compose.animation.fadeOut
+ import androidx.compose.animation.togetherWith
+@@ -512,11 +516,16 @@ private fun TabRail(selected: MainTab, onSelect: (MainTab) -> Unit, onRecord: ()
+ 
+ @Composable
+ private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
++    val interactions = remember { MutableInteractionSource() }
++    val focused by interactions.collectIsFocusedAsState()
++    val shape = androidx.compose.foundation.shape.RoundedCornerShape(19.dp)
+     Column(
+         modifier = modifier
+             .heightIn(min = 54.dp)
+-            .clip(androidx.compose.foundation.shape.RoundedCornerShape(19.dp))
+-            .selectable(selected, role = Role.Tab, onClick = onClick)
++            .then(if (focused) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, shape) else Modifier)
++            .clip(shape)
++            .selectable(selected, role = Role.Tab, onClick = onClick,
++                interactionSource = interactions, indication = LocalIndication.current)
+             .padding(horizontal = 2.dp, vertical = 4.dp),
+         horizontalAlignment = Alignment.CenterHorizontally,
+         verticalArrangement = Arrangement.spacedBy(4.dp),
+diff --git a/app/src/main/java/com/example/wastenot/ui/main/CaptureSheet.kt b/app/src/main/java/com/example/wastenot/ui/main/CaptureSheet.kt
+index df77bae..8a5d0b8 100644
+--- a/app/src/main/java/com/example/wastenot/ui/main/CaptureSheet.kt
++++ b/app/src/main/java/com/example/wastenot/ui/main/CaptureSheet.kt
+@@ -2,6 +2,8 @@ package com.example.wastenot.ui.main
+ 
+ import androidx.compose.foundation.BorderStroke
+ import androidx.compose.foundation.background
++import androidx.compose.foundation.interaction.MutableInteractionSource
++import androidx.compose.foundation.interaction.collectIsFocusedAsState
+ import androidx.compose.foundation.layout.*
+ import androidx.compose.foundation.rememberScrollState
+ import androidx.compose.foundation.shape.RoundedCornerShape
+@@ -41,14 +43,21 @@ import com.example.wastenot.theme.LocalWasteNotGradients
+ import com.example.wastenot.theme.OnAccent
+ import com.example.wastenot.theme.Pine900
+ import com.example.wastenot.ui.components.ActionButton
++import com.example.wastenot.ui.components.focusOutline
+ 
+ @Composable
+ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, vertical: Boolean = false) {
+     val description = stringResource(R.string.scan_action_description)
++    val interactions = remember { MutableInteractionSource() }
++    val focused by interactions.collectIsFocusedAsState()
++    val colors = MaterialTheme.colorScheme
++    val shape = RoundedCornerShape(26.dp)
+     Surface(
+         onClick = onClick,
+-        modifier = modifier.widthIn(min = 136.dp).heightIn(min = 52.dp).semantics { contentDescription = description },
+-        shape = RoundedCornerShape(26.dp),
++        modifier = modifier.widthIn(min = 136.dp).heightIn(min = 52.dp)
++            .focusOutline(focused, shape, colors.primary, colors.surface).semantics { contentDescription = description },
++        shape = shape,
++        interactionSource = interactions,
+         color = MaterialTheme.colorScheme.surface,
+         border = BorderStroke(3.dp, MaterialTheme.colorScheme.surface),
+         shadowElevation = 2.dp,

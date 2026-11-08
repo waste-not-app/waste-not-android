@@ -1,0 +1,11 @@
+{
+  "command": "./gradlew lintDebug test --daemon --max-workers=1",
+  "hot_reload": "default true",
+  "result": "passed",
+  "unit_results": {
+    "tests": 239,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

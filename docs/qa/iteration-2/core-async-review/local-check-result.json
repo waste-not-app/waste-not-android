@@ -1,0 +1,11 @@
+{
+  "commit": "649827e1b74aa8fe795de514926de9edc5b936c7",
+  "hook_exit": 0,
+  "unit_results": {
+    "tests": 239,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "source_hashes_match_frozen_native_build": true
+}

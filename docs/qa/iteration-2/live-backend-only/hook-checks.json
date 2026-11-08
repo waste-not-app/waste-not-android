@@ -1,0 +1,22 @@
+{
+  "Debug": {
+    "tests": 239,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "Staging": {
+    "tests": 0,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "Release": {
+    "tests": 0,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint_debug_errors": 0,
+  "commit": "e499511658ca252ab8698ca237c73b7ca27dd0fe"
+}

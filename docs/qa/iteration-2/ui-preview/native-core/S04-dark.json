@@ -1,0 +1,53 @@
+{
+  "screen": "S04",
+  "theme": "dark",
+  "font_scale": 1,
+  "width_dp": 390,
+  "density_dpi": 480,
+  "title_lines": 1,
+  "title_height_px": 91,
+  "title_visible_height_px": 91,
+  "title_text": "Halo, Pengguna",
+  "title_width_px": 536,
+  "paragraph_width_px": 870,
+  "paragraph_height_px": 91,
+  "title_line_bounds": [
+    {
+      "left": 0,
+      "right": 534.0586,
+      "top": 0,
+      "bottom": 91,
+      "ellipsized": false
+    }
+  ],
+  "raw_visual_overflow": true,
+  "overflow_width": true,
+  "overflow_height": false,
+  "navigation": [
+    {
+      "label": "Beranda",
+      "glyph_pixels": 804
+    },
+    {
+      "label": "Riwayat",
+      "glyph_pixels": 981
+    },
+    {
+      "label": "Panduan",
+      "glyph_pixels": 916
+    },
+    {
+      "label": "Statistik",
+      "glyph_pixels": 873
+    },
+    {
+      "label": "Profil",
+      "glyph_pixels": 523
+    },
+    {
+      "capture_text_pixels": 1917,
+      "capture_camera_pixels": 1529
+    }
+  ],
+  "violations": []
+}

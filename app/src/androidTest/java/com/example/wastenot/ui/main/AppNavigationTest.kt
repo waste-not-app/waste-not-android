@@ -16,17 +16,33 @@ import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.ExternalResource
 import java.io.File
 
 class AppNavigationTest {
-    @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    @get:Rule(order = -1) val navigationData = com.example.wastenot.NavigationFixtureRule()
+    @get:Rule(order = 0) val fixtures = object : ExternalResource() {
+        override fun before() {
+            val context = InstrumentationRegistry.getInstrumentation().targetContext
+            com.example.wastenot.clearEditorDraftFixtures(context)
+            listOf("dummy_session", "dummy_logs_dummy-owner", "appearance").forEach {
+                context.getSharedPreferences(it, android.content.Context.MODE_PRIVATE).edit().clear().commit()
+            }
+        }
+    }
+    @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
     private val tabs = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)
 
     private fun preview() {
-        compose.waitUntil(30_000) { compose.onAllNodesWithText("Lihat data contoh").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Lihat data contoh").performScrollTo().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
+        compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
         compose.waitForIdle()
         compose.onAllNodes(tabs).assertCountEquals(5)
+    }
+
+    private fun openEditor() {
+        compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
+        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
     }
 
     private fun tab(label: String) {
@@ -52,9 +68,11 @@ class AppNavigationTest {
     @Test fun datasetFiveTabsManualActionAndThemeWorkTogether() {
         preview()
         tab("Profil")
-        compose.onNodeWithText("Tampilan:", substring = true).performScrollTo().performClick()
-        compose.onNodeWithText("Terang").performClick()
+        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
+        compose.onNode(hasText("Terang") and hasAnyAncestor(isDialog())).performClick()
         compose.onNodeWithText("Tutup").performClick()
+        compose.onNodeWithContentDescription("Kembali").performClick()
         tab("Beranda")
         compose.onNodeWithText("650 g").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("2 benda dihindari").performScrollTo().assertIsDisplayed()
@@ -66,7 +84,7 @@ class AppNavigationTest {
                 compose.onNode(hasText(node.config[SemanticsProperties.Text].joinToString { it.text }) and tabs)
                     .assertHeightIsAtLeast(48.dp).assertWidthIsAtLeast(48.dp)
             }
-            compose.onNodeWithText("Catat").performClick()
+            openEditor()
             compose.onAllNodes(tabs).assertCountEquals(0)
             compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
             compose.onNodeWithContentDescription("Kembali").performClick()
@@ -79,9 +97,11 @@ class AppNavigationTest {
         tab("Profil"); tab("Statistik")
         compose.onNodeWithText("30 hari").assertIsSelected()
         tab("Profil")
-        compose.onNodeWithText("Tampilan:", substring = true).performScrollTo().performClick()
-        compose.onNodeWithText("Gelap").performClick().assertIsSelected()
+        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
+        compose.onNode(hasText("Gelap") and hasAnyAncestor(isDialog())).performClick().assertIsSelected()
         compose.onNodeWithText("Tutup").performClick()
+        compose.onNodeWithContentDescription("Kembali").performClick()
         tab("Beranda")
         compose.onNodeWithText("650 g").performScrollTo().assertIsDisplayed()
         capture("home-dark")
@@ -100,24 +120,42 @@ class AppNavigationTest {
         assumeTrue(android.os.Build.VERSION.SDK_INT >= 36)
         assertEquals(2, android.provider.Settings.Secure.getInt(compose.activity.contentResolver, "navigation_mode"))
         preview()
-        compose.onNodeWithText("Catat").performClick()
-        compose.onNode(hasText("Catatan", substring = true) and hasSetTextAction())
+        openEditor()
+        compose.onNodeWithContentDescription("Catatan (opsional)")
             .performScrollTo().performTextReplacement("Draf gesture")
+        fun imeVisible() = compose.runOnUiThread {
+            ViewCompat.getRootWindowInsets(compose.activity.window.decorView)?.isVisible(WindowInsetsCompat.Type.ime()) == true
+        }
+        compose.waitUntil(8_000) { imeVisible() }
+        capture("gesture-keyboard")
         val height = compose.runOnUiThread { compose.activity.window.decorView.height }
         val automation = InstrumentationRegistry.getInstrumentation().uiAutomation
-        automation.executeShellCommand("input touchscreen swipe 1 ${height / 2} 600 ${height / 2} 500").use {
-            android.os.ParcelFileDescriptor.AutoCloseInputStream(it).readBytes()
+        fun gestureBack() {
+            automation.executeShellCommand("input touchscreen swipe 1 ${height / 2} 600 ${height / 2} 500").use {
+                android.os.ParcelFileDescriptor.AutoCloseInputStream(it).readBytes()
+            }
         }
+        gestureBack()
+        compose.waitUntil(5_000) { !imeVisible() }
+        compose.onNodeWithText("Draf gesture").assertExists()
+        compose.onNodeWithText("Buang perubahan?").assertDoesNotExist()
+        compose.onAllNodes(tabs).assertCountEquals(0)
+        capture("gesture-ime-hidden")
+        gestureBack()
         compose.waitUntil(5_000) { compose.onAllNodesWithText("Buang perubahan?").fetchSemanticsNodes().isNotEmpty() }
+        capture("gesture-dirty-dialog")
         compose.onNodeWithText("Lanjut mengisi").performClick()
         compose.onNodeWithText("Draf gesture").assertExists()
         compose.onAllNodes(tabs).assertCountEquals(0)
     }
 
     @Test fun invalidPasswordStaysFocusedAboveKeyboardWithoutCallingAccountService() {
-        compose.waitUntil(30_000) { compose.onAllNodesWithText("Lihat data contoh").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNode(hasText("Email") and hasSetTextAction()).performClick().performTextReplacement("fixture@example.invalid")
-        val password = compose.onNode(hasText("Kata sandi") and hasSetTextAction())
+        preview(); tab("Profil")
+        compose.onNodeWithText("Keluar").performScrollTo().performClick()
+        compose.onNode(hasText("Keluar") and hasAnyAncestor(isDialog())).performClick()
+        compose.waitUntil(10_000) { compose.onAllNodesWithText("Belum punya akun? Daftar").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performScrollTo().performClick().performTextReplacement("fixture@example.invalid")
+        val password = compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction())
         password.performScrollTo().performClick().performTextReplacement("short")
         compose.waitUntil(8_000) { compose.runOnUiThread {
             ViewCompat.getRootWindowInsets(compose.activity.window.decorView)?.isVisible(WindowInsetsCompat.Type.ime()) == true
@@ -144,8 +182,13 @@ class AppNavigationTest {
 
     @Test fun historyFilterAndRangeSurviveDetailTabsAndRotation() {
         preview(); tab("Riwayat")
-        compose.onNodeWithText("Kategori").performScrollTo().performClick()
+        capture("history-native")
+        compose.onNodeWithContentDescription("Filter riwayat").performClick()
+        capture("history-filter-native")
+        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
         compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
+        compose.onNodeWithText("Terapkan filter").performScrollTo().performClick()
+        capture("history-filtered-native")
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("250 g"))
         compose.onNodeWithText("250 g").performScrollTo().performClick()
         capture("history-detail")
@@ -170,7 +213,7 @@ class AppNavigationTest {
 
     @Test fun dirtyBackCreateAndEditKeepExclusiveQuantityAndDoNotAddEditXp() {
         preview()
-        compose.onNodeWithText("Catat").performClick()
+        openEditor()
         compose.onNodeWithText("Recycle").performScrollTo().performClick()
         back()
         compose.onNodeWithText("Buang perubahan?").assertIsDisplayed()
@@ -178,43 +221,55 @@ class AppNavigationTest {
         compose.onNodeWithText("Recycle").assertIsSelected()
         compose.onNodeWithContentDescription("Kembali").performClick()
         compose.onNodeWithText("Buang perubahan").performClick()
-        compose.onNodeWithText("Catat").performClick()
+        openEditor()
         compose.onNodeWithText("Recycle").performScrollTo().performClick()
-        compose.onNodeWithText("Kategori").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
         compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
-        compose.onNodeWithText("kg").performScrollTo().performClick()
-        compose.onNode(hasText("Berat") and hasSetTextAction()).performTextReplacement("0,25")
-        compose.onNode(hasText("Catatan opsional") and hasSetTextAction()).performScrollTo().performTextReplacement("QA contoh pribadi")
-        compose.onNodeWithText("21 Sep 2026").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Satuan").performScrollTo().performClick()
+        compose.onNodeWithText("kg").performClick()
+        compose.onNodeWithContentDescription("Berat").performTextReplacement("0,25")
+        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("QA contoh pribadi")
+        compose.onNodeWithText(com.example.wastenot.model.WasteFormat.activityDate(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Jakarta")))).performScrollTo().performClick()
         compose.onNodeWithText("Batal").performClick()
-        compose.onNodeWithText("Simpan contoh").performScrollTo().performClick()
+        compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodesWithText("+10 XP untuk aktivitas baru ini.").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Lihat catatan").performScrollTo().performClick()
         compose.onNodeWithText("Detail catatan").assertIsDisplayed()
         compose.onNodeWithText("QA contoh pribadi").performScrollTo().assertIsDisplayed()
+        compose.waitUntil(30_000) { compose.onAllNodes(hasText("Ubah catatan") and hasClickAction() and isEnabled()).fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("Ubah catatan").performScrollTo().performClick()
         capture("editor-edit")
-        compose.onNodeWithText("benda").performScrollTo().performClick()
-        val quantity = compose.onNode(hasText("Jumlah benda") and hasSetTextAction())
+        compose.onNodeWithContentDescription("Satuan").performScrollTo().performClick()
+        compose.onNodeWithText("Benda").performClick()
+        val quantity = compose.onNodeWithContentDescription("Jumlah benda")
         assertEquals("", quantity.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
         quantity.performTextReplacement("2")
         compose.onNodeWithText("Simpan perubahan").performScrollTo().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodesWithText("Catatanmu sudah tersimpan. Tidak ada XP tambahan.").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("+10 XP", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Lihat catatan").performScrollTo().performClick()
         compose.onNodeWithText("2 benda").performScrollTo().assertIsDisplayed()
+        val retainedDetail = compose.onAllNodes(tabs).fetchSemanticsNodes().isNotEmpty()
+        if (!retainedDetail) compose.onNodeWithContentDescription("Kembali").performClick()
         tab("Profil")
-        compose.onNodeWithText("Level 1 · 60/100 XP").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("60 XP total").performScrollTo().assertIsDisplayed()
         tab("Beranda")
-        compose.onNodeWithText("Detail catatan").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Kembali").performClick()
+        if (retainedDetail) {
+            compose.onNodeWithText("Detail catatan").assertIsDisplayed()
+            compose.onNodeWithContentDescription("Kembali").performClick()
+        }
         compose.onNodeWithText("650 g").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("2 benda ditangani").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("2 benda dihindari").performScrollTo().assertIsDisplayed()
         tab("Profil")
         compose.onNodeWithText("Keluar").performScrollTo().performClick()
         compose.onNodeWithText("Batal").performClick()
-        compose.onNodeWithText("Level 1 · 60/100 XP").assertExists()
+        compose.onNodeWithText("60 XP total").assertExists()
         compose.onNodeWithText("Keluar").performClick()
         compose.onNode(hasText("Keluar") and hasAnyAncestor(isDialog())).performClick()
         compose.waitForIdle()
         compose.onAllNodes(tabs).assertCountEquals(0)
-        compose.onNodeWithText("Masuk ke demo").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Masuk").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("QA contoh pribadi").assertDoesNotExist()
         val activity = compose.activity
         compose.runOnUiThread { activity.onBackPressedDispatcher.onBackPressed() }

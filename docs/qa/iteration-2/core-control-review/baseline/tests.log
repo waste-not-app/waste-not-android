@@ -1,0 +1,71 @@
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.CoreControlDesignTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.main.CoreControlDesignTest:
+INSTRUMENTATION_STATUS: test=themeChoiceUsesTheInputBorderTypeAndSizeAndKeepsItsAction
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.CoreControlDesignTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: light: theme height 156px, expected 168.0px; light: theme outline does not use the control token; light: theme value is not 16sp; dark: theme height 156px, expected 168.0px; dark: theme outline does not use the control token; dark: theme value is not 16sp
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreControlDesignTest.themeChoiceUsesTheInputBorderTypeAndSizeAndKeepsItsAction(CoreControlDesignTest.kt:91)
+
+INSTRUMENTATION_STATUS: stream=
+Error in themeChoiceUsesTheInputBorderTypeAndSizeAndKeepsItsAction(com.example.wastenot.ui.main.CoreControlDesignTest):
+java.lang.AssertionError: light: theme height 156px, expected 168.0px; light: theme outline does not use the control token; light: theme value is not 16sp; dark: theme height 156px, expected 168.0px; dark: theme outline does not use the control token; dark: theme value is not 16sp
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreControlDesignTest.themeChoiceUsesTheInputBorderTypeAndSizeAndKeepsItsAction(CoreControlDesignTest.kt:91)
+
+INSTRUMENTATION_STATUS: test=themeChoiceUsesTheInputBorderTypeAndSizeAndKeepsItsAction
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.CoreControlDesignTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=xpUsesAnEightDpContinuousTrackInBothThemes
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.CoreControlDesignTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=2
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: light: XP paint height 21px, expected 24.0px; light: 11 pixels interrupt the XP track; dark: XP paint height 21px, expected 24.0px; dark: 11 pixels interrupt the XP track
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreControlDesignTest.xpUsesAnEightDpContinuousTrackInBothThemes(CoreControlDesignTest.kt:61)
+
+INSTRUMENTATION_STATUS: stream=
+Error in xpUsesAnEightDpContinuousTrackInBothThemes(com.example.wastenot.ui.main.CoreControlDesignTest):
+java.lang.AssertionError: light: XP paint height 21px, expected 24.0px; light: 11 pixels interrupt the XP track; dark: XP paint height 21px, expected 24.0px; dark: 11 pixels interrupt the XP track
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreControlDesignTest.xpUsesAnEightDpContinuousTrackInBothThemes(CoreControlDesignTest.kt:61)
+
+INSTRUMENTATION_STATUS: test=xpUsesAnEightDpContinuousTrackInBothThemes
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 12.697
+There were 2 failures:
+1) themeChoiceUsesTheInputBorderTypeAndSizeAndKeepsItsAction(com.example.wastenot.ui.main.CoreControlDesignTest)
+java.lang.AssertionError: light: theme height 156px, expected 168.0px; light: theme outline does not use the control token; light: theme value is not 16sp; dark: theme height 156px, expected 168.0px; dark: theme outline does not use the control token; dark: theme value is not 16sp
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreControlDesignTest.themeChoiceUsesTheInputBorderTypeAndSizeAndKeepsItsAction(CoreControlDesignTest.kt:91)
+2) xpUsesAnEightDpContinuousTrackInBothThemes(com.example.wastenot.ui.main.CoreControlDesignTest)
+java.lang.AssertionError: light: XP paint height 21px, expected 24.0px; light: 11 pixels interrupt the XP track; dark: XP paint height 21px, expected 24.0px; dark: 11 pixels interrupt the XP track
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.main.CoreControlDesignTest.xpUsesAnEightDpContinuousTrackInBothThemes(CoreControlDesignTest.kt:61)
+
+FAILURES!!!
+Tests run: 2,  Failures: 2
+
+
+INSTRUMENTATION_CODE: -1

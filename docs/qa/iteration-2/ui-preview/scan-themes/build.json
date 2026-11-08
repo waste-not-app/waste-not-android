@@ -1,0 +1,19 @@
+{
+  "scope": "Demo component previews S21 camera before activation/photo and S22-S24; both themes, first and final scroll position. No live inference or camera permission/capture proof.",
+  "base_commit": "bd5f2788f401d693f97c072e8d81a3f81fb7dfb4",
+  "hotReload": false,
+  "dummyData": true,
+  "source": {
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanSheet.kt": "e791be849bddce331a5eb5ae0f3ec89205fef65a4ac4047c0fc25ace212410b9",
+    "app/src/androidTest/java/com/example/wastenot/ui/scan/ScanSheetTest.kt": "7342e5ab2640e5ce5a8c99a7be0c2b33b628e161d758bed1a8a4fb0ec8e44fbe",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/RemainingUiPreviewTest.kt": "a624f366bef85b7667605b6a6510d78ea23f0d3e003cc8b676252145e7d9c3ca"
+  },
+  "WasteNot-design-preview-demo.apk": {
+    "sha256": "1375402eb26b2b7378653934f16e4d8d1cca91ab448cabbcb85218a3b5093b59",
+    "bytes": 46575150
+  },
+  "design-preview-androidTest.apk": {
+    "sha256": "6655559f7943d3aa0cbae9aad89de98bc0e53ce04e6ca78b42a66c01af5aa98e",
+    "bytes": 4533302
+  }
+}

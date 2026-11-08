@@ -1,0 +1,52 @@
+{
+  "api_version": "1.0.0",
+  "data": {
+    "category": "GLASS",
+    "caution": "Kaca pecah memerlukan panduan penanganan khusus.",
+    "conditions_to_verify": [],
+    "confirmed_object_key": "glass_bottle",
+    "context_revision": 1,
+    "detection_id": null,
+    "evidence_ids": [],
+    "expires_at": "2026-10-21T08:00:00Z",
+    "guide_refs": [
+      {
+        "guide_id": "pilot-glass-bottle",
+        "version": 6
+      }
+    ],
+    "missing_context": [],
+    "object_id": null,
+    "prototype_only": true,
+    "provider": "fixture",
+    "reason": "Pilihan metode untuk Botol kaca belum dapat dipastikan. Berikut arahan awal berdasarkan informasi yang tersedia.",
+    "reason_code": "LLM_UNAVAILABLE",
+    "recommendation_basis": null,
+    "recommendation_id": "00000000-0000-0000-0000-000000000001",
+    "recommendation_scope": null,
+    "recommendation_version": "pilot-policy-08",
+    "recommended_method": null,
+    "source_details": [
+      {
+        "checked_at": "2026-11-04",
+        "publisher": "US EPA",
+        "region": "Amerika Serikat",
+        "scope_note": "Panduan bahan umum; jenis dan kebersihan tidak memastikan fasilitas lokal menerima benda tersebut.",
+        "title": "How Do I Recycle Common Recyclables",
+        "url": "https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"
+      }
+    ],
+    "source_urls": [
+      "https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"
+    ],
+    "special_handling": false,
+    "status": "UNAVAILABLE",
+    "steps": [
+      "Periksa jenis kaca, kondisi, dan riwayat isi; bila belum diketahui, jangan menebak dari foto saja.",
+      "Pertimbangkan penggunaan ulang hanya jika fungsi, kebersihan, dan keamanannya memang sudah dipastikan.",
+      "Tanyakan kepada pengelola setempat apakah jenis dan kondisi barang ini diterima, lalu ikuti petunjuk pemilahan dan penyerahannya.",
+      "Jika ada tanda baterai/listrik, tepi tajam, bahan kimia, atau kontaminasi biologis, tandai jenis risikonya untuk mendapat arahan khusus."
+    ]
+  },
+  "request_id": "00000000-0000-0000-0000-000000000063"
+}

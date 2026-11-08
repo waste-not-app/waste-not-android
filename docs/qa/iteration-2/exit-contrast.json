@@ -1,0 +1,114 @@
+[
+  {
+    "foreground_token": "OnSurface",
+    "background_token": "Surface",
+    "foreground": "#182B20",
+    "background": "#FFFFFF",
+    "ratio": 14.944,
+    "minimum": 4.5
+  },
+  {
+    "foreground_token": "OnSurfaceVariant",
+    "background_token": "Surface",
+    "foreground": "#526457",
+    "background": "#FFFFFF",
+    "ratio": 6.327,
+    "minimum": 4.5
+  },
+  {
+    "foreground_token": "Primary",
+    "background_token": "SurfaceVariant",
+    "foreground": "#195B3D",
+    "background": "#E8EFE7",
+    "ratio": 6.883,
+    "minimum": 3
+  },
+  {
+    "foreground_token": "Outline",
+    "background_token": "Surface",
+    "foreground": "#738477",
+    "background": "#FFFFFF",
+    "ratio": 3.965,
+    "minimum": 3
+  },
+  {
+    "foreground_token": "OnPrimary",
+    "background_token": "ActionStart",
+    "foreground": "#FFFFFF",
+    "background": "#226948",
+    "ratio": 6.599,
+    "minimum": 4.5
+  },
+  {
+    "foreground_token": "OnPrimary",
+    "background_token": "ActionEnd",
+    "foreground": "#FFFFFF",
+    "background": "#164B35",
+    "ratio": 10.038,
+    "minimum": 4.5
+  },
+  {
+    "foreground_token": "OnError",
+    "background_token": "Error",
+    "foreground": "#FFFFFF",
+    "background": "#A82832",
+    "ratio": 6.966,
+    "minimum": 4.5
+  },
+  {
+    "foreground_token": "OnSurfaceDark",
+    "background_token": "SurfaceDark",
+    "foreground": "#F0F5ED",
+    "background": "#19281F",
+    "ratio": 13.915,
+    "minimum": 4.5
+  },
+  {
+    "foreground_token": "OnSurfaceVariantDark",
+    "background_token": "SurfaceDark",
+    "foreground": "#B2C4B6",
+    "background": "#19281F",
+    "ratio": 8.401,
+    "minimum": 4.5
+  },
+  {
+    "foreground_token": "PrimaryDark",
+    "background_token": "SurfaceVariantDark",
+    "foreground": "#B7DEB8",
+    "background": "#26392D",
+    "ratio": 8.299,
+    "minimum": 3
+  },
+  {
+    "foreground_token": "OutlineDark",
+    "background_token": "SurfaceDark",
+    "foreground": "#7F9484",
+    "background": "#19281F",
+    "ratio": 4.742,
+    "minimum": 3
+  },
+  {
+    "foreground_token": "OnPrimaryDark",
+    "background_token": "ActionStartDark",
+    "foreground": "#122C1C",
+    "background": "#D0EBC1",
+    "ratio": 11.645,
+    "minimum": 4.5
+  },
+  {
+    "foreground_token": "OnPrimaryDark",
+    "background_token": "ActionEndDark",
+    "foreground": "#122C1C",
+    "background": "#ADD8B1",
+    "ratio": 9.434,
+    "minimum": 4.5
+  },
+  {
+    "foreground_token": "OnErrorDark",
+    "background_token": "ErrorDark",
+    "foreground": "#380B12",
+    "background": "#FFB4BA",
+    "ratio": 10.198,
+    "minimum": 4.5
+  }
+]

@@ -1,0 +1,137 @@
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.data.network.RemoteReadOnlyContractTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=configuredHttpsApiReturnsTheAnonymousMetadataChallenge
+INSTRUMENTATION_STATUS: class=com.example.wastenot.data.network.RemoteReadOnlyContractTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+Error in configuredHttpsApiReturnsTheAnonymousMetadataChallenge(com.example.wastenot.data.network.RemoteReadOnlyContractTest):
+javax.net.ssl.SSLHandshakeException: Handshake failed
+	at com.android.org.conscrypt.OpenSSLSocketImpl.startHandshake(OpenSSLSocketImpl.java:429)
+	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.RetryAfterInterceptor.intercept(WasteNotNetwork.kt:126)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.DiagnosticsInterceptor.intercept(WasteNotNetwork.kt:105)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.WriteOnceInterceptor.intercept(WasteNotNetwork.kt:85)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.BearerInterceptor.intercept(WasteNotNetwork.kt:78)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:517)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1133)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:607)
+	at java.lang.Thread.run(Thread.java:761)
+Caused by: javax.net.ssl.SSLProtocolException: SSL handshake terminated: ssl=0x732d5fd44840: Failure in SSL library, usually a protocol error
+error:10000410:SSL routines:OPENSSL_internal:SSLV3_ALERT_HANDSHAKE_FAILURE (external/boringssl/src/ssl/s3_pkt.c:610 0x732d53810980:0x00000001)
+error:1000009a:SSL routines:OPENSSL_internal:HANDSHAKE_FAILURE_ON_CLIENT_HELLO (external/boringssl/src/ssl/s3_clnt.c:764 0x732d55a8c76a:0x00000000)
+	at com.android.org.conscrypt.NativeCrypto.SSL_do_handshake(Native Method)
+	at com.android.org.conscrypt.OpenSSLSocketImpl.startHandshake(OpenSSLSocketImpl.java:357)
+	... 28 more
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=configuredHttpsApiReturnsTheAnonymousMetadataChallenge
+INSTRUMENTATION_STATUS: class=com.example.wastenot.data.network.RemoteReadOnlyContractTest
+INSTRUMENTATION_STATUS: stack=javax.net.ssl.SSLHandshakeException: Handshake failed
+	at com.android.org.conscrypt.OpenSSLSocketImpl.startHandshake(OpenSSLSocketImpl.java:429)
+	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.RetryAfterInterceptor.intercept(WasteNotNetwork.kt:126)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.DiagnosticsInterceptor.intercept(WasteNotNetwork.kt:105)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.WriteOnceInterceptor.intercept(WasteNotNetwork.kt:85)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.BearerInterceptor.intercept(WasteNotNetwork.kt:78)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:517)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1133)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:607)
+	at java.lang.Thread.run(Thread.java:761)
+Caused by: javax.net.ssl.SSLProtocolException: SSL handshake terminated: ssl=0x732d5fd44840: Failure in SSL library, usually a protocol error
+error:10000410:SSL routines:OPENSSL_internal:SSLV3_ALERT_HANDSHAKE_FAILURE (external/boringssl/src/ssl/s3_pkt.c:610 0x732d53810980:0x00000001)
+error:1000009a:SSL routines:OPENSSL_internal:HANDSHAKE_FAILURE_ON_CLIENT_HELLO (external/boringssl/src/ssl/s3_clnt.c:764 0x732d55a8c76a:0x00000000)
+	at com.android.org.conscrypt.NativeCrypto.SSL_do_handshake(Native Method)
+	at com.android.org.conscrypt.OpenSSLSocketImpl.startHandshake(OpenSSLSocketImpl.java:357)
+	... 28 more
+
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 0.372
+There was 1 failure:
+1) configuredHttpsApiReturnsTheAnonymousMetadataChallenge(com.example.wastenot.data.network.RemoteReadOnlyContractTest)
+javax.net.ssl.SSLHandshakeException: Handshake failed
+	at com.android.org.conscrypt.OpenSSLSocketImpl.startHandshake(OpenSSLSocketImpl.java:429)
+	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.RetryAfterInterceptor.intercept(WasteNotNetwork.kt:126)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.DiagnosticsInterceptor.intercept(WasteNotNetwork.kt:105)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.WriteOnceInterceptor.intercept(WasteNotNetwork.kt:85)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at com.example.wastenot.data.network.BearerInterceptor.intercept(WasteNotNetwork.kt:78)
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:517)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1133)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:607)
+	at java.lang.Thread.run(Thread.java:761)
+Caused by: javax.net.ssl.SSLProtocolException: SSL handshake terminated: ssl=0x732d5fd44840: Failure in SSL library, usually a protocol error
+error:10000410:SSL routines:OPENSSL_internal:SSLV3_ALERT_HANDSHAKE_FAILURE (external/boringssl/src/ssl/s3_pkt.c:610 0x732d53810980:0x00000001)
+error:1000009a:SSL routines:OPENSSL_internal:HANDSHAKE_FAILURE_ON_CLIENT_HELLO (external/boringssl/src/ssl/s3_clnt.c:764 0x732d55a8c76a:0x00000000)
+	at com.android.org.conscrypt.NativeCrypto.SSL_do_handshake(Native Method)
+	at com.android.org.conscrypt.OpenSSLSocketImpl.startHandshake(OpenSSLSocketImpl.java:357)
+	... 28 more
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

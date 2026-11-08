@@ -27,6 +27,7 @@ data class ApiDiagnostic(val status: Int?, val durationMillis: Long, val request
 class WasteNotNetwork private constructor(
     val client: OkHttpClient,
     val api: WasteNotApi,
+    val aiApi: WasteNotAiApi,
     val executor: ApiExecutor,
 ) {
     companion object {
@@ -54,10 +55,11 @@ class WasteNotNetwork private constructor(
                 .addInterceptor(DiagnosticsInterceptor(diagnostics))
                 .addInterceptor(RetryAfterInterceptor(base, clock))
                 .build()
-            val api = Retrofit.Builder().baseUrl(base).client(client)
+            val retrofit = Retrofit.Builder().baseUrl(base).client(client)
                 .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-                .build().create(WasteNotApi::class.java)
-            return WasteNotNetwork(client, api, ApiExecutor(json, clock))
+                .build()
+            return WasteNotNetwork(client, retrofit.create(WasteNotApi::class.java),
+                retrofit.create(WasteNotAiApi::class.java), ApiExecutor(json, clock))
         }
     }
 }

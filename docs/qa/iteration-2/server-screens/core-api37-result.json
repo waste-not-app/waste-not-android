@@ -1,0 +1,79 @@
+{
+  "run_id": "2ad1be1f-e8a0-44b2-ac7b-24f6cb64c47e",
+  "channel": "public HTTPS",
+  "api_level": 37,
+  "completed": true,
+  "cleanup_complete": true,
+  "images": [
+    {
+      "file": "remote-home-counted.png",
+      "sha256": "e7af31ac14d9aaf1682f664322ed300abcf3f68b6c6bf2696ea10ae340edc5de"
+    },
+    {
+      "file": "remote-home-created.png",
+      "sha256": "06013c5a2d5fd5b9831b074d9151bec4df71477ebd2014b13e86aec769432bd5"
+    },
+    {
+      "file": "remote-home-empty.png",
+      "sha256": "94b83ac8bc5f057091d1e847f707c03ef63584d4aca985e3923f9cc4c0360f62"
+    },
+    {
+      "file": "remote-profile-created.png",
+      "sha256": "9d2717a379ea2cabb215ae37e043398d5a8aab65a59cda73088c9beacf037781"
+    },
+    {
+      "file": "remote-profile-deleted.png",
+      "sha256": "0dc1eed97816773fd2322d72b697b025b1f1820d755c2c44b732a9704ac192ee"
+    },
+    {
+      "file": "remote-statistics-counted.png",
+      "sha256": "ab5b8eb2cc1171584af84073263214ddc68abf230ad024aa7ef39c3b7601bfc6"
+    },
+    {
+      "file": "remote-statistics-deleted.png",
+      "sha256": "a27f938abaa774fb4bcb23af11eb2284f84eca5ceb3fd6a4c966ea50d8754749"
+    },
+    {
+      "file": "remote-statistics-month.png",
+      "sha256": "1bc89db1c0255006b07831bb9c1508c86a4c6d481a294b3fce3d963a306a571e"
+    }
+  ],
+  "device_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "before_count": 0,
+  "apks": {
+    "core-final.apk": "3fe1cb6260c86f3a2d559e71d8fc623525a419cc7922a126e3dcc84ba56baa26",
+    "core-final-tests.apk": "16bfbf75d5cc3c8db8459c5e1d0a736dd1c877956cbd080ab998887f66496c59"
+  },
+  "native_passed": true,
+  "native_returncode": 0,
+  "passed_steps": [
+    "register",
+    "ui_create_updates_dashboard",
+    "ui_statistics_and_profile_use_server_progress",
+    "ui_edit_refreshes_units_without_extra_xp",
+    "ui_delete_refreshes_all_server_aggregates",
+    "ui_logout_returns_to_login"
+  ],
+  "removed_ids": [
+    "d45eb0ba-ce9e-485b-9d21-72c40ea28e9f"
+  ],
+  "session_ids_checked": [
+    "e4039060-833a-4466-bc51-8ea93a3d29bb"
+  ],
+  "counts_after": {
+    "users": 0,
+    "sessions": 0,
+    "refresh_tokens": 0,
+    "waste_logs": 0,
+    "ai_operations": 0
+  },
+  "device_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  }
+}

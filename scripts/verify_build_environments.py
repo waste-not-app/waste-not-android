@@ -8,6 +8,9 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 checks = [
+    ("debug rejects empty URL", "wastenot.debugApiBaseUrl=", False, "must not be empty"),
+    ("staging rejects empty URL", "wastenot.stagingApiBaseUrl=", False, "must not be empty"),
+    ("release rejects empty URL", "wastenot.releaseApiBaseUrl=", False, "must not be empty"),
     ("debug localhost", "wastenot.debugApiBaseUrl=http://localhost:8080/v1", True, ""),
     ("staging HTTPS", "wastenot.stagingApiBaseUrl=https://api.example.invalid/v1/", True, ""),
     ("release HTTPS", "wastenot.releaseApiBaseUrl=https://api.example.invalid/v1/", True, ""),

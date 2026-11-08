@@ -2,6 +2,6 @@ package com.example.wastenot
 
 import android.app.Application
 
-class WasteNotApplication : Application() {
-    val container: AppContainer by lazy { AppContainer(this) }
+open class WasteNotApplication : Application() {
+    open val container: AppContainer by lazy { AppContainer(this) }
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.model.QuantityTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:34:22.800Z" hostname="oktaavsm" time="0.006">
+  <properties/>
+  <testcase name="allCanonicalWeightsRoundTripWithoutPrecisionLoss" classname="com.example.wastenot.model.QuantityTest" time="0.001"/>
+  <testcase name="rejectsAmbiguousGroupingNonDecimalNotationAndUnsupportedCharacters" classname="com.example.wastenot.model.QuantityTest" time="0.001"/>
+  <testcase name="rejectsFractionalCountsAndGramsAndNeverRoundsExtraPrecision" classname="com.example.wastenot.model.QuantityTest" time="0.001"/>
+  <testcase name="enforcesBothBoundsWithoutIntegerOverflow" classname="com.example.wastenot.model.QuantityTest" time="0.002"/>
+  <testcase name="switchesWeightDisplayExactlyAndClearsAmountsWhenChangingKind" classname="com.example.wastenot.model.QuantityTest" time="0.0"/>
+  <testcase name="canonicalFieldsRequireExactlyOneValueOfTheSelectedKind" classname="com.example.wastenot.model.QuantityTest" time="0.0"/>
+  <testcase name="acceptsExactIntegerGramsAndBothKilogramDecimalSeparators" classname="com.example.wastenot.model.QuantityTest" time="0.0"/>
+  <testcase name="canonicalEnumsMatchTheApiAndCarryNoTranslatedLabels" classname="com.example.wastenot.model.QuantityTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

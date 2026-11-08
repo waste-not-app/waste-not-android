@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.data.network.CoreNetworkTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:33:35.844Z" hostname="oktaavsm" time="17.441">
+  <properties/>
+  <testcase name="missingEndpointIsAnExplicitFailureAndSharedHttpIsRejected" classname="com.example.wastenot.data.network.CoreNetworkTest" time="2.947"/>
+  <testcase name="writeIsNotReplayedFor503EvenWhenRetryAfterIsZero" classname="com.example.wastenot.data.network.CoreNetworkTest" time="1.562"/>
+  <testcase name="malformedHttpErrorKeepsStatusAndSafeRequestId" classname="com.example.wastenot.data.network.CoreNetworkTest" time="2.122"/>
+  <testcase name="timeoutProducesADirectedFailure" classname="com.example.wastenot.data.network.CoreNetworkTest" time="1.761"/>
+  <testcase name="retryAfterSupportsHttpDateAndRejectsInvalidHeaders" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.007"/>
+  <testcase name="validationErrorsRetainFieldsAndRequestIdWithoutReturningServerMessage" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.79"/>
+  <testcase name="listRequiresPaginationButEmptyPageIsARealSuccess" classname="com.example.wastenot.data.network.CoreNetworkTest" time="4.272"/>
+  <testcase name="retryAfterSecondsBlocksEarlyRetryAndAllowsItAfterTheDeadline" classname="com.example.wastenot.data.network.CoreNetworkTest" time="1.828"/>
+  <testcase name="disconnectedWriteIsNotReplayedAndDiagnosticsContainNoPayloadOrCredentials" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.364"/>
+  <testcase name="httpStatusesProduceDirectedFailuresWithoutAutomaticRetries" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.415"/>
+  <testcase name="bearerIsLimitedToApiOriginAndPathAndRemovedFromExternalRequests" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.009"/>
+  <testcase name="metadataMapsCanonicalEnumsLimitsAndCapabilities" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.008"/>
+  <testcase name="cancellationStopsAnInFlightHttpRequest" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.217"/>
+  <testcase name="publicAuthEndpointsNeverReceiveExistingBearerAndRedirectIsNotFollowed" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.01"/>
+  <testcase name="executorDoesNotSwallowCallerCancellation" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.036"/>
+  <testcase name="listMapsBothQuantityKindsAndOpaquePaginationWithEncodedFilters" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.599"/>
+  <testcase name="malformedJsonEnvelopeEnumQuantityTimezoneAndPageDoNotCrash" classname="com.example.wastenot.data.network.CoreNetworkTest" time="0.49"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Nov 06, 2026 12:33:43 AM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[43803] connection from /127.0.0.1 didn't make a request
+Nov 06, 2026 12:33:51 AM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[57847] connection from /127.0.0.1 didn't make a request
+Nov 06, 2026 12:33:52 AM okhttp3.mockwebserver.MockWebServer$SocketHandler handle
+WARNING: MockWebServer[43453] connection from /127.0.0.1 didn't make a request
+]]></system-err>
+</testsuite>

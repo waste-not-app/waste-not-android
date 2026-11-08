@@ -1,0 +1,39 @@
+dock-light
+ratio: 14.94:1
+normal text (4.5:1): PASS
+large text  (3.0:1): PASS
+
+dock-dark
+ratio: 13.91:1
+normal text (4.5:1): PASS
+large text  (3.0:1): PASS
+
+canvas-light-muted
+ratio: 5.24:1
+normal text (4.5:1): PASS
+large text  (3.0:1): PASS
+
+canvas-dark-muted
+ratio: 6.50:1
+normal text (4.5:1): PASS
+large text  (3.0:1): PASS
+
+capture-label
+ratio: 9.37:1
+normal text (4.5:1): PASS
+large text  (3.0:1): PASS
+
+login-action-light
+ratio: 6.60:1
+normal text (4.5:1): PASS
+large text  (3.0:1): PASS
+
+login-action-dark
+ratio: 9.43:1
+normal text (4.5:1): PASS
+large text  (3.0:1): PASS
+
+field-light-muted
+ratio: 6.33:1
+normal text (4.5:1): PASS
+large text  (3.0:1): PASS

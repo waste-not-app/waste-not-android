@@ -1,0 +1,201 @@
+{
+  "kind": "opaque token pairs and canvas endpoints, not a pixel audit of every screen",
+  "pairs": [
+    {
+      "foreground": "OnSurface",
+      "background": "Background",
+      "ratio": 13.82895957778463,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurface",
+      "background": "Surface",
+      "ratio": 14.944005852968267,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurface",
+      "background": "CanvasStart",
+      "ratio": 14.628838111487868,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurface",
+      "background": "CanvasEnd",
+      "ratio": 12.375276382226787,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceVariant",
+      "background": "Background",
+      "ratio": 5.854643733712845,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceVariant",
+      "background": "Surface",
+      "ratio": 6.326710967049102,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceVariant",
+      "background": "CanvasStart",
+      "ratio": 6.193281200887169,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceVariant",
+      "background": "CanvasEnd",
+      "ratio": 5.239210796491128,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "Outline",
+      "background": "Background",
+      "ratio": 3.6694897468408088,
+      "required": 3,
+      "pass": true
+    },
+    {
+      "foreground": "Outline",
+      "background": "CanvasStart",
+      "ratio": 3.881736088413549,
+      "required": 3,
+      "pass": true
+    },
+    {
+      "foreground": "Outline",
+      "background": "CanvasEnd",
+      "ratio": 3.2837575049284475,
+      "required": 3,
+      "pass": true
+    },
+    {
+      "foreground": "Primary",
+      "background": "SurfaceVariant",
+      "ratio": 6.883152288009756,
+      "required": 3,
+      "pass": true
+    },
+    {
+      "foreground": "Error",
+      "background": "Surface",
+      "ratio": 6.966235188479366,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceDark",
+      "background": "BackgroundDark",
+      "ratio": 15.961974440627571,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceDark",
+      "background": "SurfaceDark",
+      "ratio": 13.91498177729452,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceDark",
+      "background": "CanvasStartDark",
+      "ratio": 14.262156419442059,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceDark",
+      "background": "CanvasEndDark",
+      "ratio": 10.765926715615514,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceVariantDark",
+      "background": "BackgroundDark",
+      "ratio": 9.636955787776449,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceVariantDark",
+      "background": "SurfaceDark",
+      "ratio": 8.4010950320899,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceVariantDark",
+      "background": "CanvasStartDark",
+      "ratio": 8.610699845670933,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceVariantDark",
+      "background": "CanvasEndDark",
+      "ratio": 6.499870060482874,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OutlineDark",
+      "background": "BackgroundDark",
+      "ratio": 5.439957023812673,
+      "required": 3,
+      "pass": true
+    },
+    {
+      "foreground": "OutlineDark",
+      "background": "CanvasStartDark",
+      "ratio": 4.860646674836326,
+      "required": 3,
+      "pass": true
+    },
+    {
+      "foreground": "OutlineDark",
+      "background": "CanvasEndDark",
+      "ratio": 3.669106154273637,
+      "required": 3,
+      "pass": true
+    },
+    {
+      "foreground": "PrimaryDark",
+      "background": "SurfaceVariantDark",
+      "ratio": 8.298816084350038,
+      "required": 3,
+      "pass": true
+    },
+    {
+      "foreground": "ErrorDark",
+      "background": "SurfaceDark",
+      "ratio": 9.152277143810856,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceVariant",
+      "background": "SurfaceVariant",
+      "ratio": 5.402308037662863,
+      "required": 4.5,
+      "pass": true
+    },
+    {
+      "foreground": "OnSurfaceVariantDark",
+      "background": "SurfaceVariantDark",
+      "ratio": 6.721819146075649,
+      "required": 4.5,
+      "pass": true
+    }
+  ]
+}

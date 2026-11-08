@@ -1,5 +1,6 @@
 package com.example.wastenot.ui.main
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -11,10 +12,21 @@ import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.ExternalResource
 import java.io.File
 
 class WideNavigationTest {
-    @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    @get:Rule(order = -1) val navigationData = com.example.wastenot.NavigationFixtureRule()
+    @get:Rule(order = 0) val fixtures = object : ExternalResource() {
+        override fun before() {
+            val context = InstrumentationRegistry.getInstrumentation().targetContext
+            com.example.wastenot.clearEditorDraftFixtures(context)
+            listOf("dummy_session", "dummy_logs_dummy-owner", "appearance").forEach {
+                check(context.getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().commit())
+            }
+        }
+    }
+    @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
     private val tabs = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)
 
     private fun SemanticsNodeInteraction.reveal(): SemanticsNodeInteraction {
@@ -37,8 +49,7 @@ class WideNavigationTest {
         val density = compose.activity.resources.displayMetrics.density
         val windowWidth = compose.runOnUiThread { compose.activity.window.decorView.width / density }
         assumeTrue("Run this case in an edge-to-edge window at least 600 dp wide ($windowWidth)", windowWidth >= 600)
-        compose.waitUntil(30_000) { compose.onAllNodesWithText("Lihat data contoh").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Lihat data contoh").reveal().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
         compose.waitForIdle()
         compose.onAllNodes(tabs).assertCountEquals(5)
         val tabNodes = compose.onAllNodes(tabs).fetchSemanticsNodes()
@@ -47,11 +58,12 @@ class WideNavigationTest {
         capture("wide-rail")
         listOf("Beranda", "Riwayat", "Panduan", "Statistik", "Profil").forEach { label ->
             compose.onNode(tabs and hasText(label)).reveal().performClick().assertIsSelected()
-            compose.onNodeWithText("Catat").reveal().performClick()
+            compose.onNodeWithContentDescription("Catat atau scan sampah").reveal().performClick()
+            compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
             compose.onAllNodes(tabs).assertCountEquals(0)
             compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
-            compose.onNode(hasText("Berat") and hasSetTextAction()).reveal().assertIsDisplayed()
-            val field = compose.onNode(hasText("Berat") and hasSetTextAction()).fetchSemanticsNode().boundsInWindow
+            compose.onNodeWithContentDescription("Berat").reveal().assertIsDisplayed()
+            val field = compose.onNodeWithContentDescription("Berat").fetchSemanticsNode().boundsInWindow
             assertTrue("Editor respects the 560 dp form cap", field.width <= 560 * density + 1)
             if (label == "Profil") capture("wide-editor")
             compose.onNodeWithContentDescription("Kembali").performClick()

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.wastenot.data.network.QuantityRequestFieldsTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-05T17:33:53.294Z" hostname="oktaavsm" time="0.696">
+  <properties/>
+  <testcase name="countIsAnIntegerAndExplicitlyClearsGrams" classname="com.example.wastenot.data.network.QuantityRequestFieldsTest" time="0.42"/>
+  <testcase name="nullClearsRemainPresentEvenWhenDefaultNullPropertiesAreOmitted" classname="com.example.wastenot.data.network.QuantityRequestFieldsTest" time="0.274"/>
+  <testcase name="switchingKindInAPatchCannotRetainThePreviousQuantity" classname="com.example.wastenot.data.network.QuantityRequestFieldsTest" time="0.0"/>
+  <testcase name="gramAndBothKilogramSeparatorsProduceTheSameCanonicalFields" classname="com.example.wastenot.data.network.QuantityRequestFieldsTest" time="0.0"/>
+  <testcase name="weightIsAnIntegerInGramsAndExplicitlyClearsCount" classname="com.example.wastenot.data.network.QuantityRequestFieldsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

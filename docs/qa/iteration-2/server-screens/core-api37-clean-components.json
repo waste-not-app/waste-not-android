@@ -1,0 +1,86 @@
+{
+  "api_level": 37,
+  "completed": true,
+  "original_font": "1.0",
+  "runs": [
+    {
+      "profile": "light",
+      "passed": true,
+      "images": [
+        {
+          "file": "server-home-light.png",
+          "sha256": "e813288e6f3a4072f4ac4b8b01cafb3d9bbbe942f52946e7a73fb7e59f1bc8ab"
+        },
+        {
+          "file": "server-statistics-empty-light.png",
+          "sha256": "dd6915949b2ade9d4c2992c4e257298c53861ded892cbbf2ebb2289e69db683d"
+        },
+        {
+          "file": "server-statistics-error-light.png",
+          "sha256": "f0bb869244030c859b85f7feeca6ffba856394261bbf9f35ae955708c1615d2d"
+        },
+        {
+          "file": "server-statistics-loading-light.png",
+          "sha256": "4fab9a8fd91efd730e39d63c7769e9b616cb404e30b856f85d7a9e27e3cf7b92"
+        },
+        {
+          "file": "server-statistics-long-method-light.png",
+          "sha256": "bc337520438499822859ea24699355db458a1e78047ecfa0cd7474ab2024d38e"
+        }
+      ]
+    },
+    {
+      "profile": "dark",
+      "passed": true,
+      "images": [
+        {
+          "file": "server-home-dark.png",
+          "sha256": "e7cd7448c64adea31484b5f89677f3480ee0e6b7b41dac1fb714355159fa564f"
+        },
+        {
+          "file": "server-statistics-empty-dark.png",
+          "sha256": "da2181489d6dc590e8ee80c95b7dc4208058aa51cebfad76e78eaaa84837f2ad"
+        },
+        {
+          "file": "server-statistics-error-dark.png",
+          "sha256": "5f77ce7e545cfe27292d3f428479bc0c122384fec3ae175e62ee4ec299f18540"
+        },
+        {
+          "file": "server-statistics-loading-dark.png",
+          "sha256": "12a7aee843c9e050598330a0e39f5fa66ec6623afdd21b1252f82db7baeb0a3c"
+        },
+        {
+          "file": "server-statistics-long-method-dark.png",
+          "sha256": "3b76023067b8c28e188d99e2d74f655f29af042fc95c29f3ab628199e9f9bf87"
+        }
+      ]
+    },
+    {
+      "profile": "font200",
+      "passed": true,
+      "images": [
+        {
+          "file": "server-home-light.png",
+          "sha256": "0754e0d5530877294b1a270dc2d7bba16832f6f81052e3f49145b7ae9523b81a"
+        },
+        {
+          "file": "server-statistics-empty-light.png",
+          "sha256": "115e04c67fd537c20852efbb398a3f09a2dfb37a110bb4cf9e73c7ebfc40bb37"
+        },
+        {
+          "file": "server-statistics-error-light.png",
+          "sha256": "418d87c7370ca1df652a7ec328c443fb29d959341b508a2c262984ac33b551c4"
+        },
+        {
+          "file": "server-statistics-loading-light.png",
+          "sha256": "7ecadb72b6ee6c567923ca57d3a99b6ff0eed8818a21fe883c401163e0b5046f"
+        },
+        {
+          "file": "server-statistics-long-method-light.png",
+          "sha256": "e849c4afa1a52bd57139016df3023853c664a59d1407b2235ff8b75e2f929f61"
+        }
+      ]
+    }
+  ],
+  "restored_font": "1.0"
+}

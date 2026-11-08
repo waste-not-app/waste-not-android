@@ -35,11 +35,14 @@ class DemoActivityStoreTest {
         val input = ActivityInput(WasteCategory.OTHER, DisposalMethod.TRASH, Quantity.Count.of(3), source.referenceDate, "contoh")
         val request = UUID.randomUUID().toString()
         val first = source.create(input, request) as ApiResult.Success
-        assertEquals(first.value.id, (source.create(input, request) as ApiResult.Success).value.id)
+        val replay = (source.create(input, request) as ApiResult.Success).value
+        assertTrue(first.value.created)
+        assertFalse(replay.created)
+        assertEquals(first.value.log.id, replay.log.id)
         assertEquals(ApiFailureKind.IDEMPOTENCY_CONFLICT, (source.create(input.copy(notes = "berbeda"), request) as ApiResult.Failure).error.kind)
         val records = source.load().value
         assertEquals(6, records.size)
-        assertEquals(first.value.id, records.first().id)
+        assertEquals(first.value.log.id, records.first().id)
         assertEquals(1_400L, demoSummary(records).handled.weightGrams)
         assertEquals(3L, demoSummary(records).handled.itemCount)
     }
@@ -63,17 +66,17 @@ class DemoActivityStoreTest {
         val source = store()
         val request = UUID.randomUUID().toString()
         val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.REDUCE, Quantity.Count.of(1), source.referenceDate, "")
-        val first = (source.create(input, request) as ApiResult.Success).value.id
+        val first = (source.create(input, request) as ApiResult.Success).value.log.id
         source.clear()
         assertTrue(source.load().value.isEmpty())
-        val next = (source.create(input, request) as ApiResult.Success).value.id
+        val next = (source.create(input, request) as ApiResult.Success).value.log.id
         assertNotEquals(first, next)
     }
 
     @Test fun editsKeepCreationTimeAndAdvanceTheDemoUpdateTime() = runTest {
         val source = store()
         val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE, Quantity.Weight.of(255), source.referenceDate, "contoh")
-        val created = (source.create(input, UUID.randomUUID().toString()) as ApiResult.Success).value
+        val created = (source.create(input, UUID.randomUUID().toString()) as ApiResult.Success).value.log
         val updated = (source.update(created.id, created.version, input.copy(notes = "koreksi")) as ApiResult.Success).value
         assertEquals(created.createdAt, updated.createdAt)
         assertTrue(updated.updatedAt > created.updatedAt)

@@ -1,0 +1,15 @@
+<resources>
+    <string name="conflict_preserve_message">Catatan telah berubah. Muat versi terbaru sebelum mencoba lagi. Isian drafmu tetap tersimpan di form.</string>
+    <string name="conflict_compare_message">Bandingkan versi terbaru dengan drafmu. Pilih seluruh isian yang ingin dipakai, lalu periksa kembali di form. Pilihan ini belum menyimpan perubahan.</string>
+    <string name="conflict_missing_draft">Catatan ini sudah tidak tersedia. Isian drafmu tetap ada, tetapi perubahan tidak dapat disimpan ke catatan yang sudah dihapus.</string>
+    <string name="conflict_loading">Memuat versi terbaru…</string>
+    <string name="conflict_latest_stale">Versi yang lebih baru belum bisa dipastikan. Coba muat lagi; drafmu tetap ada.</string>
+    <string name="conflict_reload_failed">Versi terbaru belum bisa dimuat. Coba lagi; drafmu tetap ada.</string>
+    <string name="conflict_latest">Versi terbaru · v%1$d</string>
+    <string name="conflict_my_draft">Drafmu</string>
+    <string name="conflict_use_draft">Gunakan seluruh isian drafku</string>
+    <string name="conflict_use_latest">Gunakan isian versi terbaru</string>
+    <string name="conflict_keep_draft">Tetap di draf</string>
+    <string name="conflict_no_notes">Tanpa catatan</string>
+    <string name="conflict_form_message">Catatan berubah. Muat dan periksa versi terbaru sebelum menyimpan. Isianmu tetap ada.</string>
+</resources>

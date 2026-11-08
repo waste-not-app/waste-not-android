@@ -27,7 +27,9 @@ Untuk review visual interaktif (termasuk AI scan flow): buka [`docs/WasteNot-Pro
 
 ## Kondisi implementasi
 
-Startup, form Masuk/Daftar, sesi Keystore/refresh, lima back stack, tema/form bersama, editor manual dan logout sudah terhubung. Mode contoh dipilih eksplisit dan menyediakan pencatatan/edit/statistik lokal berlabel. Adapter HTTP tersedia; write aktivitas/ringkasan backend nyata, konten panduan dan AI masih menunggu integrasi. Untuk batas implementasi dan bukti pengujian, baca [catatan task](docs/tasks/README.md) serta [QA Iteration 1](docs/tasks/ITERATION_1_QA.md).
+Semua build aplikasi memakai adapter remote dan akun backend nyata. Instalasi baru menampilkan Masuk/Daftar; tidak ada autentikasi atau data aktivitas buatan lokal. Fixture berada hanya pada source test. Alamat default ketiga varian adalah `https://pred-autoscaler.bccdev.id/wastenot/api/v1/`.
+
+Seluruh screen wajib tersedia; penyelarasan UI, navigasi dan penerimaan akhir masih mengikuti [prioritas UI](docs/UI_FIRST_PLAN.md). Bukti fungsi dan build tidak menggantikan perbandingan screenshot dengan kit.
 
 ## Tech stack
 
@@ -39,7 +41,7 @@ Startup, form Masuk/Daftar, sesi Keystore/refresh, lima back stack, tema/form be
 | State | ViewModel + StateFlow (UDF) |
 | Network | Retrofit + OkHttp (lihat API.md) |
 | Camera | CameraX (ImageCapture + lifecycle-aware, untuk AI scan) |
-| Local storage | SharedPreferences untuk tema, Saver untuk draf UI, Keystore untuk refresh token |
+| Local storage | SharedPreferences untuk tema/draf per akun, Saver untuk state UI, Keystore untuk refresh token |
 | DI | Constructor injection + AppContainer sederhana |
 | AGP | 9.0.1, Gradle 9.1.0, Kotlin 2.3.20, Compose BOM 2026.03.01 |
 | Min SDK | 24, Compile/Target SDK 36 |

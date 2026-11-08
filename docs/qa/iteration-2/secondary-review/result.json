@@ -1,0 +1,92 @@
+{
+  "package": "com.example.wastenot.staging",
+  "source_commit": "9c9781237dbb795c26e28128bb0d6624dd53e1c8",
+  "scope": "Signed-out staging navigation only; no registration, login, upload or AI generation submitted.",
+  "captures": [
+    {
+      "name": "theme-light",
+      "sha256": "2c2775895d464bd6055cc3dd66dcdd9514a7ff0fb53cd77683c35fc5ccb20e66",
+      "anchor": "Terang",
+      "editable_count": 0
+    },
+    {
+      "name": "S02-light",
+      "sha256": "4ae60e007fba227a5d25657d7fe7287fd3cbb50f07b4278eaf05c87353e7a16c",
+      "anchor": "Catat kebiasaanmu lagi.",
+      "editable_count": 2
+    },
+    {
+      "name": "S03-light",
+      "sha256": "6b79134b73bc52624bc8f562b94aabe2d8cf3a4dcf0191582d844a14b1d28851",
+      "anchor": "Mulai dari kebiasaan kecil.",
+      "editable_count": 4
+    },
+    {
+      "name": "S03-end-light",
+      "sha256": "5349b2c54212bae66cb6161bf8fd03b542bf9722bc52f4422447b7daef91e08f",
+      "anchor": "Sudah punya akun? Masuk",
+      "editable_count": 4
+    },
+    {
+      "name": "theme-dark",
+      "sha256": "72865b71aeb74103dd5128fac6d0bc29b41196ca626aed5b491b46a14a65de2f",
+      "anchor": "Gelap",
+      "editable_count": 0
+    },
+    {
+      "name": "S02-dark",
+      "sha256": "05a4bed7305386454ea89983a2ba6bbc7eefd461cb530baaadee73fcdab6227e",
+      "anchor": "Catat kebiasaanmu lagi.",
+      "editable_count": 2
+    },
+    {
+      "name": "S03-dark",
+      "sha256": "10771e07e60ed2cae2dfb9f796bf20ad7968710d4889d111ed00072bf44c027e",
+      "anchor": "Mulai dari kebiasaan kecil.",
+      "editable_count": 4
+    },
+    {
+      "name": "S03-end-dark",
+      "sha256": "aa78a6fd3e233bfbb2cc790e22e9f7b3ac19c529b8e642fb0f3f80ec0f46fa0b",
+      "anchor": "Sudah punya akun? Masuk",
+      "editable_count": 4
+    }
+  ],
+  "actions": [
+    "Tampilan",
+    "Tutup",
+    "Tampilan",
+    "Terang",
+    "Tutup",
+    "Belum punya akun? Daftar",
+    "Sudah punya akun? Masuk",
+    "Belum punya akun? Daftar",
+    "System Back returns register to login: light",
+    "Tampilan",
+    "Gelap",
+    "Tutup",
+    "Belum punya akun? Daftar",
+    "Sudah punya akun? Masuk",
+    "Belum punya akun? Daftar",
+    "System Back returns register to login: dark",
+    "Tampilan",
+    "Ikuti sistem",
+    "Tutup"
+  ],
+  "installed_apk_sha256": "274a051b6ed81c9c189fad675dd1bf0f12606a441354037b5f4f85d42cc5d9a2",
+  "normal_app_before": "eb3688bb344d5a88134b10340ddcd6eef67c1e0256e8bf62b86ff31f77d355e9",
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  },
+  "original_theme": "Ikuti sistem",
+  "normal_app_after": "eb3688bb344d5a88134b10340ddcd6eef67c1e0256e8bf62b86ff31f77d355e9",
+  "result": "passed",
+  "theme_restored": true,
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0"
+  }
+}

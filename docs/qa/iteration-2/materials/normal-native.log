@@ -1,0 +1,66 @@
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.main.ScreenKitReviewTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.ScreenKitReviewTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.ScreenKitReviewTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.components.ActionButtonDesignTest:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=touchAndKeyboardRespectLoadingAndEnabledState
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.ActionButtonDesignTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=touchAndKeyboardRespectLoadingAndEnabledState
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.ActionButtonDesignTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lightActionsMatchTheKitAndKeepUnavailableLabelsReadable
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.ActionButtonDesignTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=lightActionsMatchTheKitAndKeepUnavailableLabelsReadable
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.ActionButtonDesignTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=darkActionsMatchTheKitAndKeepUnavailableLabelsReadable
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.ActionButtonDesignTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=darkActionsMatchTheKitAndKeepUnavailableLabelsReadable
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.components.ActionButtonDesignTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 56.975
+
+OK (4 tests)
+
+
+INSTRUMENTATION_CODE: -1

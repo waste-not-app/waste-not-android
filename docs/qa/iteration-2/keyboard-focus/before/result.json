@@ -1,0 +1,28 @@
+{
+  "api": 37,
+  "complete": true,
+  "source_head": "3db2eb1b8dec745c6ecd48a671e21c79387b4592",
+  "apks": {
+    "app/build/outputs/apk/debug/app-debug.apk": "518552a20628b26a7bb4ef04712bfcaeb27e8854730c3d34272501ee2bcec0d0",
+    "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "2fd9093053b41ba44e4a1de56a6b3bc6b1d328c7e44a22517582da8362e16a01"
+  },
+  "source": {
+    "app/src/main/java/com/example/wastenot/ui/components/FormControls.kt": "1e19fdc79833d4ed884b94a626315e865ff2e09cf37dfa243ffc901c41315de3",
+    "app/src/main/java/com/example/wastenot/ui/components/SecondaryActionButton.kt": "cff51f74c8003841e6b7a74dd8c5037b648280e890f15899aa9007825e64c8f7",
+    "app/src/main/java/com/example/wastenot/ui/components/TextActionButton.kt": "2558a0a271108cfae0286c64ffe7c55e17e8d89dd7c239bac67e5468ce6c780d",
+    "app/src/main/java/com/example/wastenot/ui/components/IconActionButton.kt": "46fc1acb43ff3fb1078f17182e2782f07a70928347d13b6aee38161907c3b257",
+    "app/src/main/java/com/example/wastenot/ui/main/CaptureSheet.kt": "e6fc5d375d02eb17a1111aa89082f410319869997c89cfbebec71bf3f2d84472",
+    "app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt": "fc6a1249a3865677cb8fc1d3c70c21aaabe9c7fcf57e7b0dd041a0f3e9d18ea5",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/KeyboardFocusDesignTest.kt": "ad101b9d41f99b7be884871b318101d420d7806830cbf7120a3dfdfae2781db7"
+  },
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font_scale": "1.0",
+    "night": "no"
+  },
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480"
+  }
+}

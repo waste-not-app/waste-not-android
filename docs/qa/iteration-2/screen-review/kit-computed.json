@@ -1,0 +1,2020 @@
+[
+  {
+    "screen": "S04",
+    "theme": "light",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Halo, Pengguna Demo.",
+      "rect": {
+        "left": 24,
+        "top": 78.140625,
+        "width": 266,
+        "height": 60
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(24, 43, 32)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [
+      {
+        "label": "Beranda",
+        "rect": {
+          "left": 17,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(25, 91, 61)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(36, 57, 14)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Riwayat",
+        "rect": {
+          "left": 85,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Panduan",
+        "rect": {
+          "left": 153,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Statistik",
+        "rect": {
+          "left": 221,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Profil",
+        "rect": {
+          "left": 289,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      }
+    ],
+    "summary": {
+      "font": "Jakarta, Arial, sans-serif",
+      "size": "15px",
+      "weight": "400",
+      "lineHeight": "24px",
+      "color": "rgb(255, 255, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "radius": "24px",
+      "shadow": "rgba(255, 255, 255, 0.208) 0px 1px 0px 0px inset, rgba(18, 63, 48, 0.5) 0px 8px 20px -14px"
+    }
+  },
+  {
+    "screen": "S07",
+    "theme": "light",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Riwayat",
+      "rect": {
+        "left": 24,
+        "top": 64,
+        "width": 268,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(24, 43, 32)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [
+      {
+        "label": "Beranda",
+        "rect": {
+          "left": 17,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Riwayat",
+        "rect": {
+          "left": 85,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(25, 91, 61)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(36, 57, 14)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Panduan",
+        "rect": {
+          "left": 153,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Statistik",
+        "rect": {
+          "left": 221,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Profil",
+        "rect": {
+          "left": 289,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      }
+    ],
+    "summary": null
+  },
+  {
+    "screen": "S11",
+    "theme": "light",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Panduan",
+      "rect": {
+        "left": 24,
+        "top": 55,
+        "width": 326,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(24, 43, 32)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [
+      {
+        "label": "Beranda",
+        "rect": {
+          "left": 17,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Riwayat",
+        "rect": {
+          "left": 85,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Panduan",
+        "rect": {
+          "left": 153,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(25, 91, 61)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(36, 57, 14)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Statistik",
+        "rect": {
+          "left": 221,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Profil",
+        "rect": {
+          "left": 289,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      }
+    ],
+    "summary": null
+  },
+  {
+    "screen": "S13",
+    "theme": "light",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Statistik",
+      "rect": {
+        "left": 24,
+        "top": 55,
+        "width": 326,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(24, 43, 32)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [
+      {
+        "label": "Beranda",
+        "rect": {
+          "left": 17,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Riwayat",
+        "rect": {
+          "left": 85,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Panduan",
+        "rect": {
+          "left": 153,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Statistik",
+        "rect": {
+          "left": 221,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(25, 91, 61)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(36, 57, 14)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Profil",
+        "rect": {
+          "left": 289,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      }
+    ],
+    "summary": {
+      "font": "Jakarta, Arial, sans-serif",
+      "size": "15px",
+      "weight": "400",
+      "lineHeight": "24px",
+      "color": "rgb(255, 255, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "radius": "24px",
+      "shadow": "rgba(255, 255, 255, 0.208) 0px 1px 0px 0px inset, rgba(18, 63, 48, 0.5) 0px 8px 20px -14px"
+    }
+  },
+  {
+    "screen": "S14",
+    "theme": "light",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Profil",
+      "rect": {
+        "left": 24,
+        "top": 55,
+        "width": 326,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(24, 43, 32)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [
+      {
+        "label": "Beranda",
+        "rect": {
+          "left": 17,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Riwayat",
+        "rect": {
+          "left": 85,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Panduan",
+        "rect": {
+          "left": 153,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Statistik",
+        "rect": {
+          "left": 221,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(24, 43, 32)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Profil",
+        "rect": {
+          "left": 289,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(25, 91, 61)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(36, 57, 14)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      }
+    ],
+    "summary": {
+      "font": "Jakarta, Arial, sans-serif",
+      "size": "15px",
+      "weight": "400",
+      "lineHeight": "24px",
+      "color": "rgb(255, 255, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "radius": "24px",
+      "shadow": "rgba(255, 255, 255, 0.208) 0px 1px 0px 0px inset, rgba(18, 63, 48, 0.5) 0px 8px 20px -14px"
+    }
+  },
+  {
+    "screen": "S05",
+    "theme": "light",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Catat aktivitas",
+      "rect": {
+        "left": 82,
+        "top": 64,
+        "width": 268,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(24, 43, 32)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [],
+    "summary": null
+  },
+  {
+    "screen": "S08",
+    "theme": "light",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Detail catatan",
+      "rect": {
+        "left": 82,
+        "top": 64,
+        "width": 268,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(24, 43, 32)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [],
+    "summary": null
+  },
+  {
+    "screen": "S12",
+    "theme": "light",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Detail panduan",
+      "rect": {
+        "left": 82,
+        "top": 64,
+        "width": 268,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(24, 43, 32)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [],
+    "summary": null
+  },
+  {
+    "screen": "S16",
+    "theme": "light",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Pengaturan",
+      "rect": {
+        "left": 82,
+        "top": 64,
+        "width": 268,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(24, 43, 32)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [],
+    "summary": null
+  },
+  {
+    "screen": "S04",
+    "theme": "dark",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Halo, Pengguna Demo.",
+      "rect": {
+        "left": 24,
+        "top": 78.140625,
+        "width": 266,
+        "height": 60
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(240, 245, 237)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [
+      {
+        "label": "Beranda",
+        "rect": {
+          "left": 17,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(183, 222, 184)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(36, 57, 14)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Riwayat",
+        "rect": {
+          "left": 85,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Panduan",
+        "rect": {
+          "left": 153,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Statistik",
+        "rect": {
+          "left": 221,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Profil",
+        "rect": {
+          "left": 289,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      }
+    ],
+    "summary": {
+      "font": "Jakarta, Arial, sans-serif",
+      "size": "15px",
+      "weight": "400",
+      "lineHeight": "24px",
+      "color": "rgb(255, 255, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "radius": "24px",
+      "shadow": "rgba(255, 255, 255, 0.208) 0px 1px 0px 0px inset, rgba(18, 63, 48, 0.5) 0px 8px 20px -14px"
+    }
+  },
+  {
+    "screen": "S07",
+    "theme": "dark",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Riwayat",
+      "rect": {
+        "left": 24,
+        "top": 64,
+        "width": 268,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(240, 245, 237)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [
+      {
+        "label": "Beranda",
+        "rect": {
+          "left": 17,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Riwayat",
+        "rect": {
+          "left": 85,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(183, 222, 184)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(36, 57, 14)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Panduan",
+        "rect": {
+          "left": 153,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Statistik",
+        "rect": {
+          "left": 221,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Profil",
+        "rect": {
+          "left": 289,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      }
+    ],
+    "summary": null
+  },
+  {
+    "screen": "S11",
+    "theme": "dark",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Panduan",
+      "rect": {
+        "left": 24,
+        "top": 55,
+        "width": 326,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(240, 245, 237)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [
+      {
+        "label": "Beranda",
+        "rect": {
+          "left": 17,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Riwayat",
+        "rect": {
+          "left": 85,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Panduan",
+        "rect": {
+          "left": 153,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(183, 222, 184)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(36, 57, 14)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Statistik",
+        "rect": {
+          "left": 221,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Profil",
+        "rect": {
+          "left": 289,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      }
+    ],
+    "summary": null
+  },
+  {
+    "screen": "S13",
+    "theme": "dark",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Statistik",
+      "rect": {
+        "left": 24,
+        "top": 55,
+        "width": 326,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(240, 245, 237)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [
+      {
+        "label": "Beranda",
+        "rect": {
+          "left": 17,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Riwayat",
+        "rect": {
+          "left": 85,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Panduan",
+        "rect": {
+          "left": 153,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Statistik",
+        "rect": {
+          "left": 221,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(183, 222, 184)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(36, 57, 14)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Profil",
+        "rect": {
+          "left": 289,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      }
+    ],
+    "summary": {
+      "font": "Jakarta, Arial, sans-serif",
+      "size": "15px",
+      "weight": "400",
+      "lineHeight": "24px",
+      "color": "rgb(255, 255, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "radius": "24px",
+      "shadow": "rgba(255, 255, 255, 0.208) 0px 1px 0px 0px inset, rgba(18, 63, 48, 0.5) 0px 8px 20px -14px"
+    }
+  },
+  {
+    "screen": "S14",
+    "theme": "dark",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Profil",
+      "rect": {
+        "left": 24,
+        "top": 55,
+        "width": 326,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(240, 245, 237)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [
+      {
+        "label": "Beranda",
+        "rect": {
+          "left": 17,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Riwayat",
+        "rect": {
+          "left": 85,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Panduan",
+        "rect": {
+          "left": 153,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Statistik",
+        "rect": {
+          "left": 221,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(240, 245, 237)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      },
+      {
+        "label": "Profil",
+        "rect": {
+          "left": 289,
+          "top": 716.8125,
+          "width": 68,
+          "height": 59.1875
+        },
+        "style": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(183, 222, 184)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "19px",
+          "shadow": "none"
+        },
+        "icon": {
+          "font": "Jakarta, Arial, sans-serif",
+          "size": "12px",
+          "weight": "600",
+          "lineHeight": "19.2px",
+          "color": "rgb(36, 57, 14)",
+          "background": "rgba(0, 0, 0, 0)",
+          "radius": "0px",
+          "shadow": "none"
+        }
+      }
+    ],
+    "summary": {
+      "font": "Jakarta, Arial, sans-serif",
+      "size": "15px",
+      "weight": "400",
+      "lineHeight": "24px",
+      "color": "rgb(255, 255, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "radius": "24px",
+      "shadow": "rgba(255, 255, 255, 0.208) 0px 1px 0px 0px inset, rgba(18, 63, 48, 0.5) 0px 8px 20px -14px"
+    }
+  },
+  {
+    "screen": "S05",
+    "theme": "dark",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Catat aktivitas",
+      "rect": {
+        "left": 82,
+        "top": 64,
+        "width": 268,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(240, 245, 237)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [],
+    "summary": null
+  },
+  {
+    "screen": "S08",
+    "theme": "dark",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Detail catatan",
+      "rect": {
+        "left": 82,
+        "top": 64,
+        "width": 268,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(240, 245, 237)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [],
+    "summary": null
+  },
+  {
+    "screen": "S12",
+    "theme": "dark",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Detail panduan",
+      "rect": {
+        "left": 82,
+        "top": 64,
+        "width": 268,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(240, 245, 237)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [],
+    "summary": null
+  },
+  {
+    "screen": "S16",
+    "theme": "dark",
+    "width": 374,
+    "height": 800,
+    "canvasWidth": 360,
+    "title": {
+      "text": "Pengaturan",
+      "rect": {
+        "left": 82,
+        "top": 64,
+        "width": 268,
+        "height": 30
+      },
+      "style": {
+        "font": "Jakarta, Arial, sans-serif",
+        "size": "25px",
+        "weight": "800",
+        "lineHeight": "30px",
+        "color": "rgb(240, 245, 237)",
+        "background": "rgba(0, 0, 0, 0)",
+        "radius": "0px",
+        "shadow": "none"
+      }
+    },
+    "navigation": [],
+    "summary": null
+  }
+]

@@ -1,0 +1,171 @@
+{
+  "review_date": "2026-11-08",
+  "reviewed_product_commit": "9c9781237dbb795c26e28128bb0d6624dd53e1c8",
+  "historical_capture_scope": "36 existing PNGs from the Nov6 preview, reviewed without modifying them; not recaptured on current source",
+  "historical_frames": [
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D01-dark.png",
+      "sha256": "8db01f09f7857f6e6bf8e20aaad65128d4843ef6436a34df87b7ab3619692d94"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D01-light.png",
+      "sha256": "113a85e7bd3b1cf3ee27be5ad510ac79351a396e9563d682f07aff0c9a300cf8"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D02-dark.png",
+      "sha256": "92cc74ac3b73ee987c754b9af5b3b9c353bad406f3658362187372c48649510f"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D02-light.png",
+      "sha256": "ebcfe49b4bb0bb97ab8687b7ad92f63632358b5319b5a981cef8912c7fe4c472"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D03-dark.png",
+      "sha256": "ce27e46ea081cea288d9200bea95c896481d52dc244e6d041c547259033846ac"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D03-light.png",
+      "sha256": "4274f9b665ee93a5316d8e22d9285392959bb901a998550d0ff5f316edd0827d"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D04-compare-dark.png",
+      "sha256": "5592cfce4a9da58c015237c7a6558e0c57f7ef63b91aae953a1f7521e7b1cf81"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D04-compare-end-dark.png",
+      "sha256": "5592cfce4a9da58c015237c7a6558e0c57f7ef63b91aae953a1f7521e7b1cf81"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D04-compare-end-light.png",
+      "sha256": "62d12b183b62b234523c5be65d2e511136682a23f6bb6403fb5cfa6f0d20c461"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D04-compare-light.png",
+      "sha256": "62d12b183b62b234523c5be65d2e511136682a23f6bb6403fb5cfa6f0d20c461"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D04-dark.png",
+      "sha256": "3aeeaef683abe42fb3a8120e1ced2d1f16f031ad504a1c0a6731d49747a397f4"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/D04-light.png",
+      "sha256": "24a4c4e13e54ca2454871d5c5f779104f582bc5bafcede047b3f8bcff60953a0"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S01-dark.png",
+      "sha256": "99df9db800d94f746e1641c134297ae6d6b7cf72fe8b421d1128c015450e0f7e"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S01-error-dark.png",
+      "sha256": "7846bab15072222e31a6a9f4063e7ac770784c23d2da814ac8289d374a4cbfef"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S01-error-light.png",
+      "sha256": "a95778af81dd5075c2400d321d7a356aef61548969d60d6638ead069430dd32a"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S01-light.png",
+      "sha256": "73c7ecc669bb80a30efa5826171f1e207d5f4271e12a351c0f074b47704fd7dd"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S02-dark.png",
+      "sha256": "0327b0f4b8c6ca65162afa9e25e2ec86b55b94c129a8771bf94bcfb7fe918cea"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S02-light.png",
+      "sha256": "b6a695eb7c67dce56c784260ba66ceecc28b4926fca4a18b491c76c91fc627da"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S03-dark.png",
+      "sha256": "22583f4a03cc7fcf0a0cdb5d201b635ce075ccbc31c3a087b9d3c4e093e57173"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S03-end-dark.png",
+      "sha256": "fd07dd27a2aefa447a2440d00a676a3ec8608888a6531916a2d8d87c6acb5ae6"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S03-end-light.png",
+      "sha256": "296ae0fe2930eb327c53631ecc19e84d5a395b900f79421d8b4444ddf490c03c"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S03-light.png",
+      "sha256": "ec57cf27e4253849dae6efe4df796db4f1282c343075595310cba012f91fec33"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S06-dark.png",
+      "sha256": "11138ab1ae480b59ab94c650fcbacc51b550a46bf5340d3f75cb260276788693"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S06-end-dark.png",
+      "sha256": "11138ab1ae480b59ab94c650fcbacc51b550a46bf5340d3f75cb260276788693"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S06-end-light.png",
+      "sha256": "fa9d67592e35567bf8c22d3420d3d7bb40d1119d7044f99da12b2a4573f5d6e1"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S06-light.png",
+      "sha256": "fa9d67592e35567bf8c22d3420d3d7bb40d1119d7044f99da12b2a4573f5d6e1"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S09-dark.png",
+      "sha256": "4563cd3a714467db83c7259b61a5af3ca8cc48ebe1e766a385a4a395fe262d59"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S09-end-dark.png",
+      "sha256": "36f256a863c1068ab4f3cb7c251dc44b9d833a9624c13299679b576357026d43"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S09-end-light.png",
+      "sha256": "77d8a754ec6ac52851add15fe0056043fa6e298b7b757bb488dfaa56c668381f"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S09-light.png",
+      "sha256": "4a263182992f248937be253154e1c14f7631102afabec66481ac0cfff16bb472"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S10-dark.png",
+      "sha256": "806567c6be77615a808be08f2462265c53d7af5024938f60579059dcff7e9aad"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S10-end-dark.png",
+      "sha256": "806567c6be77615a808be08f2462265c53d7af5024938f60579059dcff7e9aad"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S10-end-light.png",
+      "sha256": "08341f3c5e06a1050e4a1a5cd45e69e5b710711927b7c819cfa31768ccac1213"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S10-light.png",
+      "sha256": "08341f3c5e06a1050e4a1a5cd45e69e5b710711927b7c819cfa31768ccac1213"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S25-dark.png",
+      "sha256": "a7d12c927f970fc92a86bebd55a0eac888825c726f20e59ba442f2dae45b649d"
+    },
+    {
+      "path": "docs/qa/iteration-2/ui-preview/remaining/S25-light.png",
+      "sha256": "e37c3d7dc6b3b395e832bca7fb2fe1140163b2cd65546ebb19c7d2dc09dc8363"
+    }
+  ],
+  "screen_source_unchanged_since_capture": {
+    "app/src/main/java/com/example/wastenot/ui/auth/AuthScreen.kt": "8f7296fc2d9e671e6e0ec38b67879fe91c0877eae9d82ecef14a582f78fa0462",
+    "app/src/main/java/com/example/wastenot/ui/auth/StartupScreen.kt": "1ec3ac0d90ab0f1f66798704f6d328b9919f14e2b7d725fcf8c12047ec3b645f",
+    "app/src/main/java/com/example/wastenot/ui/main/SaveConfirmationScreen.kt": "1eee5d755baa35151ab260e307acfdacade0103b1f43f5ff0a4ecd80f84e40cb",
+    "app/src/main/java/com/example/wastenot/ui/main/HistoryFilter.kt": "f2019b050fcede882f1cd2493d121bffd7f7e32fcdfd4614e1bda98a9faa455a",
+    "app/src/main/java/com/example/wastenot/ui/main/ExitDialogs.kt": "d0b666ec47bbdf8d51f9b476724387666b5afc81f0f976f3e5efae3a14ed7cc0",
+    "app/src/main/java/com/example/wastenot/ui/main/DeleteLogDialog.kt": "8b7875c46f3b79c33c8a7b590008e5a0b9cd32c2ff9e8c651306288c48aca23b",
+    "app/src/main/java/com/example/wastenot/ui/main/EditConflictDialog.kt": "c5212433e5cd20146c3f2dce31de5d1becc5f93d671f9541747c09b8401a8488"
+  },
+  "new_staging_scope": "8 new signed-out captures; exact APK hash and actions in result.json",
+  "backend_remote": "c1e81c25d2bd24fc5e8a010cfd72217560418756",
+  "ai_remote": "baadd773aac01f7ef48c8beb15f62875c56f6b3f",
+  "paired_contract_artifacts_checked": 34,
+  "boot_recovery_before_app_launch": "Pixel Launcher ANR close action after observing exact title/bounds; accepted app frames contain no system error dialog",
+  "gate": {
+    "hard": "PASS within signed-out S02/S03 and reviewed frames; no overflow/dead auth navigation found",
+    "purpose": "PASS: kit typography/field/button/state hierarchy retained; no new visual technique",
+    "liveliness": "PASS: existing ENERGY2/RHYTHM2/MOTION1 retained",
+    "craft": "PASS for reviewed phone normal-font frames and observed navigation; no global acceptance claim"
+  }
+}
