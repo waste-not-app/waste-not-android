@@ -20,6 +20,7 @@ import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.model.WasteLog
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.AsyncStatePanel
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.labelResource
@@ -39,15 +40,19 @@ fun LogDetailScreen(
     ScrollPage(padding, modifier) {
         if (log == null) {
             when {
-                loading -> { CircularProgressIndicator(); Text(stringResource(R.string.logs_loading)) }
+                loading -> AsyncStatePanel(stringResource(R.string.logs_loading), R.drawable.ic_clock,
+                    Modifier.fillMaxWidth(), loading = true)
                 loadError -> {
-                    MessageBanner(stringResource(R.string.logs_load_failed), isError = true)
-                    ActionButton(stringResource(R.string.retry), onRetry, Modifier.fillMaxWidth())
+                    AsyncStatePanel(stringResource(R.string.logs_load_failed), R.drawable.ic_alert, Modifier.fillMaxWidth(),
+                        description = stringResource(R.string.async_retry_hint)) {
+                        ActionButton(stringResource(R.string.retry), onRetry, Modifier.fillMaxWidth())
+                    }
                 }
                 else -> {
-                    Text(stringResource(R.string.log_unavailable), style = MaterialTheme.typography.headlineMedium)
-                    Text(stringResource(R.string.log_unavailable_message), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    ActionButton(stringResource(R.string.see_history), onHistory, Modifier.fillMaxWidth())
+                    AsyncStatePanel(stringResource(R.string.log_unavailable), R.drawable.ic_history, Modifier.fillMaxWidth(),
+                        description = stringResource(R.string.log_unavailable_message)) {
+                        ActionButton(stringResource(R.string.see_history), onHistory, Modifier.fillMaxWidth())
+                    }
                 }
             }
         } else {

@@ -31,6 +31,7 @@ import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.model.WasteGuide
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.AsyncStatePanel
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.labelResource
@@ -85,15 +86,30 @@ fun GuideListScreen(
                 GuideEditorialNotice(stringResource(R.string.guide_catalog_pending))
             }
             if (data.loading) item(key = "loading") {
-                Text(stringResource(R.string.guide_loading), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 12.dp))
+                if (data.articles.isEmpty()) AsyncStatePanel(stringResource(R.string.guide_loading), R.drawable.ic_clock,
+                    Modifier.fillMaxWidth(), loading = true)
+                else {
+                    Text(stringResource(R.string.guide_loading), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 12.dp))
+                }
             }
             if (!data.loading && data.articles.isEmpty()) item(key = "empty") {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(stringResource(if (data.error != null) guideErrorText(data.error) else R.string.guide_empty_title), style = MaterialTheme.typography.headlineSmall)
-                    if (data.error == null) Text(stringResource(R.string.guide_empty_message), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    ActionButton(stringResource(if (data.error != null) R.string.retry else R.string.guide_clear),
-                        if (data.error != null) onSearch else ::clear)
+                val filtered = data.query.isNotBlank() || data.category != null
+                AsyncStatePanel(
+                    title = stringResource(if (data.error != null) guideErrorText(data.error) else R.string.guide_empty_title),
+                    icon = if (data.error != null) R.drawable.ic_alert else R.drawable.ic_guide,
+                    modifier = Modifier.fillMaxWidth(),
+                    description = when {
+                        data.error == ApiFailureKind.RATE_LIMITED -> null
+                        data.error != null -> loadFailureHint(data.error)
+                        else -> stringResource(if (filtered) R.string.guide_empty_message else R.string.guide_catalog_empty_hint)
+                    },
+                ) {
+                    ActionButton(stringResource(when {
+                        data.error != null -> R.string.retry
+                        filtered -> R.string.guide_clear
+                        else -> R.string.guide_reload
+                    }), if (data.error != null || !filtered) onSearch else ::clear, Modifier.fillMaxWidth())
                 }
             }
             items(data.articles, key = { it.id }) { article ->
@@ -167,13 +183,21 @@ fun GuideDetailScreen(
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
         when {
             data == null || data.loading -> {
-                Text(stringResource(R.string.guide_loading))
-                LinearProgressIndicator(Modifier.fillMaxWidth())
+                AsyncStatePanel(stringResource(R.string.guide_loading), R.drawable.ic_clock,
+                    Modifier.fillMaxWidth(), loading = true)
             }
             article == null || data.error != null -> {
                 val missing = data.error == ApiFailureKind.NOT_FOUND || data.error == ApiFailureKind.DELETED
-                Text(stringResource(if (missing) R.string.guide_unavailable else guideErrorText(data.error)), style = MaterialTheme.typography.headlineSmall)
-                ActionButton(stringResource(if (missing) R.string.guide_back_list else R.string.retry), if (missing) onList else onRetry)
+                AsyncStatePanel(stringResource(if (missing) R.string.guide_unavailable else guideErrorText(data.error)),
+                    if (missing) R.drawable.ic_guide else R.drawable.ic_alert, Modifier.fillMaxWidth(),
+                    description = when {
+                        missing -> stringResource(R.string.guide_unavailable_hint)
+                        data.error == ApiFailureKind.RATE_LIMITED -> null
+                        else -> loadFailureHint(data.error)
+                    }) {
+                    ActionButton(stringResource(if (missing) R.string.guide_back_list else R.string.retry),
+                        if (missing) onList else onRetry, Modifier.fillMaxWidth())
+                }
             }
             else -> {
                 Box(Modifier.size(width = 64.dp, height = 44.dp).background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small), contentAlignment = Alignment.Center) {

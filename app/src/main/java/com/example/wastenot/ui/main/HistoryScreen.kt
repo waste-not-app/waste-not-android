@@ -26,6 +26,7 @@ import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.AsyncStatePanel
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.DateField
@@ -83,11 +84,11 @@ fun HistoryScreen(
             state = list,
             contentPadding = pagePadding(padding),
         ) {
-            item(key = "count") {
+            if (data.records.isNotEmpty() || (!data.loading && data.error == null)) item(key = "count") {
                 Text(stringResource(if (filter.active) R.string.history_filtered_count else R.string.history_count,
                     WasteFormat.integer(visible.size.toLong())), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            if (!demo) item(key = "partial") {
+            if (!demo && data.records.isNotEmpty()) item(key = "partial") {
                 Text(stringResource(R.string.loaded_records_only), style = MaterialTheme.typography.bodySmall)
             }
             if (filter.active) item(key = "filters") {
@@ -101,17 +102,29 @@ fun HistoryScreen(
                     TextActionButton(stringResource(R.string.clear_filters), onClick = { applyFilter(HistoryFilter()) })
                 }
             }
-            if (data.loading) item(key = "loading") { CircularProgressIndicator(Modifier.padding(vertical = 20.dp)) }
-            if (data.error != null) item(key = "error") {
-                Column(Modifier.padding(vertical = 16.dp)) {
+            if (data.loading) item(key = "loading") {
+                if (data.records.isEmpty()) AsyncStatePanel(stringResource(R.string.logs_loading), R.drawable.ic_clock,
+                    Modifier.fillMaxWidth(), loading = true)
+                else CircularProgressIndicator(Modifier.padding(vertical = 20.dp))
+            }
+            if (data.error != null && (!data.loading || data.records.isNotEmpty())) item(key = "error") {
+                if (data.records.isEmpty()) AsyncStatePanel(stringResource(R.string.logs_load_failed), R.drawable.ic_alert,
+                    Modifier.fillMaxWidth(), description = loadFailureHint(data.error)) {
+                    ActionButton(stringResource(R.string.retry), onRetry, Modifier.fillMaxWidth())
+                } else Column(Modifier.padding(vertical = 16.dp)) {
                     MessageBanner(stringResource(R.string.logs_load_failed), isError = true)
                     TextActionButton(stringResource(R.string.retry), onRetry)
                 }
             }
             if (!data.loading && data.error == null && visible.isEmpty()) item(key = "empty") {
-                Column(Modifier.padding(vertical = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(stringResource(if (filter.active) R.string.filtered_empty else R.string.logs_empty))
-                    if (filter.active) TextActionButton(stringResource(R.string.clear_filters), onClick = { applyFilter(HistoryFilter()) })
+                AsyncStatePanel(
+                    title = stringResource(if (filter.active) R.string.history_filter_empty_title else R.string.history_empty_title),
+                    icon = if (filter.active) R.drawable.ic_filter else R.drawable.ic_history,
+                    modifier = Modifier.fillMaxWidth(),
+                    description = stringResource(if (filter.active) R.string.history_filter_empty_hint else R.string.history_empty_hint),
+                ) {
+                    if (filter.active) ActionButton(stringResource(R.string.clear_filters), { applyFilter(HistoryFilter()) }, Modifier.fillMaxWidth())
+                    else ActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth())
                 }
             }
             groups.forEach { (date, records) ->
@@ -132,7 +145,7 @@ fun HistoryScreen(
                     if (limit < visible.size) TextActionButton(stringResource(R.string.load_more_logs), onClick = { limit += 20 })
                 }
             }
-            item(key = "manual") {
+            if (visible.isNotEmpty()) item(key = "manual") {
                 SecondaryActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth().padding(top = 20.dp))
             }
         }

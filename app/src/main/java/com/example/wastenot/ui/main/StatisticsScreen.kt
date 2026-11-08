@@ -45,10 +45,10 @@ fun StatisticsScreen(
             else stringResource(R.string.date_range, WasteFormat.activityDate(period.range.from), WasteFormat.activityDate(period.range.to)),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (period.summary.activityCount == 0L) {
-            Text(stringResource(R.string.statistics_empty), style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.semantics { heading() })
-            Text(stringResource(R.string.statistics_empty_hint), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            ActionButton(stringResource(R.string.record_activity), onRecord, Modifier.fillMaxWidth())
+            AsyncStatePanel(stringResource(R.string.statistics_empty), R.drawable.ic_statistics, Modifier.fillMaxWidth(),
+                description = stringResource(R.string.statistics_empty_hint)) {
+                ActionButton(stringResource(R.string.record_activity), onRecord, Modifier.fillMaxWidth())
+            }
         } else {
             SummaryBlock(period.summary, stringResource(R.string.handled_period), Modifier.testTag("statistics-summary"), beforeRate = {
                 DailyChart(period.daily, count = false, Modifier.fillMaxWidth())

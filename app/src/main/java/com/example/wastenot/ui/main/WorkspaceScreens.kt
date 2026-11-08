@@ -90,15 +90,33 @@ fun OverviewScreen(user: User, data: SnapshotState<DashboardSnapshot>, padding: 
 
 @Composable
 internal fun SummaryStatus(loading: Boolean, error: ApiFailureKind?, hasValue: Boolean, onRetry: () -> Unit) {
+    if (!hasValue) {
+        AsyncStatePanel(
+            title = stringResource(if (loading) R.string.summary_loading else R.string.summary_load_failed),
+            icon = if (loading) R.drawable.ic_clock else R.drawable.ic_alert,
+            modifier = Modifier.fillMaxWidth(),
+            description = if (loading) null else loadFailureHint(error),
+            loading = loading,
+        ) {
+            if (!loading) ActionButton(stringResource(R.string.retry), onRetry, Modifier.fillMaxWidth())
+        }
+        return
+    }
     if (loading) {
         LinearProgressIndicator(Modifier.fillMaxWidth())
-        if (!hasValue) Text(stringResource(R.string.summary_loading))
     }
-    if (error != null || (!loading && !hasValue)) {
-        MessageBanner(stringResource(if (hasValue) R.string.summary_refresh_failed else R.string.summary_load_failed), isError = true)
+    if (error != null) {
+        MessageBanner(stringResource(R.string.summary_refresh_failed), isError = true)
         TextActionButton(stringResource(R.string.retry), onRetry)
     }
 }
+
+@Composable
+internal fun loadFailureHint(error: ApiFailureKind?): String = stringResource(when (error) {
+    ApiFailureKind.NETWORK, ApiFailureKind.TIMEOUT -> R.string.error_network
+    ApiFailureKind.RATE_LIMITED -> R.string.error_rate_limited
+    else -> R.string.async_retry_hint
+})
 
 @Composable
 internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifier = Modifier,
@@ -235,8 +253,15 @@ internal val WasteCategory.iconResource: Int get() = when (this) {
 @Composable
 fun WorkspaceLoading(data: WorkspaceUiState, onRetry: () -> Unit, padding: PaddingValues, modifier: Modifier = Modifier) {
     ScrollPage(padding, modifier) {
-        if (data.loading) { CircularProgressIndicator(); Text(stringResource(R.string.logs_loading)) }
-        else { Text(stringResource(R.string.logs_load_failed)); ActionButton(stringResource(R.string.retry), onRetry) }
+        AsyncStatePanel(
+            title = stringResource(if (data.loading) R.string.logs_loading else R.string.logs_load_failed),
+            icon = if (data.loading) R.drawable.ic_clock else R.drawable.ic_alert,
+            modifier = Modifier.fillMaxWidth(),
+            description = if (data.loading) null else loadFailureHint(data.error),
+            loading = data.loading,
+        ) {
+            if (!data.loading) ActionButton(stringResource(R.string.retry), onRetry, Modifier.fillMaxWidth())
+        }
     }
 }
 
