@@ -10,6 +10,8 @@ import com.example.wastenot.data.repository.ActivityStore
 import com.example.wastenot.data.repository.AccountSession
 import android.net.ConnectivityManager
 import com.example.wastenot.data.local.KeystoreRefreshTokenStore
+import com.example.wastenot.data.local.ThemePreferences
+import com.example.wastenot.data.repository.ThemeStore
 import com.example.wastenot.data.network.WasteNotNetwork
 import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.data.repository.AiRepository
@@ -19,6 +21,7 @@ import com.example.wastenot.data.repository.GuideStore
 import com.example.wastenot.data.repository.RemoteGuideStore
 
 open class AppContainer(context: Context) {
+    open val appearance: ThemeStore = ThemePreferences.create(context)
     private val network = WasteNotNetwork.create(BuildConfig.API_BASE_URL, allowLocalHttp = BuildConfig.DEBUG)
     val sessions = SessionRepository(network, KeystoreRefreshTokenStore.create(context))
     private val connectivity = context.applicationContext.getSystemService(ConnectivityManager::class.java)

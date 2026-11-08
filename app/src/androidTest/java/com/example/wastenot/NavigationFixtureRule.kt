@@ -16,6 +16,7 @@ import org.junit.rules.ExternalResource
 
 /** Installs deterministic sources only for the lifetime of a navigation test. */
 class NavigationFixtureRule : ExternalResource() {
+    private val appearance = ThemeFixtureRule()
     private val app get() = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as TestWasteNotApplication
     override fun before() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -25,8 +26,10 @@ class NavigationFixtureRule : ExternalResource() {
             override fun activityStore(user: User): ActivityStore = navigationActivityFixture(context, user)
             override fun scanRepository(cache: ScanPhotoCache): ScanRepository = DummyScanRepository()
         }
+        try { appearance.reset() }
+        catch (failure: Throwable) { app.fixtureContainer = null; throw failure }
     }
-    override fun after() { app.fixtureContainer = null }
+    override fun after() { try { appearance.restore() } finally { app.fixtureContainer = null } }
 }
 
 internal fun navigationActivityFixture(context: Context, user: User): ActivityStore = DummyActivityStore(

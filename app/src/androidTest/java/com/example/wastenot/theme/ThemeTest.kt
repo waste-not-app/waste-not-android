@@ -15,6 +15,17 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.R
+import com.example.wastenot.data.local.ThemePreferences
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import java.io.File
+import java.util.UUID
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -72,24 +83,27 @@ class ThemeTest {
         }
     }
 
-    @Test fun selectionChangesImmediatelyAndPersistsAcrossStoreRecreation() {
+    @Test fun selectionChangesImmediatelyAndPersistsToDataStore() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val preferences = context.getSharedPreferences("theme-test", 0)
-        preferences.edit().clear().commit()
-        val store = ThemePreferences(preferences)
-        val selected = mutableStateOf(store.read())
+        val file = File(context.cacheDir, "theme-${UUID.randomUUID()}.preferences_pb")
+        val job = SupervisorJob()
+        val scope = CoroutineScope(job + Dispatchers.IO)
+        val data = PreferenceDataStoreFactory.create(scope = scope, produceFile = { file })
+        val store = ThemePreferences(data)
+        val selected = mutableStateOf(store.modes.first())
         assertEquals(ThemeMode.SYSTEM, selected.value)
+        try {
         compose.setContent {
             WasteNotTheme(darkTheme = selected.value.isDark(false)) {
                 CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
-                    ThemePicker(selected.value, { selected.value = it; store.write(it) }, {})
+                    ThemePicker(selected.value, { mode -> selected.value = mode; scope.launch { store.write(mode) } }, {})
                 }
             }
         }
         listOf("Gelap" to ThemeMode.DARK, "Terang" to ThemeMode.LIGHT, "Ikuti sistem" to ThemeMode.SYSTEM).forEach { (label, mode) ->
             compose.onNodeWithText(label).assertIsDisplayed().performClick().assertIsSelected()
-            assertEquals(mode, ThemePreferences(preferences).read())
+            assertEquals(mode, store.modes.first { it == mode })
         }
-        preferences.edit().clear().commit()
+        } finally { job.cancelAndJoin(); file.delete() }
     }
 }
