@@ -17,6 +17,7 @@
     <string name="scan_activate">Aktifkan kamera</string>
     <string name="scan_open_settings">Buka pengaturan kamera</string>
     <string name="scan_take_photo">Ambil foto</string>
+    <string name="scan_camera_preparing">Menyiapkan kamera…</string>
     <string name="scan_capturing">Mengambil foto…</string>
     <string name="scan_photo_consent">Gunakan foto ini untuk mengenali objek. Foto tidak otomatis menjadi lampiran catatan atau data latihan.</string>
     <string name="scan_send">Scan foto</string>

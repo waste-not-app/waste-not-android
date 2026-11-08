@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.CameraState
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
@@ -49,6 +50,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.wastenot.R
 import com.example.wastenot.data.local.ScanPhotoCache
@@ -63,12 +66,12 @@ internal fun ScanCamera(session: String, cache: ScanPhotoCache, onPhoto: (ScanPh
     onProblem: (ScanProblem) -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
-    var active by remember { mutableStateOf(false) }
+    var active by remember(session, lifecycle) { mutableStateOf(false) }
     var denied by rememberSaveable { mutableStateOf(false) }
     var blocked by rememberSaveable { mutableStateOf(false) }
     val latestPhoto by rememberUpdatedState(onPhoto)
     val latestProblem by rememberUpdatedState(onProblem)
-    val alive = remember(session) { AtomicBoolean(true) }
+    val alive = remember(session, lifecycle) { AtomicBoolean(true) }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (alive.get() && lifecycle.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             active = granted
@@ -80,12 +83,19 @@ internal fun ScanCamera(session: String, cache: ScanPhotoCache, onPhoto: (ScanPh
     }
     DisposableEffect(session, lifecycle) {
         alive.set(true)
-        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) active = false }
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) active = false
+            if (event == Lifecycle.Event.ON_RESUME &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                denied = false
+                blocked = false
+            }
+        }
         lifecycle.lifecycle.addObserver(observer)
         onDispose { alive.set(false); lifecycle.lifecycle.removeObserver(observer) }
     }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        if (active) LiveCamera(cache, latestPhoto, latestProblem, Modifier.fillMaxWidth())
+        if (active) key(session, lifecycle) { LiveCamera(cache, latestPhoto, latestProblem, Modifier.fillMaxWidth()) }
         else {
             Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFF13261D), contentColor = Color.White,
                 border = BorderStroke(1.dp, Color(0xFF647A6A))) {
@@ -133,11 +143,17 @@ private fun LiveCamera(cache: ScanPhotoCache, onPhoto: (ScanPhoto) -> Unit, onPr
     val main = remember(context) { ContextCompat.getMainExecutor(context) }
     val alive = remember { AtomicBoolean(true) }
     var ready by remember { mutableStateOf(false) }
+    var streaming by remember { mutableStateOf(false) }
     var capturing by remember { mutableStateOf(false) }
+    val streamObserver = remember { Observer<PreviewView.StreamState> { streaming = it == PreviewView.StreamState.STREAMING } }
     val latestPhoto by rememberUpdatedState(onPhoto)
     val latestProblem by rememberUpdatedState(onProblem)
     DisposableEffect(controller, owner) {
         alive.set(true)
+        var observedCamera: LiveData<CameraState>? = null
+        val cameraErrors = Observer<CameraState> { state ->
+            if (alive.get() && state.error?.type == CameraState.ErrorType.CRITICAL) latestProblem(ScanProblem.CAMERA)
+        }
         controller.initializationFuture.addListener({
             if (alive.get()) try {
                 controller.initializationFuture.get()
@@ -145,11 +161,16 @@ private fun LiveCamera(cache: ScanPhotoCache, onPhoto: (ScanPhoto) -> Unit, onPr
                     if (!controller.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) throw IllegalStateException("No camera")
                     controller.cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
                 }
-                controller.bindToLifecycle(owner); ready = true
+                controller.bindToLifecycle(owner)
+                observedCamera = controller.cameraInfo?.cameraState
+                observedCamera?.observe(owner, cameraErrors)
+                ready = true
             } catch (_: Exception) { latestProblem(ScanProblem.CAMERA) }
         }, main)
         onDispose {
-            alive.set(false); controller.unbind()
+            alive.set(false)
+            observedCamera?.removeObserver(cameraErrors)
+            controller.unbind()
             // A pending callback must still run to close its ImageProxy and delete an outgoing capture.
             if (!capturing) executor.shutdown()
         }
@@ -159,9 +180,14 @@ private fun LiveCamera(cache: ScanPhotoCache, onPhoto: (ScanPhoto) -> Unit, onPr
             implementationMode = PreviewView.ImplementationMode.COMPATIBLE
             scaleType = PreviewView.ScaleType.FIT_CENTER
             this.controller = controller
-        } }, modifier = Modifier.fillMaxWidth().aspectRatio(4f / 3f).clip(MaterialTheme.shapes.large))
-        ActionButton(stringResource(if (capturing) R.string.scan_capturing else R.string.scan_take_photo), onClick = {
-            if (ready && !capturing) {
+            previewStreamState.observe(owner, streamObserver)
+        } }, modifier = Modifier.fillMaxWidth().aspectRatio(4f / 3f).clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFF13261D)), onReset = null, onRelease = {
+            it.previewStreamState.removeObserver(streamObserver)
+            it.controller = null
+        })
+        ActionButton(stringResource(R.string.scan_take_photo), onClick = {
+            if (alive.get() && ready && streaming && !capturing) {
                 capturing = true
                 try {
                     controller.takePicture(executor, object : ImageCapture.OnImageCapturedCallback() {
@@ -185,7 +211,9 @@ private fun LiveCamera(cache: ScanPhotoCache, onPhoto: (ScanPhoto) -> Unit, onPr
                     })
                 } catch (_: Exception) { capturing = false; latestProblem(ScanProblem.CAMERA) }
             }
-        }, modifier = Modifier.fillMaxWidth(), enabled = ready && !capturing)
+        }, modifier = Modifier.fillMaxWidth(), enabled = ready && streaming && !capturing,
+            loading = !ready || !streaming || capturing,
+            loadingLabel = stringResource(if (capturing) R.string.scan_capturing else R.string.scan_camera_preparing))
     }
 }
 
