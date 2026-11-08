@@ -1,0 +1,12 @@
+{
+  "complete": true,
+  "started_at_utc": "2026-11-08T18:52:42.036534+00:00",
+  "legacy_sha256": "09c5327dfbe3f9b8985842d2762c03ad94b4cdd8b36c99b1bb48d8e6d8077aea",
+  "datastore_sha256": "07ba9daeec34f0006e5d7bc4eb641dabda697cf8389d04e9d2383e82b6611199",
+  "data_cleared": false,
+  "legacy_restart_retained_dark": true,
+  "upgrade_retained_dark": true,
+  "new_restart_retained_dark": true,
+  "normal_package_unchanged": "6861ba45bb8f9d9b50b25cf4c9e84679130ca75f4dbf30e09a9fa80f704e6dbe",
+  "finished_at_utc": "2026-11-08T18:53:41.853438+00:00"
+}

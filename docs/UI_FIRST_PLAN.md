@@ -111,3 +111,11 @@ Review viewport awal sembilan screen inti dalam dua tema pada 8 November menemuk
 APK staging `09c5327d` lolos signature, SDK/font, gate sumber/DEX/assets serta cold startup ke Masuk di luar instrumentation. Pointer APK lokal diperbarui setelah penerimaan; versi sebelumnya diarsipkan. Ini checkpoint riwayat, bukan hasil pengukuran jank/memori 1.000 log, spoken TalkBack, profil font besar maupun regresi AI baru. Migrasi DataStore A30 dan audit akhir core/AI tetap diperlukan.
 
 Skill Android yang dipilih dari katalog lokal sudah terdaftar di AGENTS.md: android-dev, android-jetpack-compose-expert, compose-state-hoisting dan compose-ui-testing-patterns, dengan panduan kualitas yang sudah digunakan sebelumnya. Stack Navigation 3 dan kit WasteNot tetap menjadi acuan implementasi.
+
+## Preferensi tampilan DataStore, 9 November 2026
+
+[Checkpoint A30/S16](qa/iteration-2/THEME_DATASTORE.md) memigrasikan key tema legacy ke DataStore, menerapkan pilihan segera, menserialkan intent terakhir dan menyediakan pemulihan I/O. Mode awal tidak dianggap tersimpan sebelum dibaca; form akun tetap dapat diakses ketika pembacaan gagal. Token, akun, catatan dan draf tetap memakai penyimpanannya sendiri.
+
+264 debug unit tests serta lint/build lulus. Enam metode native lulus pada percobaan pertama: migrasi Android nyata, nilai tidak valid, kegagalan tujuan migrasi, pemilih font200%, recreate/system-night dan pemulihan banner UI. Upgrade staging dari APK riwayat ke APK DataStore mempertahankan Gelap pada restart versi lama, setelah upgrade dan restart versi baru, tanpa menghapus data. Empat belas PNG asli/hash dipin.
+
+APK staging `07ba9dae` lolos signature v2, SDK/font dan gate sumber/DEX/assets, lalu pointer lokal diperbarui. Tidak ada akun/log backend maupun generasi AI dibuat pada batch ini. Regresi menyeluruh core/AI dan audit yang belum terbukti tetap diperlukan. Skill Kotlin Flow/state ikut diterapkan dan terdaftar bersama skill Android/Compose dalam AGENTS.md.

@@ -1,0 +1,10 @@
+{
+  "production_source_fingerprint": "06bb100beadd7d4e9741bad95e6222129cbb5864ec10e64b5ed71e08f8165503",
+  "accepted_apk_source_fingerprint": "8e2fb6a076805fa6087ca0bacb871a2346b1dafdf6d215bc3f0921c2c81db5e1",
+  "only_production_delta": [
+    "app/build.gradle.kts: wastenot.hotReload default true -> false",
+    "app/build.gradle.kts: comment describes explicit hot reload option"
+  ],
+  "native_apk_build_flag": "-Pwastenot.hotReload=false",
+  "native_behavior_changed": false
+}
