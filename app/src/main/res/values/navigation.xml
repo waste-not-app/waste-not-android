@@ -43,7 +43,6 @@
     <string name="clear_filters">Hapus filter</string>
     <string name="logs_loading">Memuat catatan…</string>
     <string name="logs_load_failed">Catatan belum bisa dimuat.</string>
-    <string name="loaded_records_only">Filter berlaku pada catatan yang sudah dimuat.</string>
     <string name="avoided_suffix"> · dihindari</string>
     <string name="date_range">%1$s – %2$s</string>
     <string name="method_activity_count">%1$s: %2$d aktivitas</string>

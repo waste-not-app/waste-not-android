@@ -108,6 +108,18 @@ fun AccountNavigation(
     } } }
     val guides: GuideViewModel = viewModel(factory = guideFactory)
     val guideData by guides.state.collectAsStateWithLifecycle()
+    val historyFactory = remember(activityStore) { viewModelFactory { initializer {
+        HistoryViewModel(activityStore, createSavedStateHandle())
+    } } }
+    val historyModel: HistoryViewModel = viewModel(factory = historyFactory)
+    val historyData by historyModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(historyModel, data.confirmedChange) { data.confirmedChange?.let(historyModel::changed) }
+    LaunchedEffect(historyModel, data.detail) {
+        data.detail?.takeUnless { it.loading }?.let { read ->
+            if (read.error == ApiFailureKind.NOT_FOUND || read.error == ApiFailureKind.DELETED) historyModel.unavailable(read.id)
+            else read.log?.let { historyModel.reconcile(it) }
+        }
+    }
     val date = model.referenceDate ?: LocalDate.now(user.timezone)
     val summariesFactory = remember(activityStore) { viewModelFactory { initializer {
         SummariesViewModel(activityStore, createSavedStateHandle()) { model.referenceDate ?: LocalDate.now(user.timezone) }
@@ -248,7 +260,7 @@ fun AccountNavigation(
                 onDismiss = ::dismissDelete,
                 onConfirm = { model.delete(id, deleteVersion) },
                 onReload = { dismissDelete(); model.loadDetail(id) },
-                onUnavailable = { dismissDelete(); history(); model.load(true) })
+                onUnavailable = { dismissDelete(); history(); historyModel.unavailable(id); model.load(true) })
         }
     }
     val pendingOutcome = draft?.outcomeUnknown == true
@@ -283,7 +295,10 @@ fun AccountNavigation(
         val provider = entryProvider {
             entry<Home> { OverviewScreen(user, summaryData.dashboard, pageInsets, { edit() }, ::history, ::detail, { summaries.dashboard(true) }, Modifier.fillMaxSize(),
                 onProfile = { selected = MainTab.PROFILE }, onResumeDraft = if (disk.active?.paused == true) ::resumeDraft else null) }
-            entry<History> { HistoryScreen(data, pageInsets, { edit() }, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
+            entry<History> {
+                LaunchedEffect(historyModel) { historyModel.load() }
+                HistoryScreen(historyData, pageInsets, { edit() }, ::detail, historyModel::refresh,
+                historyModel::filter, historyModel::more, Modifier.fillMaxSize(),
                 today = date, filterOpen = historyFilterOpen, onOpenFilter = { historyFilterOpen = true }, onDismissFilter = { historyFilterOpen = false },
                 deletedNotice = deletedNotice, onDismissNotice = { deletedNotice = false }) }
             entry<Guide> {

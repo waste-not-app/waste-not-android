@@ -6,6 +6,7 @@ import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.network.WasteNotNetwork
 import com.example.wastenot.data.network.dto.toRequestFields
 import com.example.wastenot.model.ActivityDateRange
+import com.example.wastenot.model.LogDateRange
 import com.example.wastenot.model.DashboardSnapshot
 import com.example.wastenot.model.StatisticsSnapshot
 import com.example.wastenot.model.DisposalMethod
@@ -68,7 +69,7 @@ class CoreRepository(private val network: WasteNotNetwork?, private val session:
     suspend fun wasteLogs(
         category: WasteCategory? = null,
         method: DisposalMethod? = null,
-        dates: ActivityDateRange? = null,
+        dates: LogDateRange? = null,
         cursor: String? = null,
     ): ApiResult<List<WasteLog>> {
         val result = protected { credential ->

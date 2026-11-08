@@ -7,6 +7,7 @@ import com.example.wastenot.model.Quantity
 import com.example.wastenot.model.WasteCategory
 import com.example.wastenot.model.WasteLog
 import com.example.wastenot.model.ActivityDateRange
+import com.example.wastenot.model.LogDateRange
 import com.example.wastenot.model.DashboardSnapshot
 import com.example.wastenot.model.StatisticsSnapshot
 import java.time.LocalDate
@@ -29,6 +30,8 @@ interface ActivityStore {
     suspend fun dashboard(): ApiResult<DashboardSnapshot>
     suspend fun statistics(range: ActivityDateRange): ApiResult<StatisticsSnapshot>
     suspend fun load(): ApiResult<List<WasteLog>>
+    suspend fun page(category: WasteCategory? = null, method: DisposalMethod? = null,
+        dates: LogDateRange? = null, cursor: String? = null): ApiResult<List<WasteLog>>
     suspend fun get(id: String): ApiResult<WasteLog>
     suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation>
     suspend fun update(id: String, version: Int, input: ActivityInput): ApiResult<WasteLog>
@@ -42,6 +45,8 @@ class RemoteActivityStore(private val core: CoreRepository) : ActivityStore {
     override suspend fun dashboard() = core.dashboard()
     override suspend fun statistics(range: ActivityDateRange) = core.statistics(range)
     override suspend fun load() = core.wasteLogs()
+    override suspend fun page(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, cursor: String?) =
+        core.wasteLogs(category, method, dates, cursor)
     override suspend fun get(id: String) = core.wasteLog(id)
     override suspend fun create(input: ActivityInput, clientRequestId: String) = core.createLog(input, clientRequestId)
     override suspend fun update(id: String, version: Int, input: ActivityInput) = core.updateLog(id, version, input)
