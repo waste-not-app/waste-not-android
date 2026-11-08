@@ -1,5 +1,8 @@
 package com.example.wastenot.ui.main
 
+import com.example.wastenot.data.local.ScanPhotoCache
+import com.example.wastenot.data.repository.ScanRepository
+import com.example.wastenot.data.repository.ActivityStore
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.LocalIndication
@@ -41,12 +44,8 @@ import androidx.navigation3.runtime.*
 import androidx.navigation3.ui.NavDisplay
 import com.example.wastenot.*
 import com.example.wastenot.R
-import com.example.wastenot.data.dummy.DummyActivityStore
 import com.example.wastenot.data.local.LocalEditorDraftStore
 import com.example.wastenot.data.network.ApiFailureKind
-import com.example.wastenot.data.repository.CoreRepository
-import com.example.wastenot.data.repository.AiRepository
-import com.example.wastenot.data.repository.RemoteActivityStore
 import com.example.wastenot.data.repository.GuideStore
 import com.example.wastenot.model.User
 import com.example.wastenot.theme.OnAccent
@@ -73,10 +72,9 @@ private data class EditorEntryDraft(val requestId: String, val draft: EditorDraf
 @Composable
 fun AccountNavigation(
     user: User,
-    demo: Boolean,
-    core: CoreRepository,
+    activityStore: ActivityStore,
     guideStore: GuideStore,
-    aiRepository: AiRepository,
+    scanRepositoryFactory: (ScanPhotoCache) -> ScanRepository,
     theme: ThemeMode,
     onTheme: () -> Unit,
     onLogout: () -> Unit,
@@ -84,12 +82,6 @@ fun AccountNavigation(
     logoutState: LogoutUiState = LogoutUiState.None,
 ) {
     val context = LocalContext.current.applicationContext
-    val activityStore = remember(user.id, demo, core) {
-        if (demo) DummyActivityStore(
-            context.getSharedPreferences("dummy_logs_${user.id}", android.content.Context.MODE_PRIVATE), user.timezone,
-            seedInitialRecords = user.id == "dummy-owner",
-        ) else RemoteActivityStore(core)
-    }
     val factory = remember(activityStore) { viewModelFactory { initializer {
         WorkspaceViewModel(activityStore)
     } } }
@@ -279,7 +271,7 @@ fun AccountNavigation(
         sessionFailed = (logoutState as? LogoutUiState.Complete)?.result?.localCleared == false,
     )
     if (resumingPrompt) ResumeDraftDialog({ resumingPrompt = false }, ::resumeDraft)
-    capture?.let { session -> CaptureSheet(user.id, demo, aiRepository, session, onDismiss = { capture = null }, onPrefill = { prefill ->
+    capture?.let { session -> CaptureSheet(user.id, scanRepositoryFactory, session, onDismiss = { capture = null }, onPrefill = { prefill ->
         capture = null
         openEditor(LogEditor(null, UUID.randomUUID().toString(), scanCategory = prefill.category?.name,
             scanMethod = prefill.method?.name, scanRecommendationId = prefill.aiProvenance?.recommendationId))
@@ -291,7 +283,7 @@ fun AccountNavigation(
         val provider = entryProvider {
             entry<Home> { OverviewScreen(user, summaryData.dashboard, pageInsets, { edit() }, ::history, ::detail, { summaries.dashboard(true) }, Modifier.fillMaxSize(),
                 onProfile = { selected = MainTab.PROFILE }, onResumeDraft = if (disk.active?.paused == true) ::resumeDraft else null) }
-            entry<History> { HistoryScreen(data, demo, pageInsets, { edit() }, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
+            entry<History> { HistoryScreen(data, pageInsets, { edit() }, ::detail, { model.load(true) }, Modifier.fillMaxSize(),
                 today = date, filterOpen = historyFilterOpen, onOpenFilter = { historyFilterOpen = true }, onDismissFilter = { historyFilterOpen = false },
                 deletedNotice = deletedNotice, onDismissNotice = { deletedNotice = false }) }
             entry<Guide> {
@@ -370,7 +362,7 @@ fun AccountNavigation(
                     }
                     val leavingAfterSave = current != key && form.locked && form.submissionError == null
                     val confirmed = data.save?.let { it.requestId == key.requestId && it.id != null } == true
-                    LogEditorScreen(form, date, user.timezone.id, demo, data.saving || disk.busy || leavingAfterSave, pageInsets,
+                    LogEditorScreen(form, date, user.timezone.id, data.saving || disk.busy || leavingAfterSave, pageInsets,
                         { input -> persistence.checkpoint(form.stored(key, selected),
                             { if (stack.lastOrNull() == key) model.save(input, key.logId, form.values.version, key.requestId,
                                 previousOutcomeUnknown = form.outcomeUnknown) },

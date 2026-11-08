@@ -300,10 +300,11 @@ class ScanViewModelTest {
         assertEquals(ScanContext(), vm.state.value.context); assertNull(vm.state.value.category); assertNull(vm.state.value.objectKey)
     }
 
-    @Test fun demoCanExerciseTheEditorWithoutClaimingLiveProvenance() = runTest {
+    @Test fun prototypeRecommendationsNeverPrefillAMethodOrProvenance() = runTest {
         val vm = model(DummyScanRepository()); confirm(vm); vm.recommend(); advanceUntilIdle()
         assertTrue(vm.state.value.recommendation!!.prototypeOnly)
-        assertEquals(DisposalMethod.RECYCLE, vm.prefill(true).method); assertNull(vm.prefill(true).aiProvenance)
+        assertFalse(vm.state.value.canUseRecommendation)
+        assertNull(vm.prefill(true).method); assertNull(vm.prefill(true).aiProvenance)
     }
 
     @Test fun boundingBoxesRejectInvalidCoordinatesAndFitALetterboxedImage() {
@@ -323,7 +324,7 @@ class ScanViewModelTest {
         AiRecommendationBasis.CONFIRMED, emptyList(), emptyList(), "Fixture only", null, false, "", "fixture", false,
         "fixture", listOf("fixture"), emptyList(), emptyList(), emptyList(), emptyList())
     private inner class Fake : ScanRepository {
-        override val isDemo = false
+
         val inputs = mutableListOf<AiRecommendationRequest>()
         val uploadIds = mutableListOf<String>()
         val retired = mutableListOf<String>()

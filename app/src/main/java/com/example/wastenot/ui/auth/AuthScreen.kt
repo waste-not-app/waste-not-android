@@ -57,7 +57,6 @@ import com.example.wastenot.theme.WasteNotAuthHeading
 fun AuthScreen(
     register: Boolean,
     state: AuthUiState,
-    isDemo: Boolean,
     reason: SignOutReason,
     onChange: (AccountField, String) -> Unit,
     onSubmit: () -> Unit,
@@ -123,7 +122,7 @@ fun AuthScreen(
                         MessageBanner(stringResource(R.string.logout_cleanup_failed), isError = true)
                         TextActionButton(stringResource(R.string.logout_cleanup_retry), onRetryCleanup)
                     }
-                    !logoutState.result.serverRevoked && !logoutState.isDemo -> MessageBanner(stringResource(R.string.logout_local_message))
+                    !logoutState.result.serverRevoked -> MessageBanner(stringResource(R.string.logout_local_message))
                     else -> Unit
                 }
             }

@@ -99,7 +99,7 @@ class CoreAsyncStateDesignTest {
         var retries = 0
         var records = 0
         show(dark, page) {
-            HistoryScreen(data, true, PaddingValues(), { records++ }, {}, { retries++ }, Modifier.fillMaxSize(), date)
+            HistoryScreen(data, PaddingValues(), { records++ }, {}, { retries++ }, Modifier.fillMaxSize(), date)
         }
         for (theme in listOf(false, true)) {
             val suffix = if (theme) "dark" else "light"

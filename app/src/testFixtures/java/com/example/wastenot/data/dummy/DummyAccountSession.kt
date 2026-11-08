@@ -28,7 +28,7 @@ import kotlinx.coroutines.withContext
 class DummyAccountSession(private val preferences: SharedPreferences) : AccountSession {
     private val mutableState = MutableStateFlow<SessionState>(SessionState.Checking)
     override val state = mutableState.asStateFlow()
-    override val isDemo = true
+
     private var epoch = 0L
     private val activeKeys = listOf("id", "name", "email", "timezone", "signed_out")
 

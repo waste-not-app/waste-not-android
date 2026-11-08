@@ -1,5 +1,11 @@
 package com.example.wastenot
 
+import com.example.wastenot.data.local.ScanPhotoCache
+import com.example.wastenot.data.repository.RemoteScanRepository
+import com.example.wastenot.data.repository.ScanRepository
+import com.example.wastenot.data.repository.RemoteActivityStore
+import com.example.wastenot.data.repository.ActivityStore
+import com.example.wastenot.model.User
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -56,6 +62,10 @@ fun MainNavigation(
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit,
     modifier: Modifier = Modifier,
+    activityStoreFactory: (User) -> ActivityStore =
+        { RemoteActivityStore(coreRepository) },
+    scanRepositoryFactory: (ScanPhotoCache) -> ScanRepository =
+        { RemoteScanRepository(aiRepository, it) },
 ) {
     val factory = remember(accountSession) { viewModelFactory { initializer { SessionViewModel(accountSession) } } }
     val model: SessionViewModel = viewModel(factory = factory)
@@ -65,7 +75,7 @@ fun MainNavigation(
     val root = rememberNavBackStack(SessionRoot)
     var choosingTheme by remember { mutableStateOf(false) }
     val target: NavKey = when (val phase = session.phase) {
-        is SessionState.Authenticated -> AccountRoot(phase.user.id, phase.epoch, session.isDemo)
+        is SessionState.Authenticated -> AccountRoot(phase.user.id, phase.epoch)
         is SessionState.SignedOut -> AuthRoot
         else -> SessionRoot
     }
@@ -89,12 +99,13 @@ fun MainNavigation(
             }
             entry<AuthRoot> {
                 val phase = session.phase as? SessionState.SignedOut
-                if (phase != null) AuthNavigation(model, session.isDemo, phase, { choosingTheme = true })
+                if (phase != null) AuthNavigation(model, phase, { choosingTheme = true })
             }
             entry<AccountRoot> { key ->
                 val phase = session.phase as? SessionState.Authenticated
-                if (phase != null && key == AccountRoot(phase.user.id, phase.epoch, session.isDemo)) {
-                    AccountNavigation(phase.user, session.isDemo, coreRepository, guideStore, aiRepository, themeMode,
+                if (phase != null && key == AccountRoot(phase.user.id, phase.epoch)) {
+                    val activities = remember(key, activityStoreFactory) { activityStoreFactory(phase.user) }
+                    AccountNavigation(phase.user, activities, guideStore, scanRepositoryFactory, themeMode,
                         { choosingTheme = true }, model::logout, Modifier.fillMaxSize(), logoutState = logout)
                 }
             }
@@ -107,7 +118,7 @@ fun MainNavigation(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AuthNavigation(model: SessionViewModel, demo: Boolean, phase: SessionState.SignedOut, onTheme: () -> Unit) {
+private fun AuthNavigation(model: SessionViewModel, phase: SessionState.SignedOut, onTheme: () -> Unit) {
     val stack = rememberNavBackStack(Login)
     val form by model.auth.collectAsStateWithLifecycle()
     val logout by model.logoutState.collectAsStateWithLifecycle()
@@ -129,12 +140,12 @@ private fun AuthNavigation(model: SessionViewModel, demo: Boolean, phase: Sessio
                 .consumeWindowInsets(padding),
             entryProvider = entryProvider {
                 entry<Login> {
-                    AuthScreen(false, form, demo, phase.reason, model::change, { model.submit(false) },
+                    AuthScreen(false, form, phase.reason, model::change, { model.submit(false) },
                         { model.clearPasswords(); if (stack.last() != Register) stack.add(Register) },
                         onTheme, Modifier.fillMaxSize(), logout, model::logout)
                 }
                 entry<Register> {
-                    AuthScreen(true, form, demo, phase.reason, model::change, { model.submit(true) }, ::back,
+                    AuthScreen(true, form, phase.reason, model::change, { model.submit(true) }, ::back,
                         onTheme, Modifier.fillMaxSize(), logout, model::logout, onBack = ::back)
                 }
             },

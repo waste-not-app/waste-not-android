@@ -46,7 +46,6 @@ fun LogEditorScreen(
     draft: EditorDraft,
     referenceDate: LocalDate,
     accountTimezone: String,
-    demo: Boolean,
     saving: Boolean,
     padding: PaddingValues,
     onSave: (ActivityInput) -> Unit,
@@ -97,7 +96,6 @@ fun LogEditorScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            if (!demo) MessageBanner(stringResource(R.string.remote_write_message))
             if (restored) Text(stringResource(R.string.draft_restored), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (value.aiProvenance != null) {

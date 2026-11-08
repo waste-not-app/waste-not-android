@@ -25,7 +25,6 @@ data class ActivityInput(
 data class ActivityCreation(val log: WasteLog, val created: Boolean)
 
 interface ActivityStore {
-    val isDemo: Boolean
     val referenceDate: LocalDate?
     suspend fun dashboard(): ApiResult<DashboardSnapshot>
     suspend fun statistics(range: ActivityDateRange): ApiResult<StatisticsSnapshot>
@@ -38,7 +37,7 @@ interface ActivityStore {
 }
 
 class RemoteActivityStore(private val core: CoreRepository) : ActivityStore {
-    override val isDemo = false
+
     override val referenceDate: LocalDate? = null
     override suspend fun dashboard() = core.dashboard()
     override suspend fun statistics(range: ActivityDateRange) = core.statistics(range)

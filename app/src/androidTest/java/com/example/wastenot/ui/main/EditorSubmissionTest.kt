@@ -57,7 +57,7 @@ class EditorSubmissionTest {
         restoration.setContent {
             current = rememberSaveable(saver = EditorDraft.Saver) { draft() }
             EditorHost(dark) {
-                LogEditorScreen(current, today, "Asia/Jakarta", true, false, PaddingValues(), { input ->
+                LogEditorScreen(current, today, "Asia/Jakarta", false, PaddingValues(), { input ->
                     received.add(input)
                     current.submissionFailed(when (received.size) {
                         1 -> ApiFailureKind.TIMEOUT
@@ -98,7 +98,7 @@ class EditorSubmissionTest {
         var writes = 0
         var cleanups = 0
         compose.setContent { EditorHost(false) {
-            LogEditorScreen(form, today, "Asia/Jakarta", true, false, PaddingValues(), { writes++ }, {}, {},
+            LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(), { writes++ }, {}, {},
                 Modifier.fillMaxSize(), persistence = EditorPersistenceState(loading = false, ready = true, failure = DraftFailure.FINISH),
                 saveConfirmed = true, onRetryPersistence = { cleanups++ })
         } }
@@ -116,7 +116,7 @@ class EditorSubmissionTest {
         restoration.setContent {
             current = rememberSaveable(saver = EditorDraft.Saver) { draft() }
             EditorHost(dark) {
-                LogEditorScreen(current, today, "Asia/Jakarta", true, busy.value, PaddingValues(),
+                LogEditorScreen(current, today, "Asia/Jakarta", busy.value, PaddingValues(),
                     { received.add(it); busy.value = true }, { error("Unknown result must offer an explicit retry") }, {}, Modifier.fillMaxSize())
             }
         }
@@ -154,7 +154,7 @@ class EditorSubmissionTest {
         draft.submissionFailed(error)
         var history = 0
         compose.setContent { EditorHost(dark) {
-            LogEditorScreen(draft, today, "Asia/Jakarta", true, false, PaddingValues(),
+            LogEditorScreen(draft, today, "Asia/Jakarta", false, PaddingValues(),
                 { fail("A rejected request must not be retried") }, { history++ }, {}, Modifier.fillMaxSize())
         } }
         assertFrozen()
@@ -172,7 +172,7 @@ class EditorSubmissionTest {
         draft.prepareSubmission(today)
         draft.submissionFailed(ApiFailureKind.VALIDATION)
         compose.setContent { EditorHost(false) {
-            LogEditorScreen(draft, today, "Asia/Jakarta", true, false, PaddingValues(), {}, {}, {}, Modifier.fillMaxSize())
+            LogEditorScreen(draft, today, "Asia/Jakarta", false, PaddingValues(), {}, {}, {}, Modifier.fillMaxSize())
         } }
         compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().assertIsEnabled().performTextReplacement("Koreksi")
         compose.onNodeWithText("Simpan catatan").performScrollTo().assertIsEnabled()

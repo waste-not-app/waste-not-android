@@ -57,7 +57,7 @@ class DraftRecoveryUiTest {
         var dark by mutableStateOf(false)
         var retries = 0; var writes = 0
         compose.setContent { WasteNotTheme(dark) {
-            Surface { LogEditorScreen(form, form.values.date, "Asia/Jakarta", true, false, PaddingValues(0.dp),
+            Surface { LogEditorScreen(form, form.values.date, "Asia/Jakarta", false, PaddingValues(0.dp),
                 { writes++ }, {}, {}, Modifier.fillMaxSize(), persistence = EditorPersistenceState(loading = false, ready = true, failure = DraftFailure.FINISH),
                 saveConfirmed = true, onRetryPersistence = { retries++ }) }
         } }

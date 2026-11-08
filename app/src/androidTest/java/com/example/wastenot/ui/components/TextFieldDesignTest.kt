@@ -40,7 +40,7 @@ class TextFieldDesignTest {
         compose.setContent { WasteNotTheme(dark) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                 AuthScreen(false, AuthUiState(email = "pengguna@example.com", password = "contoh-aman-12", submitting = true),
-                    false, SignOutReason.NONE, { _, _ -> changes++ }, {}, {}, {}, Modifier.fillMaxSize())
+                    SignOutReason.NONE, { _, _ -> changes++ }, {}, {}, {}, Modifier.fillMaxSize())
             }
         } }
         for (theme in listOf(false, true)) {

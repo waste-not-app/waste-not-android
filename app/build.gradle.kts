@@ -23,7 +23,7 @@ if (providers.gradleProperty("wastenot.hotReload").orElse("true").get().toBoolea
 
 fun apiBaseUrl(property: String, defaultValue: String = "", allowLocalHttp: Boolean = false): String {
     val value = providers.gradleProperty(property).orElse(defaultValue).get().trim()
-    if (value.isEmpty()) return ""
+    require(value.isNotEmpty()) { "$property must not be empty." }
     val uri = runCatching { URI(value) }.getOrElse {
         error("$property must be an absolute API URL.")
     }
@@ -50,8 +50,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("boolean", "USE_DUMMY_DATA", providers.gradleProperty("wastenot.useDummyData").orElse("true").get().toBooleanStrict().toString())
+        testInstrumentationRunner = "com.example.wastenot.WasteNotTestRunner"
     }
 
     val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull?.takeIf { it.isNotBlank() }
@@ -84,7 +83,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.debugApiBaseUrl", "http://10.0.2.2:8080/v1/", allowLocalHttp = true)}\"")
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.debugApiBaseUrl", "https://pred-autoscaler.bccdev.id/wastenot/api/v1/", allowLocalHttp = true)}\"")
         }
         create("staging") {
             initWith(getByName("debug"))
@@ -93,10 +92,10 @@ android {
             applicationIdSuffix = ".staging"
             versionNameSuffix = "-staging"
             matchingFallbacks += listOf("debug")
-            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.stagingApiBaseUrl")}\"")
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.stagingApiBaseUrl", "https://pred-autoscaler.bccdev.id/wastenot/api/v1/")}\"")
         }
         release {
-            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.releaseApiBaseUrl")}\"")
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.releaseApiBaseUrl", "https://pred-autoscaler.bccdev.id/wastenot/api/v1/")}\"")
             isMinifyEnabled = false
             signingConfigs.findByName("release")?.let {
                 signingConfig = it
@@ -104,6 +103,11 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+    sourceSets {
+        getByName("test").kotlin.srcDir("src/testFixtures/java")
+        getByName("androidTest").kotlin.srcDir("src/testFixtures/java")
+    }
+
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17

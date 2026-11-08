@@ -44,6 +44,7 @@ internal fun captureDraftFixture(name: String) {
 }
 
 class EditorPersistenceNavigationTest {
+    @get:Rule(order = -1) val navigationData = com.example.wastenot.NavigationFixtureRule()
     @get:Rule(order = 0) val fixture = object : ExternalResource() { override fun before() = resetDraftAccountFixture() }
     @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
     private fun waitFor(text: String) { compose.waitUntil(30_000) { compose.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty() } }

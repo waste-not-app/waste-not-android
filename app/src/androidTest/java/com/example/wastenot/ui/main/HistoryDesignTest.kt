@@ -40,7 +40,7 @@ class HistoryDesignTest {
                     TopAppBar(title = { Text("Riwayat") }, actions = {
                         TextButton(onClick = { open = true }) { Text("Filter riwayat") }
                     })
-                    HistoryScreen(WorkspaceUiState(records, loading = false), true, PaddingValues(), {}, onDetail, {},
+                    HistoryScreen(WorkspaceUiState(records, loading = false), PaddingValues(), {}, onDetail, {},
                         Modifier.weight(1f).fillMaxWidth(), today, open, { open = true }, { open = false },
                         deletedNotice = notice?.value ?: false, onDismissNotice = { notice?.value = false })
                 }

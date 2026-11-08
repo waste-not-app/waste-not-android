@@ -98,11 +98,11 @@ class SessionViewModelTest {
         val source = FakeSession()
         val vm = model(source)
         runCurrent()
-        assertFalse(vm.session.value.isDemo)
+        assertEquals(source.state.value, vm.session.value.phase)
         vm.bootstrap()
         advanceUntilIdle()
         assertTrue(vm.session.value.phase is SessionState.SignedOut)
-        assertFalse(vm.session.value.isDemo)
+        assertEquals(source.state.value, vm.session.value.phase)
         assertEquals(0, source.loginCalls)
         assertEquals(0, source.registerCalls)
     }
@@ -204,7 +204,7 @@ class SessionViewModelTest {
 
     private class FakeSession : AccountSession {
         override val state = MutableStateFlow<SessionState>(SessionState.SignedOut())
-        override val isDemo = false
+
         val user = User("00000000-0000-4000-8000-000000000002", "Sample User", "sample@example.invalid", ZoneId.of("Asia/Jakarta"), null)
         var bootstrapCalls = 0
         var loginCalls = 0

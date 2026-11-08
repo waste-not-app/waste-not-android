@@ -35,7 +35,8 @@ class SessionRootTest {
         com.example.wastenot.clearEditorDraftFixtures(InstrumentationRegistry.getInstrumentation().targetContext)
         val content: @androidx.compose.runtime.Composable () -> Unit = { WasteNotTheme(darkTheme = false) {
             MainNavigation(source, CoreRepository(null), com.example.wastenot.data.dummy.DummyGuideStore(),
-                com.example.wastenot.data.repository.AiRepository(null), ThemeMode.LIGHT, {}, Modifier.fillMaxSize())
+                com.example.wastenot.data.repository.AiRepository(null), ThemeMode.LIGHT, {}, Modifier.fillMaxSize(), activityStoreFactory = { user ->
+                    com.example.wastenot.navigationActivityFixture(InstrumentationRegistry.getInstrumentation().targetContext, user) })
         } }
         if (restoration == null) compose.setContent(content) else restoration.setContent(content)
         compose.waitForIdle()
@@ -150,7 +151,7 @@ class SessionRootTest {
     }
 
     @Test fun registrationValidatesFirstThenUsesVisibleTimezoneAndClearsAuthRoot() {
-        val source = FixtureSession(demo = true)
+        val source = FixtureSession()
         start(source)
         compose.onNodeWithText("Belum punya akun? Daftar").performScrollTo().performClick()
         compose.onNodeWithText("Buat akun").performScrollTo().performClick()
@@ -178,7 +179,7 @@ class SessionRootTest {
     }
 
     @Test fun aNewAccountLifetimeDoesNotRestoreThePreviousGuideQuery() {
-        val source = FixtureSession(demo = true).apply { state.value = SessionState.Authenticated(user, 1) }
+        val source = FixtureSession().apply { state.value = SessionState.Authenticated(user, 1) }
         start(source)
         compose.onNode(tabs and hasText("Panduan")).performClick()
         compose.onNodeWithContentDescription("Cari panduan").performTextReplacement("karton")
@@ -193,7 +194,7 @@ class SessionRootTest {
     }
 
     @Test fun changingIdentityNeverRestoresAnotherAccountsDraft() {
-        val source = FixtureSession(demo = true)
+        val source = FixtureSession()
         val a = source.user.copy(id = "00000000-0000-4000-8000-000000000031")
         val b = source.user.copy(id = "00000000-0000-4000-8000-000000000032", name = "Fixture B")
         source.state.value = SessionState.Authenticated(a, 1)
@@ -228,7 +229,7 @@ class SessionRootTest {
     }
 
     @Test fun failedLogoutKeepsTheAccountDialogAndAnExplicitRetryCanFinish() {
-        val source = FixtureSession(demo = true).apply {
+        val source = FixtureSession().apply {
             state.value = SessionState.Authenticated(user, 1)
             logoutResult = LogoutResult(false, false)
         }
@@ -256,7 +257,7 @@ class SessionRootTest {
     }
 
     @Test fun pendingLogoutBlocksDuplicateConfirmationBackAndEscapeUntilItsResult() {
-        val source = FixtureSession(demo = true).apply {
+        val source = FixtureSession().apply {
             state.value = SessionState.Authenticated(user, 1)
             logoutResult = LogoutResult(false, false)
             logoutGate = CompletableDeferred()
@@ -285,7 +286,7 @@ class SessionRootTest {
     }
 
     @Test fun aClosedAccountRootKeepsSessionCleanupRetryOnTheLoginScreen() {
-        val source = FixtureSession(demo = true).apply {
+        val source = FixtureSession().apply {
             state.value = SessionState.Authenticated(user, 1)
             logoutResult = LogoutResult(false, false)
             logoutClosesRoot = true
@@ -317,10 +318,10 @@ class SessionRootTest {
         compose.onAllNodes(tabs).assertCountEquals(0)
     }
 
-    private class FixtureSession(private val demo: Boolean = false) : AccountSession {
+    private class FixtureSession : AccountSession {
         val user = User("00000000-0000-4000-8000-000000000009", "Fixture A", "fixture@example.invalid", ZoneId.of("Asia/Jakarta"), null)
         override val state = MutableStateFlow<SessionState>(SessionState.SignedOut())
-        override val isDemo = demo
+
         var bootstrapCalls = 0
         var bootstrapTarget: SessionState? = null
         var bootstrapGate: CompletableDeferred<Unit>? = null

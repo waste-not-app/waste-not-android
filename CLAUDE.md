@@ -27,9 +27,9 @@ Untuk review visual interaktif (termasuk AI scan flow): buka [`docs/WasteNot-Pro
 
 ## Kondisi implementasi
 
-Iteration 2 memakai adapter dummy secara default sesuai instruksi pengguna: Beranda langsung terbuka, sesi/catatan fixture tersimpan lokal per akun, dan jalur masuk demo dihapus dari UI. `-Pwastenot.useDummyData=false` memilih adapter remote Keystore/HTTP yang masih memerlukan integrasi write dan agregat server. Password dummy hanya dipakai untuk validasi, tidak disimpan atau dikirim.
+Semua build aplikasi memakai adapter remote dan akun backend nyata. Instalasi baru menampilkan Masuk/Daftar; tidak ada autentikasi atau data aktivitas buatan lokal. Fixture berada hanya pada source test. Alamat default ketiga varian adalah `https://pred-autoscaler.bccdev.id/wastenot/api/v1/`.
 
-Dock dan Beranda sedang disesuaikan dengan mockup; layar lain, panduan dan AI belum lengkap. Baca [status Iteration 2](docs/tasks/ITERATION_2_DESIGN.md) sebelum meneruskan pekerjaan. Penerimaan visual setiap layar membutuhkan perbandingan screenshot Android dengan render kit v1.3, terpisah dari bukti fungsi/CI pada [QA Iteration 1](docs/tasks/ITERATION_1_QA.md).
+Seluruh screen wajib tersedia; penyelarasan UI, navigasi dan penerimaan akhir masih mengikuti [prioritas UI](docs/UI_FIRST_PLAN.md). Bukti fungsi dan build tidak menggantikan perbandingan screenshot dengan kit.
 
 ## Tech stack
 
@@ -41,7 +41,7 @@ Dock dan Beranda sedang disesuaikan dengan mockup; layar lain, panduan dan AI be
 | State | ViewModel + StateFlow (UDF) |
 | Network | Retrofit + OkHttp (lihat API.md) |
 | Camera | CameraX (ImageCapture + lifecycle-aware, untuk AI scan) |
-| Local storage | SharedPreferences untuk tema dan data dummy per akun, Saver untuk draf UI, Keystore untuk refresh token remote |
+| Local storage | SharedPreferences untuk tema/draf per akun, Saver untuk state UI, Keystore untuk refresh token |
 | DI | Constructor injection + AppContainer sederhana |
 | AGP | 9.0.1, Gradle 9.1.0, Kotlin 2.3.20, Compose BOM 2026.03.01 |
 | Min SDK | 24, Compile/Target SDK 36 |

@@ -31,6 +31,7 @@ class EditorProcessRecoveryTest {
     private val arguments get() = InstrumentationRegistry.getArguments()
     private val mode get() = arguments.getString("wastenot.draftMode", "create")!!
     private val stage get() = arguments.getString("wastenot.draftStage")
+    @get:Rule(order = -1) val navigationData = com.example.wastenot.NavigationFixtureRule()
     @get:Rule(order = 0) val fixture = object : ExternalResource() {
         override fun before() {
             assumeTrue("Requires the host-driven process-death protocol", stage in listOf("prepare", "restore"))

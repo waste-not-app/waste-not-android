@@ -20,6 +20,7 @@ import org.junit.rules.ExternalResource
 
 class PausedDraftReplayTest {
     private val requestId = UUID.randomUUID().toString()
+    @get:Rule(order = -1) val navigationData = com.example.wastenot.NavigationFixtureRule()
     @get:Rule(order = 0) val fixture = object : ExternalResource() {
         override fun before() {
             resetDraftAccountFixture()

@@ -1,5 +1,6 @@
 package com.example.wastenot.ui.main
 
+import com.example.wastenot.data.repository.ScanRepository
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,9 +18,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.wastenot.data.local.ScanPhotoCache
-import com.example.wastenot.data.dummy.DummyScanRepository
-import com.example.wastenot.data.repository.RemoteScanRepository
-import com.example.wastenot.data.repository.AiRepository
 import com.example.wastenot.model.ScanPrefill
 import com.example.wastenot.ui.scan.*
 import kotlinx.coroutines.Dispatchers
@@ -87,12 +85,12 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CaptureSheet(userId: String, dummy: Boolean, ai: AiRepository, session: String, onDismiss: () -> Unit,
+internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) -> ScanRepository, session: String, onDismiss: () -> Unit,
     onPrefill: (ScanPrefill) -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val cache = remember(userId) { ScanPhotoCache.create(context, userId) }
-    val factory = remember(cache, dummy, ai) { viewModelFactory { initializer {
-        ScanViewModel(if (dummy) DummyScanRepository() else RemoteScanRepository(ai, cache), cache)
+    val factory = remember(cache, repositoryFactory) { viewModelFactory { initializer {
+        ScanViewModel(repositoryFactory(cache), cache)
     } } }
     val model: ScanViewModel = viewModel(key = "scan-$userId", factory = factory)
     val state by model.state.collectAsStateWithLifecycle()

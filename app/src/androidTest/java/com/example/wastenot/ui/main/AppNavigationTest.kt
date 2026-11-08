@@ -20,6 +20,7 @@ import org.junit.rules.ExternalResource
 import java.io.File
 
 class AppNavigationTest {
+    @get:Rule(order = -1) val navigationData = com.example.wastenot.NavigationFixtureRule()
     @get:Rule(order = 0) val fixtures = object : ExternalResource() {
         override fun before() {
             val context = InstrumentationRegistry.getInstrumentation().targetContext

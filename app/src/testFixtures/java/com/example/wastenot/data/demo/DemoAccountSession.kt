@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class DemoAccountSession : AccountSession {
     private val mutableState = MutableStateFlow<SessionState>(SessionState.Checking)
     override val state = mutableState.asStateFlow()
-    override val isDemo = true
+
     private var epoch = 0L
 
     override suspend fun bootstrap() { mutableState.value = SessionState.SignedOut() }

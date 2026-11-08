@@ -13,23 +13,21 @@ import com.example.wastenot.model.initialAccountTimezone
 import com.example.wastenot.model.validateLoginInput
 import com.example.wastenot.model.validateRegistrationInput
 import java.time.ZoneId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class SessionUiState(val phase: SessionState, val isDemo: Boolean)
+data class SessionUiState(val phase: SessionState)
 
 sealed interface LogoutUiState {
     data object None : LogoutUiState
     class Pending : LogoutUiState
-    data class Complete(val result: LogoutResult, val isDemo: Boolean) : LogoutUiState
+    data class Complete(val result: LogoutResult) : LogoutUiState
 }
 
 data class AuthUiState(
@@ -47,11 +45,9 @@ data class AuthUiState(
     override fun toString() = "AuthUiState(submitting=$submitting, errors=${errors.keys}, failure=$failure)"
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
-class SessionViewModel(private val remote: AccountSession) : ViewModel() {
-    private val selected = MutableStateFlow(remote)
-    val session = selected.flatMapLatest { source -> source.state.map { SessionUiState(it, source.isDemo) } }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, SessionUiState(remote.state.value, remote.isDemo))
+class SessionViewModel(private val accounts: AccountSession) : ViewModel() {
+    val session = accounts.state.map { SessionUiState(it) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, SessionUiState(accounts.state.value))
     private val mutableAuth = MutableStateFlow(AuthUiState())
     val auth = mutableAuth.asStateFlow()
     private val mutableLogout = MutableStateFlow<LogoutUiState>(LogoutUiState.None)
@@ -65,7 +61,7 @@ class SessionViewModel(private val remote: AccountSession) : ViewModel() {
     fun bootstrap(retry: Boolean = false) {
         if (pending?.isActive == true || (bootstrapStarted && !retry)) return
         bootstrapStarted = true
-        val source = selected.value
+        val source = accounts
         mutableBootstrapping.value = true
         pending = viewModelScope.launch {
             try { source.bootstrap() } finally { mutableBootstrapping.value = false }
@@ -98,7 +94,7 @@ class SessionViewModel(private val remote: AccountSession) : ViewModel() {
     }
 
     fun submit(register: Boolean) {
-        if (pending?.isActive == true || selected.value.state.value !is SessionState.SignedOut) return
+        if (pending?.isActive == true || accounts.state.value !is SessionState.SignedOut) return
         val input = mutableAuth.value
         val errors = if (register) validateRegistrationInput(input.name, input.email, input.password, input.confirmation)
             else validateLoginInput(input.email, input.password)
@@ -106,7 +102,7 @@ class SessionViewModel(private val remote: AccountSession) : ViewModel() {
             mutableAuth.update { it.copy(errors = errors, serverFields = emptySet(), failure = null, focusRequest = it.focusRequest + 1) }
             return
         }
-        val source = selected.value
+        val source = accounts
         val revision = ++authRevision
         mutableLogout.value = LogoutUiState.None
         mutableAuth.update { it.copy(submitting = true, errors = emptyMap(), serverFields = emptySet(), failure = null) }
@@ -114,7 +110,7 @@ class SessionViewModel(private val remote: AccountSession) : ViewModel() {
             try {
                 val result = if (register) source.register(input.name, input.email, input.password, input.timezone)
                     else source.login(input.email, input.password)
-                if (selected.value !== source || authRevision != revision) return@launch
+                if (authRevision != revision) return@launch
                 when (result) {
                     is ApiResult.Success -> clearPasswords()
                     is ApiResult.Failure -> {
@@ -128,7 +124,7 @@ class SessionViewModel(private val remote: AccountSession) : ViewModel() {
                     }
                 }
             } finally {
-                if (selected.value === source && authRevision == revision) mutableAuth.update { it.copy(submitting = false) }
+                if (authRevision == revision) mutableAuth.update { it.copy(submitting = false) }
             }
         }
     }
@@ -138,13 +134,13 @@ class SessionViewModel(private val remote: AccountSession) : ViewModel() {
         authRevision++
         pending?.cancel()
         mutableAuth.value = AuthUiState()
-        val source = selected.value
+        val source = accounts
         val operation = LogoutUiState.Pending()
         mutableLogout.value = operation
         viewModelScope.launch {
             val result = source.logout()
-            // A new login/source replaces the pending outcome before an old revocation returns.
-            if (mutableLogout.value === operation) mutableLogout.value = LogoutUiState.Complete(result, source.isDemo)
+            // A new login replaces the pending outcome before an old revocation returns.
+            if (mutableLogout.value === operation) mutableLogout.value = LogoutUiState.Complete(result)
         }
     }
 }

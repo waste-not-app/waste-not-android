@@ -39,7 +39,7 @@ class HeaderIconDesignTest {
         var themes = 0; var backs = 0
         compose.setContent { WasteNotTheme(dark) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                AuthScreen(true, AuthUiState(), false, SignOutReason.NONE, { _, _ -> }, {}, {},
+                AuthScreen(true, AuthUiState(), SignOutReason.NONE, { _, _ -> }, {}, {},
                     { themes++ }, Modifier.fillMaxSize(), onBack = { backs++ })
             }
         } }

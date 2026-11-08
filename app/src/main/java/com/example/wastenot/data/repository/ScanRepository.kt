@@ -9,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 interface ScanRepository {
-    val isDemo: Boolean
     suspend fun catalog(): ApiResult<AiCatalog>
     suspend fun detect(photo: ScanPhoto, requestId: String): ApiResult<AiDetection>
     suspend fun recommend(input: AiRecommendationRequest): ApiResult<AiRecommendation>
@@ -17,7 +16,7 @@ interface ScanRepository {
 }
 
 class RemoteScanRepository(private val ai: AiRepository, private val photos: ScanPhotoStore) : ScanRepository {
-    override val isDemo = false
+
     override suspend fun catalog() = ai.catalog()
     override suspend fun detect(photo: ScanPhoto, requestId: String): ApiResult<AiDetection> {
         val bytes = try { withContext(Dispatchers.IO) { photos.read(photo) } }

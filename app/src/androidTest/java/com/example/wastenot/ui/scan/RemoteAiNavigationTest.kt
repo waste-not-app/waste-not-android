@@ -56,7 +56,7 @@ class RemoteAiNavigationTest {
         val args = InstrumentationRegistry.getArguments()
         assumeTrue(args.getString("verifyLiveAiUi") == "true")
         assertTrue(BuildConfig.DEBUG)
-        assertFalse(BuildConfig.USE_DUMMY_DATA)
+        assertTrue((androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as com.example.wastenot.WasteNotApplication).container.accountSession is com.example.wastenot.data.repository.RemoteAccountSession)
         assertEquals("https://pred-autoscaler.bccdev.id/wastenot/api/v1/", BuildConfig.API_BASE_URL)
         val runId = UUID.fromString(requireNotNull(args.getString("fixtureRunId"))).toString()
         val email = "android-$runId@example.test"

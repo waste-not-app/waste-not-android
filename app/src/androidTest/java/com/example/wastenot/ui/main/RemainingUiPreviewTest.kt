@@ -47,7 +47,7 @@ class RemainingUiPreviewTest {
                     when (screen) {
                         "S01", "S01-error" -> StartupScreen(screen.endsWith("error"), {}, {}, Modifier.fillMaxSize())
                         "S02", "S03" -> AuthScreen(screen == "S03", AuthUiState(timezone = ZoneId.of("Asia/Jakarta")),
-                            false, SignOutReason.NONE, { _, _ -> }, {}, {}, {}, Modifier.fillMaxSize().safeDrawingPadding())
+                            SignOutReason.NONE, { _, _ -> }, {}, {}, {}, Modifier.fillMaxSize().safeDrawingPadding())
                         "S25" -> ScanSheet(ScanState(phase = ScanPhase.FAILURE, problem = ScanProblem.DETECTION),
                             {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, camera = {})
                         "D04" -> EditConflictDialog(EditorDraft.from(log, date).values, null, {}, {}, { _, _ -> })

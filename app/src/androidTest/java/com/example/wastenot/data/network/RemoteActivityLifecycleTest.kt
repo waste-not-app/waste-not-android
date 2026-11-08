@@ -33,7 +33,7 @@ class RemoteActivityLifecycleTest {
         val args = InstrumentationRegistry.getArguments()
         assumeTrue(args.getString("verifyLiveFixture") == "true")
         assertTrue(BuildConfig.DEBUG)
-        assertFalse(BuildConfig.USE_DUMMY_DATA)
+        assertTrue((androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as com.example.wastenot.WasteNotApplication).container.accountSession is com.example.wastenot.data.repository.RemoteAccountSession)
         val runId = UUID.fromString(requireNotNull(args.getString("fixtureRunId"))).toString()
         val base = requireNotNull(args.getString("recordsTestBaseUrl"))
         // The host driver owns this loopback SSH tunnel and removes only this fixture account.

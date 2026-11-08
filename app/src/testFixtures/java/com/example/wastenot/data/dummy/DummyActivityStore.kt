@@ -24,7 +24,7 @@ class DummyActivityStore(
     private val seedInitialRecords: Boolean = true,
     private val today: () -> LocalDate = { LocalDate.now(zone) },
 ) : ActivityStore {
-    override val isDemo = true
+
     override val referenceDate: LocalDate get() = today()
 
     override suspend fun dashboard(): ApiResult<DashboardSnapshot> = transact { records, _, _ ->

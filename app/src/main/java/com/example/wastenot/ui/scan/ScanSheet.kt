@@ -103,7 +103,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                     Text(stringResource(title), Modifier.weight(1f).semantics { heading() }, style = MaterialTheme.typography.headlineSmall)
                     IconActionButton(R.drawable.ic_close, stringResource(R.string.scan_close), onDismiss)
                 }
-                Text(stringResource(if (state.demo) R.string.scan_demo_capture_notice else R.string.scan_capture_notice),
+                Text(stringResource(R.string.scan_capture_notice),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (pinSteps) Box(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp)) { ScanSteps(state.step) }
             }
@@ -215,7 +215,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                                 }
                             }
                             if (recommendation.prototypeOnly) ScanWarning(stringResource(
-                                if (state.demo) R.string.scan_demo_advice else R.string.scan_prototype_advice))
+                                R.string.scan_prototype_advice))
                             if (recommendation.specialHandling) ScanWarning(stringResource(R.string.scan_special_warning))
                             if (recommendation.caution.isNotBlank()) Text(recommendation.caution, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             if (recommendation.conditionsToVerify.isNotEmpty()) {
@@ -254,7 +254,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                                 style = MaterialTheme.typography.titleMedium)
                             recommendation?.reason?.takeIf { it.isNotBlank() }?.let { Text(it) }
                             if (recommendation?.prototypeOnly == true) ScanWarning(stringResource(
-                                if (state.demo) R.string.scan_demo_advice else R.string.scan_prototype_advice))
+                                R.string.scan_prototype_advice))
                             if (recommendation?.specialHandling == true) ScanWarning(stringResource(R.string.scan_special_warning))
                             recommendation?.caution?.takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                             recommendation?.missingContext?.forEach { Text(stringResource(contextFieldLabel(it))) }

@@ -26,6 +26,7 @@ import org.junit.rules.ExternalResource
 class ScanCameraNavigationTest {
     private val instrumentation get() = InstrumentationRegistry.getInstrumentation()
     private val context get() = instrumentation.targetContext
+    @get:Rule(order = -1) val navigationData = com.example.wastenot.NavigationFixtureRule()
     @get:Rule(order = 0) val fixtures = object : ExternalResource() {
         override fun before() {
             check(context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -52,7 +53,7 @@ class ScanCameraNavigationTest {
         compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
     }
 
-    @Test fun bRealCaptureThenDummyReviewPrefillsWithoutSavingAndDeletesItsPrivatePhoto() {
+    @Test fun bRealCaptureThenPrototypeReviewKeepsManualAvailableAndDeletesItsPrivatePhoto() {
         assumeTrue(context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
         openScan()
         val preferences = context.getSharedPreferences("dummy_logs_dummy-owner", Context.MODE_PRIVATE)
@@ -88,9 +89,10 @@ class ScanCameraNavigationTest {
         compose.onNodeWithText("Lihat saran").performScrollTo().performClick()
         waitFor("Periksa saran")
         capture("camera-recommendation")
-        compose.onNodeWithText("Gunakan pilihan, isi jumlah").performScrollTo().performClick()
+        compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
+        manual().performClick()
         compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
-        compose.onNodeWithText("Recycle").performScrollTo().assertIsSelected()
+        compose.onNodeWithText("Recycle").performScrollTo().assertIsNotSelected()
         compose.onNodeWithContentDescription("Kategori").performScrollTo().assertTextContains("Plastik")
         compose.onNodeWithContentDescription("Berat").performScrollTo()
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("")))

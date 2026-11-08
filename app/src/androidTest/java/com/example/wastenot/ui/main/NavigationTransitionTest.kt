@@ -18,6 +18,7 @@ import org.junit.Test
 import org.junit.rules.ExternalResource
 
 class NavigationTransitionTest {
+    @get:Rule(order = -1) val navigationData = com.example.wastenot.NavigationFixtureRule()
     @get:Rule(order = 0) val fixtures = object : ExternalResource() {
         override fun before() {
             val context = InstrumentationRegistry.getInstrumentation().targetContext

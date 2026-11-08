@@ -73,7 +73,7 @@ class ScanSheetTest {
         val photo = ScanPhoto(photoFile.absolutePath, 1045, 2431, System.currentTimeMillis())
         val cameraDirectory = File(instrumentation.targetContext.cacheDir, "scan-design-camera-${System.nanoTime()}")
         val cameraCache = ScanPhotoCache(cameraDirectory, "preview") {}
-        val fixture = objects.copy(photo = photo, demo = true, category = WasteCategory.PLASTIC,
+        val fixture = objects.copy(photo = photo, category = WasteCategory.PLASTIC,
             objectKey = "plastic_bottle", objectConfirmed = true)
         var dark by mutableStateOf(false)
         var state by mutableStateOf(fixture.copy(phase = ScanPhase.PHOTO))

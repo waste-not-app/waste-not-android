@@ -29,7 +29,7 @@ for label, url, expected in [
         assert invocation.exists() == expected, label
         if expected:
             args = json.loads(invocation.read_text())
-            assert "assembleRelease" in args and "-Pwastenot.useDummyData=false" in args, label
+            assert "assembleRelease" in args, label
             assert "-Pwastenot.hotReload=false" in args, label
             assert f"-Pwastenot.releaseApiBaseUrl={url}" in args, label
         print(f"PASS: release build {label}", flush=True)

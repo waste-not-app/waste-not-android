@@ -15,6 +15,7 @@ import org.junit.Test
 import org.junit.rules.ExternalResource
 
 class CorruptDraftRecoveryTest {
+    @get:Rule(order = -1) val navigationData = com.example.wastenot.NavigationFixtureRule()
     @get:Rule(order = 0) val fixture = object : ExternalResource() {
         override fun before() {
             resetDraftAccountFixture()

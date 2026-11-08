@@ -29,7 +29,7 @@ class AuthTextActionDesignTest {
         var switches = 0
         compose.setContent { WasteNotTheme(dark) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                AuthScreen(register, AuthUiState(submitting = pending), false, SignOutReason.NONE,
+                AuthScreen(register, AuthUiState(submitting = pending), SignOutReason.NONE,
                     { _, _ -> }, {}, { switches++ }, {}, Modifier.fillMaxSize())
             }
         } }

@@ -24,13 +24,13 @@ data class ScanState(val session: String = "", val phase: ScanPhase = ScanPhase.
     val recommendation: AiRecommendation? = null, val method: DisposalMethod? = null,
     val problem: ScanProblem? = null, val catalog: AiCatalog? = null, val detection: AiDetection? = null,
     val objectKey: String? = null, val revision: Int = 1, val conditionsConfirmed: Boolean = false,
-    val error: ApiFailure? = null, val demo: Boolean = false,
+    val error: ApiFailure? = null,
     val requestedContext: List<AiContextField> = emptyList(), val confirmedMethod: DisposalMethod? = null) {
     val selected: AiDetectionObject? get() = objects.find { it.id == selectedId }
     val item: AiCatalogItem? get() = catalog?.items?.find { it.key == objectKey && it.category == category }
     val canChooseMethod: Boolean get() = recommendation?.let {
         it.status == AiRecommendationStatus.READY && it.scope == AiRecommendationScope.HANDLING &&
-            it.method != null && it.method != DisposalMethod.REDUCE && (demo || !it.prototypeOnly)
+            it.method != null && it.method != DisposalMethod.REDUCE && !it.prototypeOnly
     } == true
     val canUseRecommendation: Boolean get() = objectConfirmed && item != null && canChooseMethod && method != null &&
         (recommendation?.conditionsToVerify.isNullOrEmpty() || conditionsConfirmed)
@@ -45,7 +45,7 @@ data class ScanState(val session: String = "", val phase: ScanPhase = ScanPhase.
 
 class ScanViewModel(private val repository: ScanRepository, private val photos: ScanPhotoStore,
     private val now: () -> Long = System::currentTimeMillis) : ViewModel() {
-    private val mutable = MutableStateFlow(ScanState(demo = repository.isDemo))
+    private val mutable = MutableStateFlow(ScanState())
     val state = mutable.asStateFlow()
     private var generation = 0
     private var job: Job? = null
@@ -54,7 +54,7 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
     fun start(session: String) {
         if (state.value.session == session) return
         close(); transferred = false
-        mutable.value = ScanState(session = session, demo = repository.isDemo)
+        mutable.value = ScanState(session = session)
     }
 
     fun close(session: String = state.value.session) {
@@ -62,7 +62,7 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
         val current = state.value
         invalidate(); current.photo?.let(photos::delete)
         if (!transferred) current.detection?.id?.let(::retire)
-        mutable.value = ScanState(demo = repository.isDemo)
+        mutable.value = ScanState()
         transferred = false
     }
 
@@ -80,7 +80,7 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
     fun retake() {
         val current = state.value
         invalidate(); current.photo?.let(photos::delete); current.detection?.id?.let(::retire)
-        mutable.value = ScanState(session = current.session, catalog = current.catalog, demo = repository.isDemo)
+        mutable.value = ScanState(session = current.session, catalog = current.catalog)
     }
 
     fun detect() {
@@ -211,7 +211,7 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
         val method = current.method.takeIf { confirmRecommendation && category != null && current.canUseRecommendation &&
             current.phase == ScanPhase.RECOMMENDATION && recommendation!!.expiresAt > instant() &&
             current.detection?.expiresAt?.let { it > instant() } == true }
-        val provenance = if (method != null && !repository.isDemo) AiLogProvenance(recommendation!!.id, checkNotNull(category)) else null
+        val provenance = if (method != null) AiLogProvenance(recommendation!!.id, checkNotNull(category)) else null
         return ScanPrefill(category, if (confirmRecommendation) method else current.confirmedMethod.takeIf { category != null }, provenance)
     }
 

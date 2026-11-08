@@ -23,7 +23,7 @@ import java.time.ZoneId
 import java.util.UUID
 
 class DemoActivityStore(private val zone: ZoneId) : ActivityStore {
-    override val isDemo = true
+
     override val referenceDate: LocalDate = LocalDate.of(2026, 9, 21)
     private val instant = referenceDate.atTime(12, 0).atZone(zone).toInstant()
     private val records = linkedMapOf<String, WasteLog>()

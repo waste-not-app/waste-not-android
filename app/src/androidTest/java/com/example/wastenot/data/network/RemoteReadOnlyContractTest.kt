@@ -10,7 +10,7 @@ import org.junit.Test
 class RemoteReadOnlyContractTest {
     @Test fun configuredHttpsApiReturnsTheAnonymousMetadataChallenge() = runTest {
         assumeTrue(InstrumentationRegistry.getArguments().getString("verifyLiveReadOnly") == "true")
-        assertFalse(BuildConfig.USE_DUMMY_DATA)
+        assertTrue((androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as com.example.wastenot.WasteNotApplication).container.accountSession is com.example.wastenot.data.repository.RemoteAccountSession)
         assertTrue(BuildConfig.API_BASE_URL.startsWith("https://"))
         val network = requireNotNull(WasteNotNetwork.create(BuildConfig.API_BASE_URL))
         try {

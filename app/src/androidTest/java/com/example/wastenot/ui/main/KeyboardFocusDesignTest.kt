@@ -18,8 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.R
 import com.example.wastenot.data.dummy.DummyGuideStore
-import com.example.wastenot.data.repository.AiRepository
-import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.model.User
 import com.example.wastenot.theme.ThemeMode
 import com.example.wastenot.theme.LocalWasteNotGradients
@@ -63,15 +61,15 @@ class KeyboardFocusDesignTest {
 
     @Test fun keyboardTabsDoNotSelectUntilEnterAndScanReturnsFocusToItsTrigger() {
         val user = User("keyboard-focus-review", "Pengguna Uji", "focus@example.test", ZoneId.of("Asia/Jakarta"), null)
-        val core = CoreRepository(null)
-        val ai = AiRepository(null)
+        val activities = com.example.wastenot.navigationActivityFixture(
+            InstrumentationRegistry.getInstrumentation().targetContext, user)
         val guides = DummyGuideStore()
         var dark by mutableStateOf(false)
         compose.setContent {
             WasteNotTheme(dark) {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                 Box(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas)) {
-                    AccountNavigation(user, true, core, guides, ai, if (dark) ThemeMode.DARK else ThemeMode.LIGHT, {}, {}, Modifier.fillMaxSize())
+                    AccountNavigation(user, activities, guides, { com.example.wastenot.data.dummy.DummyScanRepository() }, if (dark) ThemeMode.DARK else ThemeMode.LIGHT, {}, {}, Modifier.fillMaxSize())
                 }
                 }
             }

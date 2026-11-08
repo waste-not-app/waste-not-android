@@ -7,7 +7,7 @@ import java.time.Instant
 import java.util.UUID
 
 class DummyScanRepository : ScanRepository {
-    override val isDemo = true
+
     override suspend fun catalog() = ApiResult.Success(AiCatalog("kit-v1.3", listOf(
         AiCatalogItem("plastic_bottle", "Botol plastik (contoh)", WasteCategory.PLASTIC, false, AiGuideStatus.DRAFT),
         AiCatalogItem("glass_bottle", "Botol kaca (contoh)", WasteCategory.GLASS, false, AiGuideStatus.DRAFT),

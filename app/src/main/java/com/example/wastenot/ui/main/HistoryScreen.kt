@@ -44,7 +44,6 @@ private val FilterSaver = listSaver<HistoryFilter, String>(
 @Composable
 fun HistoryScreen(
     data: WorkspaceUiState,
-    demo: Boolean,
     padding: PaddingValues,
     onRecord: () -> Unit,
     onDetail: (String) -> Unit,
@@ -58,7 +57,7 @@ fun HistoryScreen(
     onDismissNotice: () -> Unit = {},
 ) {
     var filter by rememberSaveable(stateSaver = FilterSaver) { mutableStateOf(HistoryFilter()) }
-    // shortcut: paginates the loaded dummy snapshot; replace with repository cursors for A18.
+    // shortcut: paginates the loaded snapshot; replace with repository cursors for A18.
     var limit by rememberSaveable { mutableIntStateOf(20) }
     val list = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -88,7 +87,7 @@ fun HistoryScreen(
                 Text(stringResource(if (filter.active) R.string.history_filtered_count else R.string.history_count,
                     WasteFormat.integer(visible.size.toLong())), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            if (!demo && data.records.isNotEmpty()) item(key = "partial") {
+            if (data.records.isNotEmpty()) item(key = "partial") {
                 Text(stringResource(R.string.loaded_records_only), style = MaterialTheme.typography.bodySmall)
             }
             if (filter.active) item(key = "filters") {
