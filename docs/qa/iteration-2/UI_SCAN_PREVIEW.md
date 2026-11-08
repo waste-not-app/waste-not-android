@@ -8,6 +8,8 @@ Checkpoint implementasi mengikuti prioritas UI dahulu pada 6 November 2026. Stru
 
 ## Tambahan 8 November
 
+[State loading/kosong/gagal enam layar inti](CORE_ASYNC_STATES.md) kini memakai C29. Galeri terpisah memuat 72 PNG sebelum/sesudah, penguji identik, pemeriksaan unknown/zero dan pemulihan; APK staging source 649827e mempunyai bukti paket/startup sendiri. Ini melengkapi screenshot awal di bawah pada source masing-masing.
+
 [Review tujuh layar tambahan dan empat dialog](SECONDARY_SCREEN_REVIEW.md) meninjau 36 PNG lama tanpa mengubahnya. Delapan capture baru pada APK staging source 9c97812 melengkapi S02/S03, footer daftar, pemilih tema dan navigasi Daftar → Masuk/Back pada kedua tema. [Kontrol inti](CORE_CONTROL_REVIEW.md) serta [policy-08](POLICY08_ANDROID.md) mempunyai bukti perubahan/native terpisah; galeri historis di bawah bukan capture ulang source terbaru.
 
 ## Perubahan

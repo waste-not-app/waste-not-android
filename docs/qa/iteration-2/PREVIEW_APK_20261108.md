@@ -1,6 +1,6 @@
 # APK preview backend, 8 November 2026
 
-APK lokal `WasteNot-preview-backend-latest.apk` kini memuat panduan awal policy-08, progress XP kontinu dan pilihan tema sesuai kit. Package `com.example.wastenot.staging` memungkinkan pemasangan berdampingan dengan aplikasi utama.
+Snapshot source 9c97812 ini memuat panduan awal policy-08, progress XP kontinu dan pilihan tema sesuai kit. Arsip lokalnya `WasteNot-preview-backend-9c97812.apk`; alias `WasteNot-preview-backend-latest.apk` mengikuti checkpoint terbaru. Package `com.example.wastenot.staging` memungkinkan pemasangan berdampingan dengan aplikasi utama. APK checkpoint berikutnya dan bukti terbarunya ada pada [state inti C29](CORE_ASYNC_STATES.md#apk-checkpoint).
 
 - Ukuran 34.969.059 byte, sekitar 35 MB; SHA-256 `274a051b6ed81c9c189fad675dd1bf0f12606a441354037b5f4f85d42cc5d9a2`.
 - Base URL `https://pred-autoscaler.bccdev.id/wastenot/api/v1/`; adapter remote, dummy/hot reload mati, debuggable false. [Konfigurasi build](staging-preview-20261108/StagingBuildConfig.java) dan pemeriksaan DEX memastikan origin publik digunakan; URL emulator tidak menjadi origin build ini.

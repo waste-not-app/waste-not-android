@@ -65,6 +65,8 @@ Urutan ini menggantikan prioritas pengujian integrasi panjang pada catatan sebel
 | 2. Kesesuaian desain dan navigasi | Review setiap alur dari atas sampai bawah, tema terang/gelap, komponen kit, bottom nav, Back serta buka/tutup modal; selesaikan koreksi yang ditemukan | Berjalan; pasangan scan dua tema dan akhir scroll tersedia; state/kontrol serta perjalanan UI nyata masih ditinjau |
 | 3. Pengujian menyeluruh | Fungsi, backend/AI nyata, pemulihan draf, perangkat Android baru, konfigurasi/font, aksesibilitas serta CI | Dilanjutkan setelah tahap 2; bukti parsial yang ada tetap sah dalam batas masing-masing |
 
+Checkpoint 8 November terbaru: [state enam layar inti](qa/iteration-2/CORE_ASYNC_STATES.md) diselaraskan ke C29, termasuk angka nol Riwayat yang sebelumnya muncul sebelum hasil diketahui dan pemulihan katalog Panduan kosong. Tiga metode native lulus pada API37, dua tema, setelah tiga kegagalan baseline yang dituju; 72 PNG sebelum/sesudah. APK staging baru lulus pemeriksaan paket serta upgrade/startup. Lint dan 239 unit tests lulus pada source produk 649827e. Pekerjaan berikutnya tetap menutup pemeriksaan kamera/navigasi dan state lain, kemudian paging/filter API A18, preferensi DataStore A30 serta regresi akhir; inventaris 20/20 screen + 4/4 dialog tidak menggantikan kriteria tersebut.
+
 Pekerjaan terdekat tahap 2:
 
 1. Tinjau pasangan kit dan aplikasi per alur: masuk/daftar, beranda/catat/riwayat, panduan, statistik/profil/pengaturan, lalu scan sampai editor.

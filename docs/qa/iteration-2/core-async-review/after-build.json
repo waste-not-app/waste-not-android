@@ -1,0 +1,21 @@
+{
+  "base": "323e5890b77fc91d8f3b310b236bde6a1b511cf1",
+  "source": {
+    "app/src/androidTest/java/com/example/wastenot/ui/main/CoreAsyncStateDesignTest.kt": "573162a0af4ad20c0c685a2b980d123e37f349f7b9f5896281dca97bfbed2b02",
+    "app/src/main/java/com/example/wastenot/ui/components/AsyncStatePanel.kt": "542879e46b3c6bafa63c149e8fc456a642ffdde73dd81fd5457117444cab0afc",
+    "app/src/main/java/com/example/wastenot/ui/main/GuideScreens.kt": "dd44a26c98ee62bde6cb5d51304d5b91a2c5f34f901ed8ababce1e7889fddf1b",
+    "app/src/main/java/com/example/wastenot/ui/main/HistoryScreen.kt": "3e658640c0ea148e8ba3485a2c9d0e18de5cd41758c3a78d20f6d9112c74b1c2",
+    "app/src/main/java/com/example/wastenot/ui/main/LogDetailScreen.kt": "5aeacde66ec344c7554dc8634a302607abb03d021d80133a23283cabe769514f",
+    "app/src/main/java/com/example/wastenot/ui/main/StatisticsScreen.kt": "d09cabc7b14372648c9302bbae2c4843775fd75b0091eede1671ae5e9a8cb3ec",
+    "app/src/main/java/com/example/wastenot/ui/main/WorkspaceScreens.kt": "eebcd75e7c27d7c3a23eeac22b0f5e00a64cda6504e5c01302ee805bf0e6ba31",
+    "app/src/main/res/values/async_states.xml": "e5374dbf1da7506ce12b9d4c7d391b936e29dec686c0520efa9da1a4b3117835",
+    "app/src/main/res/values/server_summaries.xml": "8af28288d8f7c914cb8d56203e0ee028110ad62968e07fd253ac83a4129354c3"
+  },
+  "apks": {
+    "WasteNot-after.apk": "55448ce0bcbd0e2aad44a811c5961f55e4e33510cff7f081641b7954686328f9",
+    "WasteNot-before.apk": "eb3688bb344d5a88134b10340ddcd6eef67c1e0256e8bf62b86ff31f77d355e9",
+    "WasteNot-async-androidTest.apk": "0141163cc724c51b2088af5568977e82ac8aa2ce263aea2042cf75e5551eb852",
+    "WasteNot-preview-backend-async.apk": "d25a6e874f1076d22a0d93549687e80a5f8abbaebd616878080e3a63364c5aab"
+  },
+  "verified_code_commit": "649827e1b74aa8fe795de514926de9edc5b936c7"
+}
