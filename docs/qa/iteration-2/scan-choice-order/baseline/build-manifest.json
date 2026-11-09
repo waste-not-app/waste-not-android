@@ -1,0 +1,17 @@
+{
+  "debug": {
+    "file": "app-before-types.apk",
+    "sha256": "a7792f1630f6b1343b20d343899273c1652915e9174839deef510d251b71d9a1",
+    "bytes": 48386668
+  },
+  "androidTest": {
+    "file": "test-order.apk",
+    "sha256": "2f866581d6601a8c49bbe8fa98f44d352b4d7574baf1d0610fff3c4c2473c172",
+    "bytes": 5817619
+  },
+  "sources": {
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanViewModel.kt": "1f81fb39ae6dc53f95d81b688e764053f7492093374d223e0c5d6992a34d684d",
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanSheet.kt": "5f2a48bdaefc7013549ee75c65dc515e7d18ac2b15df1367fdf578fae49e22ed",
+    "app/src/androidTest/java/com/example/wastenot/ui/scan/ScanChoiceOrderTest.kt": "76ca73ba5644414d39530047c1822471f09470a47c7a140c012fcdc56f53b036"
+  }
+}

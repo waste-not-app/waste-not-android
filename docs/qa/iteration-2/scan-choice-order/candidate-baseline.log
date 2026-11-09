@@ -1,0 +1,88 @@
+Calculating task graph as no cached configuration is available for tasks: testDebugUnitTest --tests com.example.wastenot.ui.scan.ScanViewModelTest.eligibleDetectionsUseDescendingScoresWithoutChangingBandsOrRawResponse
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :app:kspDebugKotlin UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:kspDebugUnitTestKotlin
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:compileDebugUnitTestKotlin
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:packageDebugUnitTestForUnitTest UP-TO-DATE
+> Task :app:processDebugUnitTestManifest UP-TO-DATE
+> Task :app:generateDebugUnitTestConfig UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+
+> Task :app:testDebugUnitTest
+
+ScanViewModelTest > eligibleDetectionsUseDescendingScoresWithoutChangingBandsOrRawResponse FAILED
+    java.lang.AssertionError: expected:<[AiDetectionObject(id=first-high, classId=0, rawClass=bottle, confidence=0.91, bounds=ScanBounds(left=0.18, top=0.1, right=0.82, bottom=0.9), band=UNCERTAIN, requiresMaterialConfirmation=true, supportedForReview=true, suggestedObjectKeys=[plastic_bottle], reviewReasons=[], ambiguousWith=[], reviewThresholds=null), AiDetectionObject(id=second-high, classId=0, rawClass=bottle, confidence=0.91, bounds=ScanBounds(left=0.18, top=0.1, right=0.82, bottom=0.9), band=OFFERED, requiresMaterialConfirmation=true, supportedForReview=true, suggestedObjectKeys=[plastic_bottle], reviewReasons=[], ambiguousWith=[], reviewThresholds=null), AiDetectionObject(id=lower, classId=0, rawClass=bottle, confidence=0.52, bounds=ScanBounds(left=0.18, top=0.1, right=0.82, bottom=0.9), band=UNCERTAIN, requiresMaterialConfirmation=true, supportedForReview=true, suggestedObjectKeys=[plastic_bottle], reviewReasons=[], ambiguousWith=[], reviewThresholds=null)]> but was:<[AiDetectionObject(id=lower, classId=0, rawClass=bottle, confidence=0.52, bounds=ScanBounds(left=0.18, top=0.1, right=0.82, bottom=0.9), band=UNCERTAIN, requiresMaterialConfirmation=true, supportedForReview=true, suggestedObjectKeys=[plastic_bottle], reviewReasons=[], ambiguousWith=[], reviewThresholds=null), AiDetectionObject(id=first-high, classId=0, rawClass=bottle, confidence=0.91, bounds=ScanBounds(left=0.18, top=0.1, right=0.82, bottom=0.9), band=UNCERTAIN, requiresMaterialConfirmation=true, supportedForReview=true, suggestedObjectKeys=[plastic_bottle], reviewReasons=[], ambiguousWith=[], reviewThresholds=null), AiDetectionObject(id=second-high, classId=0, rawClass=bottle, confidence=0.91, bounds=ScanBounds(left=0.18, top=0.1, right=0.82, bottom=0.9), band=OFFERED, requiresMaterialConfirmation=true, supportedForReview=true, suggestedObjectKeys=[plastic_bottle], reviewReasons=[], ambiguousWith=[], reviewThresholds=null)]>
+        at org.junit.Assert.fail(Assert.java:89)
+        at org.junit.Assert.failNotEquals(Assert.java:835)
+        at org.junit.Assert.assertEquals(Assert.java:120)
+        at org.junit.Assert.assertEquals(Assert.java:146)
+        at com.example.wastenot.ui.scan.ScanViewModelTest$eligibleDetectionsUseDescendingScoresWithoutChangingBandsOrRawResponse$1.invokeSuspend(ScanViewModelTest.kt:69)
+        at com.example.wastenot.ui.scan.ScanViewModelTest$eligibleDetectionsUseDescendingScoresWithoutChangingBandsOrRawResponse$1.invoke(ScanViewModelTest.kt)
+        at com.example.wastenot.ui.scan.ScanViewModelTest$eligibleDetectionsUseDescendingScoresWithoutChangingBandsOrRawResponse$1.invoke(ScanViewModelTest.kt)
+        at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$1.invokeSuspend(TestBuilders.kt:317)
+        at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+        at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+        at kotlinx.coroutines.test.TestDispatcher.processEvent$kotlinx_coroutines_test(TestDispatcher.kt:24)
+        at kotlinx.coroutines.test.TestCoroutineScheduler.tryRunNextTaskUnless$kotlinx_coroutines_test(TestCoroutineScheduler.kt:99)
+        at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$workRunner$1.invokeSuspend(TestBuilders.kt:326)
+        at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+        at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+        at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+        at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+        at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+        at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+        at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+        at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+        at kotlinx.coroutines.test.TestBuildersJvmKt.createTestResult(TestBuildersJvm.kt:10)
+        at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:309)
+        at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(Unknown Source)
+        at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:167)
+        at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(Unknown Source)
+        at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0$default(TestBuilders.kt:159)
+        at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0$default(Unknown Source)
+        at com.example.wastenot.ui.scan.ScanViewModelTest.eligibleDetectionsUseDescendingScoresWithoutChangingBandsOrRawResponse(ScanViewModelTest.kt:60)
+
+1 test completed, 1 failed
+
+> Task :app:testDebugUnitTest FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (Powered by Develocity).
+
+BUILD FAILED in 1m 20s
+32 actionable tasks: 3 executed, 29 up-to-date
+Configuration cache entry stored.

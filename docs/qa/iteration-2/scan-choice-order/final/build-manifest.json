@@ -1,0 +1,23 @@
+{
+  "debug": {
+    "file": "app-scan-order.apk",
+    "sha256": "277ab6c0891be2c3013b848091cadcd26fd47455cdb034d6f2921e484b05ec23",
+    "bytes": 48388904
+  },
+  "staging": {
+    "file": "app-scan-order-staging.apk",
+    "sha256": "7b3c41ef3a9876df7f931dd03cad1fadd759b59534f273db128fd8543bac96be",
+    "bytes": 36408131
+  },
+  "androidTest": {
+    "file": "test-order.apk",
+    "sha256": "2f866581d6601a8c49bbe8fa98f44d352b4d7574baf1d0610fff3c4c2473c172",
+    "bytes": 5817619
+  },
+  "sources": {
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanViewModel.kt": "187b4b183b6ecf9b9965d4841cc8d86023f451b6633606d185660876a66e90a7",
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanSheet.kt": "baef43bc12d49de7fc72ae305f00b173f6be8c09d39492e757f7df27d6224912",
+    "app/src/androidTest/java/com/example/wastenot/ui/scan/ScanChoiceOrderTest.kt": "76ca73ba5644414d39530047c1822471f09470a47c7a140c012fcdc56f53b036"
+  },
+  "base_commit": "faccaa05548bea2ec802f17f3ae8dc3697ba39ef"
+}

@@ -28,6 +28,13 @@ data class ScanState(val session: String = "", val phase: ScanPhase = ScanPhase.
     val requestedContext: List<AiContextField> = emptyList(), val confirmedMethod: DisposalMethod? = null) {
     val selected: AiDetectionObject? get() = objects.find { it.id == selectedId }
     val item: AiCatalogItem? get() = catalog?.items?.find { it.key == objectKey && it.category == category }
+    val objectChoices: List<AiCatalogItem> get() {
+        val available = catalog?.items.orEmpty().filter { it.category == category }
+        val byKey = available.associateBy { it.key }
+        val suggested = selected?.suggestedObjectKeys.orEmpty().distinct().mapNotNull(byKey::get)
+        val preferred = suggested.map { it.key }.toSet()
+        return suggested + available.filterNot { it.key in preferred }
+    }
     val canChooseMethod: Boolean get() = recommendation?.let {
         it.status == AiRecommendationStatus.READY && it.scope == AiRecommendationScope.HANDLING &&
             it.method != null && it.method != DisposalMethod.REDUCE && !it.prototypeOnly
@@ -106,6 +113,7 @@ class ScanViewModel(private val repository: ScanRepository, private val photos: 
             else if (detection.expiresAt <= instant()) failed(snapshot.copy(catalog = catalog), ScanProblem.EXPIRED, expired())
             else {
                 val offered = detection.objects.filter { it.supportedForReview && it.band != AiConfidenceBand.MANUAL_REQUIRED }
+                    .sortedByDescending { it.confidence }
                 if (detection.objects.map { it.id }.distinct().size != detection.objects.size) {
                     retire(detection.id)
                     failed(snapshot.copy(catalog = catalog), ScanProblem.DETECTION,
