@@ -134,3 +134,8 @@ Checkpoint berikutnya: [urutan kedua pilihan scan](qa/iteration-2/SCAN_CHOICE_OR
 [Checkpoint AT-16/AT-17](qa/iteration-2/ACCOUNT_ISOLATION.md) menambahkan dua metode native pada API37: enam GET/PATCH/DELETE silang ditolak 404 dan tidak mengubah pemilik, serta MainActivity membuktikan akun baru tidak membawa data/filter/pencarian/rentang/draf akun sebelumnya. Masuk ulang memulihkan draf pemiliknya. Empat eksekusi mencakup satu kegagalan guard System UI; capture Statistik diperbaiki setelah review menemukan frame loading, lalu sembilan frame akhir diterima. Tujuh akun sementara dibersihkan, seluruh tahap diverifikasi nol.
 
 APK publik main `f98dcf2` versi `1.0.0-b9` berhasil diunduh dan lolos signature serta gate paket; runtime journey memakai APK debug native dengan source produksi sama. Perubahan checkpoint ini hanya pengujian/dokumentasi, dan A36 tetap In progress untuk kriteria lain yang belum dibuktikan. Prioritas implementasi berikutnya adalah urutan pilihan jenis objek S22 sesuai saran deteksi pada A42/#81.
+
+
+## Regresi main sesudah urutan scan, 9 November 2026
+
+[Perjalanan AI nyata pada main 24a5788](qa/iteration-2/AI_MAIN_REGRESSION.md) lulus satu metode native API37: daftar, kamera, konfirmasi, NEEDS_CONTEXT/READY Gemini, simpan, edit, hapus dan logout. Lima belas frame ditinjau, provenance diterima server, serta akun/sesi/token/log/operasi AI dibersihkan dan keenam hitungan nol. Band UNCERTAIN pada skor 88% tetap mengikuti server. PR #109, CI main dan deployment lulus; APK publik b11 sudah diunduh dan diverifikasi. Upload artefak opsional tetap ditolak kuota, terpisah dari publikasi APK. Ini menambah bukti integrasi versi kini, bukan penerimaan global semua state/perangkat atau dukungan offline.

@@ -1,0 +1,79 @@
+{
+  "run_id": "88135318-20cf-4616-9c7e-fe879cb850a7",
+  "email": "android-88135318-20cf-4616-9c7e-fe879cb850a7@example.test",
+  "name": "Android transport probe",
+  "context_is_fixture": true,
+  "camera_source": "controlled CC0 photograph via emulator imagefile; camera-input.json",
+  "user_id": "6259d6f9-6063-4c98-b243-9ddd5dcd7447",
+  "passed_steps": [
+    "ui_registration_and_live_catalog",
+    "real_camerax_photo_survives_theme_changes",
+    "real_ai_ui_context_and_recommendation_do_not_auto_save",
+    "ui_explicit_save_keeps_ai_reference_and_awards_ten_xp",
+    "ui_edit_updates_existing_record_without_more_xp",
+    "ui_delete_refreshes_server_profile_and_summary",
+    "ui_logout_clears_device_credential"
+  ],
+  "captured_photo_bytes": 64866,
+  "photo_heading_before_capture": true,
+  "photo_heading_after_capture": true,
+  "log_id": "279db317-05bd-40f0-969f-a6f2bca9b9da",
+  "capture_checks": [
+    {
+      "screen": "S21-photo",
+      "dark": false,
+      "activity_identity": 189790904,
+      "window_id": 38,
+      "visible_heading": true
+    },
+    {
+      "screen": "S21-photo",
+      "dark": true,
+      "activity_identity": 18518801,
+      "window_id": 40,
+      "visible_heading": true
+    },
+    {
+      "screen": "S22-object",
+      "dark": false,
+      "activity_identity": 105668222,
+      "window_id": 43,
+      "visible_heading": true
+    },
+    {
+      "screen": "S22-object",
+      "dark": true,
+      "activity_identity": 224214687,
+      "window_id": 46,
+      "visible_heading": true
+    },
+    {
+      "screen": "S23-context",
+      "dark": false,
+      "activity_identity": 138547502,
+      "window_id": 49,
+      "visible_heading": true
+    },
+    {
+      "screen": "S23-context",
+      "dark": true,
+      "activity_identity": 23436192,
+      "window_id": 59,
+      "visible_heading": true
+    },
+    {
+      "screen": "S24-recommendation",
+      "dark": false,
+      "activity_identity": 243776307,
+      "window_id": 62,
+      "visible_heading": true
+    },
+    {
+      "screen": "S24-recommendation",
+      "dark": true,
+      "activity_identity": 109736848,
+      "window_id": 67,
+      "visible_heading": true
+    }
+  ]
+}

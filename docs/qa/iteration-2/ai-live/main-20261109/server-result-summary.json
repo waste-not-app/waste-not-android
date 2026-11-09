@@ -1,0 +1,37 @@
+[
+  {
+    "operation": "DETECTION",
+    "http_status": 201,
+    "status": "REVIEW_REQUIRED",
+    "model_version": "broad-coco-b0f633193403",
+    "objects": [
+      {
+        "object_id": "object-1",
+        "raw_class": "bottle",
+        "confidence": 0.8841050267219543,
+        "confidence_band": "UNCERTAIN",
+        "suggested_object_keys": [
+          "pet_bottle",
+          "hdpe_bottle",
+          "glass_bottle"
+        ]
+      }
+    ]
+  },
+  {
+    "operation": "RECOMMENDATION",
+    "http_status": 200,
+    "status": "NEEDS_CONTEXT",
+    "provider": "gemini",
+    "prototype_only": false,
+    "recommended_method": null
+  },
+  {
+    "operation": "RECOMMENDATION",
+    "http_status": 201,
+    "status": "READY",
+    "provider": "gemini",
+    "prototype_only": false,
+    "recommended_method": "RECYCLE"
+  }
+]

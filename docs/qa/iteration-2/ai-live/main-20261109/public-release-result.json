@@ -1,0 +1,12 @@
+{
+  "source_commit": "24a578829969b36d0d8ce0901dff17882e271471",
+  "release_run": 42614471097,
+  "pr_run": 42581934012,
+  "version": "1.0.0-b11",
+  "url": "https://oktaavsm.bccdev.id/wastenot/apk/wastenot-v1.0.0-b11.apk",
+  "sha256": "3ac6eaf6cbac35cfb666437cb6f9a999cd3e79a7d406aa89d495ab617fafe987",
+  "size_bytes": 36408119,
+  "production_certificate_sha256": "b252b1b72bcded6b280a090a34e4451cefad8ca7fdee34b6ad6450226df1d121",
+  "minimum_api": 30,
+  "font_and_live_adapter_gates_passed": true
+}

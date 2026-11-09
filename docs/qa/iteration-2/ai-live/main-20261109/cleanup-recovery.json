@@ -1,0 +1,22 @@
+{
+  "user_id": "6259d6f9-6063-4c98-b243-9ddd5dcd7447",
+  "session_ids": [
+    "190ec72c-3704-4f06-bea1-5a7ac893e603"
+  ],
+  "before": {
+    "users": 1,
+    "refresh_tokens": 1,
+    "sessions": 1,
+    "waste_logs": 1,
+    "ai_operations": 3,
+    "ai_log_metadata": 1
+  },
+  "after": {
+    "users": 0,
+    "refresh_tokens": 0,
+    "sessions": 0,
+    "waste_logs": 0,
+    "ai_operations": 0,
+    "ai_log_metadata": 0
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "run_id": "88135318-20cf-4616-9c7e-fe879cb850a7",
+  "complete": true,
+  "cleanup_complete": false,
+  "started_at_utc": "2026-11-09T12:17:27.885244+00:00",
+  "before_count": 0,
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "passed_steps": [
+    "ui_registration_and_live_catalog",
+    "real_camerax_photo_survives_theme_changes",
+    "real_ai_ui_context_and_recommendation_do_not_auto_save",
+    "ui_explicit_save_keeps_ai_reference_and_awards_ten_xp",
+    "ui_edit_updates_existing_record_without_more_xp",
+    "ui_delete_refreshes_server_profile_and_summary",
+    "ui_logout_clears_device_credential"
+  ],
+  "owned_users": [
+    {
+      "id": "6259d6f9-6063-4c98-b243-9ddd5dcd7447",
+      "email": "android-88135318-20cf-4616-9c7e-fe879cb850a7@example.test",
+      "name": "Android transport probe"
+    }
+  ],
+  "cleanup_error": "ERROR:  column \"user_id\" does not exist\nLINE 1: ...okens',(SELECT count(*) FROM refresh_tokens WHERE user_id IN...\n                                                             ^\nHINT:  Perhaps you meant to reference the column \"refresh_tokens.used_at\".\n",
+  "captures": [],
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "finished_at_utc": "2026-11-09T12:19:28.880330+00:00"
+}

@@ -1,0 +1,26 @@
+{
+  "runs": [
+    {
+      "id": 42581934012,
+      "conclusion": "success",
+      "headSha": "c389cdc2cd868879688cd0b79eaca8510052964f",
+      "status": "completed",
+      "url": "https://github.com/waste-not-app/waste-not-android/actions/runs/42581934012"
+    },
+    {
+      "id": 42614471022,
+      "conclusion": "success",
+      "headSha": "24a578829969b36d0d8ce0901dff17882e271471",
+      "status": "completed",
+      "url": "https://github.com/waste-not-app/waste-not-android/actions/runs/42614471022"
+    },
+    {
+      "id": 42614471097,
+      "conclusion": "success",
+      "headSha": "24a578829969b36d0d8ce0901dff17882e271471",
+      "status": "completed",
+      "url": "https://github.com/waste-not-app/waste-not-android/actions/runs/42614471097"
+    }
+  ],
+  "pr_artifact_uploads": "Optional uploads rejected by storage quota; artifact listing empty. Public APK deployed and verified separately."
+}
