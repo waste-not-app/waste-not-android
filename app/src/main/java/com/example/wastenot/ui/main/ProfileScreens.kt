@@ -91,6 +91,10 @@ fun ProfileScreen(
                                 style = MaterialTheme.typography.titleMedium)
                         }
                     }
+                    if (!progress.hasLoggedToday && (progress.currentStreak ?: 0) > 0) {
+                        Text(stringResource(R.string.profile_streak_today_pending), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                     Text(stringResource(R.string.profile_streak_basis), style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

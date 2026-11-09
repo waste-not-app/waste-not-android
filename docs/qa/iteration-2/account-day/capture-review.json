@@ -1,0 +1,12 @@
+{
+  "captured": 20,
+  "accepted": 19,
+  "excluded": [
+    {
+      "file": "streak-today-pending-light.png",
+      "reason": "Blank compositor frame from the isolated component activity; not accepted as rendered UI evidence.",
+      "covered_by": "profile-yesterday-streak-light.png"
+    }
+  ],
+  "scope": "Body content in ComponentActivity, 390x844dp/API37/font100%; default component-activity status bars are not MainActivity visual acceptance."
+}

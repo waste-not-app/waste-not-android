@@ -54,6 +54,7 @@ import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.LocalWasteNotDockEdge
 import com.example.wastenot.ui.auth.LogoutUiState
 import com.example.wastenot.ui.components.IconActionButton
+import java.time.Clock
 import java.time.LocalDate
 import java.util.UUID
 import kotlinx.coroutines.flow.collect
@@ -80,6 +81,7 @@ fun AccountNavigation(
     onLogout: () -> Unit,
     modifier: Modifier = Modifier,
     logoutState: LogoutUiState = LogoutUiState.None,
+    clock: Clock = Clock.systemUTC(),
 ) {
     val context = LocalContext.current.applicationContext
     val factory = remember(activityStore) { viewModelFactory { initializer {
@@ -120,13 +122,13 @@ fun AccountNavigation(
             else read.log?.let { historyModel.reconcile(it) }
         }
     }
-    val date = model.referenceDate ?: LocalDate.now(user.timezone)
+    val date by rememberAccountDate(user.timezone, model.referenceDate, clock)
     val summariesFactory = remember(activityStore) { viewModelFactory { initializer {
-        SummariesViewModel(activityStore, createSavedStateHandle()) { model.referenceDate ?: LocalDate.now(user.timezone) }
+        SummariesViewModel(activityStore, createSavedStateHandle()) { model.referenceDate ?: LocalDate.now(clock.withZone(user.timezone)) }
     } } }
     val summaries: SummariesViewModel = viewModel(factory = summariesFactory)
     val summaryData by summaries.state.collectAsStateWithLifecycle()
-    LaunchedEffect(summaries, data.mutationRevision) { summaries.refresh() }
+    LaunchedEffect(summaries, data.mutationRevision, date) { summaries.refresh() }
     val uriHandler = LocalUriHandler.current
     val focus = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
