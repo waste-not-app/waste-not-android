@@ -1,0 +1,110 @@
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest:
+INSTRUMENTATION_STATUS: test=realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=org.junit.ComparisonFailure: expected:<[com.example.wastenot]> but was:<[android]>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest.capture(RemoteAccountSwitchNavigationTest.kt:217)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest.access$capture(RemoteAccountSwitchNavigationTest.kt:29)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest$realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner$1.invokeSuspend(RemoteAccountSwitchNavigationTest.kt:72)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.test.TestDispatcher.processEvent$kotlinx_coroutines_test(TestDispatcher.kt:24)
+	at kotlinx.coroutines.test.TestCoroutineScheduler.tryRunNextTaskUnless$kotlinx_coroutines_test(TestCoroutineScheduler.kt:99)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$workRunner$1.invokeSuspend(TestBuilders.kt:326)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-59ed90ceee74de341ad8389cb26e6868bf5f9271:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-59ed90ceee74de341ad8389cb26e6868bf5f9271:1)
+	at kotlinx.coroutines.test.TestBuildersJvmKt.createTestResult(TestBuildersJvm.kt:10)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:309)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(dex-id-991584cab5751caefb200e7711b51441b573135b:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:167)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(dex-id-991584cab5751caefb200e7711b51441b573135b:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0$default(TestBuilders.kt:159)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0$default(dex-id-991584cab5751caefb200e7711b51441b573135b:1)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest.realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner(RemoteAccountSwitchNavigationTest.kt:37)
+
+INSTRUMENTATION_STATUS: stream=
+Error in realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner(com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest):
+org.junit.ComparisonFailure: expected:<[com.example.wastenot]> but was:<[android]>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest.capture(RemoteAccountSwitchNavigationTest.kt:217)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest.access$capture(RemoteAccountSwitchNavigationTest.kt:29)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest$realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner$1.invokeSuspend(RemoteAccountSwitchNavigationTest.kt:72)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.test.TestDispatcher.processEvent$kotlinx_coroutines_test(TestDispatcher.kt:24)
+	at kotlinx.coroutines.test.TestCoroutineScheduler.tryRunNextTaskUnless$kotlinx_coroutines_test(TestCoroutineScheduler.kt:99)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$workRunner$1.invokeSuspend(TestBuilders.kt:326)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-59ed90ceee74de341ad8389cb26e6868bf5f9271:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-59ed90ceee74de341ad8389cb26e6868bf5f9271:1)
+	at kotlinx.coroutines.test.TestBuildersJvmKt.createTestResult(TestBuildersJvm.kt:10)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:309)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(dex-id-991584cab5751caefb200e7711b51441b573135b:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:167)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(dex-id-991584cab5751caefb200e7711b51441b573135b:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0$default(TestBuilders.kt:159)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0$default(dex-id-991584cab5751caefb200e7711b51441b573135b:1)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest.realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner(RemoteAccountSwitchNavigationTest.kt:37)
+
+INSTRUMENTATION_STATUS: test=realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 41.545
+There was 1 failure:
+1) realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner(com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest)
+org.junit.ComparisonFailure: expected:<[com.example.wastenot]> but was:<[android]>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest.capture(RemoteAccountSwitchNavigationTest.kt:217)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest.access$capture(RemoteAccountSwitchNavigationTest.kt:29)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest$realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner$1.invokeSuspend(RemoteAccountSwitchNavigationTest.kt:72)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.test.TestDispatcher.processEvent$kotlinx_coroutines_test(TestDispatcher.kt:24)
+	at kotlinx.coroutines.test.TestCoroutineScheduler.tryRunNextTaskUnless$kotlinx_coroutines_test(TestCoroutineScheduler.kt:99)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt$runTest$2$1$workRunner$1.invokeSuspend(TestBuilders.kt:326)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-59ed90ceee74de341ad8389cb26e6868bf5f9271:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-59ed90ceee74de341ad8389cb26e6868bf5f9271:1)
+	at kotlinx.coroutines.test.TestBuildersJvmKt.createTestResult(TestBuildersJvm.kt:10)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:309)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(dex-id-991584cab5751caefb200e7711b51441b573135b:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0(TestBuilders.kt:167)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0(dex-id-991584cab5751caefb200e7711b51441b573135b:1)
+	at kotlinx.coroutines.test.TestBuildersKt__TestBuildersKt.runTest-8Mi8wO0$default(TestBuilders.kt:159)
+	at kotlinx.coroutines.test.TestBuildersKt.runTest-8Mi8wO0$default(dex-id-991584cab5751caefb200e7711b51441b573135b:1)
+	at com.example.wastenot.ui.main.RemoteAccountSwitchNavigationTest.realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner(RemoteAccountSwitchNavigationTest.kt:37)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

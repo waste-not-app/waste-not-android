@@ -1,0 +1,93 @@
+{
+  "run_id": "e30ff75b-6e4a-4357-8c15-727ad381eee6",
+  "complete": true,
+  "cleanup_complete": true,
+  "started_at_utc": "2026-11-09T05:45:51.445868+00:00",
+  "runs": [
+    {
+      "label": "navigation",
+      "passed": true
+    }
+  ],
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "navigation_steps": [
+    "a_registers_and_creates_one_real_record",
+    "a_changes_filter_range_query_and_persists_an_unsaved_draft",
+    "b_has_only_own_empty_data_default_queries_range_and_profile",
+    "relogin_a_restores_only_a_draft_and_own_saved_record",
+    "explicit_logout_clears_only_a_draft_and_b_can_restore_its_own",
+    "final_ui_logout"
+  ],
+  "owned_users": [
+    {
+      "id": "eff7797b-958f-41a6-825d-84464ea391a2",
+      "email": "android-switch-a-e30ff75b-6e4a-4357-8c15-727ad381eee6@example.test",
+      "name": "Android switch A"
+    },
+    {
+      "id": "d43abae7-db3c-4b2d-a0c5-8965576fc771",
+      "email": "android-switch-b-e30ff75b-6e4a-4357-8c15-727ad381eee6@example.test",
+      "name": "Android switch B"
+    }
+  ],
+  "database_before_cleanup": {
+    "users": 2,
+    "sessions": 4,
+    "logs": 1
+  },
+  "database_after_cleanup": {
+    "users": 0,
+    "sessions": 0,
+    "logs": 0
+  },
+  "captures": [
+    {
+      "file": "a-draft-before-session-end.png",
+      "sha256": "e57e0c0eb27b6f3174a50c0655e6d52c20eb363f90949d683219c99c3c61c1cd"
+    },
+    {
+      "file": "a-home-saved.png",
+      "sha256": "ed3ed7875d690677e02a40d0de036c580a347c9b3c42b0e0d0b3974927d4da32"
+    },
+    {
+      "file": "a-own-draft-restored.png",
+      "sha256": "07dcf8a09c9b75a730e3491b06d3e178eef656395cf6f32f569d843dc73776f6"
+    },
+    {
+      "file": "b-history-without-a-filter.png",
+      "sha256": "90c531a243b3c446d124643fcfbf8b72f5ee9c266867c9492880f7f99505aed4"
+    },
+    {
+      "file": "b-home-empty.png",
+      "sha256": "e8567ebe7103fdbf775be654738540358b4c3208a4dee21002cb364628d9d269"
+    },
+    {
+      "file": "b-own-draft-restored.png",
+      "sha256": "7c989f82fd898ff840cd44de4a2dc9470d07ed1cae1d77c14e8b6a3b5cfe77fb"
+    },
+    {
+      "file": "b-profile-own-identity.png",
+      "sha256": "5fb19020458f255cc81a9bb9822cd0b575420d56fcfb0065235f9d355b6638fc"
+    },
+    {
+      "file": "b-statistics-default-range.png",
+      "sha256": "7169f05af8139f69c27ed26d207691571eac1cd6a847a658feb6dce1e266ba89"
+    },
+    {
+      "file": "signed-out-root-after-recreate.png",
+      "sha256": "f974dbb26ff46afb2ba6101b78a01f60fc7f0b938a180624c0c4d16fbdf42c56"
+    }
+  ],
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "finished_at_utc": "2026-11-09T05:47:31.905469+00:00"
+}

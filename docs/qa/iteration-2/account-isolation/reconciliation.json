@@ -1,0 +1,20 @@
+{
+  "unique_methods": 2,
+  "native_executions": 4,
+  "passed_executions": 3,
+  "failed_executions": 1,
+  "accepted_transport": {
+    "phase": "phase1",
+    "test_apk_sha256": "fa98974981ef4034b7ff8649dd28cf128f7055e2b754587d3397add9b5d08804"
+  },
+  "accepted_navigation": {
+    "phase": "final",
+    "test_apk_sha256": "8d11d59868ecd1b8263505d221a21bd4eb57b5982af0c7369e9b935b02b93b87"
+  },
+  "initial_navigation_failure": "Screenshot guard rejected Android System UI ANR overlay; owned accounts cleaned",
+  "phase2": "Functional assertions passed; statistics PNG was still loading, not accepted as empty frame",
+  "final": "Screenshot priming/delay and visible-state assertions; empty statistics frame inspected; nine final PNGs accepted",
+  "owned_users_created_and_cleaned": 7,
+  "cleanup_all_phases_zero": true,
+  "emulator_stopped": true
+}

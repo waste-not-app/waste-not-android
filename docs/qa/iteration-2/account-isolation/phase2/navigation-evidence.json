@@ -1,0 +1,14 @@
+{
+  "run_id": "e30ff75b-6e4a-4357-8c15-727ad381eee6",
+  "first_user_id": "eff7797b-958f-41a6-825d-84464ea391a2",
+  "first_log_id": "60201b28-3969-4b51-a69f-23f9ea4570c7",
+  "passed_steps": [
+    "a_registers_and_creates_one_real_record",
+    "a_changes_filter_range_query_and_persists_an_unsaved_draft",
+    "b_has_only_own_empty_data_default_queries_range_and_profile",
+    "relogin_a_restores_only_a_draft_and_own_saved_record",
+    "explicit_logout_clears_only_a_draft_and_b_can_restore_its_own",
+    "final_ui_logout"
+  ],
+  "second_user_id": "d43abae7-db3c-4b2d-a0c5-8965576fc771"
+}
