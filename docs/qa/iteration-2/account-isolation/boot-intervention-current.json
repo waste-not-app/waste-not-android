@@ -1,0 +1,6 @@
+{
+  "title": "System UI isn't responding",
+  "action": "Wait",
+  "bounds": "[75,1038][1005,1182]",
+  "initial_attempt_had_unconfirmed_result_after_display_restoration": true
+}

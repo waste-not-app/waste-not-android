@@ -1,0 +1,46 @@
+{
+  "latest": {
+    "version": "1.0.0-b9",
+    "filename": "wastenot-v1.0.0-b9.apk",
+    "size": "34.7 MB",
+    "bytes": 36408119,
+    "date": "09 Nov 2026, 02:42 WIB",
+    "is_latest": true,
+    "download_url": "/wastenot/apk/wastenot-v1.0.0-b9.apk",
+    "sha256": "be4aaeb04893"
+  },
+  "versions": [
+    {
+      "version": "1.0.0-b9",
+      "filename": "wastenot-v1.0.0-b9.apk",
+      "size": "34.7 MB",
+      "bytes": 36408119,
+      "date": "09 Nov 2026, 02:42 WIB",
+      "is_latest": true,
+      "download_url": "/wastenot/apk/wastenot-v1.0.0-b9.apk",
+      "sha256": "be4aaeb04893"
+    },
+    {
+      "version": "1.0.0-b8",
+      "filename": "wastenot-v1.0.0-b8.apk",
+      "size": "33.3 MB",
+      "bytes": 34939363,
+      "date": "09 Nov 2026, 01:29 WIB",
+      "is_latest": false,
+      "download_url": "/wastenot/apk/wastenot-v1.0.0-b8.apk",
+      "sha256": "6dcd631a1ed1"
+    },
+    {
+      "version": "1.0.0-b7",
+      "filename": "wastenot-v1.0.0-b7.apk",
+      "size": "33.3 MB",
+      "bytes": 34922151,
+      "date": "08 Nov 2026, 21:41 WIB",
+      "is_latest": false,
+      "download_url": "/wastenot/apk/wastenot-v1.0.0-b7.apk",
+      "sha256": "06504018c031"
+    }
+  ],
+  "max_retained": 3,
+  "updated_at": "2026-11-09T02:42:13.687532"
+}

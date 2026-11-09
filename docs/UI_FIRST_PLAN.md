@@ -119,3 +119,16 @@ Skill Android yang dipilih dari katalog lokal sudah terdaftar di AGENTS.md: andr
 264 debug unit tests serta lint/build lulus. Enam metode native lulus pada percobaan pertama: migrasi Android nyata, nilai tidak valid, kegagalan tujuan migrasi, pemilih font200%, recreate/system-night dan pemulihan banner UI. Upgrade staging dari APK riwayat ke APK DataStore mempertahankan Gelap pada restart versi lama, setelah upgrade dan restart versi baru, tanpa menghapus data. Empat belas PNG asli/hash dipin.
 
 APK staging `07ba9dae` lolos signature v2, SDK/font dan gate sumber/DEX/assets, lalu pointer lokal diperbarui. Tidak ada akun/log backend maupun generasi AI dibuat pada batch ini. Regresi menyeluruh core/AI dan audit yang belum terbukti tetap diperlukan. Skill Kotlin Flow/state ikut diterapkan dan terdaftar bersama skill Android/Compose dalam AGENTS.md.
+
+
+<!-- detected-object-priority:2026-11-09 -->
+## Prioritas berikutnya: pilihan objek sesuai hasil scan
+
+Tambahan pengguna 9 November: S22 menampilkan jenis objek yang cocok dengan kandidat deteksi terpilih paling atas. Gunakan urutan `suggestedObjectKeys` yang valid pada katalog/material terkonfirmasi, lalu sisa pilihan dengan urutan stabil. Koreksi manual dan konfirmasi pengguna tetap tersedia. Tangani saran kosong, key tak dikenal/duplikat serta pergantian kandidat/material; buktikan urutan melalui unit, native UI dan gambar sebelum merge. Pekerjaan ini mengikuti checkpoint isolasi akun dan dilacak pada A42/#81.
+
+
+## Isolasi akun nyata, 9 November 2026
+
+[Checkpoint AT-16/AT-17](qa/iteration-2/ACCOUNT_ISOLATION.md) menambahkan dua metode native pada API37: enam GET/PATCH/DELETE silang ditolak 404 dan tidak mengubah pemilik, serta MainActivity membuktikan akun baru tidak membawa data/filter/pencarian/rentang/draf akun sebelumnya. Masuk ulang memulihkan draf pemiliknya. Empat eksekusi mencakup satu kegagalan guard System UI; capture Statistik diperbaiki setelah review menemukan frame loading, lalu sembilan frame akhir diterima. Tujuh akun sementara dibersihkan, seluruh tahap diverifikasi nol.
+
+APK publik main `f98dcf2` versi `1.0.0-b9` berhasil diunduh dan lolos signature serta gate paket; runtime journey memakai APK debug native dengan source produksi sama. Perubahan checkpoint ini hanya pengujian/dokumentasi, dan A36 tetap In progress untuk kriteria lain yang belum dibuktikan. Prioritas implementasi berikutnya adalah urutan pilihan jenis objek S22 sesuai saran deteksi pada A42/#81.

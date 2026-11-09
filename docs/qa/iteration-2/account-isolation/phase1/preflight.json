@@ -1,0 +1,22 @@
+{
+  "run_id": "8ab318dd-df6c-4fcb-95fb-6aebb3ad1efe",
+  "before_count": 0,
+  "expected_accounts": [
+    {
+      "email": "android-isolation-a-8ab318dd-df6c-4fcb-95fb-6aebb3ad1efe@example.test",
+      "name": "Android isolation A"
+    },
+    {
+      "email": "android-isolation-b-8ab318dd-df6c-4fcb-95fb-6aebb3ad1efe@example.test",
+      "name": "Android isolation B"
+    },
+    {
+      "email": "android-switch-a-8ab318dd-df6c-4fcb-95fb-6aebb3ad1efe@example.test",
+      "name": "Android switch A"
+    },
+    {
+      "email": "android-switch-b-8ab318dd-df6c-4fcb-95fb-6aebb3ad1efe@example.test",
+      "name": "Android switch B"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "debug": {
+    "file": "WasteNot-account-debug.apk",
+    "sha256": "6861ba45bb8f9d9b50b25cf4c9e84679130ca75f4dbf30e09a9fa80f704e6dbe",
+    "bytes": 47037509
+  },
+  "androidTest": {
+    "file": "WasteNot-account-androidTest.apk",
+    "sha256": "fa98974981ef4034b7ff8649dd28cf128f7055e2b754587d3397add9b5d08804",
+    "bytes": 5795263
+  },
+  "test_sources": {
+    "app/src/androidTest/java/com/example/wastenot/data/network/RemoteAccountIsolationTest.kt": "db47286980ad812f96f4d718a2eb65aa25af7c3128bba1006ca1b2f391d7c1a7",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/RemoteAccountSwitchNavigationTest.kt": "e3ee96ccb641d4ff01d76b0ff073f24f3d86e1c849c0b22b9d149a761a56e6bf"
+  }
+}

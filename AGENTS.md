@@ -2,7 +2,7 @@
 
 Stack: Kotlin, Jetpack Compose, Navigation 3, CameraX and Gradle.
 Follow the WasteNot design kit under `docs/WasteNot-Product-Design-Kit update/WasteNot/`.
-The reference checkout is `/home/oktaavsm/Code/github.com/waste-not-app/wastenot-android/docs/WasteNot-Product-Design-Kit update/WasteNot/`.
+The reference checkout is `/home/oktaavsm/Code/github.com/waste-not-app/waste-not-android/docs/WasteNot-Product-Design-Kit update/WasteNot/`.
 All application builds use authenticated backend services. Test fixtures belong only to test source sets.
 Use standard feature branches and Conventional Commits without agent signatures.
 

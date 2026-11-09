@@ -1,0 +1,38 @@
+[
+  {
+    "file": "captures/a-draft-before-session-end.png",
+    "sha256": "5488433fc413c66fba62ff39f44cdfed6c1cdd179e7f4404931d62a59e181b5d"
+  },
+  {
+    "file": "captures/a-home-saved.png",
+    "sha256": "2939da45ad790b801d627a4c99583c9c965fa81ffb75703cb2dca1cc316b6c7e"
+  },
+  {
+    "file": "captures/a-own-draft-restored.png",
+    "sha256": "12c236a6f2d7f494b7a74bf0a94c1b35d1fd94487d390545a2edf45a505714fa"
+  },
+  {
+    "file": "captures/b-history-without-a-filter.png",
+    "sha256": "89b7a7fa69cad076dc699fc41025f9d142c5043fd101cd19b04d8fe042fba8a4"
+  },
+  {
+    "file": "captures/b-home-empty.png",
+    "sha256": "a0d67fea2d16c1fcf7155f5d1c7d335f312d6c30f934c4c9a9d503efd529ebe7"
+  },
+  {
+    "file": "captures/b-own-draft-restored.png",
+    "sha256": "5540ccd9ec5c4a6ac53d4a06c51138ee9b7a0aba1d13c698473628d8c2602ec6"
+  },
+  {
+    "file": "captures/b-profile-own-identity.png",
+    "sha256": "680f96ad181979e7e5ef04df13983417ad18bc7480f8d3f529511c9b2aa0f382"
+  },
+  {
+    "file": "captures/b-statistics-default-range.png",
+    "sha256": "f2f2189a432e7a890c71bb854e62518495624145f9527b3b5931b9ace520f769"
+  },
+  {
+    "file": "captures/signed-out-root-after-recreate.png",
+    "sha256": "de5322e5ffbc9b91c9784f5027da1e1f714ca6371f31ce0ad67daafe4a1adadb"
+  }
+]

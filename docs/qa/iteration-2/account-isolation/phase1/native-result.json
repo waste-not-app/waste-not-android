@@ -1,0 +1,64 @@
+{
+  "run_id": "8ab318dd-df6c-4fcb-95fb-6aebb3ad1efe",
+  "complete": false,
+  "cleanup_complete": true,
+  "started_at_utc": "2026-11-09T05:41:51.191240+00:00",
+  "runs": [
+    {
+      "label": "transport",
+      "passed": true
+    },
+    {
+      "label": "navigation",
+      "passed": false
+    }
+  ],
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "transport_steps": [
+    "two_distinct_real_accounts",
+    "owned_records_and_idempotent_replay",
+    "six_cross_account_operations_are_404_and_owners_are_unchanged",
+    "owner_edit_delete_update_only_that_accounts_totals",
+    "logout_revokes_old_credential_and_relogin_restores_only_own_identity"
+  ],
+  "owned_users": [
+    {
+      "id": "9fe22e88-e075-4d65-9892-10d7683e7b74",
+      "email": "android-isolation-a-8ab318dd-df6c-4fcb-95fb-6aebb3ad1efe@example.test",
+      "name": "Android isolation A"
+    },
+    {
+      "id": "4a2f5878-0b47-48fd-8fc4-3ba189e9dcfd",
+      "email": "android-isolation-b-8ab318dd-df6c-4fcb-95fb-6aebb3ad1efe@example.test",
+      "name": "Android isolation B"
+    },
+    {
+      "id": "472743de-73cf-4f1e-96e8-33378f11834a",
+      "email": "android-switch-a-8ab318dd-df6c-4fcb-95fb-6aebb3ad1efe@example.test",
+      "name": "Android switch A"
+    }
+  ],
+  "database_before_cleanup": {
+    "users": 3,
+    "sessions": 4,
+    "logs": 3
+  },
+  "database_after_cleanup": {
+    "users": 0,
+    "sessions": 0,
+    "logs": 0
+  },
+  "captures": [],
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "finished_at_utc": "2026-11-09T05:44:08.321354+00:00"
+}
