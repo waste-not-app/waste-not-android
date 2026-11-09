@@ -1,0 +1,19 @@
+{
+  "debug": {
+    "file": "app-scan-order.apk",
+    "sha256": "277ab6c0891be2c3013b848091cadcd26fd47455cdb034d6f2921e484b05ec23",
+    "bytes": 48388904
+  },
+  "androidTest": {
+    "file": "test-order.apk",
+    "sha256": "2f866581d6601a8c49bbe8fa98f44d352b4d7574baf1d0610fff3c4c2473c172",
+    "bytes": 5817619
+  },
+  "source_commit": "24a578829969b36d0d8ce0901dff17882e271471",
+  "source_files": {
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanSheet.kt": "baef43bc12d49de7fc72ae305f00b173f6be8c09d39492e757f7df27d6224912",
+    "app/src/main/java/com/example/wastenot/ui/scan/ScanViewModel.kt": "187b4b183b6ecf9b9965d4841cc8d86023f451b6633606d185660876a66e90a7",
+    "app/src/androidTest/java/com/example/wastenot/ui/scan/RemoteAiNavigationTest.kt": "a0159c64db62d3b62d35dae786faeca104eaf500e6dc09c9116e0bb8ee9c70cf",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/RemainingUiPreviewTest.kt": "fa7f4060565ebbff83b5f4c6a469f781cc84f79557ae798cc216d7b6b5a8b118"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "source": "/home/oktaavsm/.codex/worktrees/android-ai-integration/wastenot-android/app/src/androidTest/assets/ai/pet-bottle.jpg",
+  "source_sha256": "1f8bd2c97dc5321a22e8a052c32f6ecabd6789632517f173c9799072a23cc9fa",
+  "source_size": [
+    1045,
+    2431
+  ],
+  "photo_size": [
+    645,
+    1500
+  ],
+  "canvas_size": [
+    2048,
+    2048
+  ],
+  "offset": [
+    701,
+    274
+  ],
+  "canvas_rgb": [
+    245,
+    245,
+    245
+  ],
+  "output_sha256": "f64ac6377e8068708fdde0dd61301ab2931a608f7fca786956ad2c6436d76b1e",
+  "purpose": "Controlled emulator camera input; original object retained with padding. Not an accuracy benchmark."
+}

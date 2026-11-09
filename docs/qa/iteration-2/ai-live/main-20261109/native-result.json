@@ -1,0 +1,132 @@
+{
+  "run_id": "88135318-20cf-4616-9c7e-fe879cb850a7",
+  "complete": true,
+  "cleanup_complete": true,
+  "started_at_utc": "2026-11-09T12:17:27.885244+00:00",
+  "before_count": 0,
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "passed_steps": [
+    "ui_registration_and_live_catalog",
+    "real_camerax_photo_survives_theme_changes",
+    "real_ai_ui_context_and_recommendation_do_not_auto_save",
+    "ui_explicit_save_keeps_ai_reference_and_awards_ten_xp",
+    "ui_edit_updates_existing_record_without_more_xp",
+    "ui_delete_refreshes_server_profile_and_summary",
+    "ui_logout_clears_device_credential"
+  ],
+  "owned_users": [
+    {
+      "id": "6259d6f9-6063-4c98-b243-9ddd5dcd7447",
+      "email": "android-88135318-20cf-4616-9c7e-fe879cb850a7@example.test",
+      "name": "Android transport probe"
+    }
+  ],
+  "cleanup_error": "ERROR:  column \"user_id\" does not exist\nLINE 1: ...okens',(SELECT count(*) FROM refresh_tokens WHERE user_id IN...\n                                                             ^\nHINT:  Perhaps you meant to reference the column \"refresh_tokens.used_at\".\n",
+  "captures": [
+    {
+      "file": "S05-ai-prefill-light.png",
+      "sha256": "09e89555b1d4f3de3a973a487207f973fd82abdf53bf173d130283b1cb669d06",
+      "guest_mtime_epoch": 1794226739
+    },
+    {
+      "file": "S06-created-light.png",
+      "sha256": "db5176d7d1a0fca8448f849cb9a0ec4602019ccba76fa4fce39e2255c1efc67a",
+      "guest_mtime_epoch": 1794226742
+    },
+    {
+      "file": "S08-created-light.png",
+      "sha256": "4b9ce65e975a9dc03b838e4e282bdf141c3fef4d06967d5f5fd7d41867d5e2f7",
+      "guest_mtime_epoch": 1794226743
+    },
+    {
+      "file": "S14-after-delete-light.png",
+      "sha256": "560490203f1c8b67638d6817b4a4283f68354b4e55f2486258db97fbd35c04bd",
+      "guest_mtime_epoch": 1794226754
+    },
+    {
+      "file": "S21-camera-light.png",
+      "sha256": "13a3b0ee2643903ceaae69b167028437797fe0ebe53d9b8e25223de0ddb50f80",
+      "guest_mtime_epoch": 1794226679
+    },
+    {
+      "file": "S21-photo-before-theme.png",
+      "sha256": "353088a3f9d63d1333e55b9eb9d3828a02d50b031dd2da8a233f20d375b5b064",
+      "guest_mtime_epoch": 1794226682
+    },
+    {
+      "file": "S21-photo-dark.png",
+      "sha256": "55b2dcba5cec8cb45f5b221acd7f925f1917d9d2f8aea6d3d46f35d607ca95ee",
+      "guest_mtime_epoch": 1794226686
+    },
+    {
+      "file": "S21-photo-light.png",
+      "sha256": "353088a3f9d63d1333e55b9eb9d3828a02d50b031dd2da8a233f20d375b5b064",
+      "guest_mtime_epoch": 1794226683
+    },
+    {
+      "file": "S22-object-dark.png",
+      "sha256": "b8ed1ff0a8d1c82d85cfe70c1cdde2d28d4a75ed161201a3ce95e608c73d1b58",
+      "guest_mtime_epoch": 1794226700
+    },
+    {
+      "file": "S22-object-light.png",
+      "sha256": "c9059617e39bbd31662ac2fdd74a378d55b76b546490adf9505120b92c46b1a6",
+      "guest_mtime_epoch": 1794226698
+    },
+    {
+      "file": "S23-context-dark.png",
+      "sha256": "888866d671ba9d7d307b944832d1118d198afdc86437984c8d9c11115bbc0027",
+      "guest_mtime_epoch": 1794226721
+    },
+    {
+      "file": "S23-context-light.png",
+      "sha256": "c4bb0900d8c86d62320c698d5664518b9a5a59dc3b5c810a223883604da7002f",
+      "guest_mtime_epoch": 1794226717
+    },
+    {
+      "file": "S24-needs-context-light.png",
+      "sha256": "696477d107733822228ddd67faad9064741cff5285d85e940a58ca1f4727c762",
+      "guest_mtime_epoch": 1794226724
+    },
+    {
+      "file": "S24-recommendation-dark.png",
+      "sha256": "422640f78d961e466b559db7d5b2231dcba281010328baf185aea702c29cd1dd",
+      "guest_mtime_epoch": 1794226735
+    },
+    {
+      "file": "S24-recommendation-light.png",
+      "sha256": "5d54d10ec9b76586f768c338eb1e55c1c9d7de380c3f9b6c839c20f4e998ffdd",
+      "guest_mtime_epoch": 1794226732
+    }
+  ],
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "finished_at_utc": "2026-11-09T12:19:28.880330+00:00",
+  "database_before_cleanup": {
+    "users": 1,
+    "refresh_tokens": 1,
+    "sessions": 1,
+    "waste_logs": 1,
+    "ai_operations": 3,
+    "ai_log_metadata": 1
+  },
+  "database_after_cleanup": {
+    "users": 0,
+    "refresh_tokens": 0,
+    "sessions": 0,
+    "waste_logs": 0,
+    "ai_operations": 0,
+    "ai_log_metadata": 0
+  },
+  "cleanup_recovery": "Initial refresh-token count used the wrong relation. Verified session_id schema, removed the exact owned user, then checked all six counts through captured session IDs.",
+  "capture_pull_recovery": "Read the original external-files directory used by captureUiPreview; every image has mtime after this run started."
+}
