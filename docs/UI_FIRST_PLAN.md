@@ -124,8 +124,10 @@ APK staging `07ba9dae` lolos signature v2, SDK/font dan gate sumber/DEX/assets, 
 <!-- detected-object-priority:2026-11-09 -->
 ## Prioritas berikutnya: pilihan objek sesuai hasil scan
 
-Tambahan pengguna 9 November: S22 menampilkan jenis objek yang cocok dengan kandidat deteksi terpilih paling atas. Gunakan urutan `suggestedObjectKeys` yang valid pada katalog/material terkonfirmasi, lalu sisa pilihan dengan urutan stabil. Koreksi manual dan konfirmasi pengguna tetap tersedia. Tangani saran kosong, key tak dikenal/duplikat serta pergantian kandidat/material; buktikan urutan melalui unit, native UI dan gambar sebelum merge. Pekerjaan ini mengikuti checkpoint isolasi akun dan dilacak pada A42/#81.
+Tambahan pengguna 9 November, dikonfirmasi untuk **kedua daftar**: kandidat objek pada foto ditampilkan menurut skor deteksi menurun, dengan urutan awal dipertahankan saat skornya sama. Menu Jenis objek mengikuti urutan `suggestedObjectKeys` yang valid pada katalog/material terkonfirmasi, lalu sisa katalog dengan urutan stabil. Daftar menu kembali ke atas ketika opsinya berubah. Koreksi manual dan konfirmasi pengguna tetap tersedia; perubahan urutan tidak memilih material/jenis objek otomatis atau mengubah ID, bbox maupun band server. Tangani saran kosong, key tak dikenal/duplikat serta pergantian kandidat/material; buktikan urutan melalui unit, native UI dan gambar sebelum merge. Pekerjaan ini mengikuti checkpoint isolasi akun dan dilacak pada A42/#81.
 
+
+Checkpoint berikutnya: [urutan kedua pilihan scan](qa/iteration-2/SCAN_CHOICE_ORDER.md) selesai pada scope S22: kandidat berdasarkan skor menurun, saran jenis objek mengikuti urutan respons dan menu kembali ke atas saat opsi berubah. 271 unit tests dan dua metode native API37 dua tema lulus; sepuluh frame akhir ditinjau. Koreksi manual dan konfirmasi material tetap diwajibkan. APK staging baru lolos upgrade/startup tanpa clear data. A42 tetap In progress untuk kriteria di luar checkpoint; CI/merge dilaporkan terpisah.
 
 ## Isolasi akun nyata, 9 November 2026
 

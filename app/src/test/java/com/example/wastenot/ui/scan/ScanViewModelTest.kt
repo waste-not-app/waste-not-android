@@ -57,6 +57,26 @@ class ScanViewModelTest {
         assertEquals(ScanPrefill(WasteCategory.PLASTIC, null), vm.prefill())
     }
 
+    @Test fun eligibleDetectionsUseDescendingScoresWithoutChangingBandsOrRawResponse() = runTest {
+        val low = candidate().copy(id = "lower", confidence = .52, band = AiConfidenceBand.UNCERTAIN)
+        val firstHigh = candidate().copy(id = "first-high", confidence = .91, band = AiConfidenceBand.UNCERTAIN)
+        val secondHigh = candidate().copy(id = "second-high", confidence = .91)
+        val hidden = candidate().copy(id = "manual", confidence = .99, band = AiConfidenceBand.MANUAL_REQUIRED)
+        val unsupported = candidate().copy(id = "unsupported", confidence = .98, supportedForReview = false)
+        val rows = listOf(low, hidden, firstHigh, unsupported, secondHigh)
+        val fake = Fake().apply { detector = { id -> ApiResult.Success(detection(id).copy(objects = rows)) } }
+        val vm = model(fake); vm.detect(); advanceUntilIdle()
+        assertEquals(listOf(firstHigh, secondHigh, low), vm.state.value.objects)
+        assertEquals(rows, vm.state.value.detection!!.objects)
+        assertEquals(firstHigh.id, vm.state.value.selectedId)
+        assertEquals(AiConfidenceBand.UNCERTAIN, vm.state.value.selected!!.band)
+        assertNull(vm.state.value.category); assertNull(vm.state.value.objectKey)
+        assertFalse(vm.state.value.objectConfirmed)
+        vm.select(low.id)
+        assertEquals(low.id, vm.state.value.selectedId)
+        assertEquals(listOf(firstHigh, secondHigh, low), vm.state.value.objects)
+    }
+
     @Test fun contextFieldsStayIndependentAndChangingObjectInvalidatesTheOldDecision() = runTest {
         val vm = model(); confirm(vm)
         val context = ScanContext(Cleanliness.DIRTY, Integrity.DAMAGED, AiAnswer.YES, null,

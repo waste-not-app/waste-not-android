@@ -2,12 +2,12 @@ package com.example.wastenot.ui.scan
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
@@ -147,8 +147,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                         ScanChoice(stringResource(R.string.scan_material), state.category?.let { stringResource(it.labelResource) }
                             ?: stringResource(R.string.scan_choose_material), WasteCategory.entries,
                             { stringResource(it.labelResource) }, onCategory)
-                        val items = state.catalog?.items.orEmpty().filter { it.category == state.category }
-                            .sortedBy { it.key !in state.selected?.suggestedObjectKeys.orEmpty() }
+                        val items = state.objectChoices
                         if (state.category != null) ScanChoice(stringResource(R.string.scan_object_type),
                             state.item?.label ?: stringResource(R.string.scan_choose_object_type), items, { it.label }, { onObjectKey(it.key) })
                         ActionButton(stringResource(R.string.scan_confirm_object), onConfirmObject, Modifier.fillMaxWidth(),
@@ -330,6 +329,7 @@ private fun ScanSteps(current: Int) {
 @Composable
 internal fun <T> ScanChoice(label: String, value: String, options: List<T>, optionLabel: @Composable (T) -> String, onSelect: (T) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
+    val scroll = remember(options) { ScrollState(0) }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(label, style = MaterialTheme.typography.labelLarge)
         Box {
@@ -340,7 +340,7 @@ internal fun <T> ScanChoice(label: String, value: String, options: List<T>, opti
                 Text(value, Modifier.weight(1f))
                 Icon(painterResource(R.drawable.ic_chevron_down), null, Modifier.padding(start = 8.dp).size(20.dp))
             }
-            DropdownMenu(expanded, { expanded = false }) {
+            DropdownMenu(expanded, { expanded = false }, scrollState = scroll) {
                 options.forEach { option -> DropdownMenuItem(text = { Text(optionLabel(option)) },
                     onClick = { expanded = false; onSelect(option) }, modifier = Modifier.heightIn(min = 48.dp)) }
             }

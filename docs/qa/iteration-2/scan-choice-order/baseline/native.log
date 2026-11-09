@@ -1,0 +1,44 @@
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.scan.ScanChoiceOrderTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+com.example.wastenot.ui.scan.ScanChoiceOrderTest:
+INSTRUMENTATION_STATUS: test=matchingChoicesStayFirstAndCorrectionWorksInLight
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.example.wastenot.ui.scan.ScanChoiceOrderTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Server hint order must put HDPE before PET
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.scan.ScanChoiceOrderTest.verify(ScanChoiceOrderTest.kt:60)
+	at com.example.wastenot.ui.scan.ScanChoiceOrderTest.matchingChoicesStayFirstAndCorrectionWorksInLight(ScanChoiceOrderTest.kt:30)
+
+INSTRUMENTATION_STATUS: stream=
+Error in matchingChoicesStayFirstAndCorrectionWorksInLight(com.example.wastenot.ui.scan.ScanChoiceOrderTest):
+java.lang.AssertionError: Server hint order must put HDPE before PET
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.scan.ScanChoiceOrderTest.verify(ScanChoiceOrderTest.kt:60)
+	at com.example.wastenot.ui.scan.ScanChoiceOrderTest.matchingChoicesStayFirstAndCorrectionWorksInLight(ScanChoiceOrderTest.kt:30)
+
+INSTRUMENTATION_STATUS: test=matchingChoicesStayFirstAndCorrectionWorksInLight
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 11.432
+There was 1 failure:
+1) matchingChoicesStayFirstAndCorrectionWorksInLight(com.example.wastenot.ui.scan.ScanChoiceOrderTest)
+java.lang.AssertionError: Server hint order must put HDPE before PET
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.example.wastenot.ui.scan.ScanChoiceOrderTest.verify(ScanChoiceOrderTest.kt:60)
+	at com.example.wastenot.ui.scan.ScanChoiceOrderTest.matchingChoicesStayFirstAndCorrectionWorksInLight(ScanChoiceOrderTest.kt:30)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

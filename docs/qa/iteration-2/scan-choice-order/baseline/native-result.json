@@ -1,0 +1,28 @@
+{
+  "phase": "baseline",
+  "complete": true,
+  "api": 37,
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "expected_order_failure": true,
+  "captures": [
+    {
+      "file": "candidates-light.png",
+      "sha256": "f6ffde38b80bad50eb9dca5eb207d855e38e40764593bed9a3e8c6878de5a64d"
+    },
+    {
+      "file": "suggested-types-light.png",
+      "sha256": "2e0e79756047c60de4abfcc4aeb9b448e988ea08daa5882bb45edbee80b618f5"
+    }
+  ],
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  }
+}
