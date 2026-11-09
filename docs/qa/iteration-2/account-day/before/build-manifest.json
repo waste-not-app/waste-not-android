@@ -1,0 +1,19 @@
+{
+  "debug": {
+    "file": "app-account-day-before.apk",
+    "sha256": "a5b9e48b33875199ce6633bfa7efca5dfd13949641e0854394f7e85be85a17c9",
+    "bytes": 48389784
+  },
+  "androidTest": {
+    "file": "test-account-day.apk",
+    "sha256": "815ed1b40d0c59e0ada917e1e6248819dc50b14524b0554d49288056da1e7acf",
+    "bytes": 5853363
+  },
+  "sources": {
+    "app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt": "bf634c3abd1030f31991da66e874e52e94512de86debc0272638af9aa547f9e1",
+    "app/src/main/java/com/example/wastenot/ui/main/ProfileScreens.kt": "18bd074361832fc8fb8eb6a51f11dbdcf4f7fc386c3cf1ae1e0bcfa6f24d7261",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/AccountDayNavigationTest.kt": "f3583c98c136e895c1b6b26cef582d3ec0268550d8a43fb5c25e00e85d55d539"
+  },
+  "base_commit": "8d3859c44a86df610aae548c5547fd37af25278e",
+  "fixture_correction": "Explicit server-shaped streak fields; original test APK and initial run retained separately."
+}

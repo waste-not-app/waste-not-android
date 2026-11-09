@@ -139,3 +139,8 @@ APK publik main `f98dcf2` versi `1.0.0-b9` berhasil diunduh dan lolos signature 
 ## Regresi main sesudah urutan scan, 9 November 2026
 
 [Perjalanan AI nyata pada main 24a5788](qa/iteration-2/AI_MAIN_REGRESSION.md) lulus satu metode native API37: daftar, kamera, konfirmasi, NEEDS_CONTEXT/READY Gemini, simpan, edit, hapus dan logout. Lima belas frame ditinjau, provenance diterima server, serta akun/sesi/token/log/operasi AI dibersihkan dan keenam hitungan nol. Band UNCERTAIN pada skor 88% tetap mengikuti server. PR #109, CI main dan deployment lulus; APK publik b11 sudah diunduh dan diverifikasi. Upload artefak opsional tetap ditolak kuota, terpisah dari publikasi APK. Ini menambah bukti integrasi versi kini, bukan penerimaan global semua state/perangkat atau dukungan offline.
+
+
+## Pergantian hari akun, 9 November 2026
+
+[Checkpoint AT-22/S14](qa/iteration-2/ACCOUNT_DAY_ROLLOVER.md) memperbaiki tanggal yang tertinggal saat tengah malam/resume dan penjelasan streak kemarin. Draf lama dipertahankan, draf baru memakai tanggal baru, dan periode 7/30 hari tetap dipilih. Dua baseline gagal pada perilaku yang dituju; 274 unit tests serta enam eksekusi native akhir API37 dua tema lulus. Dari 20 capture, 19 diterima dan satu frame kosong fixture dikecualikan dengan bukti keadaan sama pada perjalanan navigasi. APK staging baru lolos upgrade/startup sambil mempertahankan Gelap. Ini bukti Android dengan Clock terkontrol; AT-10 backend, matriks aksesibilitas/performa dan penerimaan penuh tetap terpisah.

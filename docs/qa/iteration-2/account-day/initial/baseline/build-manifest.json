@@ -1,0 +1,18 @@
+{
+  "debug": {
+    "file": "app-account-day-before.apk",
+    "sha256": "a5b9e48b33875199ce6633bfa7efca5dfd13949641e0854394f7e85be85a17c9",
+    "bytes": 48389784
+  },
+  "androidTest": {
+    "file": "test-account-day.apk",
+    "sha256": "b32cbcd82454a0b1ad9f36449e03cd3c22187a53237529fe738b14d39226f2d5",
+    "bytes": 5852939
+  },
+  "sources": {
+    "app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt": "bf634c3abd1030f31991da66e874e52e94512de86debc0272638af9aa547f9e1",
+    "app/src/main/java/com/example/wastenot/ui/main/ProfileScreens.kt": "18bd074361832fc8fb8eb6a51f11dbdcf4f7fc386c3cf1ae1e0bcfa6f24d7261",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/AccountDayNavigationTest.kt": "d8bff0fc9f3cc89f948a8eb1d0c5b658532731de9f7f0360e72445d9fc4114d3"
+  },
+  "base_commit": "8d3859c44a86df610aae548c5547fd37af25278e"
+}

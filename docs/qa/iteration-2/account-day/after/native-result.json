@@ -1,0 +1,108 @@
+{
+  "phase": "final",
+  "complete": true,
+  "runs": [
+    {
+      "label": "light",
+      "passed_methods": 3
+    },
+    {
+      "label": "dark",
+      "passed_methods": 3
+    }
+  ],
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "captures": [
+    {
+      "file": "draft-before-midnight-dark.png",
+      "sha256": "dd80728ded188b1fb9b517c37c0c87892d88213fdae8aa04cd490050dd5fb980"
+    },
+    {
+      "file": "draft-before-midnight-light.png",
+      "sha256": "945c146d9fc8e30f6d492ec868815ab5aae41246d2edf57b3a5a21d5a0a252f3"
+    },
+    {
+      "file": "draft-preserved-after-midnight-dark.png",
+      "sha256": "8d85eb27183c08cd8e1e783fa7eaab0e91cf2dff288d4f589f06eec2c119c9b9"
+    },
+    {
+      "file": "draft-preserved-after-midnight-light.png",
+      "sha256": "2e98904fa97b3c6301acaf70ca5572d2bca7f6e7b0122d471b58243b579e8099"
+    },
+    {
+      "file": "home-after-midnight-dark.png",
+      "sha256": "2cb927cbb5862191636f496f23923ff98082b71193bfbaef788797a044d53dc8"
+    },
+    {
+      "file": "home-after-midnight-light.png",
+      "sha256": "af009db32798f3f6f68fdda6f98fe12c08a3f445db83da6e6ef00325f7ecf91b"
+    },
+    {
+      "file": "new-draft-current-day-dark.png",
+      "sha256": "ee9470bb5021d52338189e51b5bc1d2365e5be3cfe44a8b14874730a62e5cebf"
+    },
+    {
+      "file": "new-draft-current-day-light.png",
+      "sha256": "3af7b755ee50b40d26fa9cebbb214b72f8d46d51823596eba13cc5432c782d9d"
+    },
+    {
+      "file": "profile-yesterday-streak-dark.png",
+      "sha256": "76a4271dccda223ea8c8629af5a41dc5ff4dbe430674d75b0006053e891d23d5"
+    },
+    {
+      "file": "profile-yesterday-streak-light.png",
+      "sha256": "993452d930e49277c57e4253e1464d3c146d32caf548998f5996fbd2331c7a60"
+    },
+    {
+      "file": "statistics-after-resume-dark.png",
+      "sha256": "2786e50c0fdbc72c9a2800f6b834bd886ed3eaab3b573585bef3ae9cdc7d8970"
+    },
+    {
+      "file": "statistics-after-resume-light.png",
+      "sha256": "926649b55aaf2b843d88f777edcf1480c02d0c45d13dfef02aad91b7e1392876"
+    },
+    {
+      "file": "statistics-at-day-boundary-dark.png",
+      "sha256": "eb50a07c9c3ba13dd526ab9f71521fc0332b272bdf35510477204aa7a71b2d44"
+    },
+    {
+      "file": "statistics-at-day-boundary-light.png",
+      "sha256": "29d0058017c0ebe476a8712450b848aa9304e4e3951dbf62af804f0bd0f0f92c"
+    },
+    {
+      "file": "statistics-before-midnight-dark.png",
+      "sha256": "c9f000c3979f3605321a7dab1339729917cc50315ec9deea8d77666887a32850"
+    },
+    {
+      "file": "statistics-before-midnight-light.png",
+      "sha256": "f9dd42791d810b991d6ea659475ad9fd22f5ea66a04463d5a051cdd56af702ea"
+    },
+    {
+      "file": "streak-logged-today-dark.png",
+      "sha256": "44be97794c4333a7866c13d3c2eb41c0df50040a61f781265b5e8aa6ebca55fc"
+    },
+    {
+      "file": "streak-logged-today-light.png",
+      "sha256": "fa4bec610c713d45d3136936761c7fd5e3da3f4971f525de4315047d025373c1"
+    },
+    {
+      "file": "streak-today-pending-dark.png",
+      "sha256": "34e32aa8d463d1740cc1fac290c35cef0b4cd9c024b2099181a805cc747ced25"
+    },
+    {
+      "file": "streak-today-pending-light.png",
+      "sha256": "523aa804ef19c7cdf5293c4eab06a94d318b14cc9f67cc9843c1bf0694126bf6"
+    }
+  ],
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  }
+}

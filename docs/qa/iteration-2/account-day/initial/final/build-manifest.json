@@ -1,0 +1,24 @@
+{
+  "debug": {
+    "file": "app-account-day.apk",
+    "sha256": "91f92558709a3b4c04fbad6889d0df92dd20da78b271e57fdff6399009ffb82e",
+    "bytes": 48398424
+  },
+  "staging": {
+    "file": "app-account-day-staging.apk",
+    "sha256": "f65e9f9a6fddc18bc4635a1d52a5d79306e7e234942514620d5e5fd5eb3113ff",
+    "bytes": 36408555
+  },
+  "androidTest": {
+    "file": "test-account-day.apk",
+    "sha256": "b32cbcd82454a0b1ad9f36449e03cd3c22187a53237529fe738b14d39226f2d5",
+    "bytes": 5852939
+  },
+  "sources": {
+    "app/src/main/java/com/example/wastenot/ui/main/AccountDate.kt": "f5efdc866c31f5df7d7b78d0a360fff0b0942d6308f5006bf0df4799e0fecaea",
+    "app/src/main/java/com/example/wastenot/ui/main/AccountNavigation.kt": "a763ff75386aecbcbf6fa96bd68e13fde97603a1848499cccc33e2b9221c5951",
+    "app/src/main/java/com/example/wastenot/ui/main/ProfileScreens.kt": "ead972654bab8b3d1fa9557f29979cb9d19de2d6792e1f28cea876472ffe4f9b",
+    "app/src/main/res/values/profile.xml": "8f8608bf76940e796fbe20c58762ec62856ffb1880403ee2780f825f48c71de9",
+    "app/src/androidTest/java/com/example/wastenot/ui/main/AccountDayNavigationTest.kt": "d8bff0fc9f3cc89f948a8eb1d0c5b658532731de9f7f0360e72445d9fc4114d3"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "complete": true,
+  "predecessor_installed_for_test": true,
+  "package_initially_absent": true,
+  "previous_sha256": "7b3c41ef3a9876df7f931dd03cad1fadd759b59534f273db128fd8543bac96be",
+  "installed_sha256": "f65e9f9a6fddc18bc4635a1d52a5d79306e7e234942514620d5e5fd5eb3113ff",
+  "data_cleared": false,
+  "theme_before_upgrade": "DARK after cold restart",
+  "theme_after_upgrade": "DARK",
+  "login_form_visible": true
+}

@@ -1,0 +1,40 @@
+{
+  "phase": "baseline",
+  "complete": true,
+  "runs": [
+    {
+      "label": "clock",
+      "expected_failure": "Account day must refresh dashboard and statistics without navigation"
+    },
+    {
+      "label": "streak",
+      "expected_failure": "Belum mencatat hari ini."
+    }
+  ],
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "captures": [
+    {
+      "file": "statistics-at-day-boundary-light.png",
+      "sha256": "64af54cde311fd1b83064c0ff531a08e8d38a224e47c6a564da1a5873a8e3d6f"
+    },
+    {
+      "file": "statistics-before-midnight-light.png",
+      "sha256": "fd67e78ad6c73f7a62d780b057873cc264d8a8ba92bf4370cee37904908e2911"
+    },
+    {
+      "file": "streak-today-pending-light.png",
+      "sha256": "523aa804ef19c7cdf5293c4eab06a94d318b14cc9f67cc9843c1bf0694126bf6"
+    }
+  ],
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  }
+}
