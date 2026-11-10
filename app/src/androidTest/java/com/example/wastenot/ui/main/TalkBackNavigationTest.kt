@@ -23,6 +23,7 @@ class TalkBackNavigationTest {
         assumeTrue("Run explicitly on a dedicated TalkBack-enabled emulator",
             arguments.getString("talkback") == "true")
         assumeTrue(android.os.Build.VERSION.SDK_INT >= 36)
+        val recordSpeech = arguments.getString("talkbackRecordSpeech") == "true"
         val (modifierKey, clickKey) = when (val keymap = arguments.getString("talkbackKeymap", "default")) {
             "default" -> 4 to 40 // Alt + Enter
             "enhanced" -> 8 to 44 // Action (Windows) + Space
@@ -58,11 +59,22 @@ class TalkBackNavigationTest {
                 SystemClock.sleep(250)
             }
             ActivityScenario.launch(MainActivity::class.java).use {
-                await("login screen") { text(automation.rootInActiveWindow).contains("Belum punya akun?") }
+                await("login screen") { text(appRoot(automation)).contains("Belum punya akun?") }
                 val email = seek(automation, { shortcut(79) }) { it.isEditable && text(it).contains("Email") }
+                val passwordBeforeKeyboard = findNode(appRoot(automation)) { it.isEditable && it.isPassword }
+                // Set up the password field within the form after Gboard may have taken focus.
                 setText(email, "reader@example.invalid")
-                val password = seek(automation, { shortcut(79) }) { it.isEditable && it.isPassword }
-                shortcut(clickKey)
+                val password = awaitValue("password field visible") {
+                    findNode(appRoot(automation)) { it.isEditable && it.isPassword }
+                        ?: passwordBeforeKeyboard?.takeIf { it.refresh() }
+                        ?: run {
+                            findNode(appRoot(automation)) { it.isScrollable }
+                                ?.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
+                            null
+                        }
+                }
+                if (!password.isFocused) assertTrue(password.performAction(AccessibilityNodeInfo.ACTION_FOCUS))
+                assertTrue(password.performAction(AccessibilityNodeInfo.ACTION_CLICK))
                 await("password keyboard visible") { automation.windows.any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD } }
                 assertTrue(password.refresh())
                 setText(password, "short")
@@ -72,11 +84,13 @@ class TalkBackNavigationTest {
                     automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)?.let(::isSubmit) == true
                 }
                 assertTrue(automation.windows.any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD })
+                if (recordSpeech) SystemClock.sleep(2_000)
                 shortcut(clickKey)
                 val error = "Kata sandi perlu 12–128 karakter, termasuk spasi."
                 await("password validation") { text(appRoot(automation)).contains(error) }
                 // Validation is placed above the submit action in the form's reading order.
                 seek(automation, { shortcut(80) }) { text(it).contains(error) }
+                if (recordSpeech) SystemClock.sleep(5_000)
                 seek(automation, { shortcut(79) }) { isSubmit(it) }
                 assertTrue(manager.isTouchExplorationEnabled)
                 val file = java.io.File(instrumentation.targetContext.cacheDir, "qa/talkback-font200.png")
@@ -93,17 +107,26 @@ class TalkBackNavigationTest {
     }?.root
 
     private fun focusPasswordToggle(automation: UiAutomation) {
-        fun toggle(node: AccessibilityNodeInfo?): AccessibilityNodeInfo? {
-            if (node == null || node.contentDescription == "Tampilkan kata sandi") return node
-            return (0 until node.childCount).firstNotNullOfOrNull { toggle(node.getChild(it)) }
-        }
-        await("password visibility action") { toggle(appRoot(automation))?.isVisibleToUser == true }
         // Setting text can move accessibility focus to Gboard. Start traversal from the last form control.
-        val node = checkNotNull(toggle(appRoot(automation)))
-        if (!node.isAccessibilityFocused) assertTrue(node.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS))
+        fun isToggle(node: AccessibilityNodeInfo) =
+            node.contentDescription == "Tampilkan kata sandi" && node.isVisibleToUser
+        var focusedSince: Long? = null
         await("TalkBack focus returned to the form") {
-            automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)?.contentDescription == "Tampilkan kata sandi"
+            val focused = automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)
+            if (focused?.let(::isToggle) == true) {
+                val now = SystemClock.uptimeMillis()
+                val start = focusedSince ?: now.also { focusedSince = it }
+                return@await now - start >= 600
+            }
+            focusedSince = null
+            findNode(appRoot(automation), ::isToggle)?.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)
+            false
         }
+    }
+
+    private fun findNode(node: AccessibilityNodeInfo?, matches: (AccessibilityNodeInfo) -> Boolean): AccessibilityNodeInfo? {
+        if (node == null || matches(node)) return node
+        return (0 until node.childCount).firstNotNullOfOrNull { findNode(node.getChild(it), matches) }
     }
 
     private fun isSubmit(node: AccessibilityNodeInfo) = node.isClickable && node.isEnabled && text(node).trim() == "Masuk"
@@ -134,8 +157,15 @@ class TalkBackNavigationTest {
     }
 
     private fun await(label: String, predicate: () -> Boolean) {
+        awaitValue(label) { Unit.takeIf { predicate() } }
+    }
+
+    private fun <T : Any> awaitValue(label: String, read: () -> T?): T {
         val deadline = SystemClock.uptimeMillis() + 15_000
-        while (!predicate() && SystemClock.uptimeMillis() < deadline) SystemClock.sleep(200)
-        assertTrue(label, predicate())
+        do {
+            read()?.let { return it }
+            SystemClock.sleep(200)
+        } while (SystemClock.uptimeMillis() < deadline)
+        throw AssertionError(label)
     }
 }
