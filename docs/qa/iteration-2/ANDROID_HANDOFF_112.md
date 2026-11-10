@@ -97,13 +97,28 @@ adb shell am instrument -w -e verifyLocalGuideScan true -e class com.example.was
 
 APK debug QA SHA-256 `788448ac2d54951389764e9568d77c6253721cfd080b34abd92ad7663363964f`. APK penguji SHA-256 `e3e3c8d7f0af62f7d64b66860eb6f0213595500685f7e3c10005af1696e948f4`.
 
+## Checkpoint autentikasi dan detail setelah restart
+
+`LocalBackendCoreTest` lulus tiga eksekusi pada emulator Android 17/API 37 dengan backend Go QA dan PostgreSQL yang sama. Form Daftar menampilkan error email duplikat. Form Masuk menampilkan error untuk kata sandi pendek dan salah. Ketiganya mempertahankan root keluar tanpa token refresh lokal. Percobaan dengan kata sandi yang benar mengembalikan identitas akun awal. Basis data mencatat satu akun dan dua sesi yang sesuai dengan daftar dan login sukses.
+
+Pada akun terpisah, UI menyimpan Plastik/Recycle 250 g. Setelah `am force-stop`, proses berbeda memulihkan sesi dan membuka Detail catatan dari Riwayat. ID dan isi catatan sama, dengan satu catatan dan 10 XP. Kedua akun probe dihapus dari basis data QA. [Log pengujian dan hasil basis data](handoff-112/local-backend-core.log)
+
+Untuk mengulang, gunakan konfigurasi build dan backend QA pada checkpoint sebelumnya. Dengan aplikasi keluar, buat satu UUID baru untuk `RUN_ID` dan pilih setiap metode secara berurutan. Jangan hapus data aplikasi antar metode karena pengujian restart memakai sesi yang tersimpan.
+
+```sh
+for method in rejectsDuplicateEmailAndInvalidPasswordsWithoutStartingSession savesRecycleRecordBeforeProcessRestart opensSameRecycleRecordAfterProcessRestart; do
+    adb shell am force-stop com.example.wastenot
+    adb shell am instrument -w -e verifyLocalCore true -e fixtureRunId "$RUN_ID" -e class "com.example.wastenot.ui.main.LocalBackendCoreTest#$method" com.example.wastenot.test/com.example.wastenot.WasteNotTestRunner
+done
+```
+
 ## Core
 
 | ID | Status | Bukti dan batas |
 | --- | --- | --- |
 | AT-01 | Terverifikasi | [Isolasi akun](ACCOUNT_ISOLATION.md) mencakup daftar dan login ulang dari MainActivity dengan akun nyata. |
-| AT-02 | Parsial | Validasi form dan kegagalan kredensial tersedia di `SessionRootTest`. Ulangi email duplikat dan kata sandi salah pada endpoint nyata. |
-| AT-03 | Parsial | [Perjalanan AI](AI_MAIN_REGRESSION.md) menyimpan 250 g, satu log/10 XP, lalu membuka detail. Ulangi pembukaan detail setelah restart proses. |
+| AT-02 | Terverifikasi pada QA lokal | [Autentikasi](#checkpoint-autentikasi-dan-detail-setelah-restart) membuktikan error email duplikat, kata sandi pendek dan salah, serta tidak terbentuk sesi. |
+| AT-03 | Terverifikasi pada QA lokal | [Detail setelah restart](#checkpoint-autentikasi-dan-detail-setelah-restart) membuktikan satu catatan Plastik/Recycle 250 g dan 10 XP, dengan ID sama setelah force-stop. |
 | AT-04 | Parsial | [Recovery](WRITE_RECOVERY.md) mencakup hasil commit yang belum diketahui dan replay di UI terkontrol. [Pengulangan AI](#pemeriksaan-ai-pada-backend-aktif) membuktikan commit nyata dan replay dari draf terkunci dengan simulasi tanda terima hilang. Gabungkan dengan putus koneksi aktual di alur produksi. |
 | AT-05–06 | Parsial | `QuantityTest`, `EditorDraftTest` dan `QuantityRequestFieldsTest` menguji validasi model, form dan serialisasi. Audit penolakan HTTP untuk setiap input batas. |
 | AT-07 | Terverifikasi | [Dataset PRD](PRD_DATASET_LIVE.md) mencatat Reduce 2 terpisah dari total penanganan. |
