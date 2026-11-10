@@ -276,11 +276,12 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                             ScanProblem.CAMERA -> R.string.scan_camera_error
                             ScanProblem.CATALOG -> R.string.scan_catalog_error
                             ScanProblem.RECOMMENDATION -> R.string.scan_recommendation_error
+                            ScanProblem.DISABLED -> R.string.scan_disabled
                             else -> R.string.scan_detection_error
                         }), style = MaterialTheme.typography.bodyLarge)
                         if (state.problem == ScanProblem.EXPIRED && state.objectConfirmed && state.confirmedMethod != null)
                             Text(stringResource(R.string.scan_manual_choice_retained), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        ScanSecondary(R.string.retry, onRetry)
+                        if (state.problem != ScanProblem.DISABLED) ScanSecondary(R.string.retry, onRetry)
                     }
                 }
             }

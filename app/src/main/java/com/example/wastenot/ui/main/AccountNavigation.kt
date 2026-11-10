@@ -285,7 +285,8 @@ fun AccountNavigation(
         sessionFailed = (logoutState as? LogoutUiState.Complete)?.result?.localCleared == false,
     )
     if (resumingPrompt) ResumeDraftDialog({ resumingPrompt = false }, ::resumeDraft)
-    capture?.let { session -> CaptureSheet(user.id, scanRepositoryFactory, session, onDismiss = { capture = null }, onPrefill = { prefill ->
+    capture?.let { session -> CaptureSheet(user.id, scanRepositoryFactory, session, activityStore::isPhotoScanDisabled,
+        onDismiss = { capture = null }, onPrefill = { prefill ->
         capture = null
         openEditor(LogEditor(null, UUID.randomUUID().toString(), scanCategory = prefill.category?.name,
             scanMethod = prefill.method?.name, scanRecommendationId = prefill.aiProvenance?.recommendationId))

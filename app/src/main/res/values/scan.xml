@@ -6,6 +6,7 @@
     <string name="scan_context_title">Kondisi objek</string>
     <string name="scan_review_recommendation">Periksa saran</string>
     <string name="scan_unavailable">Scan belum tersedia</string>
+    <string name="scan_disabled">Scan foto dinonaktifkan. Kamu tetap bisa mencatat secara manual.</string>
     <string name="scan_step_photo">Foto</string>
     <string name="scan_step_object">Objek</string>
     <string name="scan_step_context">Kondisi</string>

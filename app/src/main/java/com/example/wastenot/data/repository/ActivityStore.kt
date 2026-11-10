@@ -27,6 +27,7 @@ data class ActivityCreation(val log: WasteLog, val created: Boolean)
 
 interface ActivityStore {
     val referenceDate: LocalDate?
+    suspend fun isPhotoScanDisabled(): Boolean = false
     suspend fun dashboard(): ApiResult<DashboardSnapshot>
     suspend fun statistics(range: ActivityDateRange): ApiResult<StatisticsSnapshot>
     suspend fun load(): ApiResult<List<WasteLog>>
@@ -42,6 +43,8 @@ interface ActivityStore {
 class RemoteActivityStore(private val core: CoreRepository) : ActivityStore {
 
     override val referenceDate: LocalDate? = null
+    override suspend fun isPhotoScanDisabled(): Boolean =
+        (core.metadata() as? ApiResult.Success)?.value?.capabilities?.get("ai_scan") == false
     override suspend fun dashboard() = core.dashboard()
     override suspend fun statistics(range: ActivityDateRange) = core.statistics(range)
     override suspend fun load() = core.wasteLogs()

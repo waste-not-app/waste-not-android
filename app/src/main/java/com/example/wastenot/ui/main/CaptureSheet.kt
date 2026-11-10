@@ -85,7 +85,8 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) -> ScanRepository, session: String, onDismiss: () -> Unit,
+internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) -> ScanRepository, session: String,
+    isPhotoScanDisabled: suspend () -> Boolean, onDismiss: () -> Unit,
     onPrefill: (ScanPrefill) -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val cache = remember(userId) { ScanPhotoCache.create(context, userId) }
@@ -94,6 +95,7 @@ internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) ->
     } } }
     val model: ScanViewModel = viewModel(key = "scan-$userId", factory = factory)
     val state by model.state.collectAsStateWithLifecycle()
+    val scanDisabled by produceState<Boolean?>(null, session) { value = isPhotoScanDisabled() }
     var hadPhoto by rememberSaveable(session) { mutableStateOf(false) }
     LaunchedEffect(session) {
         model.start(session)
@@ -110,10 +112,15 @@ internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) ->
         val prefill = model.handoff(confirmRecommendation = !manual) ?: return
         model.close(session); onPrefill(prefill)
     }
-    ScanSheet(state, ::dismiss, { use(true) }, model::retake, model::detect, model::select, model::category,
+    val visibleState = if (scanDisabled == true) state.copy(phase = ScanPhase.FAILURE, problem = ScanProblem.DISABLED) else state
+    ScanSheet(visibleState, ::dismiss, { use(true) }, model::retake, model::detect, model::select, model::category,
         model::confirmObject, model::correctObject, model::context, model::recommend, model::method,
         { use(false) }, model::retry, modifier, model::objectKey, model::reviewContext, model::confirmConditions) {
-        ScanCamera(session, cache, { model.photo(session, it) }, { model.problem(session, it) })
+        if (scanDisabled == false) {
+            ScanCamera(session, cache, { model.photo(session, it) }, { model.problem(session, it) })
+        } else {
+            LinearProgressIndicator(Modifier.fillMaxWidth())
+        }
     }
 }
 

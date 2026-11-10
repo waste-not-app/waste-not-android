@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 
 enum class ScanPhase { CAMERA, PHOTO, DETECTING, OBJECT, CONTEXT, RECOMMENDING, RECOMMENDATION, FAILURE }
-enum class ScanProblem { CAMERA, PERMISSION, PHOTO, CATALOG, NO_OBJECT, DETECTION, RECOMMENDATION, EXPIRED }
+enum class ScanProblem { CAMERA, PERMISSION, PHOTO, CATALOG, NO_OBJECT, DETECTION, RECOMMENDATION, EXPIRED, DISABLED }
 data class ScanState(val session: String = "", val phase: ScanPhase = ScanPhase.CAMERA,
     val photo: ScanPhoto? = null, val objects: List<AiDetectionObject> = emptyList(), val selectedId: String? = null,
     val category: WasteCategory? = null, val context: ScanContext = ScanContext(), val objectConfirmed: Boolean = false,
