@@ -1,5 +1,8 @@
 package com.example.wastenot.ui.main
 
+import android.os.Debug
+import android.os.ParcelFileDescriptor
+import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -15,17 +18,22 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.data.demo.DemoActivityStore
 import com.example.wastenot.data.dummy.fixtureLogPage
+import com.example.wastenot.data.network.ApiFailure
+import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.repository.ActivityStore
 import com.example.wastenot.model.*
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.WasteNotTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.After
+import java.io.File
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -42,10 +50,19 @@ class HistoryDesignTest {
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    private fun show(restoration: StateRestorationTester? = null, dark: State<Boolean>? = null, notice: MutableState<Boolean>? = null, onDetail: (String) -> Unit = {}) {
+    private fun show(
+        restoration: StateRestorationTester? = null,
+        dark: State<Boolean>? = null,
+        notice: MutableState<Boolean>? = null,
+        dataset: List<WasteLog> = records,
+        pageFailure: (String?) -> ApiFailure? = { null },
+        onDetail: (String) -> Unit = {},
+    ) {
         val source = object : ActivityStore by DemoActivityStore(ZoneId.of("Asia/Jakarta")) {
-            override suspend fun page(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, cursor: String?): ApiResult<List<WasteLog>> =
-                fixtureLogPage(records, category, method, dates, cursor)
+            override suspend fun page(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, cursor: String?): ApiResult<List<WasteLog>> {
+                pageFailure(cursor)?.let { return ApiResult.Failure(it) }
+                return fixtureLogPage(dataset, category, method, dates, cursor)
+            }
         }
         val vm = ViewModelProvider.create(owner, viewModelFactory { initializer { HistoryViewModel(source, SavedStateHandle()) } })[HistoryViewModel::class]
         val content: @Composable () -> Unit = {
@@ -150,6 +167,67 @@ class HistoryDesignTest {
         compose.onNodeWithText("Tutup").performClick()
         compose.onNodeWithText("Catatan dihapus.").assertDoesNotExist()
         compose.onNodeWithText("Input manual").assertIsDisplayed()
+    }
+
+    @Test fun measuresNativeHistoryLoadingAndScrollingOneThousandRecords() {
+        assumeTrue(InstrumentationRegistry.getArguments().getString("historyBenchmark") == "true")
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val context = instrumentation.targetContext
+        val directory = File(context.getExternalFilesDir(null), "history-1000").apply { mkdirs() }
+        fun graphics(suffix: String = ""): String = ParcelFileDescriptor.AutoCloseInputStream(
+            instrumentation.uiAutomation.executeShellCommand("dumpsys gfxinfo ${context.packageName}$suffix")
+        ).bufferedReader().use { it.readText() }
+
+        val dataset = (1..1_000).map { index ->
+            records.first().copy(id = "record-${index.toString().padStart(4, '0')}", notes = "Catatan $index")
+        }
+        val requests = mutableListOf<String?>()
+        show(dataset = dataset, pageFailure = { cursor ->
+            requests += cursor
+            if (requests.size == 2) ApiFailure(ApiFailureKind.NETWORK) else null
+        })
+        val list = compose.onNodeWithTag("history-list")
+        compose.onNodeWithText("20 catatan dimuat.").assertIsDisplayed()
+        compose.runOnIdle { assertEquals(listOf(null), requests) }
+
+        graphics(" reset")
+        val startPss = Debug.getPss()
+        val startedAt = SystemClock.elapsedRealtime()
+        list.performScrollToIndex(22)
+        compose.onNodeWithText("Muat catatan berikutnya").performClick()
+        compose.onNodeWithText("Catatan berikutnya belum bisa dimuat.").assertIsDisplayed()
+        list.performScrollToIndex(0)
+        compose.onNodeWithText("20 catatan dimuat.").assertIsDisplayed()
+        list.performScrollToIndex(22)
+        compose.onNodeWithText("Coba lagi").performClick()
+
+        for (loaded in 40 until 1_000 step 20) {
+            list.performScrollToIndex(loaded + 2)
+            compose.onNodeWithText("Muat catatan berikutnya").performClick()
+        }
+        list.performScrollToIndex(1_002)
+        compose.onNodeWithText("Semua catatan sudah dimuat.").assertIsDisplayed()
+        list.performScrollToIndex(1_001)
+        compose.onNodeWithText("Catatan 1").assertIsDisplayed()
+        list.performScrollToIndex(0)
+        compose.onNodeWithText("1.000 catatan dimuat.").assertIsDisplayed()
+        compose.onNodeWithText("Catatan 1000").assertIsDisplayed()
+        repeat(4) { list.performTouchInput { swipeUp() } }
+        repeat(4) { list.performTouchInput { swipeDown() } }
+        list.performScrollToIndex(0)
+        compose.runOnIdle {
+            assertEquals(51, requests.size)
+            assertEquals(requests[1], requests[2])
+            assertEquals(50, requests.distinct().size)
+        }
+        val elapsedMs = SystemClock.elapsedRealtime() - startedAt
+        val endPss = Debug.getPss()
+        File(directory, "gfxinfo.txt").writeText(graphics())
+        File(directory, "result.txt").writeText(
+            "records=1000\nrequests=51\nunique_cursors=50\nelapsed_ms=$elapsedMs\n" +
+                "start_pss_kib=$startPss\nend_pss_kib=$endPss\n"
+        )
+        captureUiPreview(compose, "history-1000", "history-1000", capturePanel = false)
     }
 
     private fun capture(name: String) {

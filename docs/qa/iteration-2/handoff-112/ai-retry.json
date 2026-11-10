@@ -1,0 +1,33 @@
+{
+  "run_id": "eabde786-eddd-47be-a4af-c6ed3502b85e",
+  "passed": true,
+  "fixture": {
+    "passed_steps": [
+      "register_owned_fixture",
+      "live_capabilities_and_catalog",
+      "received_real_detector_candidates",
+      "real_yolo_band_preserved_before_explicit_user_material_confirmation",
+      "server_requested_former_contents_returns_to_context",
+      "received_live_recommendation_response",
+      "gemini_replay_does_not_auto_save_or_award_xp",
+      "handoff_keeps_detection_valid_until_explicit_core_save",
+      "disk_restored_unknown_save_replays_once_after_detection_deletion",
+      "delete_reverses_log_and_derived_xp"
+    ],
+    "model_version": "broad-coco-b0f633193403",
+    "recommendation_status": "READY",
+    "provider": "gemini",
+    "prototype_only": false,
+    "raw_class": "bottle",
+    "band": "UNCERTAIN"
+  },
+  "cleanup_counts": {
+    "sessions": 0,
+    "waste_logs": 0,
+    "ai_operations": 0,
+    "ai_log_metadata": 0,
+    "users": 0,
+    "refresh_tokens": 0
+  },
+  "cleanup_complete": true
+}

@@ -18,9 +18,15 @@ import org.junit.Test
 class TalkBackNavigationTest {
     @Test fun readerReachesLabelsValidationAndSubmitAtLargeFont() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val arguments = InstrumentationRegistry.getArguments()
         assumeTrue("Run explicitly on a dedicated TalkBack-enabled emulator",
-            InstrumentationRegistry.getArguments().getString("talkback") == "true")
+            arguments.getString("talkback") == "true")
         assumeTrue(android.os.Build.VERSION.SDK_INT >= 36)
+        val (modifierKey, clickKey) = when (val keymap = arguments.getString("talkbackKeymap", "default")) {
+            "default" -> 4 to 40 // Alt + Enter
+            "enhanced" -> 8 to 44 // Action (Windows) + Space
+            else -> error("Unsupported TalkBack keymap: $keymap")
+        }
         instrumentation.targetContext.getSharedPreferences("dummy_session", android.content.Context.MODE_PRIVATE)
             .edit().clear().putBoolean("signed_out", true).commit()
         val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
@@ -45,7 +51,7 @@ class TalkBackNavigationTest {
                 InputDevice.getDevice(id)?.let { it.name == "WasteNot QA keyboard" && it.isExternal } == true
             } }
             fun shortcut(key: Int) {
-                send("""{"id":1,"command":"report","report":[4,0,$key,0,0,0,0,0]}""")
+                send("""{"id":1,"command":"report","report":[$modifierKey,0,$key,0,0,0,0,0]}""")
                 SystemClock.sleep(100)
                 send("""{"id":1,"command":"report","report":[0,0,0,0,0,0,0,0]}""")
                 SystemClock.sleep(250)
@@ -57,7 +63,7 @@ class TalkBackNavigationTest {
                 val password = seek(automation, { shortcut(79) }) { it.isEditable && it.isPassword }
                 setText(password, "short")
                 seek(automation, { shortcut(79) }) { text(it).trim() == "Masuk" }
-                shortcut(40)
+                shortcut(clickKey)
                 val error = "Kata sandi perlu 12–128 karakter, termasuk spasi."
                 await("password validation") { text(automation.rootInActiveWindow).contains(error) }
                 seek(automation, { shortcut(79) }) { text(it).contains(error) }

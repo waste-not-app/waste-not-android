@@ -1,0 +1,35 @@
+{
+  "run_id": "0b1f405a-28a7-4632-9909-ad621986daba",
+  "backend_release": "dc127354b7652c5e12bc2543838daa74d0fce443",
+  "original": {
+    "id": "14251a07-6b3e-4d97-a8fc-05ad59d7b230",
+    "generation": 1,
+    "revoked": false,
+    "refresh_tokens": 1,
+    "used_tokens": 0
+  },
+  "refreshed": {
+    "id": "14251a07-6b3e-4d97-a8fc-05ad59d7b230",
+    "generation": 3,
+    "revoked": false,
+    "refresh_tokens": 2,
+    "used_tokens": 1
+  },
+  "revoked": {
+    "id": "14251a07-6b3e-4d97-a8fc-05ad59d7b230",
+    "generation": 3,
+    "revoked": true,
+    "refresh_tokens": 2,
+    "used_tokens": 1
+  },
+  "passed": true,
+  "cleanup_counts": {
+    "sessions": 0,
+    "waste_logs": 0,
+    "ai_operations": 0,
+    "ai_log_metadata": 0,
+    "refresh_tokens": 0,
+    "users": 0
+  },
+  "cleanup_complete": true
+}
