@@ -2,6 +2,8 @@ package com.example.wastenot.ui.main
 
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.UiAutomation
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.SystemClock
 import android.os.ParcelFileDescriptor
@@ -24,6 +26,7 @@ class TalkBackNavigationTest {
             arguments.getString("talkback") == "true")
         assumeTrue(android.os.Build.VERSION.SDK_INT >= 36)
         val recordSpeech = arguments.getString("talkbackRecordSpeech") == "true"
+        val landscape = arguments.getString("talkbackLandscape") == "true"
         val (modifierKey, clickKey) = when (val keymap = arguments.getString("talkbackKeymap", "default")) {
             "default" -> 4 to 40 // Alt + Enter
             "enhanced" -> 8 to 44 // Action (Windows) + Space
@@ -58,42 +61,62 @@ class TalkBackNavigationTest {
                 send("""{"id":1,"command":"report","report":[0,0,0,0,0,0,0,0]}""")
                 SystemClock.sleep(250)
             }
-            ActivityScenario.launch(MainActivity::class.java).use {
-                await("login screen") { text(appRoot(automation)).contains("Belum punya akun?") }
-                val email = seek(automation, { shortcut(79) }) { it.isEditable && text(it).contains("Email") }
-                val passwordBeforeKeyboard = findNode(appRoot(automation)) { it.isEditable && it.isPassword }
-                // Set up the password field within the form after Gboard may have taken focus.
-                setText(email, "reader@example.invalid")
-                val password = awaitValue("password field visible") {
-                    findNode(appRoot(automation)) { it.isEditable && it.isPassword }
-                        ?: passwordBeforeKeyboard?.takeIf { it.refresh() }
-                        ?: run {
-                            findNode(appRoot(automation)) { it.isScrollable }
-                                ?.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
-                            null
-                        }
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                if (landscape) {
+                    scenario.onActivity { it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE }
+                    await("landscape activity orientation") {
+                        var orientation = Configuration.ORIENTATION_UNDEFINED
+                        scenario.onActivity { orientation = it.resources.configuration.orientation }
+                        orientation == Configuration.ORIENTATION_LANDSCAPE
+                    }
                 }
-                if (!password.isFocused) assertTrue(password.performAction(AccessibilityNodeInfo.ACTION_FOCUS))
-                assertTrue(password.performAction(AccessibilityNodeInfo.ACTION_CLICK))
-                await("password keyboard visible") { automation.windows.any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD } }
-                assertTrue(password.refresh())
-                setText(password, "short")
+                await("login screen") { text(appRoot(automation)).contains("Catat kebiasaanmu lagi.") }
+                fun isEmail(node: AccessibilityNodeInfo) = node.isEditable && text(node).contains("Email")
+                fun isPassword(node: AccessibilityNodeInfo) = node.isEditable && node.isPassword
+                seek(automation, { shortcut(79) }, ::isEmail)
+                val passwordBeforeKeyboard = findNode(appRoot(automation), ::isPassword)
+                // Set up the password field within the form after Gboard may have taken focus.
+                await("enter fixture email") {
+                    findNode(appRoot(automation), ::isEmail)?.let { setText(it, "reader@example.invalid") } == true
+                }
+                await("focus the password input") {
+                    val field = findNode(appRoot(automation), ::isPassword)
+                        ?: passwordBeforeKeyboard?.takeIf { it.refresh() }
+                    if (field == null) findNode(appRoot(automation)) { it.isScrollable }
+                        ?.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
+                    else if (!field.isFocused) field.performAction(AccessibilityNodeInfo.ACTION_FOCUS)
+                    field?.isFocused == true
+                }
+                fun keyboardVisible() = automation.windows.any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD }
+                await("password keyboard visible") {
+                    if (keyboardVisible()) return@await true
+                    findNode(appRoot(automation), ::isPassword)?.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                    false
+                }
+                await("enter fixture password") {
+                    findNode(appRoot(automation), ::isPassword)?.let { setText(it, "short") } == true
+                }
                 focusPasswordToggle(automation)
                 shortcut(79)
                 await("TalkBack moves from password visibility to Masuk") {
                     automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)?.let(::isSubmit) == true
                 }
-                assertTrue(automation.windows.any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD })
+                assertTrue(keyboardVisible())
                 if (recordSpeech) SystemClock.sleep(2_000)
                 shortcut(clickKey)
                 val error = "Kata sandi perlu 12–128 karakter, termasuk spasi."
                 await("password validation") { text(appRoot(automation)).contains(error) }
-                // Validation is placed above the submit action in the form's reading order.
-                seek(automation, { shortcut(80) }) { text(it).contains(error) }
+                if (landscape) await("landscape validation dismisses the keyboard") { !keyboardVisible() }
+                val focusedAfterSubmit = automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)
+                // Validation is between the password input and Masuk. Refocusing the invalid input
+                // can move TalkBack there automatically when the keyboard scrolls the form.
+                val towardValidation = if (focusedAfterSubmit?.let(::isSubmit) == true) 80 else 79
+                seek(automation, { shortcut(towardValidation) }) { text(it).contains(error) }
                 if (recordSpeech) SystemClock.sleep(5_000)
                 seek(automation, { shortcut(79) }) { isSubmit(it) }
                 assertTrue(manager.isTouchExplorationEnabled)
-                val file = java.io.File(instrumentation.targetContext.cacheDir, "qa/talkback-font200.png")
+                val fileName = if (landscape) "talkback-landscape-font200.png" else "talkback-font200.png"
+                val file = java.io.File(instrumentation.targetContext.cacheDir, "qa/$fileName")
                 file.parentFile!!.mkdirs()
                 val bitmap = checkNotNull(automation.takeScreenshot())
                 file.outputStream().use { check(bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)) }
@@ -143,11 +166,10 @@ class TalkBackNavigationTest {
         error("TalkBack did not reach the expected label/action: $observed")
     }
 
-    private fun setText(node: AccessibilityNodeInfo, value: String) {
-        assertTrue(node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
+    private fun setText(node: AccessibilityNodeInfo, value: String): Boolean =
+        node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
             putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, value)
-        }))
-    }
+        })
 
     private fun text(node: AccessibilityNodeInfo?): String {
         if (node == null) return ""

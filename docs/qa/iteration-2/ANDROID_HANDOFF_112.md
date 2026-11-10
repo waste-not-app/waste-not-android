@@ -34,6 +34,18 @@ adb shell settings put secure show_ime_with_hard_keyboard 1
 adb shell am instrument -w -e talkback true -e talkbackKeymap enhanced -e class com.example.wastenot.ui.main.TalkBackNavigationTest com.example.wastenot.test/com.example.wastenot.WasteNotTestRunner
 ```
 
+### Masuk di landscape
+
+Pada build awal, area form yang tersisa saat Gboard terbuka pada font 200% bisa memotong tombol Masuk di bawah kata sandi. Di layout landscape, tombol sekarang berada di samping kata sandi dan sejajar dengan bagian bawah pesan validasi. Grup traversal menjaga urutan kolom kata sandi, kontrol visibilitas, validasi, lalu Masuk. Jika validasi mengembalikan fokus ke kata sandi, layar menutup Gboard dan menggulir seperlunya agar pesan dan tombol bisa diperiksa. [Dokumentasi traversal Compose](https://developer.android.com/develop/ui/compose/accessibility/traversal)
+
+Enam pengulangan berturut-turut lulus di emulator Android 17/API 37, font 200%. Tes memastikan Activity benar-benar landscape. Dengan Gboard terbuka, satu langkah TalkBack dari Tampilkan kata sandi harus mencapai Masuk. Aktivasi menampilkan validasi kata sandi dan menutup Gboard. Tes menemukan pesan dari posisi fokus setelah submit, lalu maju untuk kembali ke Masuk. [Fokus setelah validasi](handoff-112/talkback-masuk-landscape-font200.png), [hasil native](handoff-112/talkback-masuk-landscape.log)
+
+```sh
+adb shell wm user-rotation lock 1
+adb shell am instrument -w -e talkback true -e talkbackKeymap enhanced -e talkbackLandscape true -e class com.example.wastenot.ui.main.TalkBackNavigationTest com.example.wastenot.test/com.example.wastenot.WasteNotTestRunner
+adb shell wm user-rotation free
+```
+
 ## Checkpoint S14
 
 Kartu streak mengikuti mockup S14 dengan ikon jam dekoratif, gradien Lime dan judul hari beruntun. Rekor terbaik serta dasar zona akun tetap tersedia. Nilai nol dan nilai yang belum tersedia dibedakan, termasuk ketika server hanya memberi satu dari dua nilai. Streak positif menampilkan status pencatatan hari ini dari server.

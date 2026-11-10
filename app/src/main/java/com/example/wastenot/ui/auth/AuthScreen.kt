@@ -1,5 +1,6 @@
 package com.example.wastenot.ui.auth
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,19 +25,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -68,12 +76,29 @@ fun AuthScreen(
     onBack: (() -> Unit)? = null,
 ) {
     val focus = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
     val requesters = remember { AccountField.entries.associateWith { FocusRequester() } }
+    val landscapeLogin = !register && LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val submitRequester = remember { BringIntoViewRequester() }
     LaunchedEffect(state.focusRequest) {
         val first = state.errors.keys.firstOrNull() ?: state.serverFields.firstOrNull()
         if (state.focusRequest > 0 && first != null) requesters.getValue(first).requestFocus()
+        if (landscapeLogin && first == AccountField.PASSWORD) {
+            // Make room for validation and the retry action in the short landscape viewport.
+            keyboard?.hide()
+            withFrameNanos { }
+            submitRequester.bringIntoView()
+        }
     }
     val next = KeyboardActions(onNext = { focus.moveFocus(FocusDirection.Next) }, onDone = { onSubmit() })
+    val passwordField: @Composable (Modifier) -> Unit = { placement ->
+        AuthField(
+            AccountField.PASSWORD, state, requesters.getValue(AccountField.PASSWORD), onChange,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = if (register) ImeAction.Next else ImeAction.Done),
+            keyboardActions = next, contentType = if (register) ContentType.NewPassword else ContentType.Password,
+            modifier = placement, passwordHint = register,
+        )
+    }
 
     Box(modifier, contentAlignment = Alignment.TopCenter) {
         Column(
@@ -137,12 +162,22 @@ fun AuthScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                     keyboardActions = next, contentType = ContentType.EmailAddress, modifier = Modifier.fillMaxWidth(),
                 )
-                AuthField(
-                    AccountField.PASSWORD, state, requesters.getValue(AccountField.PASSWORD), onChange,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = if (register) ImeAction.Next else ImeAction.Done),
-                    keyboardActions = next, contentType = if (register) ContentType.NewPassword else ContentType.Password, modifier = Modifier.fillMaxWidth(),
-                    passwordHint = register,
-                )
+                if (landscapeLogin) {
+                    state.failure?.let { MessageBanner(stringResource(it.messageResource), isError = true) }
+                    Row(
+                        modifier = Modifier.fillMaxWidth().semantics { isTraversalGroup = true },
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.Bottom,
+                    ) {
+                        passwordField(Modifier.weight(1f).semantics { isTraversalGroup = true })
+                        AuthSubmit(false, state.submitting, onSubmit,
+                            Modifier.widthIn(min = 128.dp, max = 160.dp)
+                                .bringIntoViewRequester(submitRequester)
+                                .semantics { traversalIndex = 1f })
+                    }
+                } else {
+                    passwordField(Modifier.fillMaxWidth())
+                }
                 if (register) {
                     AuthField(
                         AccountField.PASSWORD_CONFIRMATION, state, requesters.getValue(AccountField.PASSWORD_CONFIRMATION), onChange,
@@ -151,19 +186,26 @@ fun AuthScreen(
                     )
                     Text(stringResource(R.string.account_timezone, state.timezone.id), style = MaterialTheme.typography.bodyMedium)
                 }
-                state.failure?.let { MessageBanner(stringResource(it.messageResource), isError = true) }
-                ActionButton(
-                    label = stringResource(if (register) R.string.register_action else R.string.login_action),
-                    onClick = onSubmit,
-                    loading = state.submitting,
-                    loadingLabel = stringResource(if (register) R.string.register_loading else R.string.login_loading),
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                if (!landscapeLogin) {
+                    state.failure?.let { MessageBanner(stringResource(it.messageResource), isError = true) }
+                    AuthSubmit(register, state.submitting, onSubmit, Modifier.fillMaxWidth())
+                }
             }
             TextActionButton(stringResource(if (register) R.string.go_to_login else R.string.go_to_register),
                 onSwitchForm, Modifier.fillMaxWidth(), enabled = !state.submitting)
         }
     }
+}
+
+@Composable
+private fun AuthSubmit(register: Boolean, submitting: Boolean, onSubmit: () -> Unit, modifier: Modifier) {
+    ActionButton(
+        label = stringResource(if (register) R.string.register_action else R.string.login_action),
+        onClick = onSubmit,
+        loading = submitting,
+        loadingLabel = stringResource(if (register) R.string.register_loading else R.string.login_loading),
+        modifier = modifier,
+    )
 }
 
 @Composable
