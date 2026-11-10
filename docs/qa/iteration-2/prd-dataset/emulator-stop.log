@@ -1,0 +1,16 @@
+Nov 09 22:13:09 oktaavsm emulator[49221]: INFO         | Boot completed in 170746 ms
+Nov 09 22:13:09 oktaavsm emulator[49221]: INFO         | Increasing screen off timeout, logcat buffer size to 2M.
+Nov 09 22:21:07 oktaavsm systemd[5970]: Stopping wastenot-qa-api37-prd-dataset-20261109.service - [systemd-run] /home/oktaavsm/Android/Sdk/emulator/emulator -avd wastenot_api37_core -port 5564 -no-window -no-audio -no-snapshot-load -no-snapshot-save -no-boot-anim -gpu swiftshader -memory 1536 -cores 2 -camera-back none -camera-front none...
+Nov 09 22:21:08 oktaavsm emulator[49221]: INFO         | Wait for emulator (pid 49221) 20 seconds to shutdown gracefully before kill;you can set environment variable ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL(in seconds) to change the default value (20 seconds)
+Nov 09 22:21:08 oktaavsm emulator[49221]: WARNING      | Netsim Wifi ipv6:%5B::1%5D:44763 is gone due to CANCELLED
+Nov 09 22:21:08 oktaavsm emulator[49221]: USER_INFO    | Snapshots have been disabled by the user, save request is ignored.
+Nov 09 22:21:08 oktaavsm emulator[55682]: [55682:55682:20261109,222108.673952:WARNING crashpad_client_linux.cc:431] prctl: Invalid argument (22)
+Nov 09 22:21:08 oktaavsm emulator[49221]: INFO         | Saving snapshot 'default_boot' took 0 ms
+Nov 09 22:21:08 oktaavsm emulator[49221]: INFO         | ipv6:%5B::1%5D:44763: Got goaway [2] err=UNAVAILABLE:GOAWAY received; Error code: 2; Debug Text: Cancelling all calls {http2_error:2}
+Nov 09 22:21:09 oktaavsm emulator[49221]: ERROR        | stop: Not implemented
+Nov 09 22:21:09 oktaavsm emulator[49221]: WARNING      | Emulator client has not yet been configured.. Call configure me first!
+Nov 09 22:21:10 oktaavsm emulator[49221]: INFO         | removeAll
+Nov 09 22:21:12 oktaavsm systemd[5970]: wastenot-qa-api37-prd-dataset-20261109.service: Main process exited, code=dumped, status=11/SEGV
+Nov 09 22:21:13 oktaavsm systemd[5970]: wastenot-qa-api37-prd-dataset-20261109.service: Failed with result 'core-dump'.
+Nov 09 22:21:13 oktaavsm systemd[5970]: Stopped wastenot-qa-api37-prd-dataset-20261109.service - [systemd-run] /home/oktaavsm/Android/Sdk/emulator/emulator -avd wastenot_api37_core -port 5564 -no-window -no-audio -no-snapshot-load -no-snapshot-save -no-boot-anim -gpu swiftshader -memory 1536 -cores 2 -camera-back none -camera-front none.
+Nov 09 22:21:13 oktaavsm systemd[5970]: wastenot-qa-api37-prd-dataset-20261109.service: Consumed 11min 27.757s CPU time over 10min 58.002s wall clock time, 3G memory peak, 1.3G memory swap peak.

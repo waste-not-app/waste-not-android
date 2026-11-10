@@ -1,0 +1,7 @@
+{
+  "action": "Wait",
+  "package": "android",
+  "title": "System UI isn't responding",
+  "bounds": "[75,1038][1005,1182]",
+  "before_app_test": true
+}

@@ -1,0 +1,12 @@
+{
+  "url": "https://oktaavsm.bccdev.id/wastenot/apk/wastenot-v1.0.0-b13.apk",
+  "source_commit": "e6098bcd605a2756a1c54c8cec239c9cd748f45a",
+  "release_run": 42641391040,
+  "release_conclusion": "success",
+  "sha256": "72b9f2d16bc04dcd7d8953617e69dfaa9748e92dc8cd149d5009cfe68ac5a183",
+  "bytes": 36408543,
+  "certificate_sha256": "b252b1b72bcded6b280a090a34e4451cefad8ca7fdee34b6ad6450226df1d121",
+  "minimum_sdk_gate": true,
+  "remote_adapters_gate": true,
+  "scope": "Public signed APK downloaded and verified; runtime checkpoint uses source-equivalent debug/staging APKs, not instrumentation of this release APK"
+}

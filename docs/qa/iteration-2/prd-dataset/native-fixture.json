@@ -1,0 +1,21 @@
+{
+  "run_id": "aed17e11-6d3e-4ad8-a59b-28e786e47be8",
+  "email": "prd-aed17e11-6d3e-4ad8-a59b-28e786e47be8@example.test",
+  "name": "Android PRD probe",
+  "user_id": "4a5bacef-c95c-42ff-b02d-ad907b142d60",
+  "passed_steps": [
+    "register_real_account",
+    "server_prd_totals_daily_categories_methods_and_progress",
+    "recreated_activity_reads_real_server_dataset",
+    "ui_prd_home_week_month_daily_categories_methods_profile_light",
+    "ui_prd_home_week_month_daily_categories_methods_profile_dark"
+  ],
+  "server_today": "2026-11-09",
+  "log_ids": [
+    "a357c81c-484e-4599-b8cc-ee5755efa0b0",
+    "81c3d80c-59b9-41a5-b257-670dbc653d97",
+    "c8cd1ddf-60b8-41a1-9e78-9c183d54bdba",
+    "7951d1d7-57b6-4fb7-87ee-9a92127d6a1f",
+    "73311bd9-9026-4ad8-9496-035c8f971d36"
+  ]
+}
