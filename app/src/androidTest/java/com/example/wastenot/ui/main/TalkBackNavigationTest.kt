@@ -8,6 +8,7 @@ import android.os.ParcelFileDescriptor
 import android.view.InputDevice
 import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityWindowInfo
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.MainActivity
@@ -61,13 +62,22 @@ class TalkBackNavigationTest {
                 val email = seek(automation, { shortcut(79) }) { it.isEditable && text(it).contains("Email") }
                 setText(email, "reader@example.invalid")
                 val password = seek(automation, { shortcut(79) }) { it.isEditable && it.isPassword }
+                shortcut(clickKey)
+                await("password keyboard visible") { automation.windows.any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD } }
+                assertTrue(password.refresh())
                 setText(password, "short")
-                seek(automation, { shortcut(79) }) { text(it).trim() == "Masuk" }
+                focusPasswordToggle(automation)
+                shortcut(79)
+                await("TalkBack moves from password visibility to Masuk") {
+                    automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)?.let(::isSubmit) == true
+                }
+                assertTrue(automation.windows.any { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD })
                 shortcut(clickKey)
                 val error = "Kata sandi perlu 12–128 karakter, termasuk spasi."
-                await("password validation") { text(automation.rootInActiveWindow).contains(error) }
-                seek(automation, { shortcut(79) }) { text(it).contains(error) }
-                seek(automation, { shortcut(79) }) { text(it).trim() == "Masuk" }
+                await("password validation") { text(appRoot(automation)).contains(error) }
+                // Validation is placed above the submit action in the form's reading order.
+                seek(automation, { shortcut(80) }) { text(it).contains(error) }
+                seek(automation, { shortcut(79) }) { isSubmit(it) }
                 assertTrue(manager.isTouchExplorationEnabled)
                 val file = java.io.File(instrumentation.targetContext.cacheDir, "qa/talkback-font200.png")
                 file.parentFile!!.mkdirs()
@@ -77,6 +87,26 @@ class TalkBackNavigationTest {
             }
         } finally { keyboard.close(); pipe[0].close() }
     }
+
+    private fun appRoot(automation: UiAutomation) = automation.windows.firstOrNull {
+        it.type == AccessibilityWindowInfo.TYPE_APPLICATION && it.root?.packageName == "com.example.wastenot"
+    }?.root
+
+    private fun focusPasswordToggle(automation: UiAutomation) {
+        fun toggle(node: AccessibilityNodeInfo?): AccessibilityNodeInfo? {
+            if (node == null || node.contentDescription == "Tampilkan kata sandi") return node
+            return (0 until node.childCount).firstNotNullOfOrNull { toggle(node.getChild(it)) }
+        }
+        await("password visibility action") { toggle(appRoot(automation))?.isVisibleToUser == true }
+        // Setting text can move accessibility focus to Gboard. Start traversal from the last form control.
+        val node = checkNotNull(toggle(appRoot(automation)))
+        if (!node.isAccessibilityFocused) assertTrue(node.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS))
+        await("TalkBack focus returned to the form") {
+            automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)?.contentDescription == "Tampilkan kata sandi"
+        }
+    }
+
+    private fun isSubmit(node: AccessibilityNodeInfo) = node.isClickable && node.isEnabled && text(node).trim() == "Masuk"
 
     private fun seek(automation: UiAutomation, next: () -> Unit, predicate: (AccessibilityNodeInfo) -> Boolean): AccessibilityNodeInfo {
         val observed = linkedSetOf<String>()

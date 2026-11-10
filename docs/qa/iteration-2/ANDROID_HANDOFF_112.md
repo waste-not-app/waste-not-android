@@ -6,7 +6,7 @@
 
 | Layar | Bukti yang tersedia | Review yang masih dibutuhkan |
 | --- | --- | --- |
-| S01–S03 | [Startup](STARTUP.md), [Masuk/Daftar](NAV_AUTH.md), [footer daftar](SECONDARY_SCREEN_REVIEW.md), [refresh dan revocation pada root](#checkpoint-sesi-dan-konflik-versi) | Urutan fokus lisan saat validasi dan IME aktif. |
+| S01–S03 | [Startup](STARTUP.md), [Masuk/Daftar](NAV_AUTH.md), [footer daftar](SECONDARY_SCREEN_REVIEW.md), [refresh dan revocation pada root](#checkpoint-sesi-dan-konflik-versi), [TalkBack pada Masuk](#checkpoint-talkback-masuk) | Penerimaan ucapan aktual dan alur Daftar dengan TalkBack. |
 | S04–S06, S08–S09 | [Bagian bawah konten](SCROLLED_CONTENT.md), [editor](EDITOR.md), [simpan](SAVE.md), [detail/Back](DETAIL.md), [konflik versi nyata](#checkpoint-sesi-dan-konflik-versi) | Ulangi hasil write yang belum pasti dengan putus koneksi aktual pada stack produksi. |
 | S07, S10 | [Filter, halaman berikut, Back dan refresh](HISTORY_API.md), [baseline native 1.000 catatan](#checkpoint-riwayat-1000-catatan) | Profil ulang di perangkat fisik pada build yang representatif untuk distribusi. |
 | S11–S12 | [Daftar kosong dari backend dan detail dengan fixture](GUIDE_API.md), [pencarian dan prefill](GUIDE.md). Pemeriksaan ulang 10 November menemukan 0 artikel PUBLISHED. | Detail artikel PUBLISHED, sumber dan prefill dari katalog produksi. |
@@ -17,7 +17,20 @@
 
 Regresi pada API 35 menjalankan 15 metode `ScreenKitReviewTest`, `SessionRootTest` dan dua kasus `ScanSheetTest`. Empat belas lulus, termasuk scroll konten, dock, pemulihan sesi terkontrol, expiry scan dan jalur manual. Satu tes gabungan editor/filter/dialog berhenti saat Android menolak injeksi sentuhan ke window. Metode yang sama lulus saat dijalankan sendiri pada API 37 dalam 60,15 detik.
 
-Pada API 37 dengan font 200%, TalkBack 17 bergerak melalui Email dan Kata sandi menggunakan Enhanced keymap. Fokus berikutnya melewati Masuk dan masuk ke footer/keyboard. Penerimaan fokus CTA, pesan validasi dan pembacaan lisan tetap terbuka. `TalkBackNavigationTest` menerima `-e talkbackKeymap enhanced` untuk mengulang konfigurasi tersebut. [Pintasan TalkBack](https://support.google.com/accessibility/android/answer/6110948?hl=en)
+Regresi lanjutan di API 37 lulus 18 tes. Ini mencakup pemulihan sesi dan submit IME, alternatif teks grafik dan unit jumlah, pilihan objek/material, expiry, serta langkah dan sumber saat saran AI belum tersedia. [Hasil native](handoff-112/followup-emulator.log)
+
+## Checkpoint TalkBack Masuk
+
+Di emulator Android 17/API 37, font 200%, 1080×2400 px dan 420 dpi, tes lama terkadang mulai mencari tombol saat fokus sudah pindah ke Gboard. Probe pada APK aplikasi awal juga lulus ketika IME belum terbuka. Saat Gboard terbuka, tombol dapat terlihat di viewport aplikasi ketika TalkBack sedang menelusuri window keyboard.
+
+`TalkBackNavigationTest` sekarang membuka IME dan menunggu sampai terlihat, lalu mengembalikan fokus aksesibilitas ke kontrol Tampilkan kata sandi. TalkBack 17 dengan Enhanced keymap harus mencapai tombol Masuk yang dapat diaktifkan pada langkah maju berikutnya. Tes mengaktifkan tombol, memeriksa pesan validasi kata sandi di window aplikasi, lalu memakai langkah mundur untuk mencapai pesan di atas tombol dan langkah maju untuk kembali ke Masuk. Tiga pengulangan lulus dengan Gboard terbuka dan font 200%. Perubahan ada pada driver pengujian. Pengujian ini memeriksa layanan TalkBack, fokus dan aksi aksesibilitas. Verifikasi ucapan yang terdengar tetap terbuka. [Screenshot](handoff-112/talkback-masuk-font200.png), [hasil native](handoff-112/talkback-masuk-native.log), [pintasan TalkBack](https://support.google.com/accessibility/android/answer/6110948?hl=en)
+
+APK debug SHA-256 `4adc2a89ddf20c48ee3293a153fed1e5e3d8c9b844f3b08e46d3f537ef7ff5b8`. APK penguji SHA-256 `fa5d6beb5d62802a43a9af537c25ba033983f3618f68647accfee598671995e8`. Pada emulator QA dengan TalkBack Enhanced aktif, font 200%, Gboard dan kedua APK terpasang, jalankan perintah berikut.
+
+```sh
+adb shell settings put secure show_ime_with_hard_keyboard 1
+adb shell am instrument -w -e talkback true -e talkbackKeymap enhanced -e class com.example.wastenot.ui.main.TalkBackNavigationTest com.example.wastenot.test/com.example.wastenot.WasteNotTestRunner
+```
 
 ## Checkpoint S14
 
@@ -92,7 +105,7 @@ Pengulangan eksplisit memakai akun baru dan lulus dalam 13,87 detik. Gemini memb
 | AT-21 | Terverifikasi | [Dataset PRD](PRD_DATASET_LIVE.md) membuktikan periode 7/30, rentang, agregat dan chart. |
 | AT-22 | Terverifikasi dengan jam terkontrol | [Pergantian hari](ACCOUNT_DAY_ROLLOVER.md) membuktikan refresh tanggal akun, periode, draf dan status streak pada respons terkontrol. |
 | AT-23 | Parsial | [Pemulihan write](WRITE_RECOVERY.md) membuktikan PID berubah dan draf/UUID tetap tersedia pada fixture. [Isolasi](ACCOUNT_ISOLATION.md) membuktikan kepemilikan draf dengan akun nyata. Tambahkan pemeriksaan password dan process death dalam alur remote yang sama. |
-| AT-24–25 | Parsial | [Footer/tema](SECONDARY_SCREEN_REVIEW.md), [fokus keyboard](KEYBOARD_FOCUS.md), dan [editor](EDITOR.md) memberi bukti terpisah. Jalankan TalkBack dengan verifikasi ucapan serta kombinasi landscape/IME/font 200%. |
+| AT-24–25 | Parsial | [TalkBack Masuk](#checkpoint-talkback-masuk) memverifikasi fokus dan validasi pada font 200% dengan Gboard aktif. [Footer/tema](SECONDARY_SCREEN_REVIEW.md), [fokus keyboard](KEYBOARD_FOCUS.md), dan [editor](EDITOR.md) memberi bukti terpisah. Verifikasi ucapan dan kombinasi landscape/IME/font 200% untuk perjalanan lain masih terbuka. |
 | AT-26 | Parsial | [Riwayat API](HISTORY_API.md) membuktikan 22 catatan backend di MainActivity. [Benchmark native](#checkpoint-riwayat-1000-catatan) mencatat jank dan PSS untuk 1.000 catatan fixture. Pengukuran perangkat fisik dan pagination 1.000 catatan backend masih terbuka. |
 
 ## Scan AI
