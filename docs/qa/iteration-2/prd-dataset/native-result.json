@@ -1,0 +1,111 @@
+{
+  "run_id": "aed17e11-6d3e-4ad8-a59b-28e786e47be8",
+  "complete": true,
+  "cleanup_complete": true,
+  "started_at_utc": "2026-11-09T15:18:07.949041+00:00",
+  "before_count": 0,
+  "display_before": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "passed_steps": [
+    "register_real_account",
+    "server_prd_totals_daily_categories_methods_and_progress",
+    "recreated_activity_reads_real_server_dataset",
+    "ui_prd_home_week_month_daily_categories_methods_profile_light",
+    "ui_prd_home_week_month_daily_categories_methods_profile_dark"
+  ],
+  "owned_users": [
+    {
+      "id": "4a5bacef-c95c-42ff-b02d-ad907b142d60",
+      "email": "prd-aed17e11-6d3e-4ad8-a59b-28e786e47be8@example.test",
+      "name": "Android PRD probe"
+    }
+  ],
+  "owned_session_ids": [
+    "c281af52-38ec-434a-99f2-d20cec0853a0"
+  ],
+  "database_before_cleanup": {
+    "users": 1,
+    "refresh_tokens": 1,
+    "sessions": 1,
+    "waste_logs": 5,
+    "ai_operations": 0,
+    "ai_log_metadata": 0
+  },
+  "database_after_cleanup": {
+    "users": 0,
+    "refresh_tokens": 0,
+    "sessions": 0,
+    "waste_logs": 0,
+    "ai_operations": 0,
+    "ai_log_metadata": 0
+  },
+  "captures": [
+    {
+      "file": "home-dark.png",
+      "sha256": "306cdf06df1af6f6ac2545bb43cf79558829d8244ab1ea93c8eac715a3ade4ca"
+    },
+    {
+      "file": "home-light.png",
+      "sha256": "8f5b3e9d44ae3834519e65104a7abbef096756c2dd09fd980c51af786ee7eb49"
+    },
+    {
+      "file": "profile-dark.png",
+      "sha256": "287fd7967c8f154b2deb32a9e76e789bcd571cd3a7bbcabf8d6bddc133c4b18f"
+    },
+    {
+      "file": "profile-light.png",
+      "sha256": "c3125cdc851bfe94abbfcbeffeb03d60b093fea3762ba20eeb4c76651a7a81a5"
+    },
+    {
+      "file": "statistics-categories-dark.png",
+      "sha256": "9d34798b4ac67bed2ac5c84a89f329a0b563f202d521a0cebc993d2289050a23"
+    },
+    {
+      "file": "statistics-categories-light.png",
+      "sha256": "af0bec7f8088f33f3e322e7e5b8c3c9916d145c9c1cd2fbb6dd6b72eb82232d5"
+    },
+    {
+      "file": "statistics-daily-dark.png",
+      "sha256": "0f6e2a01ec10f576bda98e4db0a0bff7308c2a7b0877eabcaa17be24e6736748"
+    },
+    {
+      "file": "statistics-daily-light.png",
+      "sha256": "f7198cd8551023d3742e2b5a78909e862ae821173efb16e9e025cf186d373e31"
+    },
+    {
+      "file": "statistics-methods-dark.png",
+      "sha256": "ce14a92c640a732de98e08fafeaabff6c1b5cf4983ff60ca434cd32586a3f1c9"
+    },
+    {
+      "file": "statistics-methods-light.png",
+      "sha256": "36ac6145812268dd9b6f202e7d70f7bc5cbbe3e5409e1ac29c6858854aad9b02"
+    },
+    {
+      "file": "statistics-month-dark.png",
+      "sha256": "3a233986acebbc550fefd292d58f435e4e3b5c25ecb98eacb75a743d9b426840"
+    },
+    {
+      "file": "statistics-month-light.png",
+      "sha256": "242aa1f97170ef71d4ba6269f822ee35323cb58bbe065d04909d3ee04bbf407e"
+    },
+    {
+      "file": "statistics-week-dark.png",
+      "sha256": "99313e9a96f6512d61bafa0e4ff5b1e73b52bdedf5aeed7109a669a44e89f514"
+    },
+    {
+      "file": "statistics-week-light.png",
+      "sha256": "90ff30a6217ef03b9bdd82f2dd46d66bc08d76a405402f3c495585ead2e6e8cf"
+    }
+  ],
+  "display_after": {
+    "size": "Physical size: 1080x1920",
+    "density": "Physical density: 480",
+    "font": "1.0",
+    "night": "no"
+  },
+  "finished_at_utc": "2026-11-09T15:20:17.758060+00:00"
+}

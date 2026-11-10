@@ -1,0 +1,24 @@
+{
+  "source_commit": "e6098bcd605a2756a1c54c8cec239c9cd748f45a",
+  "production_artifact_source_commit": "cf4b420952289dc2bf697b89657d74f7349015bf",
+  "note": "Main merge preserves the exact production sources of the accepted account-day debug/staging artifacts; this branch adds only an opt-in native test.",
+  "debug": {
+    "file": "app-prd-dataset.apk",
+    "bytes": 48398424,
+    "sha256": "91f92558709a3b4c04fbad6889d0df92dd20da78b271e57fdff6399009ffb82e"
+  },
+  "staging": {
+    "file": "app-prd-dataset-staging.apk",
+    "bytes": 36408555,
+    "sha256": "f65e9f9a6fddc18bc4635a1d52a5d79306e7e234942514620d5e5fd5eb3113ff"
+  },
+  "androidTest": {
+    "file": "test-prd-dataset.apk",
+    "bytes": 5885131,
+    "sha256": "2ae2c9704933786ead2413b42a47bebc90e4498e283fb26b7e56cfb71add066a"
+  },
+  "test_source": {
+    "file": "app/src/androidTest/java/com/example/wastenot/ui/main/RemotePrdDatasetTest.kt",
+    "sha256": "08da9b3020064b7635ad42b641c7e3a4bcb82e80f911109a14fd448548228d9c"
+  }
+}

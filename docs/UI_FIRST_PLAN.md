@@ -144,3 +144,9 @@ APK publik main `f98dcf2` versi `1.0.0-b9` berhasil diunduh dan lolos signature 
 ## Pergantian hari akun, 9 November 2026
 
 [Checkpoint AT-22/S14](qa/iteration-2/ACCOUNT_DAY_ROLLOVER.md) memperbaiki tanggal yang tertinggal saat tengah malam/resume dan penjelasan streak kemarin. Draf lama dipertahankan, draf baru memakai tanggal baru, dan periode 7/30 hari tetap dipilih. Dua baseline gagal pada perilaku yang dituju; 274 unit tests serta enam eksekusi native akhir API37 dua tema lulus. Dari 20 capture, 19 diterima dan satu frame kosong fixture dikecualikan dengan bukti keadaan sama pada perjalanan navigasi. APK staging baru lolos upgrade/startup sambil mempertahankan Gelap. Ini bukti Android dengan Clock terkontrol; AT-10 backend, matriks aksesibilitas/performa dan penerimaan penuh tetap terpisah.
+
+## Dataset PRD dengan backend nyata, 9 November 2026
+
+[Checkpoint AT-10](qa/iteration-2/PRD_DATASET_LIVE.md) memakai satu akun khusus dan lima log API nyata. Satu metode MainActivity API37 lulus pada percobaan pertama dalam dua tema: Beranda 650 g, periode 7/30 hari 1.400 g, dua benda dihindari terpisah, rate 50%, rincian harian/kategori/metode serta Profil 50 XP/streak dua hari. Empat belas frame asli ditinjau. Akun/sesi/token/log/operasi AI probe dibersihkan dan enam hitungan akhir nol.
+
+Source aplikasi sama dengan main e6098bc setelah merge PR #111. Rilis publik b13 sudah diunduh dan lolos signature/gate paket; APK staging yang sudah diterima tetap berlaku karena checkpoint ini tidak mengubah produk. Status CI main dan CI perubahan baru dirujuk pada QA/PR. Perbedaan rincian streak terhadap callout mockup masih dicatat untuk penerimaan visual akhir; font/TalkBack, performa dan kriteria terbuka lain belum ditutup oleh AT-10.

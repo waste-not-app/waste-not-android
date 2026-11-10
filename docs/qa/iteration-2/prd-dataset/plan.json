@@ -1,0 +1,9 @@
+{
+  "run_id": "aed17e11-6d3e-4ad8-a59b-28e786e47be8",
+  "email": "prd-aed17e11-6d3e-4ad8-a59b-28e786e47be8@example.test",
+  "name": "Android PRD probe",
+  "backend": "https://pred-autoscaler.bccdev.id/wastenot/api/v1/",
+  "timezone": "Asia/Jakarta",
+  "scope": "AT-10 native MainActivity, five real API logs relative to server today; both themes, 7/30-day summaries, profile XP/streak; no backend deploy/restart or device/server clock change",
+  "cleanup": "Only unique probe email/name and recorded user UUID; capture session IDs before deletion to verify refresh_tokens via session_id"
+}
