@@ -61,19 +61,27 @@ class ProfileDesignTest {
         } }
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
-            compose.onNodeWithText("3 hari").performScrollTo().assertIsDisplayed()
-            compose.onNodeWithText("7 hari").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("3 hari beruntun").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Kamu sudah mencatat hari ini.").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Terbaik: 7 hari").performScrollTo().assertIsDisplayed()
             captureUiPreview(compose, "S14-streak-${if (theme) "dark" else "light"}", "backend-contract-preview")
         }
         compose.runOnIdle { progress = progress!!.copy(currentStreak = null) }
-        compose.onNodeWithText("Saat ini").assertDoesNotExist()
-        compose.onNodeWithText("7 hari").assertExists()
+        compose.onNodeWithText("3 hari beruntun").assertDoesNotExist()
+        compose.onNodeWithText("Kamu sudah mencatat hari ini.").assertDoesNotExist()
+        compose.onNodeWithText("Terbaik: 7 hari").assertExists()
+        compose.runOnIdle { progress = progress!!.copy(currentStreak = 3, bestStreak = null, hasLoggedToday = false) }
+        compose.onNodeWithText("3 hari beruntun").assertExists()
+        compose.onNodeWithText("Belum mencatat hari ini.").assertExists()
+        compose.onNodeWithText("Terbaik:", substring = true).assertDoesNotExist()
         compose.runOnIdle { progress = UserProgress(0, 0, 1, 0, 100, 0, 0, false) }
-        compose.onAllNodesWithText("0 hari").assertCountEquals(2)
+        compose.onNodeWithText("0 hari beruntun").assertExists()
+        compose.onNodeWithText("Terbaik: 0 hari").assertExists()
+        compose.onNodeWithText("Belum mencatat hari ini.").assertDoesNotExist()
         captureUiPreview(compose, "S14-streak-zero", "backend-contract-preview")
         compose.runOnIdle { progress = progress!!.copy(currentStreak = null, bestStreak = null) }
         compose.onNodeWithText("Hari berturut-turut").assertDoesNotExist()
-        compose.onAllNodesWithText("0 hari").assertCountEquals(0)
+        compose.onAllNodesWithText("0 hari", substring = true).assertCountEquals(0)
         captureUiPreview(compose, "S14-streak-unknown", "backend-contract-preview")
     }
 
