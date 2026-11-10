@@ -71,15 +71,7 @@ class LocalBackendCoreTest {
 
     @Test fun savesRecycleRecordBeforeProcessRestart() = runTest(timeout = 3.minutes) {
         val runId = requireLocalProbe()
-        assertSignedOut()
-        register("record-$runId@example.test", UUID.randomUUID().toString())
-        waitFor("Input manual")
-        tap("Input manual")
-        tap("Recycle")
-        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
-        compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
-        fill("Berat", "250")
-        fill("Catatan (opsional)", "Catatan QA $runId")
+        createRecycleDraft(runId)
         tap("Simpan catatan")
         waitFor("+10 XP untuk aktivitas baru ini.")
         val logId = verifyOnlySavedRecord(runId)
@@ -113,11 +105,30 @@ class LocalBackendCoreTest {
         }
     }
 
-    private fun requireLocalProbe(): UUID {
+    @Test fun replaysCommittedWriteAfterConnectionDrops() = runTest(timeout = 3.minutes) {
+        val runId = requireLocalProbe(port = 18091)
+        try {
+            createRecycleDraft(runId)
+            tap("Simpan catatan")
+            waitFor("Hasil penyimpanan belum diketahui. Coba lagi dengan isian awal sebelum mengubah catatan.")
+            compose.onNodeWithContentDescription("Berat").performScrollTo().assertTextContains("250")
+            captureUiPreview(compose, "unknown-outcome", "local-write-recovery", capturePanel = false)
+
+            tap("Coba lagi")
+            waitFor("Catatanmu sudah tersimpan. Tidak ada XP tambahan.")
+            val logId = verifyOnlySavedRecord(runId)
+            println("CORE_WRITE_REPLAYED log=$logId")
+            captureUiPreview(compose, "replayed-write", "local-write-recovery", capturePanel = false)
+        } finally {
+            if (container.sessions.state.value is SessionState.Authenticated) container.sessions.logout()
+        }
+    }
+
+    private fun requireLocalProbe(port: Int = 18089): UUID {
         val arguments = InstrumentationRegistry.getArguments()
         assumeTrue(arguments.getString("verifyLocalCore") == "true")
         assertTrue(BuildConfig.DEBUG)
-        assertEquals("http://10.0.2.2:18089/v1/", BuildConfig.API_BASE_URL)
+        assertEquals("http://10.0.2.2:$port/v1/", BuildConfig.API_BASE_URL)
         return UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
     }
 
@@ -128,6 +139,18 @@ class LocalBackendCoreTest {
         fill("Kata sandi", password)
         fill("Konfirmasi kata sandi", password)
         tap("Buat akun")
+    }
+
+    private suspend fun createRecycleDraft(runId: UUID) {
+        assertSignedOut()
+        register("record-$runId@example.test", UUID.randomUUID().toString())
+        waitFor("Input manual")
+        tap("Input manual")
+        tap("Recycle")
+        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
+        compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
+        fill("Berat", "250")
+        fill("Catatan (opsional)", "Catatan QA $runId")
     }
 
     private suspend fun assertSignedOut() {

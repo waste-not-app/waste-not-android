@@ -7,7 +7,7 @@
 | Layar | Bukti yang tersedia | Review yang masih dibutuhkan |
 | --- | --- | --- |
 | S01–S03 | [Startup](STARTUP.md), [Masuk/Daftar](NAV_AUTH.md), [footer daftar](SECONDARY_SCREEN_REVIEW.md), [refresh dan revocation pada root](#checkpoint-sesi-dan-konflik-versi), [TalkBack pada Masuk](#checkpoint-talkback-masuk) | Penerimaan ucapan aktual dan alur Daftar dengan TalkBack. |
-| S04–S06, S08–S09 | [Bagian bawah konten](SCROLLED_CONTENT.md), [editor](EDITOR.md), [simpan](SAVE.md), [detail/Back](DETAIL.md), [konflik versi nyata](#checkpoint-sesi-dan-konflik-versi) | Ulangi hasil write yang belum pasti dengan putus koneksi aktual pada stack produksi. |
+| S04–S06, S08–S09 | [Bagian bawah konten](SCROLLED_CONTENT.md), [editor](EDITOR.md), [simpan](SAVE.md), [detail/Back](DETAIL.md), [konflik versi nyata](#checkpoint-sesi-dan-konflik-versi), [pemulihan koneksi di QA](#checkpoint-respons-simpan-terputus) | Ulangi pemulihan koneksi pada lingkungan HTTPS staging. |
 | S07, S10 | [Filter, halaman berikut, Back dan refresh](HISTORY_API.md), [baseline native 1.000 catatan](#checkpoint-riwayat-1000-catatan) | Profil ulang di perangkat fisik pada build yang representatif untuk distribusi. |
 | S11–S12 | [Katalog produksi kosong](GUIDE_API.md), [pencarian dan prefill](GUIDE.md), [artikel PUBLISHED pada backend QA lokal](#checkpoint-panduan-dan-scan-dinonaktifkan). Pemeriksaan ulang 10 November menemukan 0 artikel PUBLISHED di produksi. | Penerimaan konten saat artikel terbit tersedia di katalog produksi. |
 | S13–S14, S16 | [Statistik dan Profil dengan dataset PRD](PRD_DATASET_LIVE.md), [tema](THEME_DATASTORE.md), [review callout S14](#checkpoint-s14) | Verifikasi alternatif chart dan status streak dengan TalkBack. |
@@ -112,6 +112,19 @@ for method in rejectsDuplicateEmailAndInvalidPasswordsWithoutStartingSession sav
 done
 ```
 
+## Checkpoint respons simpan terputus
+
+`LocalBackendCoreTest#replaysCommittedWriteAfterConnectionDrops` lulus dalam 12,11 detik pada emulator API 37 dan backend Go QA. Proxy HTTP loopback menunggu backend mengembalikan 201, lalu menutup koneksi TCP sebelum mengirim respons pertama ke aplikasi. Editor menampilkan status penyimpanan belum diketahui dengan isian 250 g tetap tersedia. Setelah Coba lagi, backend mengembalikan 200 dengan payload permintaan dan ID catatan yang sama. UI menunjukkan konfirmasi tanpa XP tambahan. Basis data mencatat tepat satu catatan 250 g, dashboard tetap 10 XP, dan akun probe dihapus.
+
+Gangguan terkontrol ini memutus satu koneksi TCP. Endpoint HTTPS staging dan perubahan konektivitas seluruh emulator belum diuji pada alur ini. [Hasil belum diketahui](handoff-112/local-write-recovery/unknown-outcome.png), [konfirmasi](handoff-112/local-write-recovery/replayed-write.png), [hasil HTTP dan basis data](handoff-112/local-write-recovery/result.log)
+
+Gunakan backend lokal di port 18089. Build APK debug dan penguji dengan `-Pwastenot.debugApiBaseUrl=http://10.0.2.2:18091/v1/` dan `-Pwastenot.hotReload=false`. Jalankan proxy dengan UUID baru, lalu gunakan UUID yang sama pada tes.
+
+```sh
+python3 scripts/local_write_recovery_proxy.py "$RUN_ID"
+adb shell am instrument -w -e verifyLocalCore true -e fixtureRunId "$RUN_ID" -e class 'com.example.wastenot.ui.main.LocalBackendCoreTest#replaysCommittedWriteAfterConnectionDrops' com.example.wastenot.test/com.example.wastenot.WasteNotTestRunner
+```
+
 ## Core
 
 | ID | Status | Bukti dan batas |
@@ -119,7 +132,7 @@ done
 | AT-01 | Terverifikasi | [Isolasi akun](ACCOUNT_ISOLATION.md) mencakup daftar dan login ulang dari MainActivity dengan akun nyata. |
 | AT-02 | Terverifikasi pada QA lokal | [Autentikasi](#checkpoint-autentikasi-dan-detail-setelah-restart) membuktikan error email duplikat, kata sandi pendek dan salah, serta tidak terbentuk sesi. |
 | AT-03 | Terverifikasi pada QA lokal | [Detail setelah restart](#checkpoint-autentikasi-dan-detail-setelah-restart) membuktikan satu catatan Plastik/Recycle 250 g dan 10 XP, dengan ID sama setelah force-stop. |
-| AT-04 | Parsial | [Recovery](WRITE_RECOVERY.md) mencakup hasil commit yang belum diketahui dan replay di UI terkontrol. [Pengulangan AI](#pemeriksaan-ai-pada-backend-aktif) membuktikan commit nyata dan replay dari draf terkunci dengan simulasi tanda terima hilang. Gabungkan dengan putus koneksi aktual di alur produksi. |
+| AT-04 | Terverifikasi pada QA lokal | [Putus koneksi TCP](#checkpoint-respons-simpan-terputus) membuktikan retry manual terhadap commit nyata mempertahankan satu catatan dan 10 XP. [Pengulangan AI](#pemeriksaan-ai-pada-backend-aktif) juga menguji pemulihan draf dari disk dengan simulasi tanda terima hilang pada adapter. |
 | AT-05–06 | Parsial | `QuantityTest`, `EditorDraftTest` dan `QuantityRequestFieldsTest` menguji validasi model, form dan serialisasi. Audit penolakan HTTP untuk setiap input batas. |
 | AT-07 | Terverifikasi | [Dataset PRD](PRD_DATASET_LIVE.md) mencatat Reduce 2 terpisah dari total penanganan. |
 | AT-08–09 | Parsial | [Ringkasan backend](BACKEND_SUMMARIES.md) dan [fixture Statistik](STATISTICS.md) mencakup agregat serta unit terpisah. Ulangi dataset Reduce saja dan campuran unit lewat UI dengan akun nyata. |

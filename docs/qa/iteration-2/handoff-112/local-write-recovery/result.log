@@ -1,0 +1,17 @@
+Android 17/API 37, emulator-5556, Go 8087405, PostgreSQL 18, isolated loopback.
+App SHA-256: b6f2663cddae5a03534c022f8980dad29f56d315a2e00c214a801d995679ad2b
+Test APK SHA-256: 38f8c3a9f7db4935b80565be2968d0efc3d85298d154927c2a31c1314a8efca9
+
+Local write-recovery proxy listening on 127.0.0.1:18091
+{"upstream_status": 201, "response_dropped": true, "same_request_and_record": true, "request_id": "987bfd42-1f7f-4127-a902-36e636d017a3", "record_id": "99a5c9cc-2921-498b-9618-6c4cb177e748", "xp": 10}
+{"upstream_status": 200, "response_dropped": false, "same_request_and_record": true, "request_id": "987bfd42-1f7f-4127-a902-36e636d017a3", "record_id": "99a5c9cc-2921-498b-9618-6c4cb177e748", "xp": 10}
+
+LocalBackendCoreTest#replaysCommittedWriteAfterConnectionDrops
+Time: 12.105
+OK (1 test)
+
+logs | weight_g
+   1 |      250
+
+DELETE 1
+remaining_probe_users: 0
