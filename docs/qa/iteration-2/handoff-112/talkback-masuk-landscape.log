@@ -1,30 +1,30 @@
 Android 17/API 37, TalkBack 17 Enhanced, font 200%, landscape 2400 x 1080, 420 dpi.
 Gboard visible when Masuk gains focus. Gboard closes after password validation.
-Baseline failed to reach Masuk from Tampilkan kata sandi.
+Baseline failed to reach Masuk from Tampilkan kata sandi. An intermediate build could reopen Gboard.
 
-app-debug.apk SHA-256: 4373bf1af624acef87c2ce42d7fa289518926a66d4ad18768c733c95785f0aa2
-app-debug-androidTest.apk SHA-256: 0f236a3cee75c47eb595dd23eb0d816b334c28a30703c20f28149a8cf7e9932e
+app-debug.apk SHA-256: d8373dd8ce8974d4e9c92b5faa3a745028ffd52f1b8fbda31a1bbef15dd8c811
+app-debug-androidTest.apk SHA-256: 574c567f8a8bb60f358c6703c3bb5c7952a8dfd6a0cb0f08da8849ad6749185f
 
 Run 1
-Time: 15.973
+Time: 8.474
 OK (1 test)
 
-Run 2
-Time: 24.077
+Run 2 (speech recording timing)
+Time: 15.121
 OK (1 test)
 
 Run 3
-Time: 32.821
+Time: 7.633
 OK (1 test)
 
 Run 4
-Time: 25.792
+Time: 8.26
 OK (1 test)
 
-Run 5
-Time: 19.828
+Run 5 (speech recording timing)
+Time: 14.764
 OK (1 test)
 
 Run 6
-Time: 29.828
+Time: 9.899
 OK (1 test)

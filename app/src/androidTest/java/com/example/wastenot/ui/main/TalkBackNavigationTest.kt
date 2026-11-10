@@ -71,13 +71,17 @@ class TalkBackNavigationTest {
                     }
                 }
                 await("login screen") { text(appRoot(automation)).contains("Catat kebiasaanmu lagi.") }
-                fun isEmail(node: AccessibilityNodeInfo) = node.isEditable && text(node).contains("Email")
+                fun isEmail(node: AccessibilityNodeInfo) =
+                    node.className == "android.widget.EditText" && !node.isPassword && text(node).contains("Email")
                 fun isPassword(node: AccessibilityNodeInfo) = node.isEditable && node.isPassword
-                seek(automation, { shortcut(79) }, ::isEmail)
                 val passwordBeforeKeyboard = findNode(appRoot(automation), ::isPassword)
                 // Set up the password field within the form after Gboard may have taken focus.
                 await("enter fixture email") {
-                    findNode(appRoot(automation), ::isEmail)?.let { setText(it, "reader@example.invalid") } == true
+                    val root = appRoot(automation)
+                    val email = findNode(root, ::isEmail)
+                    if (email != null) return@await setText(email, "reader@example.invalid")
+                    findNode(root) { it.isScrollable }?.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
+                    false
                 }
                 await("focus the password input") {
                     val field = findNode(appRoot(automation), ::isPassword)
@@ -96,7 +100,9 @@ class TalkBackNavigationTest {
                 await("enter fixture password") {
                     findNode(appRoot(automation), ::isPassword)?.let { setText(it, "short") } == true
                 }
-                focusPasswordToggle(automation)
+                focusFormControl(automation, "password visibility") {
+                    it.contentDescription == "Tampilkan kata sandi"
+                }
                 shortcut(79)
                 await("TalkBack moves from password visibility to Masuk") {
                     automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)?.let(::isSubmit) == true
@@ -106,12 +112,15 @@ class TalkBackNavigationTest {
                 shortcut(clickKey)
                 val error = "Kata sandi perlu 12–128 karakter, termasuk spasi."
                 await("password validation") { text(appRoot(automation)).contains(error) }
-                if (landscape) await("landscape validation dismisses the keyboard") { !keyboardVisible() }
-                val focusedAfterSubmit = automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)
-                // Validation is between the password input and Masuk. Refocusing the invalid input
-                // can move TalkBack there automatically when the keyboard scrolls the form.
-                val towardValidation = if (focusedAfterSubmit?.let(::isSubmit) == true) 80 else 79
-                seek(automation, { shortcut(towardValidation) }) { text(it).contains(error) }
+                if (landscape) {
+                    await("landscape validation dismisses the keyboard") { !keyboardVisible() }
+                    // Explore the visible inline message after the IME window closes.
+                    focusFormControl(automation, "password validation message") { it.text?.toString() == error }
+                } else {
+                    val focusedAfterSubmit = automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)
+                    val towardValidation = if (focusedAfterSubmit?.let(::isSubmit) == true) 80 else 79
+                    seek(automation, { shortcut(towardValidation) }) { text(it).contains(error) }
+                }
                 if (recordSpeech) SystemClock.sleep(5_000)
                 seek(automation, { shortcut(79) }) { isSubmit(it) }
                 assertTrue(manager.isTouchExplorationEnabled)
@@ -129,20 +138,23 @@ class TalkBackNavigationTest {
         it.type == AccessibilityWindowInfo.TYPE_APPLICATION && it.root?.packageName == "com.example.wastenot"
     }?.root
 
-    private fun focusPasswordToggle(automation: UiAutomation) {
-        // Setting text can move accessibility focus to Gboard. Start traversal from the last form control.
-        fun isToggle(node: AccessibilityNodeInfo) =
-            node.contentDescription == "Tampilkan kata sandi" && node.isVisibleToUser
+    private fun focusFormControl(
+        automation: UiAutomation,
+        label: String,
+        matches: (AccessibilityNodeInfo) -> Boolean,
+    ) {
+        fun isControl(node: AccessibilityNodeInfo) =
+            node.packageName == "com.example.wastenot" && node.isVisibleToUser && matches(node)
         var focusedSince: Long? = null
-        await("TalkBack focus returned to the form") {
+        await("TalkBack focused $label") {
             val focused = automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)
-            if (focused?.let(::isToggle) == true) {
+            if (focused?.let(::isControl) == true) {
                 val now = SystemClock.uptimeMillis()
                 val start = focusedSince ?: now.also { focusedSince = it }
                 return@await now - start >= 600
             }
             focusedSince = null
-            findNode(appRoot(automation), ::isToggle)?.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)
+            findNode(appRoot(automation), ::isControl)?.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)
             false
         }
     }

@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
@@ -34,7 +33,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -47,6 +46,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.wastenot.R
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.repository.SignOutReason
@@ -60,6 +61,7 @@ import com.example.wastenot.ui.components.WasteTextField
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.OnAccent
 import com.example.wastenot.theme.WasteNotAuthHeading
+import kotlinx.coroutines.delay
 
 @Composable
 fun AuthScreen(
@@ -76,18 +78,22 @@ fun AuthScreen(
     onBack: (() -> Unit)? = null,
 ) {
     val focus = LocalFocusManager.current
-    val keyboard = LocalSoftwareKeyboardController.current
+    val view = LocalView.current
     val requesters = remember { AccountField.entries.associateWith { FocusRequester() } }
     val landscapeLogin = !register && LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val submitRequester = remember { BringIntoViewRequester() }
     LaunchedEffect(state.focusRequest) {
         val first = state.errors.keys.firstOrNull() ?: state.serverFields.firstOrNull()
-        if (state.focusRequest > 0 && first != null) requesters.getValue(first).requestFocus()
+        if (state.focusRequest <= 0 || first == null) return@LaunchedEffect
         if (landscapeLogin && first == AccountField.PASSWORD) {
             // Make room for validation and the retry action in the short landscape viewport.
-            keyboard?.hide()
-            withFrameNanos { }
+            focus.clearFocus()
+            // Android can enqueue another IME show while replacing the active text input.
+            delay(120)
+            ViewCompat.getWindowInsetsController(view)?.hide(WindowInsetsCompat.Type.ime())
             submitRequester.bringIntoView()
+        } else {
+            requesters.getValue(first).requestFocus()
         }
     }
     val next = KeyboardActions(onNext = { focus.moveFocus(FocusDirection.Next) }, onDone = { onSubmit() })
