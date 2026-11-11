@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -92,7 +91,8 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
 @Composable
 internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) -> ScanRepository, session: String,
     isPhotoScanDisabled: suspend () -> Boolean, onDismiss: () -> Unit,
-    onPrefill: (ScanPrefill) -> Unit, modifier: Modifier = Modifier) {
+    onPrefill: (ScanPrefill) -> Unit, modifier: Modifier = Modifier,
+    restorePhotoReview: Boolean = false, onPhotoReviewChanged: (Boolean) -> Unit = {}) {
     val context = LocalContext.current
     val cache = remember(userId) { ScanPhotoCache.create(context, userId) }
     val factory = remember(cache, repositoryFactory) { viewModelFactory { initializer {
@@ -101,28 +101,44 @@ internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) ->
     val model: ScanViewModel = viewModel(key = "scan-$userId", factory = factory)
     val state by model.state.collectAsStateWithLifecycle()
     val scanDisabled by produceState<Boolean?>(null, session) { value = isPhotoScanDisabled() }
-    var hadPhoto by rememberSaveable(session) { mutableStateOf(false) }
     LaunchedEffect(session) {
         model.start(session)
-        if (hadPhoto && model.state.value.photo == null) model.problem(session, ScanProblem.EXPIRED)
-        withContext(Dispatchers.IO) { cache.removeExpired() }
+        val interrupted = restorePhotoReview && model.state.value.photo == null
+        if (interrupted) model.problem(session, ScanProblem.EXPIRED)
+        withContext(Dispatchers.IO) {
+            if (interrupted) cache.removeOwnerPhotos()
+            cache.removeExpired()
+        }
     }
-    LaunchedEffect(state.photo) { if (state.session == session) hadPhoto = state.photo != null }
     DisposableEffect(model, session) {
         onDispose { if (context.activity()?.isChangingConfigurations != true) model.close(session) }
     }
-    fun dismiss() { model.close(session); onDismiss() }
+    fun dismiss() {
+        model.close(session)
+        onPhotoReviewChanged(false)
+        onDismiss()
+    }
+    fun retake() {
+        model.retake()
+        onPhotoReviewChanged(false)
+    }
     fun use(manual: Boolean) {
         if (model.state.value.session != session) return
         val prefill = model.handoff(confirmRecommendation = !manual) ?: return
-        model.close(session); onPrefill(prefill)
+        model.close(session)
+        onPhotoReviewChanged(false)
+        onPrefill(prefill)
     }
     val visibleState = if (scanDisabled == true) state.copy(phase = ScanPhase.FAILURE, problem = ScanProblem.DISABLED) else state
-    ScanSheet(visibleState, ::dismiss, { use(true) }, model::retake, model::detect, model::select, model::category,
+    ScanSheet(visibleState, ::dismiss, { use(true) }, ::retake, model::detect, model::select, model::category,
         model::confirmObject, model::correctObject, model::context, model::recommend, model::method,
-        { use(false) }, model::retry, modifier, model::objectKey, model::reviewContext, model::confirmConditions) {
+        { use(false) }, { model.retry(); if (model.state.value.photo == null) onPhotoReviewChanged(false) },
+        modifier, model::objectKey, model::reviewContext, model::confirmConditions) {
         if (scanDisabled == false) {
-            ScanCamera(session, cache, { model.photo(session, it) }, { model.problem(session, it) })
+            ScanCamera(session, cache, { photo ->
+                model.photo(session, photo)
+                if (model.state.value.photo == photo) onPhotoReviewChanged(true)
+            }, { model.problem(session, it) })
         } else {
             LinearProgressIndicator(Modifier.fillMaxWidth())
         }

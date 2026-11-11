@@ -1,0 +1,17 @@
+11 November 2026 — Android 17 / API 37, Go QA 8087405.
+
+Baseline 6ecb2b9: signed in through Masuk, captured a CameraX photo,
+removed the test JPEG, backgrounded the app, and killed the Android process.
+PID 7034 stopped. PID 7473 restored the account and opened Beranda.
+The expired scan and retake controls were absent.
+
+After the fix, repeated the same procedure. PID 10146 → 10666.
+The same signed-in account saw the expired scan message. Coba lagi
+opened the camera step and no photo was re-uploaded.
+
+Repeated with the JPEG still in the cache at process death (PID 11026).
+The new process (PID 11492) showed the same message, removed the stale
+owner JPEG, and opened the camera step after Coba lagi. The loopback proxy
+received no detection request during either process-recovery run.
+
+Screenshot: photo-process-recovery.png.

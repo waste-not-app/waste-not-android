@@ -43,7 +43,11 @@ class ScanPhotoCacheTest {
             assertThrows(java.io.IOException::class.java) { other.read(photo) }
             assertThrows(java.io.IOException::class.java) { cache.read(photo.copy(path = input.path)) }
             assertFalse(other.exists(photo)); other.delete(photo); assertTrue(cache.exists(photo))
-            cache.delete(photo); assertFalse(File(photo.path).exists())
+            val otherPhoto = other.save(input.readBytes(), 0)
+            cache.removeOwnerPhotos()
+            assertFalse(cache.exists(photo))
+            assertTrue(other.exists(otherPhoto))
+            assertTrue(input.isFile)
         } finally { root.deleteRecursively() }
     }
 
