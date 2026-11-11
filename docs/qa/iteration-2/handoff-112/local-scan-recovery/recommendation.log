@@ -1,0 +1,17 @@
+11 November 2026 — Android 17 / API 37, Go QA 8087405 and isolated PostgreSQL 18.
+LocalScanRecoveryTest#recoversRecommendationAndSavesReduceWithoutProvenance
+
+CameraX uploaded one image to Go. A loopback worker supplied a contract fixture.
+Recommendation 1: HTTP 201, revision 6 (CLEAN); proxy dropped the response.
+The app showed the error. After Coba lagi, cleanliness and integrity were retained.
+Recommendation 2: HTTP 201, revision 6 (CLEAN); proxy held the response.
+The user returned to object review and changed cleanliness to Kotor. The old
+response did not open the review screen or overwrite the changed condition.
+Recommendation 3: HTTP 201, revision 8 (CLEAN after a second edit); review opened.
+
+In the editor, the Reduce selection required the explicit manual-entry action.
+Before that action the server had zero logs. The only successful save request
+used REDUCE and omitted AI provenance. PostgreSQL confirmed one log, 2 items
+and zero AI metadata rows. The Android dashboard reported 10 XP.
+
+Instrumentation: Time: 32.117; OK (1 test).

@@ -377,11 +377,12 @@ class LocalBackendCoreTest {
             val claims = JSONObject(String(Base64.decode(initial.token.value.split('.')[1],
                 Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING), Charsets.UTF_8))
             val expiry = Instant.ofEpochSecond(claims.getLong("exp"))
-            val delayMs = expiry.toEpochMilli() - System.currentTimeMillis() + 1_000
-            check(delayMs in 1L..901_000L) { "Expected an unmodified Go access lifetime" }
+            assertEquals(15.minutes.inWholeSeconds, expiry.epochSecond - claims.getLong("iat"))
+            val delayMs = expiry.toEpochMilli() - System.currentTimeMillis() + 5_000
+            check(delayMs in 1L..930_000L) { "Unexpected remaining access lifetime: ${delayMs}ms" }
             val network = checkNotNull(WasteNotNetwork.create(BuildConfig.API_BASE_URL, allowLocalHttp = true))
             assertEquals(200, network.api.me(initial).code())
-            println("CORE_NATURAL_EXPIRY waiting for signed access expiry")
+            println("CORE_NATURAL_EXPIRY waiting ${delayMs}ms for signed access expiry")
             withContext(Dispatchers.IO) { delay(delayMs) }
             val statuses = mutableListOf<Int>()
             val restored = success(container.sessions.authenticated { credential ->

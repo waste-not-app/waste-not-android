@@ -1,6 +1,6 @@
 # Audit penerimaan Android #112
 
-10 November 2026. Baseline `b772040`, hasil merge PR #113 ke `main`. Inventaris sumber mencakup **20 layar wajib dan 4 dialog**. Tabel menautkan bukti pada konfigurasi dan revisi masing-masing. Status parsial berarti masih ada bagian skenario yang perlu diuji. S20 mendeskripsikan state lintas layar.
+Pembaruan 11 November 2026. Baseline `b772040`, hasil merge PR #113 ke `main`. Inventaris sumber mencakup **20 layar wajib dan 4 dialog**. Tabel menautkan bukti pada konfigurasi dan revisi masing-masing. Status parsial berarti masih ada bagian skenario yang perlu diuji. S20 mendeskripsikan state lintas layar.
 
 ## Layar dan navigasi
 
@@ -9,9 +9,9 @@
 | S01–S03 | [Startup](STARTUP.md), [Masuk/Daftar](NAV_AUTH.md), [footer daftar](SECONDARY_SCREEN_REVIEW.md), [refresh dan revocation pada root](#checkpoint-sesi-dan-konflik-versi), [TalkBack pada Masuk](#checkpoint-talkback-masuk), [TalkBack membuka Daftar](#checkpoint-talkback-workspace) | Verifikasi ucapan dan validasi form Daftar. |
 | S04–S06, S08–S09 | [Bagian bawah konten](SCROLLED_CONTENT.md), [editor](EDITOR.md), [simpan](SAVE.md), [detail/Back](DETAIL.md), [konflik versi nyata](#checkpoint-sesi-dan-konflik-versi), [pemulihan koneksi di QA](#checkpoint-respons-simpan-terputus) | Ulangi pemulihan koneksi pada lingkungan HTTPS staging. |
 | S07, S10 | [Filter, halaman berikut, Back dan refresh](HISTORY_API.md), [pagination 1.000 catatan Go QA dan baseline emulator](#checkpoint-riwayat-1000-catatan) | Profil ulang di perangkat fisik pada build yang representatif untuk distribusi jika cakupan perangkat diperluas. |
-| S11–S12 | [Katalog produksi kosong](GUIDE_API.md), [pencarian dan prefill](GUIDE.md), [artikel PUBLISHED pada backend QA lokal](#checkpoint-panduan-dan-scan-dinonaktifkan). Pemeriksaan ulang 10 November menemukan 0 artikel PUBLISHED di produksi. | Penerimaan konten saat artikel terbit tersedia di katalog produksi. |
+| S11–S12 | [Katalog produksi kosong](GUIDE_API.md), [pencarian dan prefill](GUIDE.md), [artikel PUBLISHED pada backend QA lokal](#checkpoint-panduan-dan-scan-dinonaktifkan). Pemeriksaan ulang 11 November menemukan 0 artikel PUBLISHED di produksi. | Penerimaan konten saat artikel terbit tersedia di katalog produksi. |
 | S13–S14, S16 | [Statistik dan Profil dengan dataset PRD](PRD_DATASET_LIVE.md), [tema](THEME_DATASTORE.md), [review callout S14](#checkpoint-s14), [fokus TalkBack pada angka chart dan streak](#checkpoint-talkback-workspace) | Verifikasi ucapan pada pengaturan dan perjalanan lengkap. |
-| S21–S25 | [Dua tema hingga akhir scroll](SCAN_THEMES.md), [kamera aktif](CAMERA_LIFECYCLE.md), [saran dan fallback](SCAN_REVIEW_FIXES.md), [kamera ke simpan nyata](AI_MAIN_REGRESSION.md), [capability off](#checkpoint-panduan-dan-scan-dinonaktifkan), [gangguan koneksi deteksi di QA](#checkpoint-gangguan-deteksi-ai) | Ulangi gangguan lewat HTTPS staging dan pada tahap rekomendasi. Uji kamera fisik ditunda sesuai cakupan emulator. |
+| S21–S25 | [Dua tema hingga akhir scroll](SCAN_THEMES.md), [kamera aktif](CAMERA_LIFECYCLE.md), [saran dan fallback](SCAN_REVIEW_FIXES.md), [kamera ke simpan nyata](AI_MAIN_REGRESSION.md), [capability off](#checkpoint-panduan-dan-scan-dinonaktifkan), [gangguan koneksi deteksi di QA](#checkpoint-gangguan-deteksi-ai), [gangguan rekomendasi dan Reduce](handoff-112/local-scan-recovery/recommendation.log) | Ulangi gangguan lewat HTTPS staging. Uji kamera fisik ditunda sesuai cakupan emulator. |
 | D01–D04 | [Delete](DETAIL.md), [keluar dan buang draf](EXIT_DIALOGS.md), [pemulihan write](WRITE_RECOVERY.md), [D04 dengan backend](#checkpoint-sesi-dan-konflik-versi) | Uji fokus TalkBack kembali ke pemicu setelah Back/batal. |
 | Dock, header, dan sheet | [Navigasi](SCREENS_NAVIGATION.md), [transisi](NAVIGATION_MOTION.md), [fokus keyboard](KEYBOARD_FOCUS.md), [TalkBack membuka dan menutup sheet dari lima tab](#checkpoint-talkback-workspace) | Uji fokus lisan lintas dialog lain, rotasi pendek, serta CTA dengan IME terbuka. |
 
@@ -179,6 +179,10 @@ adb shell am instrument -w -e verifyLocalCore true -e fixtureRunId "$RUN_ID" -e 
 
 Pasangan `persistsUnsubmittedDraftBeforeProcessRestart` dan `restoresUnsubmittedDraftForSameAccountAfterProcessRestart` lulus dengan akun Go QA, sesi perangkat yang sama, dan PID berbeda setelah force-stop. Draf pulih dengan isian dan UUID request yang sama. Jumlah catatan server tetap nol. Setelah keluar, field kata sandi pada Masuk kosong. [Log dua proses](handoff-112/local-core-summary/process-restart.log).
 
+`LocalBackendCoreTest#accessTokenExpiresOnItsOwnAndOneRefreshRestoresTheRequest` lulus dalam 918,486 detik. JWT Go QA berlaku 900 detik sesuai klaim yang ditandatangani. Setelah kedaluwarsa alami, satu permintaan mendapat 401, satu refresh berhasil, lalu permintaan ulang mendapat 200. Akun dan root tetap aktif. PostgreSQL mengonfirmasi generation 2 dan hanya satu refresh token yang sudah digunakan. [Log expiry](handoff-112/local-core-summary/access-expiry.log)
+
+Jalankan metode expiry dengan `verifyLocalCore=true`, `verifyNaturalExpiry=true`, dan `fixtureRunId` unik pada APK debug port 18089. Untuk [pemulihan rekomendasi](handoff-112/local-scan-recovery/recommendation.log), gunakan APK port 18094, jalankan proxy dengan `--recommendation-recovery`, dan aktifkan rekomendasi serta hasil worker fixture pada Go QA port 18093. Jalankan metode `LocalScanRecoveryTest#recoversRecommendationAndSavesReduceWithoutProvenance` dengan `verifyLocalRecommendationRecovery=true` dan UUID baru. Pengujian ini memakai HTTP loopback.
+
 | ID | Status | Bukti dan batas |
 | --- | --- | --- |
 | AT-01 | Terverifikasi | [Isolasi akun](ACCOUNT_ISOLATION.md) mencakup daftar dan login ulang dari MainActivity dengan akun nyata. |
@@ -194,7 +198,7 @@ Pasangan `persistsUnsubmittedDraftBeforeProcessRestart` dan `restoresUnsubmitted
 | AT-14 | Terverifikasi pada Go QA dan emulator | [Penghapusan lewat UI](#batas-input-ringkasan-dan-penghapusan) menurunkan XP 40→30 dan streak 3→1. |
 | AT-15 | Terverifikasi | [Konflik versi nyata](#checkpoint-sesi-dan-konflik-versi) membuktikan 409, D04 dan draf bertahan sampai Simpan eksplisit. |
 | AT-16–17 | Terverifikasi | [Isolasi akun](ACCOUNT_ISOLATION.md) mencakup enam akses silang 404, dua sesi dan draf/stack per akun pada MainActivity. |
-| AT-18 | Parsial | [Checkpoint sesi](#checkpoint-sesi-dan-konflik-versi) membuktikan 401 akibat generation lama, satu rotasi dan retry yang berhasil. Expiry waktu JWT alami masih terbuka. |
+| AT-18 | Terverifikasi pada Go QA dan emulator | [Log expiry](handoff-112/local-core-summary/access-expiry.log) membuktikan JWT kedaluwarsa alami setelah 15 menit, satu refresh, lalu permintaan yang sama berhasil tanpa keluar dari akun. [Checkpoint sesi](#checkpoint-sesi-dan-konflik-versi) mencakup 401 akibat generation lama. |
 | AT-19 | Terverifikasi untuk revocation | [Checkpoint sesi](#checkpoint-sesi-dan-konflik-versi) membuktikan root kembali ke Masuk setelah revocation dan kredensial dihapus. |
 | AT-20 | Terverifikasi pada QA lokal | [Tes backend QA](#checkpoint-panduan-dan-scan-dinonaktifkan) mencakup kapitalisasi, hasil kosong, dan detail artikel PUBLISHED. [Panduan](GUIDE.md) mencakup clear query. Katalog produksi masih kosong. |
 | AT-21 | Terverifikasi | [Dataset PRD](PRD_DATASET_LIVE.md) membuktikan periode 7/30, rentang, agregat dan chart. |
@@ -208,19 +212,19 @@ Pasangan `persistsUnsubmittedDraftBeforeProcessRestart` dan `restoresUnsubmitted
 | ID | Status | Bukti dan batas |
 | --- | --- | --- |
 | AT-AI-01 | Terverifikasi di emulator | [TalkBack workspace](#checkpoint-talkback-workspace) membuktikan tab dan fokus kembali ke pemicu dari kelima tab. [Fokus keyboard](KEYBOARD_FOCUS.md) mencakup jalur keyboard, dan [navigasi kamera](CAMERA_LIFECYCLE.md) mencakup sheet aktif. |
-| AT-AI-02 | Parsial | [Lifecycle kamera](CAMERA_LIFECYCLE.md) menguji penolakan izin dan pemulihan preview. Uji permanent denial dan kamera tidak tersedia pada perangkat fisik. |
+| AT-AI-02 | Terverifikasi di emulator | [Lifecycle kamera](CAMERA_LIFECYCLE.md) mencakup dua penolakan izin, tombol Pengaturan setelah izin diblokir, dan pemulihan tanpa membuka kamera otomatis. [Emulator tanpa kamera](handoff-112/local-scan-recovery/no-camera.log) membuktikan pesan kesalahan dan Input manual setelah izin diberikan. |
 | AT-AI-03–04 | Parsial | [Lifecycle kamera](CAMERA_LIFECYCLE.md), [transport](AI_TRANSPORT.md) dan [regresi nyata](AI_MAIN_REGRESSION.md) mencakup capture, upload setelah tinjau, lifecycle, dan recreate. [Go QA](#checkpoint-gangguan-deteksi-ai) membuktikan cancel saat deteksi aktif. Uji retake saat operasi aktif dan process death dengan foto hilang. |
 | AT-AI-05 | Terverifikasi di emulator | [TalkBack daftar kandidat](#checkpoint-gangguan-deteksi-ai) membuktikan satu pilihan dan [urutan kandidat](SCAN_CHOICE_ORDER.md) membuktikan konfirmasi eksplisit. |
 | AT-AI-06 | Parsial | [Transport](AI_TRANSPORT.md) mempertahankan band server. Verifikasi batas skor/unknown dengan respons layanan yang terkontrol. |
 | AT-AI-07 | Terverifikasi | [Regresi nyata](AI_MAIN_REGRESSION.md) meminta konfirmasi material untuk `bottle` meskipun skornya tinggi. |
-| AT-AI-08 | Parsial | `ScanViewModelTest` membuang hasil terlambat saat pilihan dikoreksi. Uji perubahan kondisi ketika request sedang aktif dari UI. |
+| AT-AI-08 | Terverifikasi pada Go QA dan emulator | [Gangguan rekomendasi](handoff-112/local-scan-recovery/recommendation.log) membuktikan respons dari kondisi lama diabaikan setelah pengguna kembali ke objek dan mengubah kondisi. Permintaan baru membawa revisi baru dan membuka saran. |
 | AT-AI-09–10 | Parsial | [Transport](AI_TRANSPORT.md) memvalidasi identitas rekomendasi dan membedakan special handling. [Policy-08](POLICY08_ANDROID.md) membuktikan tampilan langkah/sumber terkontrol. Periksa kasus layanan nyata dengan kebijakan backend yang berlaku. |
-| AT-AI-11 | Parsial | [Transport](AI_TRANSPORT.md) mensyaratkan pelepasan provenance untuk Reduce. Jalankan skenario koreksi ke Reduce dari UI nyata. |
-| AT-AI-12 | Parsial | `ScanViewModelTest` mencakup timeout, Retry-After dan jalur manual eksplisit. [Go QA](#checkpoint-gangguan-deteksi-ai) membuktikan fallback dan retry deteksi setelah TCP putus. [Uji backend](#pemeriksaan-ai-pada-backend-aktif) mengamati `LLM_TIMEOUT` nyata dan keberhasilan pengulangan eksplisit. Ulangi gangguan jaringan tahap rekomendasi dan HTTPS staging. |
+| AT-AI-11 | Terverifikasi pada Go QA dan emulator | [Reduce manual](handoff-112/local-scan-recovery/recommendation.log) membuktikan UI mewajibkan tindakan manual eksplisit sebelum menyimpan dua benda. Go menyimpan satu catatan/10 XP tanpa provenance. |
+| AT-AI-12 | Parsial | `ScanViewModelTest` mencakup timeout, Retry-After dan jalur manual eksplisit. Go QA dan emulator membuktikan retry deteksi dan [retry rekomendasi](handoff-112/local-scan-recovery/recommendation.log) setelah respons putus. [Uji backend](#pemeriksaan-ai-pada-backend-aktif) mengamati `LLM_TIMEOUT` nyata. Gangguan pada HTTPS staging masih terbuka. |
 | AT-AI-13 | Parsial | [Regresi nyata](AI_MAIN_REGRESSION.md) membuktikan 250 g, satu log/10 XP dan provenance. [Transport](AI_TRANSPORT.md) mencakup replay setelah acknowledgment hilang. Uji dua aksi simpan dalam alur UI yang sama. |
-| AT-AI-14 | Parsial | [Transport](AI_TRANSPORT.md) memvalidasi foreign/expired dan [review scan](SCAN_REVIEW_FIXES.md) menguji expiry/manual. Uji 404/410/409 dari layanan dengan dua akun dan referensi yang sudah dipakai. |
-| AT-AI-15–16 | Parsial | `ScanViewModelTest`, `ScanPhotoCacheTest` dan [transport](AI_TRANSPORT.md) mencakup koordinat, expiry dan cleanup lokal. Uji file rusak/besar, orientasi kamera fisik, serta deadline retensi setelah crash. |
-| AT-AI-17 | Parsial | [TalkBack daftar kandidat](#checkpoint-gangguan-deteksi-ai) lulus pada 200% di portrait dan landscape, termasuk akses Input manual di landscape. Pengumuman audio kandidat masih perlu diperiksa. |
+| AT-AI-14 | Terverifikasi pada Go QA dan tes UI terkontrol | `TestAIIntegration` membuktikan 404 dari akun kedua, 410 setelah sesi dipensiunkan, dan 409 saat rekomendasi dipakai untuk catatan kedua. [Review scan](SCAN_REVIEW_FIXES.md) menguji tindakan manual pada UI Android. [Log Go](handoff-112/local-scan-recovery/backend.log) |
+| AT-AI-15–16 | Parsial | `ScanViewModelTest`, `ScanPhotoCacheTest` dan [transport](AI_TRANSPORT.md) mencakup koordinat, expiry dan cleanup lokal. Go menolak file rusak, MIME keliru, dan file di atas batas dengan 422/415/413, serta membersihkan operasi kedaluwarsa dan pekerjaan yang tertinggal setelah crash. Orientasi kamera dan bukti retensi raw image setelah crash masih terbuka. [Log Go](handoff-112/local-scan-recovery/backend.log) |
+| AT-AI-17 | Terverifikasi di emulator | [TalkBack daftar kandidat](#checkpoint-gangguan-deteksi-ai) lulus pada 200% di portrait dan landscape, termasuk pemilihan tanpa bbox dan akses Input manual di landscape. Bukti ucapan tetap dilacak pada AT-24–25. |
 | AT-AI-18 | Terverifikasi pada QA lokal | [Tes backend QA](#checkpoint-panduan-dan-scan-dinonaktifkan) mencakup `ai_scan=false`, autentikasi, Riwayat dan input manual saat kamera dinonaktifkan. |
 
 ## Penyimpanan aktivitas

@@ -13,7 +13,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 
-def run(examples: Path, candidate_review: bool) -> None:
+def run(examples: Path, candidate_review: bool, recommendation_recovery: bool) -> None:
     model = {
         "model_version": "mock-four-class-v1",
         "sha256": "a" * 64,
@@ -31,9 +31,14 @@ def run(examples: Path, candidate_review: bool) -> None:
             "confidence": 0.8,
         })
     catalog = json.loads((examples / "catalog-response.json").read_text())["data"]
+    recommendation = json.loads((examples / "internal-recommendation-response.json").read_text())["data"]
+    if recommendation_recovery:
+        # Exercise the UI path reserved for actionable recommendations, on the loopback worker only.
+        recommendation["prototype_only"] = False
     headers_to_skip = {"connection", "content-length", "host", "keep-alive", "transfer-encoding"}
     request_pattern = re.compile(rb'name="client_request_id"[^\r\n]*\r\n(?:[^\r\n]+\r\n)*\r\n([0-9a-f-]{36})')
     detection_count = 0
+    recommendation_count = 0
     lock = threading.Lock()
 
     class QuietHandler(BaseHTTPRequestHandler):
@@ -45,7 +50,8 @@ def run(examples: Path, candidate_review: bool) -> None:
                 if key.lower() not in headers_to_skip:
                     self.send_header(key, value)
             self.send_header("Content-Length", str(len(body)))
-            self.send_header("Connection", "close")
+            if self.close_connection:
+                self.send_header("Connection", "close")
             self.end_headers()
             self.wfile.write(body)
 
@@ -65,6 +71,7 @@ def run(examples: Path, candidate_review: bool) -> None:
                     "supported_object_labels": {"glass_bottle": "Botol kaca"},
                 },
                 "/internal/v1/detect": detection,
+                "/internal/v1/recommendations": recommendation,
             }.get(self.path)
             if value is None:
                 self.reply(404, b"")
@@ -76,7 +83,7 @@ def run(examples: Path, candidate_review: bool) -> None:
 
     class Proxy(QuietHandler):
         def forward(self) -> None:
-            nonlocal detection_count
+            nonlocal detection_count, recommendation_count
             body = self.rfile.read(int(self.headers.get("Content-Length", "0")))
             headers = {k: v for k, v in self.headers.items() if k.lower() not in headers_to_skip}
             headers["Accept-Encoding"] = "identity"
@@ -94,15 +101,35 @@ def run(examples: Path, candidate_review: bool) -> None:
                 match = request_pattern.search(body)
                 print(json.dumps({"upload": number, "status": status,
                                   "client_request_id": match[1].decode() if match else None}), flush=True)
-                if not candidate_review and status == 201 and number == 1:
+                if not (candidate_review or recommendation_recovery) and status == 201 and number == 1:
                     self.close_connection = True
                     self.connection.shutdown(socket.SHUT_RDWR)
                     print("Dropped the first committed detection response.", flush=True)
                     return
-                if not candidate_review and status == 201 and number == 3:
+                if not (candidate_review or recommendation_recovery) and status == 201 and number == 3:
                     time.sleep(8)
                     print("Released the held detection response.", flush=True)
             url = urlsplit(self.path)
+            if recommendation_recovery and self.command == "POST" and url.path == "/v1/ai/recommendations":
+                with lock:
+                    recommendation_count += 1
+                    number = recommendation_count
+                request = json.loads(body)
+                print(json.dumps({"recommendation": number, "status": status,
+                                  "revision": request["context_revision"],
+                                  "condition": request["condition"]["cleanliness"]}), flush=True)
+                if status == 201 and number == 1:
+                    self.close_connection = True
+                    self.connection.shutdown(socket.SHUT_RDWR)
+                    print("Dropped the first committed recommendation response.", flush=True)
+                    return
+                if status == 201 and number == 2:
+                    time.sleep(5)
+                    print("Released the superseded recommendation response.", flush=True)
+            if recommendation_recovery and self.command == "POST" and url.path == "/v1/waste-logs":
+                request = json.loads(body)
+                print(json.dumps({"saved": status, "method": request["method"],
+                                  "has_ai_provenance": request.get("ai_provenance") is not None}), flush=True)
             if self.command == "GET" and url.path == "/v1/waste-logs":
                 query = parse_qs(url.query)
                 if query.get("category") == ["PLASTIC"] and not query.get("method"):
@@ -132,6 +159,8 @@ def run(examples: Path, candidate_review: bool) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("examples", type=Path)
-    parser.add_argument("--candidate-review", action="store_true")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--candidate-review", action="store_true")
+    modes.add_argument("--recommendation-recovery", action="store_true")
     arguments = parser.parse_args()
-    run(arguments.examples, arguments.candidate_review)
+    run(arguments.examples, arguments.candidate_review, arguments.recommendation_recovery)
