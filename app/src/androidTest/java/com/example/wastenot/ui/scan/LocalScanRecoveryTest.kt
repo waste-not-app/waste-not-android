@@ -1,5 +1,8 @@
 package com.example.wastenot.ui.scan
 
+import android.view.WindowInsets
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
@@ -11,6 +14,7 @@ import com.example.wastenot.WasteNotApplication
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.repository.SessionState
 import com.example.wastenot.model.DisposalMethod
+import com.example.wastenot.model.Quantity
 import com.example.wastenot.ui.main.captureUiPreview
 import java.time.ZoneId
 import java.util.UUID
@@ -73,6 +77,48 @@ class LocalScanRecoveryTest {
         }
     }
 
+    @Test fun scanListRespectsServerConfidenceBandsAtBoundaries() = runTest(timeout = 3.minutes) {
+        val arguments = InstrumentationRegistry.getArguments()
+        assumeTrue(arguments.getString("verifyLocalConfidenceReview") == "true")
+        assertTrue(BuildConfig.DEBUG)
+        assertEquals("http://10.0.2.2:18094/v1/", BuildConfig.API_BASE_URL)
+        val runId = UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
+        val container = (compose.activity.application as WasteNotApplication).container
+        waitFor("Belum punya akun? Daftar")
+        assertTrue(container.sessions.state.value is SessionState.SignedOut)
+        try {
+            assertTrue(container.sessions.register("Android QA 112", "confidence-$runId@example.test",
+                UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
+            waitFor("Input manual")
+            val scanCache = compose.activity.cacheDir.resolve("scan")
+            val beforeCapture = scanCache.listFiles().orEmpty().toSet()
+            capturePhoto()
+            val originalPhoto = (scanCache.listFiles().orEmpty().toSet() - beforeCapture).single()
+            tap("Ambil ulang")
+            waitFor("Arahkan ke satu benda")
+            assertTrue(!originalPhoto.exists())
+            captureInOpenSheet()
+            val retake = (scanCache.listFiles().orEmpty().toSet() - beforeCapture).single()
+            tap("Scan foto")
+            waitFor("Periksa objek")
+            val candidate = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton)
+            val uncertain = hasText("Belum yakin. Periksa atau ambil ulang foto.")
+            val atOfferedThreshold = candidate and hasText("Skor deteksi 70%") and !uncertain
+            val belowOfferedThreshold = candidate and hasText("Skor deteksi 70%") and uncertain
+            val atLowerThreshold = candidate and hasText("Skor deteksi 50%") and uncertain
+            compose.onAllNodes(candidate).assertCountEquals(3)
+            compose.onNode(atOfferedThreshold).assertIsSelected()
+            compose.onNode(belowOfferedThreshold).assertIsNotSelected()
+            compose.onNode(atLowerThreshold).performScrollTo().performClick().assertIsSelected()
+            compose.onNode(atOfferedThreshold).assertIsNotSelected()
+            compose.onNode(hasText("Konfirmasi objek") and hasClickAction()).assertIsNotEnabled()
+            dismissScan()
+            assertTrue(!retake.exists())
+        } finally {
+            if (container.sessions.state.value is SessionState.Authenticated) container.sessions.logout()
+        }
+    }
+
     @Test fun recoversRecommendationAndSavesReduceWithoutProvenance() = runTest(timeout = 3.minutes) {
         val arguments = InstrumentationRegistry.getArguments()
         assumeTrue(arguments.getString("verifyLocalRecommendationRecovery") == "true")
@@ -89,13 +135,7 @@ class LocalScanRecoveryTest {
             capturePhoto()
             tap("Scan foto")
             waitFor("Periksa objek")
-            choose(R.string.scan_material, "Kaca")
-            choose(R.string.scan_object_type, "Botol kaca")
-            tap("Konfirmasi objek")
-            waitFor("Kondisi objek")
-            choose(R.string.scan_cleanliness, "Bersih")
-            choose(R.string.scan_integrity, "Utuh")
-            choose(R.string.scan_recycling_access, "Ya")
+            confirmGlassAndFillConditions()
             tap("Lihat saran")
             waitFor("Saran belum bisa dimuat. Kondisi yang sudah kamu isi tetap tersimpan.")
             tap("Coba lagi")
@@ -147,6 +187,53 @@ class LocalScanRecoveryTest {
         }
     }
 
+    @Test fun rapidDoubleTapSavesOneAiAssistedLog() = runTest(timeout = 3.minutes) {
+        val arguments = InstrumentationRegistry.getArguments()
+        assumeTrue(arguments.getString("verifyLocalDoubleSave") == "true")
+        assertTrue(BuildConfig.DEBUG)
+        assertEquals("http://10.0.2.2:18094/v1/", BuildConfig.API_BASE_URL)
+        val runId = UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
+        val container = (compose.activity.application as WasteNotApplication).container
+        waitFor("Belum punya akun? Daftar")
+        assertTrue(container.sessions.state.value is SessionState.SignedOut)
+        try {
+            assertTrue(container.sessions.register("Android QA 112", "double-save-$runId@example.test",
+                UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
+            waitFor("Input manual")
+            capturePhoto()
+            tap("Scan foto")
+            waitFor("Periksa objek")
+            confirmGlassAndFillConditions()
+            tap("Lihat saran")
+            waitFor("Periksa saran")
+            tap("Gunakan pilihan, isi jumlah")
+            waitFor(compose.activity.getString(R.string.ai_provenance_attached))
+            compose.onNodeWithContentDescription("Berat").performScrollTo().performTextReplacement("250")
+            compose.runOnUiThread { compose.activity.window.insetsController?.hide(WindowInsets.Type.ime()) }
+            compose.onNode(hasText("Simpan catatan") and hasClickAction()).performScrollTo().assertIsEnabled()
+                .performTouchInput { doubleClick() }
+            waitFor("Catatan tersimpan")
+            val dashboard = (container.core.dashboard() as ApiResult.Success).value
+            assertEquals(1L, dashboard.summary.activityCount)
+            assertEquals(10, dashboard.progress.xp)
+            val saved = dashboard.recentLogs.single()
+            assertEquals(DisposalMethod.RECYCLE, saved.method)
+            assertEquals(Quantity.Weight.of(250), saved.quantity)
+        } finally {
+            if (container.sessions.state.value is SessionState.Authenticated) container.sessions.logout()
+        }
+    }
+
+    private fun confirmGlassAndFillConditions() {
+        choose(R.string.scan_material, "Kaca")
+        choose(R.string.scan_object_type, "Botol kaca")
+        tap("Konfirmasi objek")
+        waitFor("Kondisi objek")
+        choose(R.string.scan_cleanliness, "Bersih")
+        choose(R.string.scan_integrity, "Utuh")
+        choose(R.string.scan_recycling_access, "Ya")
+    }
+
     private fun choose(label: Int, value: String) {
         compose.onNodeWithContentDescription(compose.activity.getString(label)).performScrollTo().performClick()
         compose.onNode(hasText(value) and hasAnyAncestor(isPopup())).performScrollTo().performClick()
@@ -158,6 +245,10 @@ class LocalScanRecoveryTest {
 
     private fun capturePhoto() {
         compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
+        captureInOpenSheet()
+    }
+
+    private fun captureInOpenSheet() {
         compose.waitUntil(30_000) {
             compose.onAllNodesWithText("Aktifkan kamera").fetchSemanticsNodes().isNotEmpty() ||
                 compose.onAllNodes(hasText("Ambil foto") and isEnabled()).fetchSemanticsNodes().isNotEmpty()

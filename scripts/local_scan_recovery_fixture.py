@@ -13,7 +13,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 
-def run(examples: Path, candidate_review: bool, recommendation_recovery: bool) -> None:
+def run(examples: Path, mode: str | None) -> None:
     model = {
         "model_version": "mock-four-class-v1",
         "sha256": "a" * 64,
@@ -23,16 +23,37 @@ def run(examples: Path, candidate_review: bool, recommendation_recovery: bool) -
     detection.pop("detection_id")
     detection.pop("expires_at")
     detection["model"] = model
-    if candidate_review:
+    if mode == "candidate":
         detection["objects"].append({
             **detection["objects"][0],
             "object_id": "object-2",
             "bbox": [0.02, 0.03, 0.4, 0.5],
             "confidence": 0.8,
         })
+    if mode == "confidence":
+        model["class_names"].append("unknown")
+        template = detection["objects"][0]
+        detection["objects"] = [
+            {
+                **template,
+                "object_id": f"object-{index}",
+                "class_id": class_id,
+                "raw_class": model["class_names"][class_id],
+                "bbox": [0.05 * index, 0.05, 0.05 * index + 0.1, 0.2],
+                "confidence": score,
+                "confidence_band": band,
+                "supported_for_review": band != "MANUAL_REQUIRED",
+                "requires_material_confirmation": band != "MANUAL_REQUIRED",
+                "suggested_object_keys": ["glass_bottle"] if band != "MANUAL_REQUIRED" else [],
+            }
+            for index, (score, band, class_id) in enumerate(
+                [(0.49, "MANUAL_REQUIRED", 1), (0.50, "UNCERTAIN", 1), (0.699, "UNCERTAIN", 1),
+                 (0.70, "OFFERED", 1), (0.95, "MANUAL_REQUIRED", 4)], start=1
+            )
+        ]
     catalog = json.loads((examples / "catalog-response.json").read_text())["data"]
     recommendation = json.loads((examples / "internal-recommendation-response.json").read_text())["data"]
-    if recommendation_recovery:
+    if mode in ("recommendation", "double-save"):
         # Exercise the UI path reserved for actionable recommendations, on the loopback worker only.
         recommendation["prototype_only"] = False
     headers_to_skip = {"connection", "content-length", "host", "keep-alive", "transfer-encoding"}
@@ -101,16 +122,16 @@ def run(examples: Path, candidate_review: bool, recommendation_recovery: bool) -
                 match = request_pattern.search(body)
                 print(json.dumps({"upload": number, "status": status,
                                   "client_request_id": match[1].decode() if match else None}), flush=True)
-                if not (candidate_review or recommendation_recovery) and status == 201 and number == 1:
+                if mode is None and status == 201 and number == 1:
                     self.close_connection = True
                     self.connection.shutdown(socket.SHUT_RDWR)
                     print("Dropped the first committed detection response.", flush=True)
                     return
-                if not (candidate_review or recommendation_recovery) and status == 201 and number == 3:
+                if mode is None and status == 201 and number == 3:
                     time.sleep(8)
                     print("Released the held detection response.", flush=True)
             url = urlsplit(self.path)
-            if recommendation_recovery and self.command == "POST" and url.path == "/v1/ai/recommendations":
+            if mode == "recommendation" and self.command == "POST" and url.path == "/v1/ai/recommendations":
                 with lock:
                     recommendation_count += 1
                     number = recommendation_count
@@ -126,10 +147,12 @@ def run(examples: Path, candidate_review: bool, recommendation_recovery: bool) -
                 if status == 201 and number == 2:
                     time.sleep(5)
                     print("Released the superseded recommendation response.", flush=True)
-            if recommendation_recovery and self.command == "POST" and url.path == "/v1/waste-logs":
+            if mode in ("recommendation", "double-save") and self.command == "POST" and url.path == "/v1/waste-logs":
                 request = json.loads(body)
                 print(json.dumps({"saved": status, "method": request["method"],
                                   "has_ai_provenance": request.get("ai_provenance") is not None}), flush=True)
+                if mode == "double-save" and status == 201:
+                    time.sleep(2)
             if self.command == "GET" and url.path == "/v1/waste-logs":
                 query = parse_qs(url.query)
                 if query.get("category") == ["PLASTIC"] and not query.get("method"):
@@ -160,7 +183,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("examples", type=Path)
     modes = parser.add_mutually_exclusive_group()
-    modes.add_argument("--candidate-review", action="store_true")
-    modes.add_argument("--recommendation-recovery", action="store_true")
+    modes.add_argument("--candidate-review", dest="mode", action="store_const", const="candidate")
+    modes.add_argument("--recommendation-recovery", dest="mode", action="store_const", const="recommendation")
+    modes.add_argument("--confidence-review", dest="mode", action="store_const", const="confidence")
+    modes.add_argument("--double-save", dest="mode", action="store_const", const="double-save")
     arguments = parser.parse_args()
-    run(arguments.examples, arguments.candidate_review, arguments.recommendation_recovery)
+    run(arguments.examples, arguments.mode)

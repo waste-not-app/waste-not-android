@@ -1,0 +1,19 @@
+11 November 2026 — Android 17 / API 37, Go QA 8087405 and isolated PostgreSQL 18.
+
+LocalScanRecoveryTest#scanListRespectsServerConfidenceBandsAtBoundaries
+CameraX captured a JPEG and opened photo review. Ambil ulang deleted it and
+returned to the camera. Only the replacement photo was uploaded (HTTP 201).
+Go returned five candidates from the controlled worker. The list excluded 0.49
+and the unknown class (0.95). At 0.50 and 0.699, the rows showed the uncertainty
+message. At 0.70, the initially selected row had no uncertainty message. The two
+highest scores both round to 70% in the UI. Selecting 0.50 deselected 0.70 and
+still required material confirmation. Closing the sheet deleted the retake.
+Instrumentation: Time: 14.205; OK (1 test).
+
+LocalScanRecoveryTest#rapidDoubleTapSavesOneAiAssistedLog
+CameraX → Go detection → actionable Recycle recommendation from the worker
+fixture → editor. Filled 250 g and injected a rapid double tap on Simpan catatan.
+The proxy held the committed receipt for two seconds and recorded only one
+save (HTTP 201, RECYCLE, AI provenance present). The app showed confirmation
+and 10 XP. PostgreSQL confirmed one record at 250 g and one AI metadata row.
+Instrumentation: Time: 21.575; OK (1 test).
