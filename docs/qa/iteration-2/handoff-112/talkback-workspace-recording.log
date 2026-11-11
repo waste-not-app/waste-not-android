@@ -1,0 +1,26 @@
+11 November 2026 — Android 17 / API 37, TalkBack 17 Enhanced, font 200%.
+TalkBackNavigationTest#readerOpensRegistrationAndNavigatesWorkspace
+Go QA, portrait, emulator audio recorded locally. Time: 69.708; OK (1 test).
+Recording SHA-256: b7cefb621368d2ea04286b9f8a2240b4856a84342d5d21732d02c06d6b56f591.
+
+The native test reached registration heading/name, selected all five tabs,
+read the chart's textual alternative and focused the streak status. The scan
+sheet opened and closed from each tab, restoring focus to its trigger.
+
+Selected excerpts from automatic local transcription, with spelling errors:
+14.8–17.8 Beranda. Katada tau scan sampa.
+17.8–22.8 Button. Out of list. Bottom sheet. Tut of scan. Button.
+32.8–36.8 Button. Waste not. Statistic. Tab.
+36.8–41.8 Leadheading. The 11th of November 2026-250 gram zero-benda.
+49.8–54.8 Profil. Tab. 5-5. Kamu suta men-katada hari ini. Out of list.
+61.8–67.8 Button. Waste not. Beranda. Tab. Selected. Katada tau scan sampa.
+
+The recording verifies spoken roles, scan action/modal/close, chart value,
+streak and selected tab. Registration focus assertions passed; the
+automatic transcript was inconclusive for the registration heading/name.
+
+A later recording included "Edit box. Nama. Nama yang ingin ditampilkan."
+The native run after correcting keyboard traversal passed in 47.736 seconds.
+From Pengaturan, the forward TalkBack shortcut reached Keluar. The test
+opened the logout dialog, focused its heading, activated Batal and confirmed
+that TalkBack focus returned to Keluar. Spoken dialog heading was inconclusive.

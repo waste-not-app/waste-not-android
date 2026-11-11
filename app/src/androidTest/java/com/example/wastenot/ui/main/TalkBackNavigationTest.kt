@@ -109,6 +109,7 @@ class TalkBackNavigationTest {
     @Test fun readerOpensRegistrationAndNavigatesWorkspace() = withTalkBack { automation, shortcut, clickKey ->
         val arguments = InstrumentationRegistry.getArguments()
         assumeTrue(arguments.getString("verifyLocalTalkBack") == "true")
+        val recordSpeech = arguments.getString("talkbackRecordSpeech") == "true"
         check(BuildConfig.DEBUG && BuildConfig.API_BASE_URL == "http://10.0.2.2:18089/v1/")
         val runId = UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
         val application = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as WasteNotApplication
@@ -119,6 +120,7 @@ class TalkBackNavigationTest {
             node.isClickable && (node.contentDescription?.contains(label) == true || text(node).trim() == label)
         fun activate(label: String) {
             focusFormControl(automation, label) { matches(label, it) }
+            if (recordSpeech) SystemClock.sleep(1_800)
             shortcut(clickKey)
         }
         fun show(label: String, predicate: (AccessibilityNodeInfo) -> Boolean) {
@@ -139,6 +141,7 @@ class TalkBackNavigationTest {
                 text(it).trim() == "Beranda" && (it.isClickable || it.isSelected)
             }
             seek(automation, { shortcut(80) }, ::scanTrigger)
+            if (recordSpeech && fromTab == "Riwayat") SystemClock.sleep(2_500)
             shortcut(clickKey)
             show("disabled scan explanation") { it.text?.contains("Scan foto dinonaktifkan.") == true }
             activate("Tutup scan")
@@ -157,9 +160,11 @@ class TalkBackNavigationTest {
                 shortcut(clickKey)
                 await("register screen") { text(appRoot(automation)).contains("Mulai dari kebiasaan kecil.") }
                 show("registration heading") { it.isHeading && it.text?.toString() == "Mulai dari kebiasaan kecil." }
+                if (recordSpeech) SystemClock.sleep(3_500)
                 show("registration name field") {
                     it.className == "android.widget.EditText" && text(it).contains("Nama")
                 }
+                if (recordSpeech) SystemClock.sleep(3_500)
                 println("TALKBACK_REGISTER heading_and_name")
 
                 runBlocking {
@@ -179,14 +184,28 @@ class TalkBackNavigationTest {
                 show("daily chart text action") { matches("Lihat angka harian", it) }
                 shortcut(clickKey)
                 show("daily chart text value") { it.text?.contains("250 g · 0 benda") == true }
+                if (recordSpeech) SystemClock.sleep(3_500)
                 println("TALKBACK_CHART 250 g, 0 benda")
                 verifyScanSheet("Statistik")
                 tab("Profil")
                 show("streak status") { it.text?.toString() == "Kamu sudah mencatat hari ini." }
+                if (recordSpeech) SystemClock.sleep(3_500)
                 println("TALKBACK_STREAK logged_today")
                 verifyScanSheet("Profil")
                 tab("Beranda")
                 verifyScanSheet("Beranda")
+                tab("Profil")
+                show("settings row") { matches("Pengaturan", it) }
+                seek(automation, { shortcut(79) }) { matches("Keluar", it) }
+                shortcut(clickKey)
+                show("logout dialog heading") { it.text?.toString() == "Keluar dari akun?" }
+                if (recordSpeech) SystemClock.sleep(3_500)
+                activate("Batal")
+                await("logout dialog dismissed") { !text(appRoot(automation)).contains("Keluar dari akun?") }
+                await("TalkBack focus returns to logout trigger") {
+                    automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)?.let { matches("Keluar", it) } == true
+                }
+                println("TALKBACK_LOGOUT_DIALOG dismissed_focus_restored")
             }
         } finally {
             runBlocking { container.sessions.logout() }
@@ -196,6 +215,7 @@ class TalkBackNavigationTest {
     @Test fun readerSelectsSecondScanCandidateFromList() = withTalkBack { automation, shortcut, clickKey ->
         val arguments = InstrumentationRegistry.getArguments()
         assumeTrue(arguments.getString("verifyLocalTalkBackCandidate") == "true")
+        val recordSpeech = arguments.getString("talkbackRecordSpeech") == "true"
         check(BuildConfig.DEBUG && BuildConfig.API_BASE_URL == "http://10.0.2.2:18094/v1/")
         val runId = UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -232,11 +252,14 @@ class TalkBackNavigationTest {
                 click("Scan foto")
                 await("scan candidate response") { text(appRoot(automation)).contains("Periksa objek") }
                 showControl(automation, "first radio candidate") { candidate(90, it) && it.isChecked }
+                if (recordSpeech) SystemClock.sleep(4_500)
                 showControl(automation, "second radio candidate") { candidate(80, it) && !it.isChecked }
+                if (recordSpeech) SystemClock.sleep(4_500)
                 shortcut(clickKey)
                 await("second candidate checked") {
                     findNode(appRoot(automation)) { candidate(80, it) && it.isChecked } != null
                 }
+                if (recordSpeech) SystemClock.sleep(3_000)
                 showControl(automation, "first candidate unchecked") { candidate(90, it) && !it.isChecked }
                 showControl(automation, "manual entry") { it.isClickable && text(it).trim() == "Input manual" }
                 println("TALKBACK_CANDIDATE selected_80_unchecked_90")

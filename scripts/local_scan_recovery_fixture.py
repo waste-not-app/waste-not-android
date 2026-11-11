@@ -53,6 +53,18 @@ def run(examples: Path, mode: str | None) -> None:
         ]
     catalog = json.loads((examples / "catalog-response.json").read_text())["data"]
     recommendation = json.loads((examples / "internal-recommendation-response.json").read_text())["data"]
+    if mode == "policy":
+        special = json.loads((examples / "provider-unavailable-response.json").read_text())["data"]
+        for field in ("category", "confirmed_object_key", "context_revision", "detection_id", "expires_at", "object_id", "recommendation_id"):
+            special.pop(field)
+        special.update(special_handling=True, prototype_only=False)
+        policy_cases = [
+            ("malformed JSON", None),
+            ("invalid method", {**recommendation, "recommended_method": "INVALID_METHOD"}),
+            ("invalid evidence", {**recommendation, "evidence_ids": [{"id": "invalid"}]}),
+            ("missing sources", {**recommendation, "source_urls": []}),
+            ("special handling", special),
+        ]
     if mode in ("recommendation", "double-save"):
         # Exercise the UI path reserved for actionable recommendations, on the loopback worker only.
         recommendation["prototype_only"] = False
@@ -60,6 +72,7 @@ def run(examples: Path, mode: str | None) -> None:
     request_pattern = re.compile(rb'name="client_request_id"[^\r\n]*\r\n(?:[^\r\n]+\r\n)*\r\n([0-9a-f-]{36})')
     detection_count = 0
     recommendation_count = 0
+    worker_recommendations = 0
     lock = threading.Lock()
 
     class QuietHandler(BaseHTTPRequestHandler):
@@ -81,7 +94,8 @@ def run(examples: Path, mode: str | None) -> None:
 
     class Worker(QuietHandler):
         def respond(self) -> None:
-            self.rfile.read(int(self.headers.get("Content-Length", "0")))
+            nonlocal worker_recommendations
+            body = self.rfile.read(int(self.headers.get("Content-Length", "0")))
             value = {
                 "/internal/v1/objects": catalog,
                 "/internal/v1/capabilities": {
@@ -97,6 +111,17 @@ def run(examples: Path, mode: str | None) -> None:
             if value is None:
                 self.reply(404, b"")
                 return
+            if mode == "policy" and self.path == "/internal/v1/recommendations":
+                with lock:
+                    case, value = policy_cases[min(worker_recommendations, len(policy_cases) - 1)]
+                    worker_recommendations += 1
+                if case == "special handling" and not json.loads(body)["context"]["risk_flag"]:
+                    self.reply(400, b"")
+                    return
+                print(f"Worker returned {case}.", flush=True)
+                if value is None:
+                    self.reply(200, b"{", [("Content-Type", "application/json")])
+                    return
             payload = {"api_version": "1.0.0", "request_id": self.headers.get("X-Request-ID"), "data": value}
             self.reply(200, json.dumps(payload).encode(), [("Content-Type", "application/json")])
 
@@ -131,6 +156,10 @@ def run(examples: Path, mode: str | None) -> None:
                     time.sleep(8)
                     print("Released the held detection response.", flush=True)
             url = urlsplit(self.path)
+            if mode == "policy" and self.command == "POST" and url.path == "/v1/ai/recommendations":
+                payload = json.loads(data)
+                print(json.dumps({"status": status, "code": payload.get("error", {}).get("code"),
+                                  "method": payload.get("data", {}).get("recommended_method")}), flush=True)
             if mode == "recommendation" and self.command == "POST" and url.path == "/v1/ai/recommendations":
                 with lock:
                     recommendation_count += 1
@@ -187,5 +216,6 @@ if __name__ == "__main__":
     modes.add_argument("--recommendation-recovery", dest="mode", action="store_const", const="recommendation")
     modes.add_argument("--confidence-review", dest="mode", action="store_const", const="confidence")
     modes.add_argument("--double-save", dest="mode", action="store_const", const="double-save")
+    modes.add_argument("--policy-review", dest="mode", action="store_const", const="policy")
     arguments = parser.parse_args()
     run(arguments.examples, arguments.mode)

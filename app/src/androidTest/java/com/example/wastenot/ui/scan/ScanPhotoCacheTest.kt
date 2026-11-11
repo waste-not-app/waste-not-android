@@ -6,14 +6,40 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.media.ExifInterface
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.WorkManager
 import com.example.wastenot.data.local.ScanPhotoCache
+import com.example.wastenot.data.local.ScanPhotoCleanupWorker
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.*
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 class ScanPhotoCacheTest {
+    @Test fun schedulesCleanupForAnInterruptedCapture() {
+        val registry = InstrumentationRegistry.getInstrumentation()
+        assumeTrue(InstrumentationRegistry.getArguments().getString("verifyScheduledPhotoCleanup") == "true")
+        val context = registry.targetContext
+        val worker = WorkManager.getInstance(context)
+        val tag = ScanPhotoCleanupWorker::class.java.name
+        val before = worker.getWorkInfosByTag(tag).get(5, TimeUnit.SECONDS).map { it.id }.toSet()
+        val bitmap = Bitmap.createBitmap(4, 4, Bitmap.Config.ARGB_8888)
+        val jpeg = ByteArrayOutputStream()
+        jpeg.use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
+        bitmap.recycle()
+        val cache = ScanPhotoCache.create(context, "interrupted-cleanup-qa")
+        val start = System.currentTimeMillis()
+        val photo = cache.save(jpeg.toByteArray(), 0)
+        val scheduled = worker.getWorkInfosByTag(tag).get(5, TimeUnit.SECONDS).single { it.id !in before }
+        val delayMs = scheduled.nextScheduleTimeMillis - start
+        assertTrue(delayMs in 3_600_000..3_610_000)
+        assertTrue(cache.exists(photo))
+        context.cacheDir.resolve("photo-cleanup-probe").writeText("${File(photo.path).name}\n${scheduled.id}")
+        println("PHOTO_CLEANUP scheduledDelayMs=$delayMs")
+    }
+
     @Test fun normalizesRotationStripsExifSchedulesCleanupAndEnforcesOwner() {
         val root = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "scan-test-${UUID.randomUUID()}").apply { mkdirs() }
         try {

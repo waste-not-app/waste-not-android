@@ -234,6 +234,49 @@ class LocalScanRecoveryTest {
         choose(R.string.scan_recycling_access, "Ya")
     }
 
+    @Test fun rejectsInvalidAdviceAndKeepsSpecialHandlingManual() = runTest(timeout = 3.minutes) {
+        val arguments = InstrumentationRegistry.getArguments()
+        assumeTrue(arguments.getString("verifyLocalPolicyReview") == "true")
+        assertTrue(BuildConfig.DEBUG)
+        assertEquals("http://10.0.2.2:18094/v1/", BuildConfig.API_BASE_URL)
+        val runId = UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
+        val container = (compose.activity.application as WasteNotApplication).container
+        waitFor("Belum punya akun? Daftar")
+        assertTrue(container.sessions.state.value is SessionState.SignedOut)
+        try {
+            assertTrue(container.sessions.register("Android QA 112", "scan-policy-$runId@example.test",
+                UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
+            waitFor("Input manual")
+            capturePhoto()
+            tap("Scan foto")
+            waitFor("Periksa objek")
+            confirmGlassAndFillConditions()
+            repeat(4) {
+                tap("Lihat saran")
+                waitFor(compose.activity.getString(R.string.scan_recommendation_error))
+                compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
+                tap("Coba lagi")
+                waitFor("Kondisi objek")
+                assertChoice(R.string.scan_cleanliness, "Bersih")
+            }
+            tap(compose.activity.getString(R.string.scan_risk_flag))
+            choose(R.string.scan_risk_type, compose.activity.getString(R.string.scan_risk_sharp))
+            tap("Lihat saran")
+            waitFor("Panduan penanganan khusus")
+            compose.onNodeWithText("How Do I Recycle Common Recyclables").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
+            compose.onNodeWithText(compose.activity.getString(R.string.scan_method_confirmation)).assertDoesNotExist()
+            compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).performClick()
+            waitFor("Cara pengelolaan")
+            compose.onNodeWithText(compose.activity.getString(R.string.ai_provenance_attached)).assertDoesNotExist()
+            val dashboard = (container.core.dashboard() as ApiResult.Success).value
+            assertEquals(0L, dashboard.summary.activityCount)
+            assertEquals(0, dashboard.progress.xp)
+        } finally {
+            if (container.sessions.state.value is SessionState.Authenticated) container.sessions.logout()
+        }
+    }
+
     private fun choose(label: Int, value: String) {
         compose.onNodeWithContentDescription(compose.activity.getString(label)).performScrollTo().performClick()
         compose.onNode(hasText(value) and hasAnyAncestor(isPopup())).performScrollTo().performClick()

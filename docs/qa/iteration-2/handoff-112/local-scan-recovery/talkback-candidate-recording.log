@@ -1,0 +1,14 @@
+11 November 2026 — Android 17 / API 37, TalkBack 17 Enhanced, font 200%.
+TalkBackNavigationTest#readerSelectsSecondScanCandidateFromList
+Go QA with two controlled detections, portrait. Time: 24.540; OK (1 test).
+Recording SHA-256: 766830fcc9a8e99dc5fa08de976d49ca390771f5830599bf24f3d08a4b24fbc6.
+
+Selected automatic transcription, with spelling errors:
+11.8–17.2 Model Kaka, score detect C90%, radio button, one of two, not selected.
+17.2–22.6 Model Kaka, score detect C80%, radio button 2 of 2, not selected.
+22.6–24.9 Input manual, tata of scan, button.
+
+The recording confirms the score and radio-button role for each row.
+The native assertions verified selection independently: 90% started checked,
+and TalkBack activation checked 80% and unchecked 90%. The transcript did
+not reliably distinguish the checked-state wording.
