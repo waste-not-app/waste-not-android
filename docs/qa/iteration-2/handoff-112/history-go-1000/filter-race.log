@@ -1,0 +1,11 @@
+
+com.example.wastenot.ui.main.LocalBackendCoreTest:.
+
+Time: 27.493
+
+OK (1 test)
+
+
+Held older Plastik filter response (200).
+Returned newer Kertas/Recycle filter response (200).
+Released the older Plastik filter response.

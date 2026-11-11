@@ -1,0 +1,13 @@
+--- PASS: TestAIIntegration (0.79s)
+--- PASS: TestMediaAndPrototypeGates (0.23s)
+--- PASS: TestGuidePublication (0.19s)
+--- PASS: TestAIDeleteDuringGenerationAndCrashRecovery (0.20s)
+--- PASS: TestScanOnlyDeployment (0.20s)
+--- PASS: TestCoreIntegration (0.35s)
+--- PASS: TestSessionIntegration (0.24s)
+--- PASS: TestEmptyAndReduceOnly (0.30s)
+--- PASS: TestMixedHandledUnits (0.19s)
+ok  	github.com/waste-not-app/waste-not-backend/internal/api	5.503s
+--- PASS: TestValidationBoundaries (0.00s)
+--- PASS: TestProgressAndTimezone (0.03s)
+ok  	github.com/waste-not-app/waste-not-backend/internal/domain	1.374s

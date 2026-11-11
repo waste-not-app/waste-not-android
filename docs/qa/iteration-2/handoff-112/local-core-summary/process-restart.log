@@ -1,0 +1,18 @@
+
+com.example.wastenot.ui.main.LocalBackendCoreTest:.
+
+Time: 6.549
+
+OK (1 test)
+
+
+adb shell am force-stop com.example.wastenot
+
+com.example.wastenot.ui.main.LocalBackendCoreTest:.
+
+Time: 2.933
+
+OK (1 test)
+
+
+11-11 08:45:52.825  8997  9013 I System.out: CORE_DRAFT_RESTORED previous_pid=8876 current_pid=8997

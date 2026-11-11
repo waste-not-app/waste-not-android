@@ -3,6 +3,7 @@ package com.example.wastenot.ui.main
 import com.example.wastenot.data.repository.ScanRepository
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.testTag
@@ -33,7 +35,9 @@ import androidx.compose.ui.window.DialogWindowProvider
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
@@ -51,11 +55,12 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(26.dp)
     Surface(
-        onClick = onClick,
         modifier = modifier.widthIn(min = 136.dp).heightIn(min = 52.dp)
-            .focusOutline(focused, shape, colors.primary, colors.surface).semantics { contentDescription = description },
+            .focusOutline(focused, shape, colors.primary, colors.surface)
+            .clip(shape)
+            .clickable(interactionSource = interactions, indication = ripple(), role = Role.Button, onClick = onClick)
+            .clearAndSetSemantics { contentDescription = description },
         shape = shape,
-        interactionSource = interactions,
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(3.dp, MaterialTheme.colorScheme.surface),
         shadowElevation = 2.dp,
