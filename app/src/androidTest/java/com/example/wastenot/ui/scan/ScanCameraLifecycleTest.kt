@@ -36,6 +36,7 @@ import com.example.wastenot.ui.main.captureUiPreview
 import java.io.File
 import org.json.JSONObject
 import org.junit.Assert.*
+import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExternalResource
@@ -164,6 +165,22 @@ class ScanCameraLifecycleTest {
         awaitReleased(closing)
         assertEquals(1, photos)
         assertTrue(problems.joinToString("; "), problems.isEmpty())
+    }
+
+    @Test fun deviceWithoutCamerasShowsErrorAndKeepsManualEntryAvailable() {
+        assumeTrue(InstrumentationRegistry.getArguments().getString("verifyNoCamera") == "true")
+        instrumentation.uiAutomation.grantRuntimePermission(context.packageName, Manifest.permission.CAMERA)
+        val cameras = context.getSystemService(android.hardware.camera2.CameraManager::class.java)
+        assertEquals(0, cameras.cameraIdList.size)
+        show()
+        compose.onNodeWithText("Aktifkan kamera").performScrollTo().performClick()
+        compose.waitUntil(30_000) { state.problem == ScanProblem.CAMERA }
+        compose.onNodeWithText("Kamera belum bisa dibuka. Coba lagi atau gunakan input manual.")
+            .performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Input manual").performClick()
+        compose.onNodeWithText("Scan ditutup").assertIsDisplayed()
+        assertEquals(1, manuals)
+        assertEquals(0, photos)
     }
 
     private fun activate() {

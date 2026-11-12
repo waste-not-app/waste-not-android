@@ -82,6 +82,8 @@ fun AccountNavigation(
     modifier: Modifier = Modifier,
     logoutState: LogoutUiState = LogoutUiState.None,
     clock: Clock = Clock.systemUTC(),
+    restorePhotoReview: Boolean = false,
+    onPhotoReviewChanged: (Boolean) -> Unit = {},
 ) {
     val context = LocalContext.current.applicationContext
     val factory = remember(activityStore) { viewModelFactory { initializer {
@@ -142,7 +144,7 @@ fun AccountNavigation(
     val draft = activeEditorDraft?.takeIf { it.requestId == editor?.requestId }?.draft
     var discard by remember { mutableStateOf(false) }
     var leaving by rememberSaveable { mutableStateOf(false) }
-    var capture by rememberSaveable { mutableStateOf<String?>(null) }
+    var capture by rememberSaveable { mutableStateOf(if (restorePhotoReview) UUID.randomUUID().toString() else null) }
     var conflictRequest by rememberSaveable { mutableStateOf<String?>(null) }
     var historyFilterOpen by rememberSaveable { mutableStateOf(false) }
     var deletingId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -285,11 +287,12 @@ fun AccountNavigation(
         sessionFailed = (logoutState as? LogoutUiState.Complete)?.result?.localCleared == false,
     )
     if (resumingPrompt) ResumeDraftDialog({ resumingPrompt = false }, ::resumeDraft)
-    capture?.let { session -> CaptureSheet(user.id, scanRepositoryFactory, session, onDismiss = { capture = null }, onPrefill = { prefill ->
+    capture?.let { session -> CaptureSheet(user.id, scanRepositoryFactory, session, activityStore::isPhotoScanDisabled,
+        onDismiss = { capture = null }, onPrefill = { prefill ->
         capture = null
         openEditor(LogEditor(null, UUID.randomUUID().toString(), scanCategory = prefill.category?.name,
             scanMethod = prefill.method?.name, scanRecommendationId = prefill.aiProvenance?.recommendationId))
-    }) }
+    }, restorePhotoReview = restorePhotoReview, onPhotoReviewChanged = onPhotoReviewChanged) }
     BoxWithConstraints(modifier) {
         val rail = maxWidth >= 600.dp
         val railWidth = if (LocalDensity.current.fontScale >= 1.5f) 144.dp else 112.dp

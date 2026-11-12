@@ -1,0 +1,16 @@
+11 November 2026 — Android 17 / API 37, Go QA 8087405 and isolated PostgreSQL 18.
+LocalScanRecoveryTest#rejectsInvalidAdviceAndKeepsSpecialHandlingManual
+
+CameraX uploaded one image. A controlled loopback worker returned malformed
+JSON, an invalid method enum, a malformed evidence list and a READY response
+without sources. Go rejected all four with HTTP 503 / INVALID_AI_RESPONSE. Android showed the
+recommendation error, retained the cleanliness choice on explicit retry and
+never offered the action to apply a recommendation.
+
+The user flagged sharp or broken material. The worker returned a sourced
+special-handling response and Go returned HTTP 200 with method=null.
+Android showed Panduan penanganan khusus and the linked source. Input manual opened the editor
+without an AI reference, and the account stayed at zero records and 0 XP.
+
+Instrumentation: Time: 27.999; OK (1 test).
+This run controlled worker responses. It did not invoke the public AI provider.

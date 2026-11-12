@@ -1,0 +1,21 @@
+
+com.example.wastenot.ui.main.TalkBackNavigationTest:.
+
+Time: 38.816
+
+OK (1 test)
+
+
+TALKBACK_REGISTER heading_and_name
+TALKBACK_TAB Riwayat selected
+TALKBACK_MODAL Riwayat opened_closed_focus_restored
+TALKBACK_TAB Panduan selected
+TALKBACK_MODAL Panduan opened_closed_focus_restored
+TALKBACK_TAB Statistik selected
+TALKBACK_CHART 250 g, 0 benda
+TALKBACK_MODAL Statistik opened_closed_focus_restored
+TALKBACK_TAB Profil selected
+TALKBACK_STREAK logged_today
+TALKBACK_MODAL Profil opened_closed_focus_restored
+TALKBACK_TAB Beranda selected
+TALKBACK_MODAL Beranda opened_closed_focus_restored

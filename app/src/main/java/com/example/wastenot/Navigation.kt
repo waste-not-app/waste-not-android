@@ -1,5 +1,6 @@
 package com.example.wastenot
 
+import android.content.Context
 import com.example.wastenot.data.local.ScanPhotoCache
 import com.example.wastenot.data.repository.RemoteScanRepository
 import com.example.wastenot.data.repository.ScanRepository
@@ -28,6 +29,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.edit
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -74,12 +77,27 @@ fun MainNavigation(
     val logout by model.logoutState.collectAsStateWithLifecycle()
     val root = rememberNavBackStack(SessionRoot)
     var choosingTheme by remember { mutableStateOf(false) }
+    val context = LocalContext.current.applicationContext
+    val scanReview = remember(context) { context.getSharedPreferences("scan_review", Context.MODE_PRIVATE) }
+    // A fresh task can restore the account without restoring any of its navigation state.
+    var photoReviewOwner by remember(scanReview) { mutableStateOf(scanReview.getString("owner", null)) }
+    fun setPhotoReviewOwner(owner: String?) {
+        if (photoReviewOwner == owner) return
+        photoReviewOwner = owner
+        scanReview.edit { putString("owner", owner) }
+    }
     val target: NavKey = when (val phase = session.phase) {
         is SessionState.Authenticated -> AccountRoot(phase.user.id, phase.epoch)
         is SessionState.SignedOut -> AuthRoot
         else -> SessionRoot
     }
     LaunchedEffect(model) { model.bootstrap() }
+    LaunchedEffect(session.phase) {
+        val phase = session.phase
+        if (phase is SessionState.SignedOut || (phase is SessionState.Authenticated && photoReviewOwner != phase.user.id)) {
+            setPhotoReviewOwner(null)
+        }
+    }
     LaunchedEffect(target) {
         if (root.size != 1 || root.last() != target) { root.clear(); root.add(target) }
     }
@@ -106,7 +124,9 @@ fun MainNavigation(
                 if (phase != null && key == AccountRoot(phase.user.id, phase.epoch)) {
                     val activities = remember(key, activityStoreFactory) { activityStoreFactory(phase.user) }
                     AccountNavigation(phase.user, activities, guideStore, scanRepositoryFactory, themeMode,
-                        { choosingTheme = true }, model::logout, Modifier.fillMaxSize(), logoutState = logout)
+                        { choosingTheme = true }, model::logout, Modifier.fillMaxSize(), logoutState = logout,
+                        restorePhotoReview = photoReviewOwner == phase.user.id,
+                        onPhotoReviewChanged = { reviewing -> setPhotoReviewOwner(phase.user.id.takeIf { reviewing }) })
                 }
             }
         },

@@ -1,0 +1,20 @@
+Portrait, TalkBack 17 Enhanced, font 200%, emulator API 37
+
+com.example.wastenot.ui.main.TalkBackNavigationTest:.
+
+Time: 18.269
+
+OK (1 test)
+
+
+Landscape, TalkBack 17 Enhanced, font 200%, emulator API 37
+
+com.example.wastenot.ui.main.TalkBackNavigationTest:.
+
+Time: 22.837
+
+OK (1 test)
+
+
+11-11 08:53:09.290 12002 12020 I System.out: TALKBACK_CANDIDATE selected_80_unchecked_90
+11-11 08:54:49.973 12903 12920 I System.out: TALKBACK_CANDIDATE selected_80_unchecked_90

@@ -1,0 +1,20 @@
+Android 17/API 37, emulator-5556, 1080×2400 px, 420 dpi, font 200%.
+TalkBack 17 Enhanced keymap with Gboard visible. Display speech output was off.
+App APK SHA-256: f4875ee3d7ad8ae862c417481afae5de127980018317391ca2df20bfe57c09db
+Test APK SHA-256: b6f42eead036c0e4fe1fde9052e211b149aca0451d6cc71aa2aeff44b1dda8e8
+TalkBack-Masuk-API37.mp4 SHA-256: 84e65a1a428a8927cbea40a673ef46369a1e791f7825f09cb466fbc973a97975
+
+TalkBackNavigationTest#readerReachesLabelsValidationAndSubmitAtLargeFont
+Recorded run: 25.120 seconds, OK (1 test)
+Three follow-up runs with staging and Settings stopped: 15.976, 16.011,
+and 12.892 seconds, each OK (1 test).
+
+Selected uncorrected local automatic transcription of the 12-second clip.
+2.9–3.5  Masik.
+3.7–4.0  Button.
+4.5–5.7  Showing Password Keyboard.
+6.2–9.0  K2 Sandi Perlu 12-1228 Korokter.
+9.2–9.9  Termasuk Spazi.
+
+Video and accessibility focus identify the button as Masuk and the error as
+"Kata sandi perlu 12–128 karakter, termasuk spasi."

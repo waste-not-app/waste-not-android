@@ -1,0 +1,12 @@
+11 November 2026 — Android 17 / API 37, Go QA 8087405 and isolated PostgreSQL 18.
+LocalBackendCoreTest#accessTokenExpiresOnItsOwnAndOneRefreshRestoresTheRequest
+
+The test read the signed access claims and verified exp − iat = 900 seconds.
+GET /me returned 200 before expiry. The emulator waited 903564 ms of wall time.
+At expiry the observed request statuses were 401, 200. The Go log also records
+HTTP 200 for the refresh between those two attempts.
+The app retained the same account and session epoch. The credential revision
+increased once and the signed-in workspace remained available.
+
+Instrumentation: Time: 918.486; OK (1 test).
+PostgreSQL after test logout: generation=2, refresh_tokens=2, used_tokens=1.

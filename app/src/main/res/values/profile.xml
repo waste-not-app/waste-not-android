@@ -2,11 +2,11 @@
     <string name="settings_title">Pengaturan</string>
     <string name="profile_progress">Progres pencatatan</string>
     <string name="profile_streak_title">Hari berturut-turut</string>
-    <string name="profile_current_streak">Saat ini</string>
-    <string name="profile_best_streak">Terbaik</string>
-    <string name="profile_streak_days">%1$s hari</string>
+    <string name="profile_current_streak">%1$s hari beruntun</string>
+    <string name="profile_best_streak">Terbaik: %1$s hari</string>
     <string name="profile_streak_basis">Dihitung dari hari pencatatan menurut zona akun.</string>
     <string name="profile_streak_today_pending">Belum mencatat hari ini.</string>
+    <string name="profile_streak_today_logged">Kamu sudah mencatat hari ini.</string>
     <string name="profile_xp_count">%1$s XP dari %2$s catatan aktif</string>
     <string name="profile_empty">Mulai catat aktivitasmu untuk membangun progres.</string>
     <string name="profile_xp_basis">XP menunjukkan kebiasaan mencatat, bukan skor lingkungan.</string>

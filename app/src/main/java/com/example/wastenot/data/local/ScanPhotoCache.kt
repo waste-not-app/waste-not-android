@@ -73,6 +73,11 @@ class ScanPhotoCache(private val directory: File, owner: String, private val sch
         directory.listFiles()?.filter { it.isFile && now - it.lastModified() >= TimeUnit.HOURS.toMillis(1) }?.forEach { it.delete() }
     }
 
+    fun removeOwnerPhotos() {
+        directory.listFiles()?.filter { it.isFile && it.name.startsWith(prefix) && it.name.endsWith(".jpg") }
+            ?.forEach { it.delete() }
+    }
+
     companion object {
         fun create(context: Context, owner: String): ScanPhotoCache {
             val app = context.applicationContext

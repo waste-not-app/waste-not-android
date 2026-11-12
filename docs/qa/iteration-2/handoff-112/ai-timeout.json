@@ -1,0 +1,30 @@
+{
+  "run_id": "ffa5b667-727b-4c90-8fdd-ea3515a4e697",
+  "passed": false,
+  "fixture": {
+    "passed_steps": [
+      "register_owned_fixture",
+      "live_capabilities_and_catalog",
+      "received_real_detector_candidates",
+      "real_yolo_band_preserved_before_explicit_user_material_confirmation",
+      "server_requested_former_contents_returns_to_context",
+      "received_live_recommendation_response"
+    ],
+    "model_version": "broad-coco-b0f633193403",
+    "recommendation_status": "UNAVAILABLE",
+    "reason_code": "LLM_TIMEOUT",
+    "provider": "gemini",
+    "prototype_only": false,
+    "raw_class": "bottle",
+    "band": "UNCERTAIN"
+  },
+  "cleanup_counts": {
+    "sessions": 0,
+    "waste_logs": 0,
+    "ai_operations": 0,
+    "ai_log_metadata": 0,
+    "users": 0,
+    "refresh_tokens": 0
+  },
+  "cleanup_complete": true
+}

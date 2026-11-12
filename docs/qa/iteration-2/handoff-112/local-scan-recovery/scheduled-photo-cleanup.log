@@ -1,0 +1,13 @@
+11 November 2026 — Android 17 / API 37.
+ScanPhotoCacheTest#schedulesCleanupForAnInterruptedCapture
+
+The production cache scheduled ScanPhotoCleanupWorker via WorkManager.
+Its requested earliest run was 3,600,004 ms after creating the probe.
+Instrumentation exited. The app process was absent and the system job persisted.
+The QA emulator clock was advanced 61 minutes. Android JobScheduler was
+explicitly instructed to dispatch the existing job. The JPEG disappeared
+without opening the app. The emulator clock and automatic time were restored.
+
+Instrumentation: Time: 0.033; OK (1 test).
+This verifies dispatch after the deadline with controlled timing. Natural
+dispatch under Android background scheduling was not measured.

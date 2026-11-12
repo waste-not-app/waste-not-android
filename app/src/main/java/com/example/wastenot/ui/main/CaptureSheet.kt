@@ -3,6 +3,7 @@ package com.example.wastenot.ui.main
 import com.example.wastenot.data.repository.ScanRepository
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
@@ -11,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.testTag
@@ -33,7 +34,9 @@ import androidx.compose.ui.window.DialogWindowProvider
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
@@ -51,11 +54,12 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(26.dp)
     Surface(
-        onClick = onClick,
         modifier = modifier.widthIn(min = 136.dp).heightIn(min = 52.dp)
-            .focusOutline(focused, shape, colors.primary, colors.surface).semantics { contentDescription = description },
+            .focusOutline(focused, shape, colors.primary, colors.surface)
+            .clip(shape)
+            .clickable(interactionSource = interactions, indication = ripple(), role = Role.Button, onClick = onClick)
+            .clearAndSetSemantics { contentDescription = description },
         shape = shape,
-        interactionSource = interactions,
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(3.dp, MaterialTheme.colorScheme.surface),
         shadowElevation = 2.dp,
@@ -85,8 +89,10 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) -> ScanRepository, session: String, onDismiss: () -> Unit,
-    onPrefill: (ScanPrefill) -> Unit, modifier: Modifier = Modifier) {
+internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) -> ScanRepository, session: String,
+    isPhotoScanDisabled: suspend () -> Boolean, onDismiss: () -> Unit,
+    onPrefill: (ScanPrefill) -> Unit, modifier: Modifier = Modifier,
+    restorePhotoReview: Boolean = false, onPhotoReviewChanged: (Boolean) -> Unit = {}) {
     val context = LocalContext.current
     val cache = remember(userId) { ScanPhotoCache.create(context, userId) }
     val factory = remember(cache, repositoryFactory) { viewModelFactory { initializer {
@@ -94,26 +100,49 @@ internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) ->
     } } }
     val model: ScanViewModel = viewModel(key = "scan-$userId", factory = factory)
     val state by model.state.collectAsStateWithLifecycle()
-    var hadPhoto by rememberSaveable(session) { mutableStateOf(false) }
-    LaunchedEffect(session) {
+    val scanDisabled by produceState<Boolean?>(null, session) { value = isPhotoScanDisabled() }
+    val photoCacheReady by produceState(false, session) {
         model.start(session)
-        if (hadPhoto && model.state.value.photo == null) model.problem(session, ScanProblem.EXPIRED)
-        withContext(Dispatchers.IO) { cache.removeExpired() }
+        val interrupted = restorePhotoReview && model.state.value.photo == null
+        withContext(Dispatchers.IO) {
+            if (interrupted) cache.removeOwnerPhotos()
+            cache.removeExpired()
+        }
+        if (interrupted) model.problem(session, ScanProblem.EXPIRED)
+        value = true
     }
-    LaunchedEffect(state.photo) { if (state.session == session) hadPhoto = state.photo != null }
     DisposableEffect(model, session) {
         onDispose { if (context.activity()?.isChangingConfigurations != true) model.close(session) }
     }
-    fun dismiss() { model.close(session); onDismiss() }
+    fun dismiss() {
+        model.close(session)
+        onPhotoReviewChanged(false)
+        onDismiss()
+    }
+    fun retake() {
+        model.retake()
+        onPhotoReviewChanged(false)
+    }
     fun use(manual: Boolean) {
         if (model.state.value.session != session) return
         val prefill = model.handoff(confirmRecommendation = !manual) ?: return
-        model.close(session); onPrefill(prefill)
+        model.close(session)
+        onPhotoReviewChanged(false)
+        onPrefill(prefill)
     }
-    ScanSheet(state, ::dismiss, { use(true) }, model::retake, model::detect, model::select, model::category,
+    val visibleState = if (scanDisabled == true) state.copy(phase = ScanPhase.FAILURE, problem = ScanProblem.DISABLED) else state
+    ScanSheet(visibleState, ::dismiss, { use(true) }, ::retake, model::detect, model::select, model::category,
         model::confirmObject, model::correctObject, model::context, model::recommend, model::method,
-        { use(false) }, model::retry, modifier, model::objectKey, model::reviewContext, model::confirmConditions) {
-        ScanCamera(session, cache, { model.photo(session, it) }, { model.problem(session, it) })
+        { use(false) }, { model.retry(); if (model.state.value.photo == null) onPhotoReviewChanged(false) },
+        modifier, model::objectKey, model::reviewContext, model::confirmConditions) {
+        if (scanDisabled == false && photoCacheReady) {
+            ScanCamera(session, cache, { photo ->
+                model.photo(session, photo)
+                if (model.state.value.photo == photo) onPhotoReviewChanged(true)
+            }, { model.problem(session, it) })
+        } else {
+            LinearProgressIndicator(Modifier.fillMaxWidth())
+        }
     }
 }
 

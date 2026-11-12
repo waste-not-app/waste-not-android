@@ -1,0 +1,9 @@
+11 November 2026 — Android 17 / API 37.
+ScanCameraLifecycleTest#deviceWithoutCamerasShowsErrorAndKeepsManualEntryAvailable
+
+Booted the QA emulator with -camera-back none -camera-front none.
+CameraManager and dumpsys media.camera reported zero cameras.
+With CAMERA permission granted, activation showed the camera unavailable message.
+Input manual closed the sheet and invoked the manual action once. No photo was taken.
+
+Instrumentation: Time: 29.956; OK (1 test).

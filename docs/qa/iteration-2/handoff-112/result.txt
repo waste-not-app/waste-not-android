@@ -1,0 +1,6 @@
+records=1000
+requests=51
+unique_cursors=50
+elapsed_ms=93580
+start_pss_kib=97313
+end_pss_kib=107362

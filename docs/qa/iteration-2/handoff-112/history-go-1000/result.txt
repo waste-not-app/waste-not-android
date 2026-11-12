@@ -1,0 +1,5 @@
+records=1000
+pages=50
+elapsed_ms=13342
+start_pss_kib=113909
+end_pss_kib=124052

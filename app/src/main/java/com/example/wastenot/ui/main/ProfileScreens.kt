@@ -76,28 +76,8 @@ fun ProfileScreen(
                     WasteFormat.integer(progress.activeLogCount.toLong())), color = SummarySecondaryText)
             }
             ProgressMeter(progress, Modifier.fillMaxWidth())
-            val streaks = listOfNotNull(
-                progress.currentStreak?.let { R.string.profile_current_streak to it },
-                progress.bestStreak?.let { R.string.profile_best_streak to it },
-            )
-            if (streaks.isNotEmpty()) {
-                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.profile_streak_title), style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.semantics { heading() })
-                    streaks.forEach { (label, days) ->
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Text(stringResource(label), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                            Text(stringResource(R.string.profile_streak_days, WasteFormat.integer(days.toLong())),
-                                style = MaterialTheme.typography.titleMedium)
-                        }
-                    }
-                    if (!progress.hasLoggedToday && (progress.currentStreak ?: 0) > 0) {
-                        Text(stringResource(R.string.profile_streak_today_pending), style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Text(stringResource(R.string.profile_streak_basis), style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+            if (progress.currentStreak != null || progress.bestStreak != null) {
+                StreakCallout(progress)
             }
             if (progress.activeLogCount == 0) {
                 Text(stringResource(R.string.profile_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -109,6 +89,39 @@ fun ProfileScreen(
             Modifier.fillMaxWidth(), icon = R.drawable.ic_logout)
         Text(stringResource(R.string.profile_xp_basis), style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun StreakCallout(progress: UserProgress) {
+    val current = progress.currentStreak
+    val best = progress.bestStreak
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .background(LocalWasteNotGradients.current.accent, MaterialTheme.shapes.medium)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Icon(painterResource(R.drawable.ic_clock), null, Modifier.size(24.dp), tint = OnAccent)
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            val title = if (current != null) {
+                stringResource(R.string.profile_current_streak, WasteFormat.integer(current.toLong()))
+            } else {
+                stringResource(R.string.profile_streak_title)
+            }
+            Text(title, Modifier.semantics { heading() }, color = OnAccent, style = MaterialTheme.typography.titleMedium)
+            if (current != null && current > 0) {
+                val todayStatus = if (progress.hasLoggedToday) R.string.profile_streak_today_logged
+                    else R.string.profile_streak_today_pending
+                Text(stringResource(todayStatus), color = OnAccent, style = MaterialTheme.typography.bodyMedium)
+            }
+            if (best != null) {
+                Text(stringResource(R.string.profile_best_streak, WasteFormat.integer(best.toLong())),
+                    color = OnAccent, style = MaterialTheme.typography.bodyMedium)
+            }
+            Text(stringResource(R.string.profile_streak_basis), color = OnAccent, style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 
