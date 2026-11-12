@@ -101,14 +101,15 @@ internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) ->
     val model: ScanViewModel = viewModel(key = "scan-$userId", factory = factory)
     val state by model.state.collectAsStateWithLifecycle()
     val scanDisabled by produceState<Boolean?>(null, session) { value = isPhotoScanDisabled() }
-    LaunchedEffect(session) {
+    val photoCacheReady by produceState(false, session) {
         model.start(session)
         val interrupted = restorePhotoReview && model.state.value.photo == null
-        if (interrupted) model.problem(session, ScanProblem.EXPIRED)
         withContext(Dispatchers.IO) {
             if (interrupted) cache.removeOwnerPhotos()
             cache.removeExpired()
         }
+        if (interrupted) model.problem(session, ScanProblem.EXPIRED)
+        value = true
     }
     DisposableEffect(model, session) {
         onDispose { if (context.activity()?.isChangingConfigurations != true) model.close(session) }
@@ -134,7 +135,7 @@ internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) ->
         model::confirmObject, model::correctObject, model::context, model::recommend, model::method,
         { use(false) }, { model.retry(); if (model.state.value.photo == null) onPhotoReviewChanged(false) },
         modifier, model::objectKey, model::reviewContext, model::confirmConditions) {
-        if (scanDisabled == false) {
+        if (scanDisabled == false && photoCacheReady) {
             ScanCamera(session, cache, { photo ->
                 model.photo(session, photo)
                 if (model.state.value.photo == photo) onPhotoReviewChanged(true)
