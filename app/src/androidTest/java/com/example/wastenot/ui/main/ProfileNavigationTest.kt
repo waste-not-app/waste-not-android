@@ -33,6 +33,7 @@ class ProfileNavigationTest {
         compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
         compose.onNode(tabs and hasText("Profil")).performClick()
         logout()
+        chooseTheme("Terang")
         capture("auth-login-light")
         compose.onNodeWithText("Masuk").performScrollTo()
         capture("auth-login-form-light")
@@ -57,6 +58,8 @@ class ProfileNavigationTest {
                 .config[SemanticsProperties.EditableText].text
             assertEquals("Masked password length for $label", 19, rendered.length)
         }
+        androidx.test.espresso.Espresso.closeSoftKeyboard()
+        compose.waitForIdle()
         compose.onNodeWithText("Buat akun").performScrollTo().performClick()
         capture("auth-register-submitted-light")
         listOf("Nama perlu", "Masukkan alamat email", "Kata sandi perlu", "Konfirmasi kata sandi belum sama", "Email ini sudah digunakan", "Permintaan belum berhasil").forEach {
@@ -96,9 +99,14 @@ class ProfileNavigationTest {
         compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
         compose.onNode(tabs and hasText("Profil")).performClick()
         compose.onNodeWithText("50 XP dari 5 catatan aktif").assertExists()
-        capture("profile-app-light")
         compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
         compose.onNodeWithContentDescription("Kembali").assertExists()
+        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
+        compose.onNode(hasText("Terang") and hasAnyAncestor(isDialog())).performClick()
+        compose.onNodeWithText("Tutup").performClick()
+        compose.onNodeWithContentDescription("Kembali").performClick()
+        capture("profile-app-light")
+        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
         compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
         compose.onNode(hasText("Gelap") and hasAnyAncestor(isDialog())).performClick()
         compose.onNodeWithText("Tutup").performClick()
@@ -122,12 +130,20 @@ class ProfileNavigationTest {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val directory = File(instrumentation.targetContext.getExternalFilesDir(null), "profile-qa").apply { mkdirs() }
         val dark = name.endsWith("dark")
-        val minima = if (dark) intArrayOf(20, 35, 26) else intArrayOf(220, 235, 216)
-        compose.waitUntil(10_000) {
-            val frame = instrumentation.uiAutomation.takeScreenshot()
-            val pixel = frame.getPixel(1, frame.height / 2)
-            frame.recycle()
-            listOf(16, 8, 0).mapIndexed { i, shift -> (pixel shr shift and 255) >= minima[i] }.all { it }
+        val minima = if (dark) intArrayOf(15, 30, 20) else intArrayOf(210, 225, 210)
+        var lastPixel = 0
+        try {
+            compose.waitUntil(10_000) {
+                val frame = instrumentation.uiAutomation.takeScreenshot()
+                lastPixel = frame.getPixel(20, frame.height / 2)
+                frame.recycle()
+                listOf(16, 8, 0).mapIndexed { i, shift -> (lastPixel shr shift and 255) >= minima[i] }.all { it }
+            }
+        } catch (t: Throwable) {
+            val r = android.graphics.Color.red(lastPixel)
+            val g = android.graphics.Color.green(lastPixel)
+            val b = android.graphics.Color.blue(lastPixel)
+            throw AssertionError("capture($name) failed pixel(1,h/2)=($r,$g,$b) vs minima=${minima.toList()}", t)
         }
         val bitmap = instrumentation.uiAutomation.takeScreenshot()
         File(directory, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }

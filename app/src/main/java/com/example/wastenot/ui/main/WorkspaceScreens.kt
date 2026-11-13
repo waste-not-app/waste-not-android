@@ -226,9 +226,9 @@ internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifi
                     MetricTile(stringResource(R.string.avoided_short_title), avoidedText, R.drawable.ic_leaf, Modifier.fillMaxWidth(), limeHighlight = true, subtitle = avoidedSub)
                 }
             } else {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    MetricTile(stringResource(R.string.rate_title), rateText, R.drawable.ic_recycle, Modifier.weight(1f), subtitle = rateSub)
-                    MetricTile(stringResource(R.string.avoided_short_title), avoidedText, R.drawable.ic_leaf, Modifier.weight(1f), limeHighlight = true, subtitle = avoidedSub)
+                Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    MetricTile(stringResource(R.string.rate_title), rateText, R.drawable.ic_recycle, Modifier.weight(1f).fillMaxHeight(), subtitle = rateSub)
+                    MetricTile(stringResource(R.string.avoided_short_title), avoidedText, R.drawable.ic_leaf, Modifier.weight(1f).fillMaxHeight(), limeHighlight = true, subtitle = avoidedSub)
                 }
             }
         }

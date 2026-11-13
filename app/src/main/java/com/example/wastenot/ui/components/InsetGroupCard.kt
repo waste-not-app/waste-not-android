@@ -115,6 +115,7 @@ fun MetricTile(
     modifier: Modifier = Modifier,
     limeHighlight: Boolean = false,
     subtitle: String? = null,
+    secondarySubtitle: String? = null,
 ) {
     val tokens = LocalWasteNotSurfaceTokens.current
     Surface(
@@ -165,6 +166,13 @@ fun MetricTile(
             if (subtitle != null) {
                 Text(
                     subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (secondarySubtitle != null) {
+                Text(
+                    secondarySubtitle,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

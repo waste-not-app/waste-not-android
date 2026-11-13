@@ -22,7 +22,6 @@ import com.example.wastenot.R
 import com.example.wastenot.model.*
 import com.example.wastenot.ui.components.*
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
@@ -30,9 +29,7 @@ import com.patrykandpatrick.vico.compose.common.ProvideVicoTheme
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.compose.m3.common.rememberM3VicoTheme
-import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
@@ -208,12 +205,6 @@ private fun DailyChart(daily: List<StatisticsDayTotal>, count: Boolean, modifier
             columnSeries { series(values.map { it.toDouble() }) }
         }
     }
-    val bottomFormatter = remember(daily) {
-        CartesianValueFormatter { _, x, _ ->
-            val idx = x.toInt().coerceIn(daily.indices)
-            daily[idx].date.dayOfMonth.toString()
-        }
-    }
     val primaryColor = MaterialTheme.colorScheme.primary
     Column(modifier.testTag(if (count) "daily-count-chart" else "daily-weight-chart"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         StatisticsHeading(title)
@@ -243,16 +234,8 @@ private fun DailyChart(daily: List<StatisticsDayTotal>, count: Boolean, modifier
                         val layer = rememberColumnCartesianLayer(
                             columnProvider = ColumnCartesianLayer.ColumnProvider.series(column),
                         )
-                        val bottomAxis = HorizontalAxis.rememberBottom(
-                            valueFormatter = bottomFormatter,
-                            itemPlacer = remember(weekly) {
-                                HorizontalAxis.ItemPlacer.aligned(
-                                    spacing = { if (weekly) 1 else (daily.size / 3).coerceAtLeast(1) },
-                                )
-                            },
-                        )
                         CartesianChartHost(
-                            chart = rememberCartesianChart(layer, bottomAxis = bottomAxis),
+                            chart = rememberCartesianChart(layer),
                             modelProducer = modelProducer,
                             modifier = Modifier
                                 .width(plotWidth)
@@ -263,6 +246,21 @@ private fun DailyChart(daily: List<StatisticsDayTotal>, count: Boolean, modifier
                                 },
                             scrollState = rememberVicoScrollState(scrollEnabled = false),
                         )
+                    }
+                    Row(
+                        Modifier.width(plotWidth).padding(top = 6.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        val ticks = if (weekly) daily else listOf(daily.first(), daily[daily.size / 2], daily.last())
+                        ticks.forEach {
+                            Text(
+                                it.date.dayOfMonth.toString(),
+                                modifier = if (weekly) Modifier.weight(1f) else Modifier,
+                                textAlign = if (weekly) TextAlign.Center else TextAlign.Start,
+                                style = labelStyle,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
                 if (plotWidth > viewportWidth) {

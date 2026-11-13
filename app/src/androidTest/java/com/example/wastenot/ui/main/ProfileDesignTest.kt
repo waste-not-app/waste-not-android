@@ -94,7 +94,7 @@ class ProfileDesignTest {
         compose.onNodeWithText("Versi ${BuildConfig.VERSION_NAME}").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Zona akun ditetapkan saat pendaftaran.").assertExists()
         compose.onNodeWithText("Ringkasan ini bukan kebijakan privasi resmi.", substring = true).assertExists()
-        compose.onNodeWithText("Pengingat").assertDoesNotExist()
+        compose.onNodeWithText("Pengingat").assertIsDisplayed()
         compose.onNodeWithText("Achievement").assertDoesNotExist()
         capture("settings-privacy")
     }

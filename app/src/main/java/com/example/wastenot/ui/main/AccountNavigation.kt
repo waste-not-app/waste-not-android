@@ -13,12 +13,12 @@ import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.model.Metadata
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.HazeStyle
+import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.materials.CupertinoMaterials
-import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.rememberHazeState
-import dev.chrisbanes.haze.HazeState
 import com.example.wastenot.ui.components.ambientCanvasBackground
 import com.example.wastenot.theme.LocalWasteNotScaffoldPadding
 import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
@@ -601,7 +601,7 @@ fun AccountNavigation(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AccountPage(
     route: NavKey,
@@ -617,26 +617,35 @@ private fun AccountPage(
 ) {
     val hazeState = rememberHazeState()
     val tokens = LocalWasteNotSurfaceTokens.current
+    val glassStyle = HazeStyle(
+        backgroundColor = MaterialTheme.colorScheme.surface,
+        tint = HazeTint(tokens.glassTintStrong),
+        blurRadius = 26.dp,
+        noiseFactor = 0f,
+        fallbackTint = HazeTint(tokens.glassTintStrong),
+    )
     val headerShape = androidx.compose.foundation.shape.RoundedCornerShape(22.dp)
     // Each fading entry keeps its own chrome so the outgoing list cannot resize and clamp its scroll.
-    Row(Modifier.fillMaxSize().ambientCanvasBackground()) {
-        if (rail && route !is LogEditor) TabRail(tab, onSelect, onRecord, Modifier.width(railWidth).fillMaxHeight())
-        Scaffold(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
-            containerColor = Color.Transparent,
-            topBar = {
-                if (route != Home) {
-                    Surface(
-                        modifier = Modifier
-                            .statusBarsPadding()
-                            .padding(horizontal = 16.dp, vertical = 6.dp)
-                            .fillMaxWidth()
-                            .clip(headerShape)
-                            .hazeEffect(state = hazeState, style = CupertinoMaterials.thin(tokens.glassTint)),
-                        shape = headerShape,
-                        color = Color.Transparent,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, tokens.glassEdge),
-                    ) {
+    Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize().ambientCanvasBackground().hazeSource(hazeState, zIndex = 0f))
+        Row(Modifier.fillMaxSize()) {
+            if (rail && route !is LogEditor) TabRail(tab, onSelect, onRecord, Modifier.width(railWidth).fillMaxHeight())
+            Scaffold(
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                containerColor = Color.Transparent,
+                topBar = {
+                    if (route != Home) {
+                        Surface(
+                            modifier = Modifier
+                                .statusBarsPadding()
+                                .padding(horizontal = 16.dp, vertical = 6.dp)
+                                .fillMaxWidth()
+                                .clip(headerShape)
+                                .hazeEffect(state = hazeState, style = glassStyle),
+                            shape = headerShape,
+                            color = Color.Transparent,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, tokens.glassEdge),
+                        ) {
                         TopAppBar(
                             title = {
                                 Text(
@@ -680,27 +689,28 @@ private fun AccountPage(
                     }
                 }
             },
-            bottomBar = { if (!rail && route == tab.key) TabDock(tab, onSelect, onRecord, hazeState) },
-        ) { padding ->
-            CompositionLocalProvider(LocalWasteNotScaffoldPadding provides padding) {
-                val bodyModifier = if (route is LogEditor) {
-                    Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).hazeSource(hazeState)
-                } else {
-                    Modifier.fillMaxSize().hazeSource(hazeState)
+                bottomBar = { if (!rail && route == tab.key) TabDock(tab, onSelect, onRecord, hazeState, glassStyle) },
+            ) { padding ->
+                CompositionLocalProvider(LocalWasteNotScaffoldPadding provides padding) {
+                    val bodyModifier = if (route is LogEditor) {
+                        Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).hazeSource(hazeState, zIndex = 1f)
+                    } else {
+                        Modifier.fillMaxSize().hazeSource(hazeState, zIndex = 1f)
+                    }
+                    Box(bodyModifier) { content() }
                 }
-                Box(bodyModifier) { content() }
             }
         }
     }
 }
 
-@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 private fun TabDock(
     selected: MainTab,
     onSelect: (MainTab) -> Unit,
     onRecord: () -> Unit,
     hazeState: HazeState,
+    glassStyle: HazeStyle,
     modifier: Modifier = Modifier,
 ) {
     val tokens = LocalWasteNotSurfaceTokens.current
@@ -722,11 +732,10 @@ private fun TabDock(
                 .fillMaxWidth()
                 .padding(top = 24.dp)
                 .clip(dockShape)
-                .hazeEffect(state = hazeState, style = CupertinoMaterials.thin(tokens.glassTint)),
+                .hazeEffect(state = hazeState, style = glassStyle),
             color = Color.Transparent,
             shape = dockShape,
             border = androidx.compose.foundation.BorderStroke(1.dp, tokens.glassEdge),
-            shadowElevation = if (tokens.isDark) 0.dp else 4.dp,
         ) {
             FlowRow(
                 modifier = Modifier.padding(top = 28.dp, bottom = 7.dp, start = 4.dp, end = 4.dp).selectableGroup(),
