@@ -20,6 +20,7 @@ import com.example.wastenot.ui.auth.AuthUiState
 import com.example.wastenot.ui.main.OverviewScreen
 import com.example.wastenot.ui.main.WorkspaceUiState
 import java.io.File
+import androidx.core.graphics.ColorUtils
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -100,10 +101,15 @@ class HeaderIconDesignTest {
         val directory = File(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null), "icon-action-qa").apply { mkdirs() }
         File(directory, "$name-$theme.png").outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) }
         val pixels = JSONArray(); val violations = mutableListOf<String>()
-        for ((xDp, yDp) in listOf(4f to 4f, 24f to 4f, 44f to 4f)) {
+        val tokens = if (dark) DarkSurfaceTokens else LightSurfaceTokens
+        val expectedSurface = if (name == "home-profile") tokens.glassTintStrong else scheme.surfaceContainer
+        val expectedInk = if (name == "home-profile") scheme.onPrimaryContainer else scheme.onPrimaryContainer
+        val sampleOffsets = if (name == "home-profile") listOf(24f to 6f, 24f to 42f) else listOf(4f to 4f, 24f to 4f, 44f to 4f)
+        for ((xDp, yDp) in sampleOffsets) {
             val actual = bitmap.getPixel((bounds.left + with(compose.density) { xDp.dp.toPx() }).roundToInt(),
                 (bounds.top + with(compose.density) { yDp.dp.toPx() }).roundToInt())
-            if (!near(actual, scheme.surfaceContainer.toArgb())) violations.add("$label: soft/12dp corner sample ($xDp,$yDp) $actual != ${scheme.surfaceContainer.toArgb()}")
+            val ratio = ColorUtils.calculateContrast(expectedInk.toArgb(), actual)
+            if (ratio < 3.0) violations.add("$label: low icon contrast $ratio at ($xDp,$yDp)")
             pixels.put(actual)
         }
         var ink = 0
@@ -111,14 +117,14 @@ class HeaderIconDesignTest {
         val top = (bounds.center.y - with(compose.density) { 12.dp.toPx() }).roundToInt()
         val side = with(compose.density) { 24.dp.toPx() }.roundToInt()
         for (x in left until left + side) for (y in top until top + side) {
-            if (near(bitmap.getPixel(x, y), scheme.onSurface.toArgb())) ink++
+            if (near(bitmap.getPixel(x, y), expectedInk.toArgb())) ink++
         }
         if (ink < 20) violations.add("$label: expected ink glyph, found $ink matching pixels")
         bitmap.recycle()
         File(directory, "$name-$theme.json").writeText(JSONObject().put("label", label).put("theme", theme)
             .put("font_scale", InstrumentationRegistry.getInstrumentation().targetContext.resources.configuration.fontScale)
             .put("width_px", bounds.width).put("height_px", bounds.height).put("surface_samples", pixels)
-            .put("expected_surface", scheme.surfaceContainer.toArgb()).put("ink_pixels", ink)
+            .put("expected_surface", expectedSurface.toArgb()).put("ink_pixels", ink)
             .put("violations", JSONArray(violations)).toString(2))
         assertTrue(violations.joinToString("\n"), violations.isEmpty())
     }

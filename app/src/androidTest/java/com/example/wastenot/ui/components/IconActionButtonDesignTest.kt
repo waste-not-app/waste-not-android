@@ -57,7 +57,7 @@ class IconActionButtonDesignTest {
             val bounds = node.fetchSemanticsNode().boundsInWindow
             automation.waitForIdle(300, 5_000); automation.takeScreenshot()?.recycle(); android.os.SystemClock.sleep(150)
             val bitmap = checkNotNull(automation.takeScreenshot())
-            val tint = if (index == 0) scheme.onSurface else scheme.onSurfaceVariant
+            val tint = if (index == 0) scheme.onPrimaryContainer else scheme.onSurfaceVariant
             val samples = JSONArray()
             for ((xDp, yDp) in listOf(4f to 4f, 24f to 4f, 44f to 4f)) {
                 val actual = bitmap.getPixel((bounds.left + with(compose.density) { xDp.dp.toPx() }).roundToInt(),

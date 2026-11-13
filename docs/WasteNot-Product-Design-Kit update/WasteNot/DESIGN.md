@@ -1,6 +1,6 @@
 # WasteNot Design System
 
-Versi 1.3 · 28 September 2026 · Core + AI extension · Rancangan implementasi
+Versi 1.4 · 13 November 2026 · Core + AI extension · iOS Inset-Grouped & Liquid Glass
 
 **Arah:** catatan kebiasaan yang segar, praktis, dan mudah dibaca. Desain ini ditentukan khusus untuk personal waste tracking dan panduan 3R, sesuai permintaan pengguna. Referensi Titip.in tidak menjadi sumber warna, font, bentuk komponen, atau komposisi WasteNot.
 
@@ -241,3 +241,25 @@ C35–C39 dan S21–S25 melengkapi katalog menjadi 39 komponen dan 25 layar/pane
 Sheet menggunakan step indicator empat tahap, current step berupa lingkaran lime dengan label teks. Preview kamera memakai pinus gelap, area framing garis putus, dan teks berkontras tinggi. Hasil objek memakai ikon material besar dalam ilustrasi bbox berlabel contoh; tidak mengklaim koordinat hasil inference foto.
 
 Header, isi scroll, dan footer manual dipisahkan divider. Footer tetap opak agar teks tidak bercampur feed kamera dan dapat dicapai saat isi panjang. Pengaturan simulasi dan dasar rekomendasi memakai disclosure. Form manual Beranda/Riwayat menjadi aksi sekunder agar Catat/Scan di dock menjadi fokus utama. Radius, gradasi, glass dock dan typography v1.1 tetap dipakai.
+
+## 14. Penyempurnaan visual v1.4: iOS Inset-Grouped, Liquid Glass, dan Copy Ringkas
+
+Revisi 13 November merapikan kepadatan teks dan struktur permukaan sesuai evaluasi langsung mockup dan aplikasi Android:
+
+1. **iOS Inset-Grouped Surface**: daftar aktivitas, baris metadata detail, hasil panduan, menu profil/pengaturan, dan breakdown statistik tidak lagi mengapung di atas divider telanjang. Item yang sekelompok dibungkus dalam satu kartu solid (`--surface`, radius `20 dp` luar / `16 dp` metrik kompak) dengan garis pemisah internal tipis yang menjorok sejajar teks (`inset-left: 68 px` untuk baris berikon).
+2. **Liquid Glass terarah (maksimal 2 layer per viewport)**:
+   - **Floating Liquid Glass Dock** (`TabDock`) melayang di tepi bawah dengan `backdrop-filter: blur(22px) saturate(1.8)`, specular rim highlight `1 px`, bayangan halus, kapsul aktif lime, dan tombol `Catat / Scan` yang menonjol. Konten di belakang dock tetap mengalir dan ter-blur lembut saat discroll.
+   - **Sticky Glass Header** pada daftar panjang memakai tint kaca lembut agar judul halaman dan tombol aksi tetap tajam di atas konten scroll.
+   - Form, input, error banner, dialog, dan kartu isi tetap **solid opak** agar keterbacaan angka dan kontras WCAG AA (`≥ 4,5:1` teks normal, `≥ 3:1` komponen) terjaga di tema terang dan gelap.
+3. **Aturan Kepadatan Teks (Copy Tightening)**:
+   - Setiap kartu ringkasan dan kartu metrik menampilkan maksimal **1 label + 1 angka utama + 1 baris subkonteks**. Penjelasan metodologi ("Catatan pribadi...", "Proporsi seluruh aktivitas...") dipindah ke disclosure (`(i)` / `<details>`) atau helper singkat agar pengguna langsung melihat data dan aksi inti.
+   - Banner peringatan editorial tidak memblokir bagian atas daftar ketika informasi sudah diwakili badge status (`Draf`).
+4. **Pemetaan Library Jetpack Compose (v1.4, minSdk 30 / Kotlin 2.3.20)**:
+   - **Liquid Glass**: `Haze` (`chrisbanes/haze`) untuk real-time backdrop blur pada floating dock & sticky header dengan fallback translucent surface otomatis di Android 11 (API 30).
+   - **Komponen Clean iOS-like**: struktur *Inset Grouped*, segmented pill, toggle switch, dan sheet header dibangun dengan token `WasteNotTheme` + pola `Compose Unstyled` / `Composables UI` (tanpa mencampur widget M3 dengan `Compose Cupertino` atau mengubah sistem tema).
+   - **Chart, Foto & Skeleton**: `Vico` untuk grafik statistik harian (`S13`), `Coil` untuk muat foto privat (`S18`), dan `Compose Shimmer` untuk skeleton state loading (`S20`).
+5. **Harmoni Warna & Elemen Hidup**:
+   - **Primary & Secondary Button**: tombol primary memakai emerald bertingkat (`#146342 → #1D7A52` terang; `#52D69A → #3BC487` gelap); tombol secondary memakai tint emerald lembut (`--soft`, `#E5F2EA` / `#1E3529`) agar satu keluarga dengan tombol utama, bukan abu-abu pucat.
+   - **Metric Tile Terkendali**: kartu metrik sekunder tetap memakai permukaan solid (`--surface`) dengan ikon badge beraksen lembut (`.metric-spark`), menghindari blok neon lime raksasa terutama pada tema gelap.
+   - **Ikon Material Berwarna Lembut & Ambient Canvas**: kategori material memakai tint lembut berbeda per jenis (organik, plastik, kaca, kertas, logam, elektronik) dan latar belakang kanvas membawa cahaya ambient halus agar efek Liquid Glass pada dock/header membiaskan kedalaman warna nyata.
+   - **Glass Form & Soft-Well Inputs**: kartu form memakai frosted glass lembut (`glass-form`), field input/dropdown/date/time memakai soft-well tint (`--field-bg`) dengan fokus halo emerald (`--focus-halo`), dropdown memakai chevron kustom tanpa panah OS kaku, input berat + satuan menyatu dalam `.quantity-compound`, serta radio metode memakai indikator cincin kustom (`appearance: none`). Di Compose, pola ini dipetakan ke custom `Surface` + `BasicTextField` (`Compose Unstyled` / `RikkaUI`), dropdown/sheet picker, dan `Compose-Pickers` / Material 3 `DatePicker`/`TimePicker` di dalam sheet frosted.

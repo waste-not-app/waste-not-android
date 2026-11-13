@@ -8,7 +8,7 @@ const {chromium} = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 const output = process.env.QA_DIR || path.join(os.tmpdir(), 'wastenot-qa');
 fs.mkdirSync(output, {recursive:true});
 (async()=>{
- const browser=await chromium.launch({headless:true});
+ const browser=await chromium.launch({executablePath:process.env.CHROME_PATH||undefined,headless:true});
  const page=await browser.newPage({viewport:{width:1512,height:1100},deviceScaleFactor:1});
  const errors=[],report=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(pathToFileURL(path.join(__dirname,'design-system.html')).href);

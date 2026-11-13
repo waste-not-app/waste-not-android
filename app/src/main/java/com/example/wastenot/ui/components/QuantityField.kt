@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
 import com.example.wastenot.model.QuantityInput
 import com.example.wastenot.model.QuantityUnit
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 
 @Composable
 fun QuantityField(
@@ -88,20 +90,21 @@ private fun QuantityUnitPicker(unit: QuantityUnit, onChange: (QuantityUnit) -> U
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(label, style = MaterialTheme.typography.titleSmall)
         Box {
+            val tokens = LocalWasteNotSurfaceTokens.current
             OutlinedButton(
                 onClick = { expanded = true }, enabled = enabled,
-                shape = MaterialTheme.shapes.small,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 16.dp),
+                shape = RoundedCornerShape(15.dp),
+                border = BorderStroke(1.5.dp, if (enabled) tokens.fieldEdge else MaterialTheme.colorScheme.outlineVariant),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 14.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
                     disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 56.dp)
+                    .heightIn(min = 54.dp)
                     .semantics { contentDescription = label }
                     .focusProperties { canFocus = enabled },
             ) {

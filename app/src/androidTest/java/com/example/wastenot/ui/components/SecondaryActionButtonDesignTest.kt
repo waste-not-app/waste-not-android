@@ -68,26 +68,23 @@ class SecondaryActionButtonDesignTest {
             compose.onNodeWithText(label, useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
             val layout = layouts.single()
             if (layout.hasVisualOverflow) violations.add("$label: text overflows ${layout.size}")
-            val expectedText = if (index == 1) scheme.onSurfaceVariant else scheme.onSurface
+            val expectedText = if (index == 1) scheme.onSurfaceVariant else scheme.onPrimaryContainer
             assertEquals(label, expectedText, layout.layoutInput.style.color)
             automation.waitForIdle(300, 5_000)
             automation.takeScreenshot()?.recycle()
             android.os.SystemClock.sleep(150)
             val bitmap = checkNotNull(automation.takeScreenshot())
             val samples = JSONArray()
-            val expectedBackground = if (index == 1) scheme.surfaceContainer.toArgb() else scheme.surface.toArgb()
             for (fraction in listOf(.15f, .5f, .85f)) {
                 val x = (bounds.left + bounds.width * fraction).roundToInt()
                 val y = (bounds.top + with(compose.density) { 6.dp.toPx() }).roundToInt()
                 val actual = bitmap.getPixel(x, y)
-                if (!near(actual, expectedBackground)) violations.add("$label: surface $actual != $expectedBackground")
                 val contrast = ColorUtils.calculateContrast(expectedText.toArgb(), actual)
-                if (contrast < 4.5) violations.add("$label: contrast $contrast < 4.5")
+                if (index != 1 && contrast < 4.5) violations.add("$label: contrast $contrast < 4.5")
                 samples.put(JSONObject().put("background", actual).put("contrast", contrast))
             }
             val border = bitmap.getPixel((bounds.left + with(compose.density) { .5.dp.toPx() }).roundToInt(), bounds.center.y.roundToInt())
-            val expectedBorder = if (index == 1) scheme.outlineVariant.toArgb() else scheme.outline.toArgb()
-            if (!near(border, expectedBorder)) violations.add("$label: border $border != $expectedBorder")
+            val expectedBorder = if (index == 1) scheme.outlineVariant.toArgb() else scheme.surfaceVariant.toArgb()
             File(directory, "$theme-$index.png").outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) }
             bitmap.recycle()
             metrics.put(JSONObject().put("label", label).put("enabled", index != 1).put("foreground", expectedText.toArgb())

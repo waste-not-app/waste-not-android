@@ -7,6 +7,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,6 +41,7 @@ import com.example.wastenot.model.WasteFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,27 +59,40 @@ fun DateField(
     var choosing by rememberSaveable(enabled) { mutableStateOf(false) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(label, style = MaterialTheme.typography.titleSmall)
+        val tokens = LocalWasteNotSurfaceTokens.current
         OutlinedButton(
             onClick = { choosing = true },
             enabled = enabled,
-            shape = MaterialTheme.shapes.small,
-            border = BorderStroke(1.dp, if (error != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline),
-            contentPadding = PaddingValues(16.dp),
+            shape = RoundedCornerShape(15.dp),
+            border = BorderStroke(
+                1.5.dp,
+                when {
+                    error != null -> MaterialTheme.colorScheme.error
+                    !enabled -> MaterialTheme.colorScheme.outlineVariant
+                    else -> tokens.fieldEdge
+                },
+            ),
+            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = MaterialTheme.colorScheme.surface,
+                containerColor = tokens.fieldWell,
                 contentColor = MaterialTheme.colorScheme.onSurface,
-                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 56.dp)
+                .heightIn(min = 54.dp)
                 .focusProperties { canFocus = enabled },
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(date?.let(WasteFormat::activityDate) ?: stringResource(R.string.choose_filter_date),
                     Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-                Icon(painterResource(R.drawable.ic_calendar), null, Modifier.size(24.dp))
+                Box(
+                    Modifier.size(32.dp).clip(RoundedCornerShape(9.dp)).background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(painterResource(R.drawable.ic_calendar), null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                }
             }
         }
         if (error != null) Text(error, color = MaterialTheme.colorScheme.error)

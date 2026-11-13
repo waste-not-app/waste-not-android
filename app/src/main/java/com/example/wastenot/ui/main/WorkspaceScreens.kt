@@ -1,41 +1,53 @@
 package com.example.wastenot.ui.main
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.model.*
 import com.example.wastenot.theme.*
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.*
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
 internal fun pagePadding(padding: PaddingValues): PaddingValues {
     val direction = LocalLayoutDirection.current
-    return PaddingValues(padding.calculateStartPadding(direction) + 20.dp, padding.calculateTopPadding() + 20.dp,
-        padding.calculateEndPadding(direction) + 20.dp, padding.calculateBottomPadding() + 24.dp)
+    val scaffold = LocalWasteNotScaffoldPadding.current
+    return PaddingValues(
+        start = padding.calculateStartPadding(direction) + scaffold.calculateStartPadding(direction) + 20.dp,
+        top = padding.calculateTopPadding() + scaffold.calculateTopPadding() + 16.dp,
+        end = padding.calculateEndPadding(direction) + scaffold.calculateEndPadding(direction) + 20.dp,
+        bottom = padding.calculateBottomPadding() + scaffold.calculateBottomPadding() + 24.dp,
+    )
 }
 
 @Composable
@@ -68,29 +80,44 @@ fun OverviewScreen(user: User, data: SnapshotState<DashboardSnapshot>, padding: 
     }
     ScrollPage(padding, modifier) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(snapshot.date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.forLanguageTag("id-ID"))),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(stringResource(R.string.greeting, user.name), style = MaterialTheme.typography.headlineMedium)
             }
-            IconActionButton(R.drawable.ic_profile, stringResource(R.string.open_profile), onProfile)
+            IconActionButton(R.drawable.ic_profile, stringResource(R.string.open_profile), onProfile, circle = true)
         }
         SummaryStatus(data.loading, data.error, true, onRetry)
         if (onResumeDraft != null) PausedDraftNotice(onResumeDraft)
         if (snapshot.summary.activityCount == 0L && snapshot.recentLogs.none {
-                it.activityDate == snapshot.date || it.syncState != com.example.wastenot.model.ActivitySyncState.SYNCED
+                it.activityDate == snapshot.date || it.syncState != ActivitySyncState.SYNCED
             }) MessageBanner(stringResource(R.string.home_empty_today))
-        SummaryBlock(snapshot.summary, stringResource(R.string.handled_today), afterPrimary = {
-            SecondaryActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth())
-        }, personal = true)
-        ProgressMeter(snapshot.progress)
+        SummaryBlock(snapshot.summary, stringResource(R.string.handled_today), personal = true)
+        InsetGroupCard(contentPadding = true) {
+            ProgressMeter(snapshot.progress)
+        }
+        SecondaryActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth())
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.recent_activities), style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.weight(1f).semantics { heading() })
             TextActionButton(stringResource(R.string.see_history), onHistory)
         }
-        if (snapshot.recentLogs.isEmpty()) Text(stringResource(R.string.logs_empty))
-        snapshot.recentLogs.forEach { log -> ActivityRow(log, { onDetail(log.id) }, Modifier.fillMaxWidth()) }
+        if (snapshot.recentLogs.isEmpty()) {
+            InsetGroupCard(contentPadding = true) {
+                Text(stringResource(R.string.logs_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        } else {
+            InsetGroupCard {
+                snapshot.recentLogs.forEachIndexed { idx, log ->
+                    ActivityRow(
+                        log = log,
+                        onClick = { onDetail(log.id) },
+                        modifier = Modifier.fillMaxWidth(),
+                        showDivider = idx < snapshot.recentLogs.lastIndex,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -109,7 +136,7 @@ internal fun SummaryStatus(loading: Boolean, error: ApiFailureKind?, hasValue: B
         return
     }
     if (loading) {
-        LinearProgressIndicator(Modifier.fillMaxWidth())
+        LinearProgressIndicator(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)))
     }
     if (error != null) {
         MessageBanner(stringResource(R.string.summary_refresh_failed), isError = true)
@@ -127,61 +154,100 @@ internal fun loadFailureHint(error: ApiFailureKind?): String = stringResource(wh
 @Composable
 internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifier = Modifier,
     personal: Boolean = false, afterPrimary: @Composable () -> Unit = {}, beforeRate: @Composable () -> Unit = {}) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    var showMethodology by rememberSaveable { mutableStateOf(false) }
+    val infoToggleDesc = stringResource(R.string.summary_info_toggle)
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .summarySurface()
-                .padding(24.dp),
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(title, color = SummarySecondaryText)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(title, color = SummarySecondaryText, style = MaterialTheme.typography.bodyMedium)
+                if (personal) {
+                    Surface(
+                        onClick = { showMethodology = !showMethodology },
+                        shape = CircleShape,
+                        color = Color.White.copy(alpha = 0.16f),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.24f)),
+                        modifier = Modifier.size(32.dp).semantics { contentDescription = infoToggleDesc },
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text("i", color = SummaryText, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
+                        }
+                    }
+                }
+            }
             val weight = WasteFormat.weight(summary.handled.weightGrams, summary = true)
             Text(buildAnnotatedString {
                 append(weight.amount)
-                withStyle(SpanStyle(fontSize = MaterialTheme.typography.headlineSmall.fontSize)) {
+                withStyle(SpanStyle(fontSize = MaterialTheme.typography.headlineSmall.fontSize, fontWeight = FontWeight.SemiBold)) {
                     append(" " + stringResource(weight.unit.labelResource))
                 }
             }, color = SummaryText, style = MaterialTheme.typography.displayLarge)
-            Text(stringResource(R.string.summary_activity_count, summary.activityCount), color = SummarySecondaryText,
-                style = MaterialTheme.typography.bodyMedium)
-            if (summary.handled.itemCount > 0) Text(stringResource(R.string.handled_items, WasteFormat.integer(summary.handled.itemCount)), color = SummaryText)
-            if (personal) {
-                HorizontalDivider(Modifier.padding(top = 12.dp, bottom = 8.dp), color = SummarySecondaryText.copy(alpha = 0.4f))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painterResource(R.drawable.ic_history), null, Modifier.size(20.dp), tint = SummarySecondaryText)
-                    Text(stringResource(R.string.summary_footer), style = MaterialTheme.typography.bodySmall, color = SummarySecondaryText)
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                SummaryPillChip(stringResource(R.string.summary_activity_count, summary.activityCount))
+                if (summary.handled.itemCount > 0) {
+                    SummaryPillChip(stringResource(R.string.handled_items, WasteFormat.integer(summary.handled.itemCount)))
                 }
+            }
+            if (personal && showMethodology) {
+                HorizontalDivider(Modifier.padding(top = 6.dp), color = SummarySecondaryText.copy(alpha = 0.3f))
+                Text(stringResource(R.string.summary_footer), style = MaterialTheme.typography.bodySmall, color = SummarySecondaryText)
             }
         }
         afterPrimary()
-        if (summary.avoided.itemCount > 0 || summary.avoided.weightGrams > 0) Row(
-            modifier = Modifier.fillMaxWidth().background(LocalWasteNotGradients.current.accent, MaterialTheme.shapes.medium).padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(painterResource(R.drawable.ic_leaf), null, Modifier.size(24.dp), tint = OnAccent)
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                if (summary.avoided.itemCount > 0) Text(stringResource(R.string.avoided_items, WasteFormat.integer(summary.avoided.itemCount)), style = MaterialTheme.typography.titleMedium, color = OnAccent)
-                if (summary.avoided.weightGrams > 0) Text(stringResource(R.string.avoided_weight, formatted(WasteFormat.weight(summary.avoided.weightGrams, summary = true))), color = OnAccent)
-                Text(stringResource(R.string.reduce_separate), style = MaterialTheme.typography.bodyMedium, color = OnAccent)
-            }
-        }
         beforeRate()
         val rate = WasteFormat.percentage(summary.recyclingRatePercent)
-        Column {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(stringResource(R.string.rate_title), style = MaterialTheme.typography.bodyMedium)
-                    Text(stringResource(R.string.rate_basis), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Text(if (rate == null) stringResource(R.string.rate_empty) else stringResource(R.string.rate_value, rate), style = MaterialTheme.typography.headlineSmall)
-            }
-            if (rate != null) Text(stringResource(R.string.rate_fraction, summary.recycledActivityCount, summary.handledActivityCount),
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            else Text(stringResource(R.string.rate_no_handled), style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-            HorizontalDivider(Modifier.padding(top = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
+        val rateText = if (rate == null) stringResource(R.string.rate_empty) else stringResource(R.string.rate_value, rate)
+        val rateSub = if (rate != null) {
+            stringResource(R.string.rate_fraction, summary.recycledActivityCount, summary.handledActivityCount)
+        } else {
+            stringResource(R.string.rate_no_handled)
         }
+        val avoidedText = stringResource(R.string.avoided_items, WasteFormat.integer(summary.avoided.itemCount))
+        val avoidedSub = if (summary.avoided.weightGrams > 0) {
+            stringResource(R.string.avoided_weight, formatted(WasteFormat.weight(summary.avoided.weightGrams, summary = true)))
+        } else null
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val stackTiles = maxWidth < 280.dp || LocalDensity.current.fontScale >= 1.5f
+            if (stackTiles) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    MetricTile(stringResource(R.string.rate_title), rateText, R.drawable.ic_recycle, Modifier.fillMaxWidth(), subtitle = rateSub)
+                    MetricTile(stringResource(R.string.avoided_short_title), avoidedText, R.drawable.ic_leaf, Modifier.fillMaxWidth(), limeHighlight = true, subtitle = avoidedSub)
+                }
+            } else {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    MetricTile(stringResource(R.string.rate_title), rateText, R.drawable.ic_recycle, Modifier.weight(1f), subtitle = rateSub)
+                    MetricTile(stringResource(R.string.avoided_short_title), avoidedText, R.drawable.ic_leaf, Modifier.weight(1f), limeHighlight = true, subtitle = avoidedSub)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SummaryPillChip(label: String) {
+    Surface(
+        shape = RoundedCornerShape(999.dp),
+        color = Color.White.copy(alpha = 0.15f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.20f)),
+    ) {
+        Text(
+            label,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelMedium,
+            color = SummaryText,
+        )
     }
 }
 
@@ -189,49 +255,83 @@ internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifi
 internal fun ProgressMeter(progress: UserProgress, modifier: Modifier = Modifier) {
     val xp = progress.xp
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(stringResource(R.string.level_title, progress.level), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
-            Text(stringResource(R.string.xp_total, xp), Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.End,
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Surface(
+                shape = RoundedCornerShape(999.dp),
+                color = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ) {
+                Text(
+                    stringResource(R.string.level_title, progress.level),
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                )
+            }
+            Text(
+                stringResource(R.string.xp_total, xp),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
-        LinearProgressIndicator(progress = { progress.xpIntoLevel / 100f }, modifier = Modifier.fillMaxWidth().height(8.dp)
-            .background(MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(8.dp)),
-            color = MaterialTheme.colorScheme.primary, trackColor = MaterialTheme.colorScheme.outlineVariant,
-            gapSize = 0.dp, drawStopIndicator = {})
-        Text(stringResource(R.string.xp_next, progress.xpToNextLevel, progress.level + 1), style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        LinearProgressIndicator(
+            progress = { progress.xpIntoLevel / 100f },
+            modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(8.dp)),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            gapSize = 0.dp,
+            drawStopIndicator = {},
+        )
+        Text(
+            stringResource(R.string.xp_next, progress.xpToNextLevel, progress.level + 1),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
 @Composable
-internal fun ActivityRow(log: WasteLog, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(onClick = onClick, modifier = modifier.heightIn(min = 64.dp), color = Color.Transparent, contentColor = MaterialTheme.colorScheme.onSurface) {
-        Column {
-            Row(Modifier.padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(44.dp).background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small), contentAlignment = Alignment.Center) {
-                    Icon(painterResource(log.category.iconResource), null, Modifier.size(24.dp), tint = MaterialTheme.colorScheme.primary)
-                }
-                if (androidx.compose.ui.platform.LocalDensity.current.fontScale >= 1.5f) {
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ActivityMetadata(log, Modifier.fillMaxWidth())
-                        ActivityQuantity(log)
-                    }
-                } else {
-                    ActivityMetadata(log, Modifier.weight(1f))
+internal fun ActivityRow(
+    log: WasteLog,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    showDivider: Boolean = true,
+) {
+    Column(modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 66.dp)
+                .clickable(role = Role.Button, onClick = onClick)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CategoryIconBadge(log.category, log.category.iconResource)
+            if (LocalDensity.current.fontScale >= 1.5f) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    ActivityMetadata(log, Modifier.fillMaxWidth())
                     ActivityQuantity(log)
                 }
+            } else {
+                ActivityMetadata(log, Modifier.weight(1f))
+                ActivityQuantity(log)
             }
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        }
+        if (showDivider) {
+            HorizontalDivider(
+                modifier = Modifier.padding(start = 70.dp),
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
         }
     }
 }
 
 @Composable
 private fun ActivityMetadata(log: WasteLog, modifier: Modifier = Modifier) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(3.dp)) {
         Text(stringResource(log.category.labelResource), style = MaterialTheme.typography.titleMedium)
-        if (log.syncState != com.example.wastenot.model.ActivitySyncState.SYNCED) Text(stringResource(syncLabel(log.syncState)),
-            style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (log.syncState != ActivitySyncState.SYNCED) Text(stringResource(syncLabel(log.syncState)),
+            style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
         Text(stringResource(R.string.date_method, stringResource(log.method.labelResource), WasteFormat.activityDate(log.activityDate)),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (log.notes.isNotBlank()) Text(log.notes, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
@@ -241,8 +341,8 @@ private fun ActivityMetadata(log: WasteLog, modifier: Modifier = Modifier) {
 
 @Composable
 private fun ActivityQuantity(log: WasteLog, modifier: Modifier = Modifier) {
-    Column(modifier, horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(formatted(WasteFormat.quantity(log.quantity)), style = MaterialTheme.typography.titleSmall)
+    Column(modifier, horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(formatted(WasteFormat.quantity(log.quantity)), style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
         if (log.method == DisposalMethod.REDUCE) Text(stringResource(R.string.avoided_label),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }

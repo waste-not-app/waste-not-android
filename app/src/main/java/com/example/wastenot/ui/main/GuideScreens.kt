@@ -35,6 +35,13 @@ import com.example.wastenot.ui.components.AsyncStatePanel
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.labelResource
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.clip
+import com.example.wastenot.ui.components.CategoryIconBadge
+import com.example.wastenot.ui.components.GroupSectionLabel
+import com.example.wastenot.ui.components.InsetGroupCard
+import com.example.wastenot.ui.components.wasteTextFieldColors
 import kotlinx.coroutines.launch
 
 @Composable
@@ -59,20 +66,26 @@ fun GuideListScreen(
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         LazyColumn(Modifier.weight(1f).widthIn(max = 840.dp).fillMaxWidth(), state = list,
             contentPadding = pagePadding(padding), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            item(key = "intro") { Text(stringResource(R.string.guide_intro), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             item(key = "search") {
                 val label = stringResource(R.string.guide_search)
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                InsetGroupCard(glass = true, contentPadding = true) {
                     Text(label, style = MaterialTheme.typography.titleSmall)
-                    OutlinedTextField(data.query, { onQuery(it); resetScroll() }, Modifier.fillMaxWidth().semantics { contentDescription = label },
-                        placeholder = { Text(stringResource(R.string.guide_search_hint)) }, singleLine = true, shape = MaterialTheme.shapes.small,
-                        colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface),
-                        trailingIcon = if (data.query.isNotEmpty()) ({ IconButton(onClick = { onQuery(""); resetScroll() }) {
-                            Icon(painterResource(R.drawable.ic_clear), stringResource(R.string.guide_clear))
-                        } }) else null,
+                    OutlinedTextField(
+                        data.query,
+                        { onQuery(it); resetScroll() },
+                        Modifier.fillMaxWidth().semantics { contentDescription = label },
+                        placeholder = { Text(stringResource(R.string.guide_search_hint)) },
+                        singleLine = true,
+                        shape = RoundedCornerShape(15.dp),
+                        colors = wasteTextFieldColors(),
+                        trailingIcon = if (data.query.isNotEmpty()) ({
+                            IconButton(onClick = { onQuery(""); resetScroll() }) {
+                                Icon(painterResource(R.drawable.ic_clear), stringResource(R.string.guide_clear))
+                            }
+                        }) else null,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = { submit() }))
+                        keyboardActions = KeyboardActions(onSearch = { submit() }),
+                    )
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         SecondaryActionButton(stringResource(R.string.guide_search_action), ::submit,
                             Modifier.focusProperties { canFocus = true }.focusRequester(searchAction), icon = R.drawable.ic_search)
@@ -81,9 +94,6 @@ fun GuideListScreen(
                         GuideCategory(data.category, { onCategory(it); resetScroll() })
                     }
                 }
-            }
-            if (data.articles.any { it.review == null }) item(key = "editorial") {
-                GuideEditorialNotice(stringResource(R.string.guide_catalog_pending))
             }
             if (data.loading) item(key = "loading") {
                 if (data.articles.isEmpty()) AsyncStatePanel(stringResource(R.string.guide_loading), R.drawable.ic_clock,
@@ -112,9 +122,15 @@ fun GuideListScreen(
                     }), if (data.error != null || !filtered) onSearch else ::clear, Modifier.fillMaxWidth())
                 }
             }
-            items(data.articles, key = { it.id }) { article ->
-                GuideRow(article, { keyboard?.hide(); onDetail(article.id) })
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            if (data.articles.isNotEmpty()) item(key = "articles-card") {
+                InsetGroupCard {
+                    data.articles.forEachIndexed { idx, article ->
+                        GuideRow(article, { keyboard?.hide(); onDetail(article.id) })
+                        if (idx < data.articles.lastIndex) {
+                            HorizontalDivider(Modifier.padding(start = 70.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                        }
+                    }
+                }
             }
             if (data.articles.isNotEmpty() && data.error != null) item(key = "page-error") {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -153,11 +169,9 @@ private fun GuideCategory(category: WasteCategory?, onCategory: (WasteCategory?)
 private fun GuideRow(article: WasteGuide, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val rowFocus = remember { FocusRequester() }
     Row(modifier.fillMaxWidth().focusProperties { canFocus = true }.focusRequester(rowFocus)
-        .clickable { rowFocus.requestFocus(); onClick() }.padding(vertical = 12.dp),
+        .clickable { rowFocus.requestFocus(); onClick() }.padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Box(Modifier.size(48.dp).background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small), contentAlignment = Alignment.Center) {
-            Icon(painterResource(article.category.iconResource), null, Modifier.size(24.dp), tint = MaterialTheme.colorScheme.primary)
-        }
+        CategoryIconBadge(article.category, article.category.iconResource, sizeDp = 44)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(article.name, style = MaterialTheme.typography.titleMedium)
             Text(if (article.review == null) stringResource(R.string.guide_method_draft, stringResource(article.method.labelResource)) else stringResource(article.method.labelResource),
@@ -200,34 +214,72 @@ fun GuideDetailScreen(
                 }
             }
             else -> {
-                Box(Modifier.size(width = 64.dp, height = 44.dp).background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small), contentAlignment = Alignment.Center) {
-                    Icon(painterResource(article.category.iconResource), null, Modifier.size(24.dp), tint = MaterialTheme.colorScheme.primary)
-                }
-                Text(stringResource(article.category.labelResource), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Surface(color = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer, shape = MaterialTheme.shapes.extraSmall) {
-                    Text(stringResource(article.method.labelResource), Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium)
-                }
-                Text(article.name, style = MaterialTheme.typography.headlineLarge, modifier = Modifier.semantics { heading() })
-                Text(article.summary, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(stringResource(R.string.guide_steps), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
-                article.steps.forEachIndexed { index, step ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Surface(color = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer, shape = MaterialTheme.shapes.extraSmall) {
-                            Text(WasteFormat.integer(index.toLong() + 1), Modifier.padding(8.dp), style = MaterialTheme.typography.labelMedium)
+                InsetGroupCard(contentPadding = true) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        CategoryIconBadge(article.category, article.category.iconResource, sizeDp = 50)
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Surface(color = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer, shape = RoundedCornerShape(999.dp)) {
+                                Text(stringResource(article.method.labelResource), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium)
+                            }
+                            Text(stringResource(article.category.labelResource), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        Text(step, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                    }
+                    Text(article.name, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.semantics { heading() })
+                    Text(article.summary, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                GroupSectionLabel(stringResource(R.string.guide_steps))
+                InsetGroupCard {
+                    article.steps.forEachIndexed { index, step ->
+                        Row(
+                            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.Top,
+                        ) {
+                            Surface(color = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer, shape = RoundedCornerShape(8.dp)) {
+                                Text(WasteFormat.integer(index.toLong() + 1), Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium)
+                            }
+                            Text(step, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                        }
+                        if (index < article.steps.lastIndex) {
+                            HorizontalDivider(Modifier.padding(start = 52.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                        }
                     }
                 }
                 if (article.cautions.isNotEmpty()) {
-                    Text(stringResource(R.string.guide_cautions), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
-                    article.cautions.forEach { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    GroupSectionLabel(stringResource(R.string.guide_cautions))
+                    InsetGroupCard(contentPadding = true) {
+                        article.cautions.forEach { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    }
                 }
                 val review = article.review
-                if (review == null) GuideEditorialNotice(stringResource(R.string.guide_review_pending), title = stringResource(R.string.guide_editorial_draft)) else {
-                    Text(stringResource(R.string.guide_sources), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
-                    TextActionButton(review.source.host, onClick = { onSource(review.source.toASCIIString()) })
-                    Text(stringResource(R.string.guide_reviewed, WasteFormat.activityDate(review.date)), style = MaterialTheme.typography.bodySmall)
-                    review.reviewer?.let { Text(stringResource(R.string.guide_reviewer, it), style = MaterialTheme.typography.bodySmall) }
+                if (review == null) {
+                    var showEditorial by rememberSaveable(article.id) { mutableStateOf(false) }
+                    InsetGroupCard(contentPadding = true) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Surface(color = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer, shape = RoundedCornerShape(999.dp)) {
+                                Text(stringResource(R.string.guide_editorial_draft), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium)
+                            }
+                            TextActionButton(stringResource(R.string.editorial_details_toggle), { showEditorial = !showEditorial })
+                        }
+                        if (showEditorial) {
+                            Text(stringResource(R.string.guide_review_pending), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                } else {
+                    GroupSectionLabel(stringResource(R.string.guide_sources))
+                    InsetGroupCard(contentPadding = true) {
+                        TextActionButton(review.source.host, onClick = { onSource(review.source.toASCIIString()) })
+                        Text(stringResource(R.string.guide_reviewed, WasteFormat.activityDate(review.date)), style = MaterialTheme.typography.bodySmall)
+                        review.reviewer?.let { Text(stringResource(R.string.guide_reviewer, it), style = MaterialTheme.typography.bodySmall) }
+                    }
                 }
                 if (sourceUnavailable) MessageBanner(stringResource(R.string.guide_source_error), isError = true)
                 ActionButton(stringResource(R.string.guide_record), onRecord, Modifier.fillMaxWidth())

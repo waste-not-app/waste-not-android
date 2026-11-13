@@ -7,8 +7,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import android.graphics.BitmapFactory
 import android.net.Uri
+import coil3.compose.AsyncImage
+import com.example.wastenot.ui.components.InsetGroupCard
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -130,92 +130,93 @@ fun LogEditorScreen(
             MethodSelector(value.method, { draft.change(EditorField.METHOD, value.copy(method = it)) }, fieldModifier(EditorField.METHOD),
                 draft.errors[EditorField.METHOD]?.let { stringResource(it) }, enabled = enabled,
                 initialFocusModifier = inputModifier(EditorField.METHOD))
-            CategoryPicker(value.category, { draft.change(EditorField.CATEGORY, value.copy(category = it)) }, fieldModifier(EditorField.CATEGORY),
-                draft.errors[EditorField.CATEGORY]?.let { stringResource(it) }, enabled = enabled)
-            QuantityField(value.quantity, { draft.change(EditorField.QUANTITY, value.copy(quantity = it)) },
-                fieldModifier(EditorField.QUANTITY),
-                error = draft.errors[EditorField.QUANTITY]?.let { stringResource(it) }, avoided = value.method == DisposalMethod.REDUCE, enabled = enabled,
-                inputModifier = inputModifier(EditorField.QUANTITY),
-            )
-            DateField(value.date, referenceDate.minusDays(30), referenceDate,
-                { draft.change(EditorField.DATE, value.copy(date = it)) }, fieldModifier(EditorField.DATE), enabled = enabled,
-                error = draft.errors[EditorField.DATE]?.let { stringResource(it) },
-                preservedDate = draft.original.date.takeIf { draft.original.version != null })
-            WasteTextField(value.notes, { draft.change(EditorField.NOTES, value.copy(notes = it)) }, stringResource(R.string.notes_optional),
-                fieldModifier(EditorField.NOTES), helper = stringResource(R.string.notes_helper), singleLine = false,
-                errorText = draft.errors[EditorField.NOTES]?.let { stringResource(it) }, enabled = enabled, labelAbove = true,
-                placeholder = stringResource(R.string.notes_placeholder))
-            if (photosEnabled) {
-                val picker = rememberLauncherForActivityResult(
-                    ActivityResultContracts.PickVisualMedia(),
-                ) { uri ->
-                    if (uri != null) onPickPhoto(uri)
-                }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(stringResource(R.string.photo_section_title), style = MaterialTheme.typography.titleSmall)
-                    if (photoBusy) {
-                        LinearProgressIndicator(Modifier.fillMaxWidth())
-                        Text(
-                            stringResource(R.string.photo_uploading),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+            InsetGroupCard(glass = true, contentPadding = true) {
+                CategoryPicker(value.category, { draft.change(EditorField.CATEGORY, value.copy(category = it)) }, fieldModifier(EditorField.CATEGORY),
+                    draft.errors[EditorField.CATEGORY]?.let { stringResource(it) }, enabled = enabled)
+                QuantityField(value.quantity, { draft.change(EditorField.QUANTITY, value.copy(quantity = it)) },
+                    fieldModifier(EditorField.QUANTITY),
+                    error = draft.errors[EditorField.QUANTITY]?.let { stringResource(it) }, avoided = value.method == DisposalMethod.REDUCE, enabled = enabled,
+                    inputModifier = inputModifier(EditorField.QUANTITY),
+                )
+                DateField(value.date, referenceDate.minusDays(30), referenceDate,
+                    { draft.change(EditorField.DATE, value.copy(date = it)) }, fieldModifier(EditorField.DATE), enabled = enabled,
+                    error = draft.errors[EditorField.DATE]?.let { stringResource(it) },
+                    preservedDate = draft.original.date.takeIf { draft.original.version != null })
+            }
+            InsetGroupCard(glass = true, contentPadding = true) {
+                WasteTextField(value.notes, { draft.change(EditorField.NOTES, value.copy(notes = it)) }, stringResource(R.string.notes_optional),
+                    fieldModifier(EditorField.NOTES), helper = stringResource(R.string.notes_helper), singleLine = false,
+                    errorText = draft.errors[EditorField.NOTES]?.let { stringResource(it) }, enabled = enabled, labelAbove = true,
+                    placeholder = stringResource(R.string.notes_placeholder))
+                if (photosEnabled) {
+                    val picker = rememberLauncherForActivityResult(
+                        ActivityResultContracts.PickVisualMedia(),
+                    ) { uri ->
+                        if (uri != null) onPickPhoto(uri)
                     }
-                    photoError?.let { errRes ->
-                        MessageBanner(stringResource(errRes), isError = true)
-                        TextActionButton(stringResource(R.string.photo_continue_without), onDismissPhotoError)
-                    }
-                    if (value.photoId != null) {
-                        val previewBitmap = remember(photoPreviewBytes) {
-                            photoPreviewBytes?.let { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }
-                        }
-                        if (previewBitmap != null) {
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                            ) {
-                                Image(
-                                    bitmap = previewBitmap,
-                                    contentDescription = stringResource(R.string.photo_preview_description),
-                                    modifier = Modifier.fillMaxWidth().heightIn(max = 180.dp)
-                                        .clip(RoundedCornerShape(12.dp)),
-                                    contentScale = ContentScale.Crop,
-                                )
-                            }
-                        } else {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(stringResource(R.string.photo_section_title), style = MaterialTheme.typography.titleSmall)
+                        if (photoBusy) {
+                            LinearProgressIndicator(Modifier.fillMaxWidth())
                             Text(
-                                stringResource(R.string.photo_saved_summary),
+                                stringResource(R.string.photo_uploading),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
+                        photoError?.let { errRes ->
+                            MessageBanner(stringResource(errRes), isError = true)
+                            TextActionButton(stringResource(R.string.photo_continue_without), onDismissPhotoError)
+                        }
+                        if (value.photoId != null) {
+                            if (photoPreviewBytes != null) {
+                                Surface(
+                                    shape = RoundedCornerShape(14.dp),
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                                ) {
+                                    AsyncImage(
+                                        model = photoPreviewBytes,
+                                        contentDescription = stringResource(R.string.photo_preview_description),
+                                        modifier = Modifier.fillMaxWidth().heightIn(max = 180.dp)
+                                            .clip(RoundedCornerShape(14.dp)),
+                                        contentScale = ContentScale.Crop,
+                                    )
+                                }
+                            } else {
+                                Text(
+                                    stringResource(R.string.photo_saved_summary),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                SecondaryActionButton(
+                                    stringResource(R.string.photo_replace),
+                                    { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = enabled && !photoBusy,
+                                )
+                                TextActionButton(
+                                    stringResource(R.string.photo_remove),
+                                    onRemovePhoto,
+                                    enabled = enabled && !photoBusy,
+                                )
+                            }
+                        } else {
                             SecondaryActionButton(
-                                stringResource(R.string.photo_replace),
+                                stringResource(R.string.photo_choose),
                                 { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-                                modifier = Modifier.weight(1f),
-                                enabled = enabled && !photoBusy,
-                            )
-                            TextActionButton(
-                                stringResource(R.string.photo_remove),
-                                onRemovePhoto,
+                                modifier = Modifier.fillMaxWidth(),
                                 enabled = enabled && !photoBusy,
                             )
                         }
-                    } else {
-                        SecondaryActionButton(
-                            stringResource(R.string.photo_choose),
-                            { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = enabled && !photoBusy,
-                        )
                     }
                 }
             }

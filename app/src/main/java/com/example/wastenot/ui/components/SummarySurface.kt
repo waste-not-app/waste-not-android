@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.SummaryBorder
 import com.example.wastenot.theme.SummaryDecoration
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import com.example.wastenot.theme.SummaryAmbientGlow
 import com.example.wastenot.theme.SummaryHighlight
 import com.example.wastenot.theme.SummaryShadow
 
@@ -30,7 +33,15 @@ internal fun Modifier.summarySurface(): Modifier {
         .border(1.dp, SummaryBorder, shape)
         .innerShadow(shape, Shadow(0.dp, SummaryHighlight, offset = DpOffset(0.dp, 1.dp)))
         .drawBehind {
-            // Kit ring: 150 dp outer diameter, 24 dp stroke, top -80/right -94.
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(SummaryAmbientGlow, Color.Transparent),
+                    center = Offset(size.width * 0.92f, size.height * 0.14f),
+                    radius = size.maxDimension * 0.50f,
+                ),
+                center = Offset(size.width * 0.92f, size.height * 0.14f),
+                radius = size.maxDimension * 0.50f,
+            )
             drawCircle(SummaryDecoration, radius = 63.dp.toPx(),
                 center = Offset(size.width + 19.dp.toPx(), -5.dp.toPx()), style = Stroke(width = 24.dp.toPx()))
         }

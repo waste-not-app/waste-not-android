@@ -1,6 +1,6 @@
 # WasteNot: Product & Design Kit
 
-Product & design kit v1.3 · 28 September 2026
+Product & design kit v1.4 · 13 November 2026
 
 Mulai dengan membuka **[design-system.html](design-system.html)** di browser. Tidak perlu build, instalasi dependency, atau koneksi internet. Pertahankan file CSS, JavaScript, dan folder `assets` di sebelah HTML. Jika memakai ZIP, ekstrak seluruh isinya dahulu.
 
@@ -68,3 +68,7 @@ Semua dokumen diperluas mengikuti plan tim dan arahan bottom sheet pengguna. Bas
 ## Penyempurnaan v1.3
 
 Preview S21–S25 kini menampilkan komponen sheet lengkap, indikator tahap, framing kamera, ilustrasi objek, kondisi dan review saran. Fallback manual tetap terlihat di footer sheet; pengaturan demo disembunyikan dalam disclosure. Koreksi mempertahankan isian, draf manual dilindungi, dan perpindahan dari kamera ke contoh simulasi menghentikan stream. Aturan produk/API v1.2 tetap berlaku.
+
+## Penyempurnaan v1.4
+
+Mockup dan `DESIGN.md` dirapikan memakai pendekatan **iOS Inset-Grouped + Liquid Glass** dengan pemangkasan teks inline: kartu statistik dan baris daftar dikelompokkan dalam container solid ber-radius konsisten, header/dock mengambang memakai efek Liquid Glass (`backdrop-filter: blur(22px) saturate(1.8)` + specular rim highlight) dengan konten mengalir di belakangnya, kontrol segmented/switch diperjelas, dan penjelasan metodologi panjang dipindah ke disclosure `(i)`. Aturan produk/API dan seluruh 25 layar (`S01–S25`) serta 39 komponen (`C01–C39`) tetap utuh.

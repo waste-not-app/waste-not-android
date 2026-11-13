@@ -1,7 +1,13 @@
 # WasteNot: Pemeriksaan Design Kit
 
-Tanggal pemeriksaan terbaru: 28 September 2026 (penyempurnaan mockup v1.3). Bukti material v1.1 di bawah tetap dicatat sebagai riwayat. Cakupan: HTML/CSS/JavaScript, dokumen, font, dan simulasi interaksi. **Bukan** hasil pengujian aplikasi Android atau backend.
+Tanggal pemeriksaan terbaru: 13 November 2026 (penyempurnaan mockup v1.4 iOS Inset-Grouped + Liquid Glass). Bukti material v1.1–v1.3 di bawah tetap dicatat sebagai riwayat. Cakupan: HTML/CSS/JavaScript, dokumen, font, dan simulasi interaksi. **Bukan** hasil pengujian aplikasi Android atau backend.
 
+
+## Hasil v1.4 (iOS Inset-Grouped + Liquid Glass)
+
+- PASS `verify.cjs`: seluruh 22 pemeriksaan lulus (25 layar/panel, 39 komponen, 360/390/768/1024/1512 px pada terang & gelap, stress teks 200%, 4 dialog, 8×5 state, form/filter/panduan/statistik/reminder/foto/lokasi, 0 JS error).
+- PASS `verify-ai.cjs`: seluruh flow AI bottom sheet (4 lebar × 2 tema, Escape/focus restore, multi/low/none/special/offline/LLM fallback, kamera virtual, 200% text stress, 0 JS error) lulus.
+- Kontras token baru v1.4 dihitung dengan formula WCAG AA: 10/10 pasangan terang/gelap ≥ 5,96:1 (target ≥ 4,5:1).
 ## Hasil AI v1.2
 
 - PASS `verify.cjs`: 25 layar/panel, 39 komponen, lima viewport pada dua tema; regresi create/edit/delete, state, unit, navigasi dan font 200% lulus, tanpa JavaScript error.

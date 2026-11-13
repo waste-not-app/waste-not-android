@@ -89,6 +89,7 @@ fun WasteNotTheme(
     CompositionLocalProvider(
         LocalWasteNotGradients provides if (darkTheme) DarkGradients else LightGradients,
         LocalWasteNotDockEdge provides if (darkTheme) DockEdgeDark else DockEdge,
+        LocalWasteNotSurfaceTokens provides if (darkTheme) DarkSurfaceTokens else LightSurfaceTokens,
     ) {
         MaterialTheme(colorScheme = colorScheme, typography = Typography, shapes = WasteNotShapes, content = content)
     }
