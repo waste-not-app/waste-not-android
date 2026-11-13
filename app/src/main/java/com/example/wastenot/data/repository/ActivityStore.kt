@@ -11,6 +11,8 @@ import com.example.wastenot.model.LogDateRange
 import com.example.wastenot.model.DashboardSnapshot
 import com.example.wastenot.model.StatisticsSnapshot
 import java.time.LocalDate
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 data class ActivityInput(
     val category: WasteCategory,
@@ -27,18 +29,29 @@ data class ActivityCreation(val log: WasteLog, val created: Boolean)
 
 interface ActivityStore {
     val referenceDate: LocalDate?
+    val changes: Flow<Unit> get() = emptyFlow()
+    val pending: Flow<List<SyncIssue>> get() = emptyFlow()
+    val historyReady: Flow<Boolean> get() = kotlinx.coroutines.flow.flowOf(true)
+    fun requestSync() = Unit
+    suspend fun resolveSync(id: String, keepLocal: Boolean): ApiResult<Unit> =
+        ApiResult.Failure(com.example.wastenot.data.network.ApiFailure(com.example.wastenot.data.network.ApiFailureKind.NOT_CONFIGURED))
     suspend fun isPhotoScanDisabled(): Boolean = false
     suspend fun dashboard(): ApiResult<DashboardSnapshot>
     suspend fun statistics(range: ActivityDateRange): ApiResult<StatisticsSnapshot>
     suspend fun load(): ApiResult<List<WasteLog>>
     suspend fun page(category: WasteCategory? = null, method: DisposalMethod? = null,
         dates: LogDateRange? = null, cursor: String? = null): ApiResult<List<WasteLog>>
+    suspend fun visiblePage(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?,
+        limit: Int): ApiResult<List<WasteLog>> = page(category, method, dates)
     suspend fun get(id: String): ApiResult<WasteLog>
     suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation>
     suspend fun update(id: String, version: Int, input: ActivityInput): ApiResult<WasteLog>
     suspend fun delete(id: String, version: Int): ApiResult<Unit>
     fun clear()
 }
+
+data class SyncIssue(val localId: String, val local: WasteLog, val remote: WasteLog?,
+    val deleting: Boolean, val error: com.example.wastenot.data.network.ApiFailureKind?)
 
 class RemoteActivityStore(private val core: CoreRepository) : ActivityStore {
 

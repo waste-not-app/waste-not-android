@@ -157,6 +157,45 @@ class SessionRepositoryTest {
     }
 
     @Test
+    fun offlineBootstrapUsesOnlyVerifiedLocalIdentityAndNeverExposesAnAccessCredential() = runTest {
+        var identity: com.example.wastenot.model.User? = null
+        val identities = object : com.example.wastenot.data.local.SessionIdentityStore {
+            override suspend fun read() = identity
+            override suspend fun write(user: com.example.wastenot.model.User) { identity = user }
+            override suspend fun clear() { identity = null }
+        }
+        val original = SessionRepository(network, store, identityStore = identities)
+        server.enqueue(json(fixture("auth-session")))
+        assertTrue(original.login(login.email, login.password) is ApiResult.Success)
+        assertNotNull(identity)
+        val restored = SessionRepository(network, store, identityStore = identities)
+        val offline = restored.bootstrap(networkAvailable = false) as SessionState.Authenticated
+        assertTrue(offline.offline)
+        assertEquals(USER_A, offline.user.id)
+        var called = false
+        val result = restored.authenticated { called = true; ApiResult.Success(Unit) }
+        assertFalse(called)
+        assertEquals(ApiFailureKind.UNAUTHENTICATED, (result as ApiResult.Failure).error.kind)
+        assertEquals(1, server.requestCount)
+        restored.logout()
+        assertNull(identity)
+        assertNull(store.token)
+        assertTrue(restored.bootstrap(networkAvailable = false) is SessionState.SignedOut)
+    }
+
+    @Test
+    fun cachedIdentityWithoutKeystoreCredentialCannotRestoreOfflineAccount() = runTest {
+        val identities = object : com.example.wastenot.data.local.SessionIdentityStore {
+            override suspend fun read() = com.example.wastenot.model.User(USER_A, "A", "a@example.com", java.time.ZoneId.of("Asia/Jakarta"), null)
+            override suspend fun write(user: com.example.wastenot.model.User) = Unit
+            override suspend fun clear() = Unit
+        }
+        val restored = SessionRepository(network, store, identityStore = identities)
+        assertTrue(restored.bootstrap(networkAvailable = false) is SessionState.SignedOut)
+        assertEquals(0, server.requestCount)
+    }
+
+    @Test
     fun uuidCaseDoesNotChangeTheIdentityOrSessionAcrossRotation() = runTest {
         val user = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
         val sid = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"

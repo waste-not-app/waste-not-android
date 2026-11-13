@@ -10,6 +10,8 @@ enum class DisposalMethod { REDUCE, REUSE, RECYCLE, TRASH }
 
 enum class QuantityKind { WEIGHT, COUNT }
 
+enum class ActivitySyncState { SYNCED, PENDING, CONFLICT, FAILED }
+
 sealed interface Quantity {
     val kind: QuantityKind
 
@@ -59,4 +61,5 @@ data class WasteLog(
     val version: Int,
     val createdAt: Instant,
     val updatedAt: Instant,
+    val syncState: ActivitySyncState = ActivitySyncState.SYNCED,
 )

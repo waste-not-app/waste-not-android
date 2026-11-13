@@ -5,7 +5,7 @@ import com.example.wastenot.model.User
 
 sealed interface SessionState {
     data object Checking : SessionState
-    data class Authenticated(val user: User, val epoch: Long) : SessionState
+    data class Authenticated(val user: User, val epoch: Long, val offline: Boolean = false) : SessionState
     data class SignedOut(val reason: SignOutReason = SignOutReason.NONE) : SessionState
     data class ConnectionRequired(val error: ApiFailure) : SessionState
 }

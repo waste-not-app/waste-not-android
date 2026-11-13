@@ -91,6 +91,14 @@ fun AccountNavigation(
     } } }
     val model: WorkspaceViewModel = viewModel(factory = factory)
     val data by model.state.collectAsStateWithLifecycle()
+    val syncFactory = remember(activityStore) { viewModelFactory { initializer { ActivitySyncViewModel(activityStore) } } }
+    val syncModel: ActivitySyncViewModel = viewModel(factory = syncFactory)
+    val syncIssues by syncModel.issues.collectAsStateWithLifecycle()
+    val historyReady by syncModel.historyReady.collectAsStateWithLifecycle()
+    val syncBusy by syncModel.busy.collectAsStateWithLifecycle()
+    val syncError by syncModel.error.collectAsStateWithLifecycle()
+    var showingSync by rememberSaveable { mutableStateOf(false) }
+    if (showingSync) ActivitySyncSheet(syncIssues, syncBusy, syncError, syncModel::retry, syncModel::resolve, { showingSync = false })
     val persistenceFactory = remember(user.id) { viewModelFactory { initializer {
         EditorPersistenceViewModel(LocalEditorDraftStore.create(context, user.id))
     } } }
@@ -283,7 +291,7 @@ fun AccountNavigation(
         onDismiss = { leaving = false },
         onConfirm = { persistence.clear { onLogout() } },
         busy = disk.busy, error = disk.failure == DraftFailure.FINISH, hasDraft = disk.active != null,
-        sessionPending = logoutState is LogoutUiState.Pending,
+        hasPendingSync = syncIssues.isNotEmpty(), sessionPending = logoutState is LogoutUiState.Pending,
         sessionFailed = (logoutState as? LogoutUiState.Complete)?.result?.localCleared == false,
     )
     if (resumingPrompt) ResumeDraftDialog({ resumingPrompt = false }, ::resumeDraft)
@@ -420,7 +428,12 @@ fun AccountNavigation(
                             if (selected == tab && stacks.getValue(selected).lastOrNull() == key) openCapture()
                         },
                         onFilter = { if (selected == tab && stacks.getValue(selected).lastOrNull() == History) historyFilterOpen = true }) {
-                        entry.Content()
+                        Column(Modifier.fillMaxSize()) {
+                            if (activityStore is com.example.wastenot.data.repository.OfflineActivityStore) {
+                                ActivitySyncBar(syncIssues.size, historyReady, { showingSync = true })
+                            }
+                            Box(Modifier.weight(1f)) { entry.Content() }
+                        }
                     }
                 }
             }

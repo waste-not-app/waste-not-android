@@ -42,8 +42,16 @@ class SummariesViewModel(
     private var statisticsGeneration = 0
     private var lastStatistics: StatisticsSnapshot? = null
 
+    init {
+        viewModelScope.launch { store.changes.collect {
+            if (dashboardStarted) { dashboardStarted = false; dashboard() }
+            if (statisticsStarted) { statisticsStarted = false; statistics() }
+        } }
+    }
+
     fun dashboard(retry: Boolean = false) {
         if (dashboardStarted && !retry) return
+        if (retry) store.requestSync()
         dashboardStarted = true
         val generation = ++dashboardGeneration
         dashboardJob?.cancel()
@@ -61,6 +69,7 @@ class SummariesViewModel(
 
     fun statistics(days: Int = mutableState.value.days, retry: Boolean = false) {
         require(days == 7 || days == 30)
+        if (retry) store.requestSync()
         val range = ActivityDateRange.lastDays(today(), days)
         val current = mutableState.value
         if (statisticsStarted && days == current.days && !retry &&

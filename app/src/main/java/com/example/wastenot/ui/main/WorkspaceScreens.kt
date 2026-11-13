@@ -59,7 +59,11 @@ fun OverviewScreen(user: User, data: SnapshotState<DashboardSnapshot>, padding: 
     onProfile: () -> Unit = {}, onResumeDraft: (() -> Unit)? = null) {
     val snapshot = data.value
     if (snapshot == null) {
-        ScrollPage(padding, modifier) { SummaryStatus(data.loading, data.error, false, onRetry) }
+        ScrollPage(padding, modifier) {
+            SummaryStatus(data.loading, data.error, false, onRetry)
+            SecondaryActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth())
+            TextActionButton(stringResource(R.string.see_history), onHistory)
+        }
         return
     }
     ScrollPage(padding, modifier) {
@@ -224,6 +228,8 @@ internal fun ActivityRow(log: WasteLog, onClick: () -> Unit, modifier: Modifier 
 private fun ActivityMetadata(log: WasteLog, modifier: Modifier = Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(stringResource(log.category.labelResource), style = MaterialTheme.typography.titleMedium)
+        if (log.syncState != com.example.wastenot.model.ActivitySyncState.SYNCED) Text(stringResource(syncLabel(log.syncState)),
+            style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(stringResource(R.string.date_method, stringResource(log.method.labelResource), WasteFormat.activityDate(log.activityDate)),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (log.notes.isNotBlank()) Text(log.notes, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,

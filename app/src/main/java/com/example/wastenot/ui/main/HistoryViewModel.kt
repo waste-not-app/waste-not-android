@@ -50,6 +50,10 @@ class HistoryViewModel(
     private var handledRevision = 0
     private val cursors = mutableSetOf<String>()
 
+    init {
+        viewModelScope.launch { store.changes.collect { if (started) fetch(more = false, preserveVisible = true) } }
+    }
+
     fun load() { if (!started) refresh() }
 
     fun filter(value: HistoryFilter) {
@@ -63,7 +67,7 @@ class HistoryViewModel(
         refresh()
     }
 
-    fun refresh() = fetch(more = false)
+    fun refresh() { store.requestSync(); fetch(more = false) }
 
     fun more() {
         val current = state.value
@@ -99,7 +103,7 @@ class HistoryViewModel(
         mutableState.update { it.copy(records = it.records.filterNot { record -> record.id == id }) }
     }
 
-    private fun fetch(more: Boolean) {
+    private fun fetch(more: Boolean, preserveVisible: Boolean = false) {
         started = true
         val before = state.value
         val cursor = if (more) before.nextCursor ?: return else null
@@ -115,24 +119,26 @@ class HistoryViewModel(
             return
         }
         val filter = before.filter
+        val pageSize = if (preserveVisible) maxOf(20, before.records.size) else 20
         request = viewModelScope.launch {
             val dates = filter.from?.let { LogDateRange(it, checkNotNull(filter.to)) }
-            val response = store.page(filter.category, filter.method, dates, cursor)
+            val response = if (preserveVisible) store.visiblePage(filter.category, filter.method, dates, pageSize)
+                else store.page(filter.category, filter.method, dates, cursor)
             currentCoroutineContext().ensureActive()
             if (stamp != generation) return@launch
             when (response) {
-                is ApiResult.Success -> accept(response, filter, cursor, more)
+                is ApiResult.Success -> accept(response, filter, cursor, more, pageSize)
                 is ApiResult.Failure -> failed(response.error, more)
             }
         }
     }
 
-    private fun accept(response: ApiResult.Success<List<WasteLog>>, filter: HistoryFilter, cursor: String?, more: Boolean) {
+    private fun accept(response: ApiResult.Success<List<WasteLog>>, filter: HistoryFilter, cursor: String?, more: Boolean, pageSize: Int) {
         val page = response.page
         val next = page?.nextCursor
         if (page == null || page.hasMore != (next != null) ||
             (next != null && (next.isBlank() || next == cursor || next in cursors)) ||
-            response.value.size > 20 || (page.hasMore && response.value.isEmpty()) ||
+            response.value.size > pageSize || (page.hasMore && response.value.isEmpty()) ||
             response.value.any { !filter.matches(it) }) {
             failed(ApiFailure(ApiFailureKind.MALFORMED_RESPONSE), more)
             return

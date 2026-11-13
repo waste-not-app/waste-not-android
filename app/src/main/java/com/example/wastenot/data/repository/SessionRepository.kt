@@ -3,6 +3,7 @@ package com.example.wastenot.data.repository
 import com.example.wastenot.data.local.RefreshToken
 import com.example.wastenot.data.local.RefreshTokenStore
 import com.example.wastenot.data.local.TokenReadResult
+import com.example.wastenot.data.local.SessionIdentityStore
 import com.example.wastenot.data.network.ApiFailure
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
@@ -29,6 +30,7 @@ import kotlinx.coroutines.withContext
 class SessionRepository(
     private val network: WasteNotNetwork?,
     private val tokenStore: RefreshTokenStore,
+    private val identityStore: SessionIdentityStore? = null,
     private val clearAccountData: suspend (userId: String, epoch: Long) -> Unit = { _, _ -> },
 ) {
     private val lock = Any()
@@ -77,9 +79,13 @@ class SessionRepository(
                     SessionState.SignedOut(SignOutReason.INVALID_CREDENTIAL))
                 is TokenReadResult.Available -> {
                     if (!networkAvailable || network == null) {
-                        setState(operation.epoch, SessionState.ConnectionRequired(ApiFailure(
+                        val cached = persistence.withLock { identityStore?.read() }
+                        if (cached != null && !networkAvailable) {
+                            setState(operation.epoch, SessionState.Authenticated(cached, operation.epoch, offline = true))
+                        } else setState(operation.epoch, SessionState.ConnectionRequired(ApiFailure(
                             if (network == null) ApiFailureKind.NOT_CONFIGURED else ApiFailureKind.NETWORK)))
-                    } else if (rotate(operation.epoch, null, stored.token)) {
+                    } else if (rotate(operation.epoch, null, stored.token,
+                            persistence.withLock { identityStore?.read()?.id })) {
                         verifyIdentity(operation.epoch)
                     }
                 }
@@ -188,7 +194,8 @@ class SessionRepository(
         }
     }
 
-    private suspend fun rotate(expected: Long, previous: Record?, token: RefreshToken): Boolean {
+    private suspend fun rotate(expected: Long, previous: Record?, token: RefreshToken,
+        cachedOwner: String? = null): Boolean {
         val connection = network ?: return false
         if (!isCurrent(expected)) return false
         val result = connection.executor.execute({ it.toModel() }) { connection.api.refresh(RefreshDto(token.value)) }
@@ -199,13 +206,14 @@ class SessionRepository(
             return false
         }
         val tokens = (result as ApiResult.Success).value
-        if (tokens.refresh == token || previous != null && tokens.user != null &&
+        if (tokens.refresh == token || cachedOwner != null && tokens.user != null && tokens.user.id != cachedOwner ||
+            previous != null && tokens.user != null &&
                 previous.expectedUserId != null && tokens.user.id != previous.expectedUserId) {
             expire(expected, SignOutReason.ROTATION_UNCERTAIN)
             return false
         }
         // Bootstrap publishes no identity until GET /me verifies the new access token.
-        return persist(expected, tokens, previous?.user, previous?.expectedUserId ?: tokens.user?.id)
+        return persist(expected, tokens, previous?.user, previous?.expectedUserId ?: cachedOwner ?: tokens.user?.id)
     }
 
     private suspend fun verifyIdentity(expected: Long): SessionState {
@@ -219,10 +227,15 @@ class SessionRepository(
                 expire(expected, SignOutReason.INVALID_CREDENTIAL)
                 return state.value
             }
-            synchronized(lock) {
-                if (epoch == expected && record != null) {
-                    record = record!!.copy(user = result.value)
-                    mutableState.value = SessionState.Authenticated(result.value, expected)
+            persistence.withLock {
+                if (isCurrent(expected)) {
+                    identityStore?.write(result.value)
+                    synchronized(lock) {
+                        if (epoch == expected && record != null) {
+                            record = record!!.copy(user = result.value)
+                            mutableState.value = SessionState.Authenticated(result.value, expected)
+                        }
+                    }
                 }
             }
         } else if (result is ApiResult.Failure && isCurrent(expected)) {
@@ -237,6 +250,7 @@ class SessionRepository(
         if (!isCurrent(expected)) return@withLock false
         try {
             tokenStore.write(tokens.refresh)
+            if (user != null) identityStore?.write(user)
             currentCoroutineContext().ensureActive()
             storedEpoch = expected
             val installed = synchronized(lock) {
@@ -273,6 +287,7 @@ class SessionRepository(
             persistence.withLock {
                 if (storedEpoch <= through) {
                     tokenStore.clear()
+                    identityStore?.clear()
                     storedEpoch = Long.MIN_VALUE
                 }
                 old?.user?.let { clearAccountData(it.id, old.credential.epoch) }
