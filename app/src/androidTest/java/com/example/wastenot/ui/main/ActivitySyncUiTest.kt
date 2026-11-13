@@ -46,6 +46,14 @@ class ActivitySyncUiTest {
         compose.runOnIdle { assertEquals(log.id to true, decision) }
     }
 
+    @Test fun synchronizedQueuedSaveShowsServerConfirmationWithoutDenyingItsXp() {
+        compose.setContent { WasteNotTheme { SaveConfirmationScreen(log.copy(syncState = ActivitySyncState.SYNCED),
+            false, PaddingValues(), {}, {}, wasQueued = true) } }
+        compose.onNodeWithText("Catatan sudah tersinkron.", substring = true).performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Tidak ada XP tambahan.", substring = true).assertDoesNotExist()
+        capture("confirmed-save")
+    }
+
     private fun capture(name: String) {
         compose.waitForIdle()
         val instrumentation = InstrumentationRegistry.getInstrumentation()

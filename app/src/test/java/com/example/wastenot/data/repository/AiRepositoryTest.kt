@@ -189,6 +189,24 @@ class AiRepositoryTest {
         assertEquals(1, server.requestCount)
     }
 
+    @Test fun policy09KeepsSourcedRulesAdviceReadyWithoutRelabelingItsProvider() = runTest {
+        val input = AiRecommendationRequest(requestId, true, "glass_bottle", WasteCategory.GLASS, AiInputSource.MANUAL)
+        server.enqueue(reply(fixture("rules-ready-policy09-response")))
+        val result = success(repository.recommend(input))
+        assertEquals(AiRecommendationStatus.READY, result.status)
+        assertEquals("rules", result.provider)
+        assertEquals("LLM_UNAVAILABLE", result.reasonCode)
+        assertEquals("pilot-policy-09", result.version)
+        assertEquals(DisposalMethod.RECYCLE, result.method)
+        assertEquals(AiRecommendationBasis.CONFIRMED, result.basis)
+        assertTrue(result.evidenceIds.isNotEmpty())
+        assertTrue(result.sourceDetails.isNotEmpty())
+        assertTrue(result.sourceDetails.all { it.url in result.sources })
+        assertTrue(result.prototypeOnly)
+        assertFalse(result.canUseForTracking)
+        assertEquals(1, server.requestCount)
+    }
+
     @Test fun typedFailuresNeverInventResultsOrAutomaticallyRepeatInference() = runTest {
         for ((status, code, expected) in listOf(
             Triple(410, "AI_SESSION_EXPIRED", ApiFailureKind.AI_EXPIRED),

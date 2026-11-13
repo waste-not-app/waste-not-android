@@ -346,7 +346,8 @@ fun AccountNavigation(
                 val log = if (read != null) read.log else data.records.find { it.id == key.id }
                 val missing = read?.error == ApiFailureKind.NOT_FOUND || read?.error == ApiFailureKind.DELETED
                 if (current == key && savedNoticeId == key.id && log != null) SaveConfirmationScreen(log, savedWasCreated, pageInsets,
-                    onView = { savedNoticeId = null }, onHome = ::home, modifier = Modifier.fillMaxSize())
+                    onView = { savedNoticeId = null }, onHome = ::home, modifier = Modifier.fillMaxSize(),
+                    wasQueued = activityStore is com.example.wastenot.data.repository.OfflineActivityStore)
                 else LogDetailScreen(log, read == null || read.loading, read?.error != null && !missing, pageInsets,
                     onEdit = { edit(key.id) },
                     onDelete = { if (log != null && log.version > 0) { deletingId = log.id; deleteVersion = log.version } },

@@ -77,7 +77,9 @@ fun OverviewScreen(user: User, data: SnapshotState<DashboardSnapshot>, padding: 
         }
         SummaryStatus(data.loading, data.error, true, onRetry)
         if (onResumeDraft != null) PausedDraftNotice(onResumeDraft)
-        if (snapshot.summary.activityCount == 0L) MessageBanner(stringResource(R.string.home_empty_today))
+        if (snapshot.summary.activityCount == 0L && snapshot.recentLogs.none {
+                it.activityDate == snapshot.date || it.syncState != com.example.wastenot.model.ActivitySyncState.SYNCED
+            }) MessageBanner(stringResource(R.string.home_empty_today))
         SummaryBlock(snapshot.summary, stringResource(R.string.handled_today), afterPrimary = {
             SecondaryActionButton(stringResource(R.string.manual_input), onRecord, Modifier.fillMaxWidth())
         }, personal = true)

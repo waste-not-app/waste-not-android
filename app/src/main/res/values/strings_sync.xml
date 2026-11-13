@@ -10,6 +10,7 @@
     <string name="sync_explanation">Perubahan disimpan di HP ini dan dikirim saat terhubung. Ringkasan dan XP menampilkan hasil terakhir yang dikonfirmasi server. Panduan dan pemindaian AI memerlukan koneksi.</string>
     <string name="sync_queue_empty">Tidak ada perubahan lokal yang menunggu. Tarik data terbaru dengan tombol di bawah.</string>
     <string name="sync_saved_local">Tersimpan di HP ini. Aktivitas menunggu sinkronisasi; XP diperbarui setelah server menerimanya.</string>
+    <string name="sync_saved_confirmed">Catatan sudah tersinkron. Ringkasan dan XP mengikuti data server.</string>
     <string name="sync_retry">Sinkronkan saat terhubung</string>
     <string name="sync_save_manual">Simpan sebagai catatan manual</string>
     <string name="sync_confirm_decision">Konfirmasi</string>
