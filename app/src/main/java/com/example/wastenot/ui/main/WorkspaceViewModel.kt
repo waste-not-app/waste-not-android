@@ -77,9 +77,12 @@ class WorkspaceViewModel(private val store: ActivityStore) : ViewModel() {
             currentCoroutineContext().ensureActive()
             if (generation != conflictGeneration) return@launch
             val latest = (result as? ApiResult.Success)?.value
+            val sameActivity = latest?.let { store.isSameActivity(id, it.id) } == true
+            currentCoroutineContext().ensureActive()
+            if (generation != conflictGeneration) return@launch
             val failure = when {
                 latest == null -> (result as? ApiResult.Failure)?.error?.kind
-                latest.id != id -> ApiFailureKind.MALFORMED_RESPONSE
+                !sameActivity -> ApiFailureKind.MALFORMED_RESPONSE
                 latest.version <= version -> ApiFailureKind.PRECONDITION_REQUIRED
                 else -> null
             }

@@ -196,11 +196,43 @@ class OfflineActivityStoreTest {
         assertEquals(1, database.activities().mutations(owner.id).size)
         assertEquals(0, server.created)
         store.resolveSync(original, keepLocal = true)
-        assertEquals(ApiFailureKind.NOT_FOUND, store.get(original).kind())
+        assertEquals(ActivitySyncState.PENDING, store.get(original).value().syncState)
         server.rejectCreate = null
         store.synchronize()
         assertEquals(1, server.created)
         assertEquals("botol", server.rows.values.single().notes)
+    }
+
+    @Test fun localAliasIdentifiesOnlyItsConfirmedServerRecord() = runBlocking {
+        val store = store()
+        val local = store.create(input, request()).value().log.id
+        store.synchronize()
+        val confirmed = store.get(local).value()
+        assertTrue(store.isSameActivity(local, confirmed.id))
+        assertFalse(store.isSameActivity(local, request()))
+        assertFalse(store(owner.copy(id = request())).isSameActivity(local, confirmed.id))
+    }
+
+    @Test fun requestIdMatchingAnExistingServerRecordCannotShadowIt() = runBlocking {
+        val store = store()
+        val local = store.create(input, request()).value().log.id
+        store.synchronize()
+        val confirmed = store.get(local).value()
+        assertEquals(ApiFailureKind.IDEMPOTENCY_CONFLICT, store.create(input.copy(notes = "different"), confirmed.id).kind())
+        assertEquals(listOf(confirmed), store.page().value())
+        assertTrue(database.activities().mutations(owner.id).isEmpty())
+    }
+
+    @Test fun alreadyLinkedAiAdviceCannotBecomeAnotherCreateThroughManualConversion() = runBlocking {
+        val store = store()
+        val id = request()
+        store.create(input.copy(aiProvenance = AiLogProvenance(request(), input.category)), id)
+        server.rejectCreate = ApiFailureKind.AI_ALREADY_LINKED
+        store.synchronize()
+        assertEquals(ApiFailureKind.PRECONDITION_REQUIRED, store.resolveSync(id, keepLocal = true).kind())
+        assertEquals(ActivitySyncState.FAILED, store.get(id).value().syncState)
+        assertEquals(1, database.activities().mutations(owner.id).size)
+        assertEquals(0, server.created)
     }
 
     private inner class TestServer : ActivityStore {

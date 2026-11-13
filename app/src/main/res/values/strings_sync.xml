@@ -14,6 +14,8 @@
     <string name="sync_retry">Sinkronkan saat terhubung</string>
     <string name="sync_save_manual">Simpan sebagai catatan manual</string>
     <string name="sync_confirm_decision">Konfirmasi</string>
+    <string name="sync_manual_confirmation">Simpan isian ini sebagai catatan manual? Saran AI sebelumnya tidak dipakai.</string>
+    <string name="sync_already_linked">Saran ini sudah digunakan untuk catatan lain. Periksa Riwayat agar aktivitas yang sama tidak dicatat dua kali.</string>
     <string name="sync_local">Isian di HP ini</string>
     <string name="sync_local_delete">Penghapusan di HP ini</string>
     <string name="sync_remote">Versi terakhir dari server</string>

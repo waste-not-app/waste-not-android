@@ -44,6 +44,7 @@ interface ActivityStore {
     suspend fun visiblePage(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?,
         limit: Int): ApiResult<List<WasteLog>> = page(category, method, dates)
     suspend fun get(id: String): ApiResult<WasteLog>
+    suspend fun isSameActivity(requestedId: String, actualId: String): Boolean = requestedId == actualId
     suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation>
     suspend fun update(id: String, version: Int, input: ActivityInput): ApiResult<WasteLog>
     suspend fun delete(id: String, version: Int): ApiResult<Unit>

@@ -72,6 +72,12 @@ class OfflineActivityStore(
             ?: failure(ApiFailureKind.NOT_FOUND)
     }
 
+    override suspend fun isSameActivity(requestedId: String, actualId: String): Boolean {
+        if (!isOwnerActive()) return false
+        val row = dao.find(user.id, requestedId) ?: return false
+        return actualId == row.localId || actualId == row.serverId
+    }
+
     override suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation> = write {
         if (!valid(input) || runCatching { UUID.fromString(clientRequestId).toString().equals(clientRequestId, ignoreCase = true) }.getOrDefault(false).not())
             return@write failure(ApiFailureKind.INVALID_REQUEST)
@@ -84,6 +90,7 @@ class OfflineActivityStore(
                 else if (receipt.payload != encoded) failure(ApiFailureKind.IDEMPOTENCY_CONFLICT)
                 else ApiResult.Success(ActivityCreation(existing.log(user.timezone), created = false))
         }
+        if (dao.find(user.id, requestId) != null) return@write failure(ApiFailureKind.IDEMPOTENCY_CONFLICT)
         val timestamp = now().toString()
         val row = LocalActivity(user.id, requestId, null, input.category.name, input.method.name,
             input.date.toString(), encoded, 1, 0, timestamp, timestamp, syncState = "PENDING")
@@ -123,13 +130,12 @@ class OfflineActivityStore(
         if (keepLocal && !row.deleted && row.serverId == null && row.error in manualConversionErrors) {
             val request = UUID.randomUUID().toString()
             val payload = row.payload.activityInput().copy(aiProvenance = null).encode()
-            val manual = row.copy(localId = request, payload = payload, syncState = "PENDING", error = null,
+            val manual = row.copy(payload = payload, syncState = "PENDING", error = null,
                 remotePayload = null, remoteVersion = null)
             dao.discard(user.id, row.localId)
-            dao.remove(user.id, row.localId)
             dao.put(manual)
-            dao.receipt(ActivityReceipt(user.id, request, payload, request))
-            dao.enqueue(ActivityMutation(owner = user.id, localId = request, kind = "CREATE", payload = payload,
+            dao.receipt(ActivityReceipt(user.id, request, payload, row.localId))
+            dao.enqueue(ActivityMutation(owner = user.id, localId = row.localId, kind = "CREATE", payload = payload,
                 requestId = request, revision = manual.revision))
             return@write ApiResult.Success(Unit)
         }
@@ -311,7 +317,6 @@ class OfflineActivityStore(
             ApiFailureKind.HTTP, ApiFailureKind.RATE_LIMITED, ApiFailureKind.MALFORMED_RESPONSE)
         private val conflictFailures = setOf(ApiFailureKind.VERSION_CONFLICT, ApiFailureKind.CONFLICT,
             ApiFailureKind.DELETED, ApiFailureKind.NOT_FOUND)
-        private val manualConversionErrors = setOf(ApiFailureKind.AI_EXPIRED.name,
-            ApiFailureKind.AI_REFERENCE_INVALID.name, ApiFailureKind.AI_ALREADY_LINKED.name)
+        private val manualConversionErrors = setOf(ApiFailureKind.AI_EXPIRED.name, ApiFailureKind.AI_REFERENCE_INVALID.name)
     }
 }

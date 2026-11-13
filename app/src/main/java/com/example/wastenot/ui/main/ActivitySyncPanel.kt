@@ -83,10 +83,11 @@ internal fun ActivitySyncSheet(issues: List<SyncIssue>, busy: Boolean, error: Bo
                         if (issue.remote != null) SecondaryActionButton(
                             stringResource(if (issue.deleting) R.string.sync_retry_delete else R.string.sync_keep_local),
                             { decision = issue to true }, Modifier.fillMaxWidth(), enabled = !busy)
-                        else if (!issue.deleting && issue.error in setOf(ApiFailureKind.AI_EXPIRED, ApiFailureKind.AI_REFERENCE_INVALID, ApiFailureKind.AI_ALREADY_LINKED)) {
+                        else if (!issue.deleting && issue.error in setOf(ApiFailureKind.AI_EXPIRED, ApiFailureKind.AI_REFERENCE_INVALID)) {
                             SecondaryActionButton(stringResource(R.string.sync_save_manual), { decision = issue to true },
                                 Modifier.fillMaxWidth(), enabled = !busy)
                         }
+                        if (issue.error == ApiFailureKind.AI_ALREADY_LINKED) Text(stringResource(R.string.sync_already_linked))
                         SecondaryActionButton(stringResource(R.string.sync_use_remote),
                             { decision = issue to false }, Modifier.fillMaxWidth(), enabled = !busy)
                     }
@@ -99,7 +100,11 @@ internal fun ActivitySyncSheet(issues: List<SyncIssue>, busy: Boolean, error: Bo
     decision?.let { (issue, keep) -> AlertDialog(
         onDismissRequest = { decision = null },
         title = { Text(stringResource(R.string.sync_decision_title)) },
-        text = { Text(stringResource(if (keep) R.string.sync_keep_confirmation else R.string.sync_discard_confirmation)) },
+        text = { Text(stringResource(when {
+            keep && issue.remote == null -> R.string.sync_manual_confirmation
+            keep -> R.string.sync_keep_confirmation
+            else -> R.string.sync_discard_confirmation
+        })) },
         confirmButton = { TextButton(onClick = { onResolve(issue.localId, keep); decision = null }) { Text(stringResource(R.string.sync_confirm_decision)) } },
         dismissButton = { TextButton(onClick = { decision = null }) { Text(stringResource(R.string.cancel)) } },
     ) }
