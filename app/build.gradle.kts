@@ -83,6 +83,14 @@ android {
 
     buildTypes {
         debug {
+            val installSuffix = providers.gradleProperty("wastenot.debugApplicationIdSuffix").orElse("").get()
+            require(installSuffix.isEmpty() || Regex("(\\.[a-z][a-z0-9]*)+").matches(installSuffix)) {
+                "wastenot.debugApplicationIdSuffix must be a lowercase application ID suffix."
+            }
+            if (installSuffix.isNotEmpty()) {
+                applicationIdSuffix = installSuffix
+                resValue("string", "app_name", "WasteNot QA")
+            }
             buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.debugApiBaseUrl", "https://pred-autoscaler.bccdev.id/wastenot/api/v1/", allowLocalHttp = true)}\"")
         }
         create("staging") {
@@ -117,6 +125,7 @@ android {
       compose = true
       aidl = false
       buildConfig = true
+      resValues = true
       shaders = false
     }
 
@@ -131,12 +140,27 @@ kotlin {
     jvmToolchain(17)
 }
 
+// Resolve SDK jars through Gradle's repository/cache handling before the test JVM starts.
+val robolectricSdks by configurations.creating { isTransitive = false }
+val prepareRobolectricSdks by tasks.registering(Sync::class) {
+    from(robolectricSdks)
+    into(layout.buildDirectory.dir("robolectric-sdks"))
+}
 tasks.withType<Test>().configureEach {
-    systemProperty("robolectric.dependency.repo.url", "https://repo.maven.apache.org/maven2")
+    dependsOn(prepareRobolectricSdks)
+    systemProperty("robolectric.dependency.dir", layout.buildDirectory.dir("robolectric-sdks").get().asFile.absolutePath)
     testLogging.exceptionFormat = TestExceptionFormat.FULL
 }
 
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }
+
 dependencies {
+  // API 35 is the explicit host-test SDK for Room and the generated navigation render check.
+  robolectricSdks(libs.robolectric.sdk)
+  implementation(libs.androidx.room.runtime)
+  implementation(libs.androidx.room.ktx)
+  ksp(libs.androidx.room.compiler)
+  testImplementation(libs.robolectric)
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.camera.core)
   implementation(libs.androidx.camera.camera2)

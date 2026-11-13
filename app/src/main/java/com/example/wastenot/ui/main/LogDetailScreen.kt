@@ -56,6 +56,9 @@ fun LogDetailScreen(
                 }
             }
         } else {
+            if (log.syncState != com.example.wastenot.model.ActivitySyncState.SYNCED) {
+                MessageBanner(stringResource(syncLabel(log.syncState)))
+            }
             if (loadError) {
                 MessageBanner(stringResource(R.string.refresh_failed), isError = true)
                 TextActionButton(stringResource(R.string.retry), onRetry)

@@ -64,6 +64,29 @@ class HistoryViewModelTest {
         vm.more(); advanceUntilIdle(); assertEquals(50, requests.size)
     }
 
+    @Test fun backgroundCacheChangesPreserveAlreadyVisiblePages() = runTest {
+        var records = (42 downTo 1).map(::record)
+        val updates = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+        val source = object : ActivityStore by base {
+            override val changes = updates
+            override suspend fun page(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, cursor: String?): ApiResult<List<WasteLog>> {
+                val offset = cursor?.toInt() ?: 0
+                return this@HistoryViewModelTest.page(records.drop(offset).take(20), (offset + 20).takeIf { it < records.size }?.toString())
+            }
+            override suspend fun visiblePage(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, limit: Int) =
+                this@HistoryViewModelTest.page(records.take(limit), limit.takeIf { it < records.size }?.toString())
+        }
+        val vm = model(source)
+        vm.load(); advanceUntilIdle(); vm.more(); advanceUntilIdle()
+        assertEquals(40, vm.state.value.records.size)
+        val lastVisible = vm.state.value.records.last().id
+        records = records.map { if (it.id == record(42).id) it.copy(notes = "changed in cache", version = 2) else it }
+        updates.emit(Unit); advanceUntilIdle()
+        assertEquals(40, vm.state.value.records.size)
+        assertEquals(lastVisible, vm.state.value.records.last().id)
+        assertEquals("changed in cache", vm.state.value.records.first().notes)
+    }
+
     @Test fun nextPageFailureKeepsRowsAndRetriesTheSameCursor() = runTest {
         var fail = true
         val vm = model(store { if (it.cursor == null) page(listOf(record(3)), "second")

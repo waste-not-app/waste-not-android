@@ -35,6 +35,7 @@ fun SaveConfirmationScreen(
     onView: () -> Unit,
     onHome: () -> Unit,
     modifier: Modifier = Modifier,
+    wasQueued: Boolean = false,
 ) {
     val status = stringResource(R.string.save_confirm_title)
     val quantity = WasteFormat.quantity(log.quantity)
@@ -47,7 +48,8 @@ fun SaveConfirmationScreen(
             }
             Text(stringResource(R.string.save_confirm_heading), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center,
                 modifier = Modifier.semantics { heading(); liveRegion = LiveRegionMode.Polite; stateDescription = status })
-            Text(stringResource(if (created) R.string.save_confirm_created else R.string.save_confirm_existing),
+            Text(stringResource(if (log.syncState != com.example.wastenot.model.ActivitySyncState.SYNCED) R.string.sync_saved_local
+                else if (created) R.string.save_confirm_created else if (wasQueued) R.string.sync_saved_confirmed else R.string.save_confirm_existing),
                 color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
         }
         Surface(color = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer,

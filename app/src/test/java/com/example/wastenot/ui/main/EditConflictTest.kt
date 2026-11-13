@@ -95,6 +95,19 @@ class EditConflictTest {
         assertEquals(response, vm.state.value.conflict?.latest); assertEquals(0, writes)
     }
 
+    @Test fun conflictReadAcceptsTheStoresVerifiedLocalAlias() = runTest {
+        val log = initial().copy(version = 2)
+        val alias = java.util.UUID.randomUUID().toString()
+        val vm = model(object : ActivityStore by source {
+            override suspend fun get(id: String) = ApiResult.Success(log)
+            override suspend fun isSameActivity(requestedId: String, actualId: String) =
+                requestedId == alias && actualId == log.id
+        })
+        vm.loadConflict("editor", alias, 1); advanceUntilIdle()
+        assertEquals(log, vm.state.value.conflict?.latest)
+        assertNull(vm.state.value.conflict?.error)
+    }
+
     @Test fun cancelledReadCannotReplaceANewerEntryEvenWhenStoreIgnoresCancellation() = runTest {
         val log = initial(); val old = CompletableDeferred<ApiResult<WasteLog>>(); var calls = 0
         val vm = model(object : ActivityStore by source {

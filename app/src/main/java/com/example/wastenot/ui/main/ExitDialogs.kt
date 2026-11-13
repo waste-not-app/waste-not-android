@@ -33,10 +33,11 @@ import com.example.wastenot.ui.components.SecondaryActionButton
 
 @Composable
 internal fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit, busy: Boolean = false, error: Boolean = false,
-    hasDraft: Boolean = false, sessionPending: Boolean = false, sessionFailed: Boolean = false) {
+    hasDraft: Boolean = false, sessionPending: Boolean = false, sessionFailed: Boolean = false,
+    hasPendingSync: Boolean = false) {
     ExitConfirmationDialog(
         title = stringResource(R.string.logout_title),
-        message = stringResource(if (hasDraft) R.string.draft_logout_message else R.string.logout_message),
+        message = stringResource(if (hasPendingSync) R.string.sync_logout_message else if (hasDraft) R.string.draft_logout_message else R.string.logout_message),
         confirmLabel = stringResource(R.string.logout_action),
         dismissLabel = stringResource(R.string.cancel),
         icon = R.drawable.ic_logout,

@@ -23,8 +23,16 @@ ksp = "2.3.12"
 skydovesNavgraph = "0.3.0"
 camera = "1.6.2"
 work = "2.12.0"
+room = "2.8.5"
+robolectric = "4.16.1"
+robolectricSdk = "15-robolectric-13954326-i7"
 
 [libraries]
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+robolectric-sdk = { module = "org.robolectric:android-all-instrumented", version.ref = "robolectricSdk" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "camera" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camera" }
