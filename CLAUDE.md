@@ -44,7 +44,7 @@ Seluruh screen wajib tersedia; penyelarasan UI, navigasi dan penerimaan akhir ma
 | Local storage | Room untuk aktivitas/outbox/snapshot per akun, DataStore untuk tema, SharedPreferences untuk draf, Keystore untuk refresh token |
 | DI | Constructor injection + AppContainer sederhana |
 | AGP | 9.0.1, Gradle 9.1.0, Kotlin 2.3.20, Compose BOM 2026.03.01 |
-| Min SDK | 24, Compile/Target SDK 36 |
+| Min SDK | 30 (Android 11), Compile/Target SDK 36 |
 
 ## Plugin development
 

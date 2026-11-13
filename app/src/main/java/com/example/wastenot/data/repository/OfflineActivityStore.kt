@@ -50,10 +50,7 @@ class OfflineActivityStore(
         ApiResult.Success(activityJson.decodeFromString(StatisticsDto.serializer(), snapshot.payload).toModel())
     }
 
-    private fun missingSnapshot(): ApiResult.Failure {
-        requestSync()
-        return failure(ApiFailureKind.NETWORK)
-    }
+    private fun missingSnapshot(): ApiResult.Failure = failure(ApiFailureKind.NETWORK)
 
     override suspend fun load() = page()
     override suspend fun visiblePage(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, limit: Int): ApiResult<List<WasteLog>> = read {

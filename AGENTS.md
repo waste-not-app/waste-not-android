@@ -2,6 +2,7 @@
 
 Stack: Kotlin, Jetpack Compose, Navigation 3, CameraX and Gradle.
 Follow the WasteNot design kit under `docs/WasteNot-Product-Design-Kit update/WasteNot/`.
+For offline reads, mutation queues or conflict handling, read `docs/OFFLINE_SYNC.md` before changing the implementation.
 The reference checkout is `/home/oktaavsm/Code/github.com/waste-not-app/waste-not-android/docs/WasteNot-Product-Design-Kit update/WasteNot/`.
 All application builds use authenticated backend services. Test fixtures belong only to test source sets.
 Do not access emulators. Device checks are deferred until the owner connects a physical phone and requests them. Host unit/database tests and builds may run without a device.

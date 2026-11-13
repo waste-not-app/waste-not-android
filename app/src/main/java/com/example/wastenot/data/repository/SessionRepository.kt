@@ -70,7 +70,7 @@ class SessionRepository(
                 }
                 return verifyIdentity(existing.credential.epoch)
             }
-            operation = begin(SessionState.Checking)
+            operation = beginBootstrap()
             val stored = persistence.withLock { tokenStore.read() }
             if (!isCurrent(operation.epoch)) return state.value
             when (stored) {
@@ -239,7 +239,9 @@ class SessionRepository(
                 }
             }
         } else if (result is ApiResult.Failure && isCurrent(expected)) {
-            setState(expected, SessionState.ConnectionRequired(result.error))
+            if ((state.value as? SessionState.Authenticated)?.offline != true) {
+                setState(expected, SessionState.ConnectionRequired(result.error))
+            }
         }
         return state.value
     }
@@ -302,6 +304,17 @@ class SessionRepository(
     private suspend fun begin(nextState: SessionState): Operation {
         val caller = currentCoroutineContext()[Job] ?: error("Session operation needs a caller job.")
         return checkNotNull(transition(nextState, caller))
+    }
+
+    private suspend fun beginBootstrap(): Operation {
+        val caller = currentCoroutineContext()[Job] ?: error("Bootstrap needs a caller job.")
+        // Verifying an offline account must not replace its navigation/ViewModel owner.
+        return synchronized(lock) {
+            if ((mutableState.value as? SessionState.Authenticated)?.offline == true) {
+                accountJobs[caller] = epoch
+                Operation(epoch, caller)
+            } else null
+        } ?: begin(SessionState.Checking)
     }
 
     private fun transition(

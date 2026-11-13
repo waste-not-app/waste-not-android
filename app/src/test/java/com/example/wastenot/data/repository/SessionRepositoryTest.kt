@@ -23,6 +23,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.supervisorScope
@@ -156,6 +157,7 @@ class SessionRepositoryTest {
         assertEquals(3, server.requestCount)
     }
 
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     @Test
     fun offlineBootstrapUsesOnlyVerifiedLocalIdentityAndNeverExposesAnAccessCredential() = runTest {
         var identity: com.example.wastenot.model.User? = null
@@ -177,6 +179,22 @@ class SessionRepositoryTest {
         assertFalse(called)
         assertEquals(ApiFailureKind.UNAUTHENTICATED, (result as ApiResult.Failure).error.kind)
         assertEquals(1, server.requestCount)
+        val phases = mutableListOf<SessionState>()
+        val watching = backgroundScope.launch(kotlinx.coroutines.test.UnconfinedTestDispatcher(testScheduler)) {
+            restored.state.collect { phases.add(it) }
+        }
+        server.enqueue(json(fixture("auth-refresh")))
+        server.enqueue(MockResponse().setResponseCode(503))
+        val waiting = restored.bootstrap() as SessionState.Authenticated
+        assertTrue(waiting.offline)
+        assertEquals(offline.epoch, waiting.epoch)
+        server.enqueue(json(fixture("me")))
+        val verified = restored.bootstrap() as SessionState.Authenticated
+        assertFalse(verified.offline)
+        assertEquals(offline.epoch, verified.epoch)
+        assertFalse(phases.any { it is SessionState.Checking })
+        watching.cancel()
+        server.enqueue(MockResponse().setResponseCode(204))
         restored.logout()
         assertNull(identity)
         assertNull(store.token)
