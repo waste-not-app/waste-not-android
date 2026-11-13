@@ -57,6 +57,7 @@ import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.IconActionButton
 import com.example.wastenot.ui.components.BrandWordmark
+import com.example.wastenot.ui.components.InsetGroupCard
 import com.example.wastenot.ui.components.WasteTextField
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.OnAccent
@@ -157,7 +158,7 @@ fun AuthScreen(
                     else -> Unit
                 }
             }
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            InsetGroupCard(glass = true, contentPadding = true) {
                 if (register) AuthField(
                     AccountField.NAME, state, requesters.getValue(AccountField.NAME), onChange,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
@@ -190,7 +191,8 @@ fun AuthScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                         keyboardActions = next, contentType = ContentType.NewPassword, modifier = Modifier.fillMaxWidth(),
                     )
-                    Text(stringResource(R.string.account_timezone, state.timezone.id), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.account_timezone, state.timezone.id), style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 if (!landscapeLogin) {
                     state.failure?.let { MessageBanner(stringResource(it.messageResource), isError = true) }

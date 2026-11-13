@@ -62,7 +62,7 @@ class PickerAvailabilityTest {
             fun px(dp: Float) = with(compose.density) { dp.dp.toPx() }
             val border = image.getPixel(bounds.center.x.roundToInt(), (bounds.top + px(.5f)).roundToInt())
             val background = image.getPixel((bounds.left + px(4f)).roundToInt(), (bounds.top + px(24f)).roundToInt())
-            if (!near(border, scheme.outline.toArgb())) violations.add("Category border $border != ${scheme.outline.toArgb()}")
+            if (!near(border, scheme.outlineVariant.toArgb())) violations.add("Category border $border != ${scheme.outlineVariant.toArgb()}")
             if (!near(background, scheme.surfaceContainer.toArgb())) violations.add("Category background $background != ${scheme.surfaceContainer.toArgb()}")
             var arrow = 0
             for (x in (bounds.right - px(48f)).roundToInt() until (bounds.right - px(8f)).roundToInt())

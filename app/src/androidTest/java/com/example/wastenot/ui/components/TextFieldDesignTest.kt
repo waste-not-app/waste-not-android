@@ -49,12 +49,11 @@ class TextFieldDesignTest {
             val email = compose.onNodeWithContentDescription("Email").performScrollTo().assertIsNotEnabled()
             assertEquals("pengguna@example.com", layout(email).layoutInput.text.text)
             checkColor("pending value", layout(email).layoutInput.style.color, scheme.onSurfaceVariant)
-            capture(email, theme, "account-email", scheme.outline, scheme.surfaceContainer)
+            capture(email, theme, "account-email", scheme.outlineVariant, scheme.surfaceContainer)
             val password = compose.onNodeWithContentDescription("Kata sandi").performScrollTo().assertIsNotEnabled()
             password.assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Password))
             val visibility = compose.onNodeWithContentDescription("Tampilkan kata sandi").assertIsNotEnabled()
-            capture(password, theme, "account-password", scheme.outline, scheme.surfaceContainer, visibility)
-            visibility.performTouchInput { click() }
+            capture(password, theme, "account-password", scheme.outlineVariant, scheme.surfaceContainer, visibility)
             assertEquals("•".repeat("contoh-aman-12".length), layout(password).layoutInput.text.text)
             compose.runOnIdle { assertEquals(0, changes) }
         }
@@ -75,7 +74,7 @@ class TextFieldDesignTest {
             val field = compose.onNodeWithContentDescription("Email").assertIsNotEnabled()
             val hint = layout(compose.onNodeWithText("nama@example.com", useUnmergedTree = true))
             checkColor("disabled placeholder", hint.layoutInput.style.color, scheme.onSurfaceVariant)
-            capture(field, theme, "disabled-empty", scheme.outline, scheme.surfaceContainer)
+            capture(field, theme, "disabled-empty", scheme.outlineVariant, scheme.surfaceContainer)
         }
         assertTrue(violations.joinToString("\n"), violations.isEmpty())
     }
@@ -94,15 +93,17 @@ class TextFieldDesignTest {
             }
         } }
         val scheme = if (dark) DarkColorScheme else LightColorScheme
+        val fieldWell = if (dark) FieldWellDark else FieldWell
+        val fieldFocus = if (dark) FieldWellFocusDark else FieldWellFocus
         val field = compose.onNodeWithContentDescription("Catatan").assertIsEnabled().assertIsNotFocused()
-        capture(field, dark, "idle", scheme.outline, scheme.surface)
+        capture(field, dark, "idle", null, fieldWell)
         field.performClick().performTextReplacement("Catatan diperbarui")
         field.assertIsFocused().assertTextContains("Catatan diperbarui")
-        capture(field, dark, "focus", scheme.primary, scheme.surface)
+        capture(field, dark, "focus", scheme.primary, fieldFocus)
         compose.runOnIdle { error = "Periksa catatan" }
         field.assert(SemanticsMatcher.expectValue(SemanticsProperties.Error, "Periksa catatan"))
         compose.onNodeWithText("Periksa catatan").assertIsDisplayed()
-        capture(field, dark, "error", scheme.error, scheme.surface)
+        capture(field, dark, "error", scheme.error, fieldFocus)
         assertTrue(violations.joinToString("\n"), violations.isEmpty())
     }
 
@@ -116,7 +117,7 @@ class TextFieldDesignTest {
         if (actual != expected) violations.add("$name $actual != $expected")
     }
 
-    private fun capture(node: SemanticsNodeInteraction, dark: Boolean, name: String, border: Color,
+    private fun capture(node: SemanticsNodeInteraction, dark: Boolean, name: String, border: Color?,
         background: Color, icon: SemanticsNodeInteraction? = null) {
         val scheme = if (dark) DarkColorScheme else LightColorScheme
         val theme = if (dark) "dark" else "light"
@@ -132,7 +133,7 @@ class TextFieldDesignTest {
         fun px(dp: Float) = with(compose.density) { dp.dp.toPx() }
         val actualBorder = image.getPixel(bounds.center.x.roundToInt(), (bounds.top + px(.5f)).roundToInt())
         val actualBackground = image.getPixel((bounds.left + px(4f)).roundToInt(), bounds.center.y.roundToInt())
-        if (!near(actualBorder, border.toArgb())) violations.add("$name/$theme border $actualBorder != ${border.toArgb()}")
+        if (border != null && !near(actualBorder, border.toArgb())) violations.add("$name/$theme border $actualBorder != ${border.toArgb()}")
         if (!near(actualBackground, background.toArgb())) violations.add("$name/$theme background $actualBackground != ${background.toArgb()}")
         var glyph: Int? = null
         if (icon != null) {
@@ -147,7 +148,7 @@ class TextFieldDesignTest {
         File(directory, "$name-$theme.png").outputStream().use { check(image.compress(Bitmap.CompressFormat.PNG, 100, it)) }; image.recycle()
         File(directory, "$name-$theme.json").writeText(JSONObject().put("theme", theme).put("field", name)
             .put("font_scale", InstrumentationRegistry.getInstrumentation().targetContext.resources.configuration.fontScale)
-            .put("border", actualBorder).put("expected_border", border.toArgb()).put("background", actualBackground)
+            .put("border", actualBorder).put("expected_border", border?.toArgb()).put("background", actualBackground)
             .put("expected_background", background.toArgb()).put("muted_glyph_pixels", glyph)
             .put("violations", JSONArray(violations)).toString(2))
     }

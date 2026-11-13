@@ -32,6 +32,8 @@ import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.DateField
 import com.example.wastenot.ui.components.labelResource
+import com.example.wastenot.ui.components.GroupSectionLabel
+import com.example.wastenot.ui.components.InsetGroupCard
 import java.time.LocalDate
 import kotlinx.coroutines.launch
 
@@ -129,14 +131,27 @@ fun HistoryScreen(
             }
             groups.forEach { (date, records) ->
                 item(key = "date:$date") {
-                    Text(when (date) {
-                        today -> stringResource(R.string.history_today)
-                        today.minusDays(1) -> stringResource(R.string.history_yesterday)
-                        else -> WasteFormat.activityDate(date)
-                    }, modifier = Modifier.padding(top = 24.dp, bottom = 4.dp).semantics { heading() },
-                        style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    GroupSectionLabel(
+                        when (date) {
+                            today -> stringResource(R.string.history_today)
+                            today.minusDays(1) -> stringResource(R.string.history_yesterday)
+                            else -> WasteFormat.activityDate(date)
+                        },
+                        modifier = Modifier.padding(top = 18.dp, bottom = 8.dp),
+                    )
                 }
-                items(records, key = { "log:${it.id}" }) { log -> ActivityRow(log, { onDetail(log.id) }, Modifier.fillMaxWidth()) }
+                item(key = "group:$date") {
+                    InsetGroupCard {
+                        records.forEachIndexed { idx, log ->
+                            ActivityRow(
+                                log = log,
+                                onClick = { onDetail(log.id) },
+                                modifier = Modifier.fillMaxWidth(),
+                                showDivider = idx < records.lastIndex,
+                            )
+                        }
+                    }
+                }
             }
             if (data.records.isNotEmpty() || data.pageError != null) item(key = "pages") {
                 Column(Modifier.fillMaxWidth().padding(top = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {

@@ -1,33 +1,34 @@
 package com.example.wastenot.ui.main
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import android.graphics.BitmapFactory
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.runtime.remember
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.wastenot.R
+import com.example.wastenot.model.ActivitySyncState
 import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.model.WasteLog
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.AsyncStatePanel
+import com.example.wastenot.ui.components.CategoryIconBadge
+import com.example.wastenot.ui.components.GroupSectionLabel
+import com.example.wastenot.ui.components.InsetGroupCard
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.labelResource
@@ -68,7 +69,7 @@ fun LogDetailScreen(
                 }
             }
         } else {
-            if (log.syncState != com.example.wastenot.model.ActivitySyncState.SYNCED) {
+            if (log.syncState != ActivitySyncState.SYNCED) {
                 MessageBanner(stringResource(syncLabel(log.syncState)))
             }
             if (loadError) {
@@ -78,13 +79,26 @@ fun LogDetailScreen(
             val badgeColor = when (log.method) {
                 DisposalMethod.REDUCE, DisposalMethod.RECYCLE -> MaterialTheme.colorScheme.primaryContainer
                 DisposalMethod.REUSE -> MaterialTheme.colorScheme.secondaryContainer
-                DisposalMethod.TRASH -> MaterialTheme.colorScheme.surfaceContainer
+                DisposalMethod.TRASH -> MaterialTheme.colorScheme.surfaceVariant
             }
-            Surface(shape = RoundedCornerShape(8.dp), color = badgeColor, contentColor = contentColorFor(badgeColor)) {
-                Text(stringResource(log.method.labelResource), Modifier.padding(horizontal = 12.dp, vertical = 8.dp), style = MaterialTheme.typography.labelMedium)
-            }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(stringResource(log.category.labelResource), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            InsetGroupCard(contentPadding = true) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
+                    CategoryIconBadge(log.category, log.category.iconResource, sizeDp = 46)
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(stringResource(log.category.labelResource), style = MaterialTheme.typography.titleMedium)
+                        Surface(shape = RoundedCornerShape(999.dp), color = badgeColor, contentColor = contentColorFor(badgeColor)) {
+                            Text(
+                                stringResource(log.method.labelResource),
+                                Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                style = MaterialTheme.typography.labelMedium,
+                            )
+                        }
+                    }
+                }
                 val quantity = WasteFormat.quantity(log.quantity)
                 Text(buildAnnotatedString {
                     append(quantity.amount)
@@ -92,45 +106,35 @@ fun LogDetailScreen(
                         append(" " + stringResource(quantity.unit.labelResource))
                     }
                 }, style = MaterialTheme.typography.displayLarge)
-                if (log.method == DisposalMethod.REDUCE) Text(stringResource(R.string.reduce_detail), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (log.method == DisposalMethod.REDUCE) {
+                    Text(stringResource(R.string.reduce_detail), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
-            Column {
-                DetailMetadata(stringResource(R.string.activity_date), WasteFormat.activityDate(log.activityDate), Modifier.fillMaxWidth())
-                DetailMetadata(stringResource(R.string.timezone_label), log.activityTimezone.id, Modifier.fillMaxWidth())
-                DetailMetadata(stringResource(R.string.method), stringResource(log.method.labelResource), Modifier.fillMaxWidth())
+            InsetGroupCard {
+                DetailMetadata(stringResource(R.string.activity_date), WasteFormat.activityDate(log.activityDate), showDivider = true)
+                DetailMetadata(stringResource(R.string.timezone_label), log.activityTimezone.id, showDivider = true)
+                DetailMetadata(stringResource(R.string.method), stringResource(log.method.labelResource), showDivider = false)
             }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(stringResource(R.string.notes_title), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+            InsetGroupCard(contentPadding = true) {
+                Text(stringResource(R.string.notes_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
                 Text(log.notes.ifBlank { stringResource(R.string.no_notes) }, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             if (photosEnabled && log.photoId != null) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        stringResource(R.string.photo_detail_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.semantics { heading() },
-                    )
+                GroupSectionLabel(stringResource(R.string.photo_detail_title))
+                InsetGroupCard(contentPadding = true) {
                     when {
                         photoBytes != null -> {
-                            val bitmap = remember(photoBytes) {
-                                BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size)?.asImageBitmap()
-                            }
-                            if (bitmap != null) {
-                                Surface(
-                                    shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                                ) {
-                                    Image(
-                                        bitmap = bitmap,
-                                        contentDescription = stringResource(R.string.photo_preview_description),
-                                        modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp)
-                                            .clip(RoundedCornerShape(12.dp)),
-                                        contentScale = ContentScale.Crop,
-                                    )
-                                }
-                            } else {
-                                MessageBanner(stringResource(R.string.photo_detail_error), isError = true)
-                                TextActionButton(stringResource(R.string.retry), onRetryPhoto)
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            ) {
+                                AsyncImage(
+                                    model = photoBytes,
+                                    contentDescription = stringResource(R.string.photo_preview_description),
+                                    modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp)
+                                        .clip(RoundedCornerShape(16.dp)),
+                                    contentScale = ContentScale.Crop,
+                                )
                             }
                         }
                         photoLoading -> {
@@ -163,19 +167,19 @@ fun LogDetailScreen(
 }
 
 @Composable
-private fun DetailMetadata(label: String, value: String, modifier: Modifier = Modifier) {
-    Column(modifier) {
+private fun DetailMetadata(label: String, value: String, showDivider: Boolean, modifier: Modifier = Modifier) {
+    Column(modifier.fillMaxWidth()) {
         if (LocalDensity.current.fontScale >= 1.5f) {
-            Column(Modifier.padding(vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                 Text(value, style = MaterialTheme.typography.titleSmall)
             }
         } else {
-            Row(Modifier.padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 13.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(label, Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                 Text(value, style = MaterialTheme.typography.titleSmall)
             }
         }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        if (showDivider) HorizontalDivider(Modifier.padding(start = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
     }
 }

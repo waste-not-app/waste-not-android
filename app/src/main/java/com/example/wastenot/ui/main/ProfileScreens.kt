@@ -1,19 +1,23 @@
 package com.example.wastenot.ui.main
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.BuildConfig
 import com.example.wastenot.R
@@ -24,9 +28,12 @@ import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.theme.*
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
+import com.example.wastenot.ui.components.GroupSectionLabel
+import com.example.wastenot.ui.components.GroupedNavRow
+import com.example.wastenot.ui.components.InsetGroupCard
+import com.example.wastenot.ui.components.MetricTile
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.TextActionButton
-import com.example.wastenot.ui.components.summarySurface
 import java.util.Locale
 
 @Composable
@@ -45,88 +52,93 @@ fun ProfileScreen(
     onAchievements: () -> Unit = {},
 ) {
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
-            val initials = user.name.split(' ').filter(String::isNotBlank).take(2)
-                .joinToString("") { String(Character.toChars(it.codePointAt(0))).uppercase(Locale.forLanguageTag("id-ID")) }
-            Box(Modifier.sizeIn(minWidth = 56.dp, minHeight = 56.dp)
-                .background(LocalWasteNotGradients.current.accent, MaterialTheme.shapes.medium).padding(12.dp),
-                contentAlignment = Alignment.Center) {
-                Text(initials, color = OnAccent, style = MaterialTheme.typography.titleLarge)
+        InsetGroupCard(contentPadding = true) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val initials = user.name.split(' ').filter(String::isNotBlank).take(2)
+                    .joinToString("") { String(Character.toChars(it.codePointAt(0))).uppercase(Locale.forLanguageTag("id-ID")) }
+                Box(
+                    Modifier.size(54.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(LocalWasteNotGradients.current.accent),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(initials, color = OnAccent, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
+                }
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(user.name, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        "${user.email} · ${user.timezone.id}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(user.name, style = MaterialTheme.typography.titleLarge)
-                Text(user.email, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(user.timezone.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (progress != null) {
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                ProgressMeter(progress, Modifier.fillMaxWidth())
+                if (progress.activeLogCount == 0) {
+                    Text(stringResource(R.string.profile_empty), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    ActionButton(stringResource(R.string.record_activity), onRecord, Modifier.fillMaxWidth())
+                }
+            } else if (!loading && error == null) {
+                MessageBanner(stringResource(R.string.profile_progress_unavailable))
             }
         }
-        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)))
         if (error != null) {
             MessageBanner(stringResource(R.string.profile_refresh_failed), isError = true)
             TextActionButton(stringResource(R.string.retry), onRetry)
         }
         if (progress != null) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .summarySurface()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Text(stringResource(R.string.profile_progress), color = SummarySecondaryText)
-                Text(stringResource(R.string.level_title, progress.level), color = SummaryText, style = MaterialTheme.typography.displayLarge)
-                Text(stringResource(R.string.profile_xp_count, WasteFormat.integer(progress.xp.toLong()),
-                    WasteFormat.integer(progress.activeLogCount.toLong())), color = SummarySecondaryText)
+            val streakLabel = progress.currentStreak?.let {
+                stringResource(R.string.profile_current_streak, WasteFormat.integer(it.toLong()))
+            } ?: "—"
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val stacked = maxWidth < 280.dp || LocalDensity.current.fontScale >= 1.5f
+                if (stacked) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_check, Modifier.fillMaxWidth())
+                        MetricTile(stringResource(R.string.streak_short_title), streakLabel, R.drawable.ic_clock, Modifier.fillMaxWidth(), limeHighlight = true)
+                    }
+                } else {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_check, Modifier.weight(1f))
+                        MetricTile(stringResource(R.string.streak_short_title), streakLabel, R.drawable.ic_clock, Modifier.weight(1f), limeHighlight = true)
+                    }
+                }
             }
-            ProgressMeter(progress, Modifier.fillMaxWidth())
-            if (progress.currentStreak != null || progress.bestStreak != null) {
-                StreakCallout(progress)
-            }
-            if (progress.activeLogCount == 0) {
-                Text(stringResource(R.string.profile_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                ActionButton(stringResource(R.string.record_activity), onRecord, Modifier.fillMaxWidth())
-            }
-        } else if (!loading && error == null) MessageBanner(stringResource(R.string.profile_progress_unavailable))
-        if (achievementsEnabled) {
-            AccountMenuRow(stringResource(R.string.achievements_title), onAchievements, Modifier.fillMaxWidth())
         }
-        AccountMenuRow(stringResource(R.string.settings_title), onSettings, Modifier.fillMaxWidth())
-        SecondaryActionButton(stringResource(R.string.logout_action), onLogout,
-            Modifier.fillMaxWidth(), icon = R.drawable.ic_logout)
-        Text(stringResource(R.string.profile_xp_basis), style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@Composable
-private fun StreakCallout(progress: UserProgress) {
-    val current = progress.currentStreak
-    val best = progress.bestStreak
-    Row(
-        modifier = Modifier.fillMaxWidth()
-            .background(LocalWasteNotGradients.current.accent, MaterialTheme.shapes.medium)
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        Icon(painterResource(R.drawable.ic_clock), null, Modifier.size(24.dp), tint = OnAccent)
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            val title = if (current != null) {
-                stringResource(R.string.profile_current_streak, WasteFormat.integer(current.toLong()))
-            } else {
-                stringResource(R.string.profile_streak_title)
+        InsetGroupCard {
+            if (achievementsEnabled) {
+                GroupedNavRow(
+                    label = stringResource(R.string.achievements_title),
+                    icon = R.drawable.ic_check,
+                    onClick = onAchievements,
+                    showDivider = true,
+                )
             }
-            Text(title, Modifier.semantics { heading() }, color = OnAccent, style = MaterialTheme.typography.titleMedium)
-            if (current != null && current > 0) {
-                val todayStatus = if (progress.hasLoggedToday) R.string.profile_streak_today_logged
-                    else R.string.profile_streak_today_pending
-                Text(stringResource(todayStatus), color = OnAccent, style = MaterialTheme.typography.bodyMedium)
-            }
-            if (best != null) {
-                Text(stringResource(R.string.profile_best_streak, WasteFormat.integer(best.toLong())),
-                    color = OnAccent, style = MaterialTheme.typography.bodyMedium)
-            }
-            Text(stringResource(R.string.profile_streak_basis), color = OnAccent, style = MaterialTheme.typography.bodySmall)
+            GroupedNavRow(
+                label = stringResource(R.string.settings_title),
+                icon = R.drawable.ic_settings,
+                onClick = onSettings,
+                showDivider = false,
+            )
         }
+        SecondaryActionButton(
+            stringResource(R.string.logout_action),
+            onLogout,
+            Modifier.fillMaxWidth(),
+            icon = R.drawable.ic_logout,
+        )
+        Text(
+            stringResource(R.string.profile_xp_basis),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -139,44 +151,65 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     onReminderSettings: () -> Unit = {},
 ) {
+    val tokens = LocalWasteNotSurfaceTokens.current
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
-        Text(stringResource(R.string.theme_title), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
-        Text(stringResource(R.string.theme_application), style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
-        val themeLabel = stringResource(R.string.theme_application)
-        OutlinedButton(onClick = onTheme, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
-            .semantics { contentDescription = themeLabel }, shape = MaterialTheme.shapes.small,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface,
-                containerColor = MaterialTheme.colorScheme.surface)) {
-            Text(stringResource(theme.label), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-            Icon(painterResource(R.drawable.ic_next), null, Modifier.size(24.dp).rotate(90f))
+        GroupSectionLabel(stringResource(R.string.theme_title))
+        InsetGroupCard {
+            val themeLabel = stringResource(R.string.theme_application)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp)
+                    .clickable(onClick = onTheme)
+                    .semantics { contentDescription = themeLabel }
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier.size(32.dp).clip(RoundedCornerShape(9.dp)).background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(painterResource(R.drawable.ic_device), null, Modifier.size(17.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                }
+                Column(Modifier.weight(1f)) {
+                    Text(themeLabel, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(theme.label), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
+                }
+                Icon(painterResource(R.drawable.ic_next), null, Modifier.size(20.dp).rotate(90f), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            HorizontalDivider(Modifier.padding(start = 60.dp), color = MaterialTheme.colorScheme.outlineVariant)
+            GroupedNavRow(
+                label = stringResource(R.string.reminder_title),
+                icon = R.drawable.ic_clock,
+                onClick = onReminderSettings,
+                showDivider = false,
+            )
         }
-        AccountMenuRow(stringResource(R.string.reminder_title), onReminderSettings, Modifier.fillMaxWidth())
-        Text(stringResource(R.string.personal_data), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
-        Text(stringResource(R.string.privacy_account), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(stringResource(R.string.privacy_optional_photo), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(stringResource(R.string.privacy_policy_pending), style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(stringResource(R.string.account_timezone, user.timezone.id), style = MaterialTheme.typography.bodyMedium)
-        Text(stringResource(R.string.timezone_read_only), style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        Text(stringResource(R.string.app_version, BuildConfig.VERSION_NAME), style = MaterialTheme.typography.bodyMedium)
+        GroupSectionLabel(stringResource(R.string.personal_data))
+        InsetGroupCard {
+            SettingsMetaRow(stringResource(R.string.timezone_label), user.timezone.id, showDivider = true)
+            SettingsMetaRow(stringResource(R.string.app_version, BuildConfig.VERSION_NAME), "", showDivider = false)
+        }
+        InsetGroupCard(contentPadding = true) {
+            Text(stringResource(R.string.privacy_account), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.privacy_optional_photo), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.privacy_policy_pending), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 
 @Composable
-private fun AccountMenuRow(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier) {
-      Surface(onClick = onClick, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), color = Color.Transparent) {
-        Row(Modifier.padding(vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(R.drawable.ic_settings), null, Modifier.size(20.dp))
-            Text(label, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-            Icon(painterResource(R.drawable.ic_next), null, Modifier.size(20.dp))
+private fun SettingsMetaRow(label: String, value: String, showDivider: Boolean) {
+    Column(Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (value.isNotEmpty()) Text(value, style = MaterialTheme.typography.titleSmall)
         }
-      }
-      HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        if (showDivider) HorizontalDivider(Modifier.padding(start = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
     }
 }

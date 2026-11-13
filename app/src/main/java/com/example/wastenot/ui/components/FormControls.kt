@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.ActionHighlight
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 import com.example.wastenot.theme.ActionShadow
 
 @Composable
@@ -118,6 +120,7 @@ fun WasteTextField(
     var visible by rememberSaveable { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
     val support = errorText ?: helper
+    val fieldShape = RoundedCornerShape(15.dp)
     val field: @Composable (Modifier) -> Unit = { placement ->
         OutlinedTextField(
             value = value,
@@ -125,15 +128,14 @@ fun WasteTextField(
             label = if (labelAbove) null else ({ Text(label) }),
             placeholder = if (placeholder != null) ({ Text(placeholder) }) else null,
             modifier = placement
-                .heightIn(min = 56.dp)
+                .heightIn(min = 54.dp)
                 .semantics {
                     if (labelAbove) contentDescription = label
                     if (autofillType != null) contentType = autofillType
                     if (errorText != null) error(errorText)
                 },
-            shape = MaterialTheme.shapes.small,
+            shape = fieldShape,
             colors = wasteTextFieldColors(),
-            enabled = enabled,
             isError = errorText != null,
             singleLine = singleLine,
             minLines = if (singleLine) 1 else 3,
@@ -166,13 +168,16 @@ fun WasteTextField(
 @Composable
 internal fun wasteTextFieldColors(): TextFieldColors {
     val colors = MaterialTheme.colorScheme
+    val tokens = LocalWasteNotSurfaceTokens.current
     return OutlinedTextFieldDefaults.colors(
-        focusedContainerColor = colors.surface,
-        unfocusedContainerColor = colors.surface,
-        errorContainerColor = colors.surface,
-        disabledContainerColor = colors.surfaceContainer,
+        focusedContainerColor = tokens.fieldWellFocus,
+        unfocusedContainerColor = tokens.fieldWell,
+        errorContainerColor = tokens.fieldWellFocus,
+        focusedBorderColor = colors.primary,
+        unfocusedBorderColor = tokens.fieldEdge,
+        disabledContainerColor = colors.surfaceVariant,
         disabledTextColor = colors.onSurfaceVariant,
-        disabledBorderColor = colors.outline,
+        disabledBorderColor = colors.outlineVariant,
         disabledPlaceholderColor = colors.onSurfaceVariant,
         disabledLabelColor = colors.onSurfaceVariant,
         disabledSupportingTextColor = colors.onSurfaceVariant,

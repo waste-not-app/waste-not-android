@@ -13,6 +13,15 @@ import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.model.Metadata
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.materials.CupertinoMaterials
+import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
+import dev.chrisbanes.haze.rememberHazeState
+import dev.chrisbanes.haze.HazeState
+import com.example.wastenot.ui.components.ambientCanvasBackground
+import com.example.wastenot.theme.LocalWasteNotScaffoldPadding
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -592,7 +601,7 @@ fun AccountNavigation(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
 @Composable
 private fun AccountPage(
     route: NavKey,
@@ -606,37 +615,97 @@ private fun AccountPage(
     onFilter: () -> Unit,
     content: @Composable () -> Unit,
 ) {
+    val hazeState = rememberHazeState()
+    val tokens = LocalWasteNotSurfaceTokens.current
+    val headerShape = androidx.compose.foundation.shape.RoundedCornerShape(22.dp)
     // Each fading entry keeps its own chrome so the outgoing list cannot resize and clamp its scroll.
-    Row(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas)) {
+    Row(Modifier.fillMaxSize().ambientCanvasBackground()) {
         if (rail && route !is LogEditor) TabRail(tab, onSelect, onRecord, Modifier.width(railWidth).fillMaxHeight())
         Scaffold(
             modifier = Modifier.weight(1f).fillMaxHeight(),
             containerColor = Color.Transparent,
-            topBar = { if (route != Home) TopAppBar(title = { Text(stringResource(when (route) {
-                is LogDetail -> if (confirmation) R.string.save_confirm_title else R.string.log_detail
-                is LogEditor -> if (route.logId == null) R.string.log_create else R.string.log_edit
-                is GuideDetail -> R.string.guide_detail
-                Settings -> R.string.settings_title
-                Achievements -> R.string.achievements_title
-                ReminderSettings -> R.string.reminder_title
-                else -> tab.label
-            }), style = MaterialTheme.typography.headlineMedium) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent), navigationIcon = {
-                if (route != tab.key && !confirmation) IconActionButton(R.drawable.ic_back, stringResource(R.string.back),
-                    onBack, Modifier.padding(start = 16.dp))
-            }, actions = {
-                if (route == History) IconActionButton(R.drawable.ic_filter, stringResource(R.string.filter_history),
-                    onFilter, Modifier.padding(end = 12.dp))
-            }) },
-            bottomBar = { if (!rail && route == tab.key) TabDock(tab, onSelect, onRecord) },
+            topBar = {
+                if (route != Home) {
+                    Surface(
+                        modifier = Modifier
+                            .statusBarsPadding()
+                            .padding(horizontal = 16.dp, vertical = 6.dp)
+                            .fillMaxWidth()
+                            .clip(headerShape)
+                            .hazeEffect(state = hazeState, style = CupertinoMaterials.thin(tokens.glassTint)),
+                        shape = headerShape,
+                        color = Color.Transparent,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, tokens.glassEdge),
+                    ) {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    stringResource(
+                                        when (route) {
+                                            is LogDetail -> if (confirmation) R.string.save_confirm_title else R.string.log_detail
+                                            is LogEditor -> if (route.logId == null) R.string.log_create else R.string.log_edit
+                                            is GuideDetail -> R.string.guide_detail
+                                            Settings -> R.string.settings_title
+                                            Achievements -> R.string.achievements_title
+                                            ReminderSettings -> R.string.reminder_title
+                                            else -> tab.label
+                                        },
+                                    ),
+                                    style = MaterialTheme.typography.titleLarge,
+                                )
+                            },
+                            windowInsets = WindowInsets(0.dp),
+                            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                            navigationIcon = {
+                                if (route != tab.key && !confirmation) {
+                                    IconActionButton(
+                                        R.drawable.ic_back,
+                                        stringResource(R.string.back),
+                                        onBack,
+                                        Modifier.padding(start = 8.dp),
+                                    )
+                                }
+                            },
+                            actions = {
+                                if (route == History) {
+                                    IconActionButton(
+                                        R.drawable.ic_filter,
+                                        stringResource(R.string.filter_history),
+                                        onFilter,
+                                        Modifier.padding(end = 8.dp),
+                                    )
+                                }
+                            },
+                        )
+                    }
+                }
+            },
+            bottomBar = { if (!rail && route == tab.key) TabDock(tab, onSelect, onRecord, hazeState) },
         ) { padding ->
-            Box(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)) { content() }
+            CompositionLocalProvider(LocalWasteNotScaffoldPadding provides padding) {
+                val bodyModifier = if (route is LogEditor) {
+                    Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).hazeSource(hazeState)
+                } else {
+                    Modifier.fillMaxSize().hazeSource(hazeState)
+                }
+                Box(bodyModifier) { content() }
+            }
         }
     }
 }
 
+@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
-private fun TabDock(selected: MainTab, onSelect: (MainTab) -> Unit, onRecord: () -> Unit, modifier: Modifier = Modifier) {
-    BoxWithConstraints(modifier.navigationBarsPadding().padding(start = 7.dp, end = 7.dp, bottom = 9.dp)) {
+private fun TabDock(
+    selected: MainTab,
+    onSelect: (MainTab) -> Unit,
+    onRecord: () -> Unit,
+    hazeState: HazeState,
+    modifier: Modifier = Modifier,
+) {
+    val tokens = LocalWasteNotSurfaceTokens.current
+    val dockShape = androidx.compose.foundation.shape.RoundedCornerShape(30.dp)
+    BoxWithConstraints(modifier.navigationBarsPadding().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
         val measurer = rememberTextMeasurer()
         val style = MaterialTheme.typography.labelMedium
         val labels = MainTab.entries.map { stringResource(it.label) }
@@ -649,14 +718,18 @@ private fun TabDock(selected: MainTab, onSelect: (MainTab) -> Unit, onRecord: ()
             cellWidth >= 48.dp && widest + 8.dp <= cellWidth
         } ?: 1
         Surface(
-            modifier = Modifier.fillMaxWidth().padding(top = 27.dp),
-            color = MaterialTheme.colorScheme.surface,
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, LocalWasteNotDockEdge.current),
-            shadowElevation = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp)
+                .clip(dockShape)
+                .hazeEffect(state = hazeState, style = CupertinoMaterials.thin(tokens.glassTint)),
+            color = Color.Transparent,
+            shape = dockShape,
+            border = androidx.compose.foundation.BorderStroke(1.dp, tokens.glassEdge),
+            shadowElevation = if (tokens.isDark) 0.dp else 4.dp,
         ) {
             FlowRow(
-                modifier = Modifier.padding(top = 32.dp, bottom = 7.dp, start = 2.dp, end = 2.dp).selectableGroup(),
+                modifier = Modifier.padding(top = 28.dp, bottom = 7.dp, start = 4.dp, end = 4.dp).selectableGroup(),
                 maxItemsInEachRow = columns,
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
@@ -689,6 +762,7 @@ private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifi
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
     val shape = androidx.compose.foundation.shape.RoundedCornerShape(19.dp)
+    val pillShape = androidx.compose.foundation.shape.RoundedCornerShape(999.dp)
     Column(
         modifier = modifier
             .heightIn(min = 54.dp)
@@ -700,12 +774,28 @@ private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifi
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Box(Modifier.size(width = 46.dp, height = 28.dp).then(if (selected) Modifier.background(LocalWasteNotGradients.current.accent,
-            androidx.compose.foundation.shape.RoundedCornerShape(9.dp)) else Modifier), contentAlignment = Alignment.Center) {
-            Icon(painterResource(tab.icon), null, Modifier.size(20.dp), tint = if (selected) OnAccent else MaterialTheme.colorScheme.onSurface)
+        Box(
+            Modifier.size(width = 48.dp, height = 28.dp)
+                .then(
+                    if (selected) Modifier.background(MaterialTheme.colorScheme.primaryContainer, pillShape)
+                    else Modifier,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painterResource(tab.icon),
+                null,
+                Modifier.size(20.dp),
+                tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
-        Text(stringResource(tab.label), modifier = Modifier.fillMaxWidth(),
-            style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center, maxLines = 1,
-            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
+        Text(
+            stringResource(tab.label),
+            modifier = Modifier.fillMaxWidth(),
+            style = MaterialTheme.typography.labelMedium,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }

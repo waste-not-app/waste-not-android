@@ -190,6 +190,11 @@ dependencies {
   implementation(libs.androidx.compose.ui)
   implementation(libs.androidx.compose.ui.tooling.preview)
   implementation(libs.androidx.compose.material3)
+  implementation(libs.haze)
+  implementation(libs.haze.materials)
+  implementation(libs.coil.compose)
+  implementation(libs.vico.compose.m3)
+  implementation(libs.compose.shimmer)
   // Tooling
   debugImplementation(libs.androidx.compose.ui.tooling)
   // Instrumented tests

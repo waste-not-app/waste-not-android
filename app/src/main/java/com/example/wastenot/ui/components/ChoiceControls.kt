@@ -15,6 +15,8 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
 import com.example.wastenot.model.DisposalMethod
 import com.example.wastenot.model.WasteCategory
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +72,7 @@ fun CategoryPicker(
                 isError = error != null,
                 supportingText = if (error != null) ({ Text(error) }) else null,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                shape = MaterialTheme.shapes.small,
+                shape = RoundedCornerShape(15.dp),
                 colors = wasteTextFieldColors(),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -105,11 +108,16 @@ fun MethodSelector(
                     Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         row.forEach { option ->
                             val selected = method == option
+                            val tokens = LocalWasteNotSurfaceTokens.current
                             Surface(
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
-                                shape = MaterialTheme.shapes.small,
-                                color = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
-                                border = BorderStroke(1.dp, if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline),
+                                shape = RoundedCornerShape(17.dp),
+                                color = if (selected) MaterialTheme.colorScheme.primaryContainer else tokens.glassTintStrong,
+                                border = BorderStroke(
+                                    if (selected) 1.5.dp else 1.dp,
+                                    if (selected) MaterialTheme.colorScheme.primary else tokens.cardEdge,
+                                ),
+                                shadowElevation = if (tokens.isDark) 0.dp else 1.dp,
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -145,17 +153,34 @@ fun MethodSelector(
 
 @Composable
 fun RangeSelector(days: Int, onChange: (Int) -> Unit, modifier: Modifier = Modifier) {
-    Surface(modifier, shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
-        Row(Modifier.height(IntrinsicSize.Min).selectableGroup()) {
+    val tokens = LocalWasteNotSurfaceTokens.current
+    Surface(
+        modifier,
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        border = BorderStroke(1.dp, tokens.cardEdge),
+    ) {
+        Row(
+            Modifier.padding(4.dp).height(IntrinsicSize.Min).selectableGroup(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             listOf(7, 30).forEach { range ->
                 val selected = days == range
-                Box(Modifier.weight(1f).fillMaxHeight().heightIn(min = 48.dp)
-                    .background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
-                    .selectable(selected, role = Role.RadioButton, onClick = { onChange(range) })
-                    .padding(horizontal = 12.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
-                    Text(stringResource(R.string.day_range, range), style = MaterialTheme.typography.labelLarge,
-                        color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant)
+                Surface(
+                    modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 42.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .selectable(selected, role = Role.RadioButton, onClick = { onChange(range) }),
+                    shape = RoundedCornerShape(10.dp),
+                    color = if (selected) MaterialTheme.colorScheme.surface else androidx.compose.ui.graphics.Color.Transparent,
+                    shadowElevation = if (selected && !tokens.isDark) 2.dp else 0.dp,
+                ) {
+                    Box(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
+                        Text(
+                            stringResource(R.string.day_range, range),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
         }

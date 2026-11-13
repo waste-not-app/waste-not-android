@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 
 @Composable
 fun SecondaryActionButton(
@@ -33,30 +35,35 @@ fun SecondaryActionButton(
     @DrawableRes icon: Int? = null,
 ) {
     val colors = MaterialTheme.colorScheme
+    val tokens = LocalWasteNotSurfaceTokens.current
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
+    val shape = RoundedCornerShape(15.dp)
     OutlinedButton(
         onClick = onClick,
         modifier = modifier.heightIn(min = 52.dp)
-            .focusOutline(enabled && focused, MaterialTheme.shapes.small, colors.primary, colors.surface),
+            .focusOutline(enabled && focused, shape, colors.primary, colors.surface),
         enabled = enabled,
         interactionSource = interactions,
-        shape = MaterialTheme.shapes.small,
+        shape = shape,
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = if (enabled && focused) colors.primaryContainer else colors.surface,
-            contentColor = if (enabled && focused) colors.onPrimaryContainer else colors.onSurface,
-            disabledContainerColor = colors.surfaceContainer,
+            containerColor = if (enabled && focused) colors.primaryContainer else colors.surfaceVariant,
+            contentColor = colors.onPrimaryContainer,
+            disabledContainerColor = colors.surfaceVariant.copy(alpha = 0.6f),
             disabledContentColor = colors.onSurfaceVariant,
         ),
-        border = BorderStroke(1.dp, when {
-            !enabled -> colors.outlineVariant
-            focused -> colors.primary
-            else -> colors.outline
-        }),
+        border = BorderStroke(
+            1.dp,
+            when {
+                !enabled -> colors.outlineVariant
+                focused -> colors.primary
+                else -> tokens.cardEdge
+            },
+        ),
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             if (icon != null) Icon(painterResource(icon), null, Modifier.size(20.dp))
-            Text(label, Modifier.weight(1f, fill = false).width(IntrinsicSize.Max), textAlign = TextAlign.Center)
+            Text(label, Modifier.width(IntrinsicSize.Max), textAlign = TextAlign.Center)
         }
     }
 }
