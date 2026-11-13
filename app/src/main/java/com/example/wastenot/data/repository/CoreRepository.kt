@@ -16,6 +16,19 @@ import com.example.wastenot.model.WasteLog
 import com.example.wastenot.model.WasteGuide
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import com.example.wastenot.model.Achievement
+import com.example.wastenot.model.PhotoAttachment
+import java.io.IOException
+import java.io.InterruptedIOException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class CoreRepository(private val network: WasteNotNetwork?, private val session: SessionRepository? = null) {
     suspend fun guides(query: String, category: WasteCategory? = null, cursor: String? = null): ApiResult<List<WasteGuide>> {
@@ -64,6 +77,74 @@ class CoreRepository(private val network: WasteNotNetwork?, private val session:
 
     suspend fun metadata(): ApiResult<Metadata> = protected { credential ->
         network?.executor?.execute({ it.toModel() }) { network.api.metadata(credential) } ?: notConfigured()
+    }
+
+    suspend fun achievements(): ApiResult<List<Achievement>> = protected { credential ->
+        network?.executor?.executeWithStatus({ dtos, status ->
+            require(status == 200)
+            dtos.map { it.toModel() }
+        }) { network.api.achievements(credential) } ?: notConfigured()
+    }
+
+    suspend fun uploadPhoto(mimeType: String, bytes: ByteArray, fileName: String): ApiResult<PhotoAttachment> {
+        if (bytes.isEmpty() || bytes.size > 5 * 1024 * 1024) return invalidRequest()
+        if (mimeType !in setOf("image/jpeg", "image/png", "image/webp")) return invalidRequest()
+        val safeName = fileName.ifBlank { "photo.jpg" }
+        val part = MultipartBody.Part.createFormData("image", safeName, bytes.toRequestBody(mimeType.toMediaType()))
+        return protected { credential ->
+            network?.executor?.executeWithStatus({ dto, status ->
+                require(status == 201)
+                dto.toModel()
+            }) { network.api.uploadPhoto(part, credential) } ?: notConfigured()
+        }
+    }
+
+    suspend fun deletePhoto(id: String): ApiResult<Unit> {
+        if (!uuid.matches(id)) return invalidRequest()
+        return protected { credential ->
+            network?.executor?.executeEmpty { network.api.deletePhoto(id, credential) } ?: notConfigured()
+        }
+    }
+
+    suspend fun downloadPhoto(id: String): ApiResult<ByteArray> {
+        if (!uuid.matches(id)) return invalidRequest()
+        return protected { credential ->
+            val net = network ?: return@protected notConfigured()
+            val url = net.baseUrl.newBuilder().addPathSegment("photos").addPathSegment(id).build()
+            val req = Request.Builder().url(url).get()
+                .apply { if (credential != null) tag(RequestCredential::class.java, credential) }
+                .build()
+            withContext(Dispatchers.IO) {
+                try {
+                    net.client.newCall(req).execute().use { resp ->
+                        when (resp.code) {
+                            200 -> {
+                                val body = resp.body ?: return@withContext ApiResult.Failure(ApiFailure(ApiFailureKind.MALFORMED_RESPONSE, 200))
+                                val bytes = body.bytes()
+                                if (bytes.isEmpty() || bytes.size > 5 * 1024 * 1024) {
+                                    ApiResult.Failure(ApiFailure(ApiFailureKind.MALFORMED_RESPONSE, 200))
+                                } else {
+                                    ApiResult.Success(bytes)
+                                }
+                            }
+                            401 -> ApiResult.Failure(ApiFailure(ApiFailureKind.UNAUTHENTICATED, 401))
+                            404 -> ApiResult.Failure(ApiFailure(ApiFailureKind.NOT_FOUND, 404))
+                            429 -> ApiResult.Failure(ApiFailure(ApiFailureKind.RATE_LIMITED, 429))
+                            in 500..599 -> ApiResult.Failure(ApiFailure(ApiFailureKind.SERVER, resp.code))
+                            else -> ApiResult.Failure(ApiFailure(ApiFailureKind.HTTP, resp.code))
+                        }
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: InterruptedIOException) {
+                    currentCoroutineContext().ensureActive()
+                    ApiResult.Failure(ApiFailure(ApiFailureKind.TIMEOUT))
+                } catch (_: IOException) {
+                    currentCoroutineContext().ensureActive()
+                    ApiResult.Failure(ApiFailure(ApiFailureKind.NETWORK))
+                }
+            }
+        }
     }
 
     suspend fun wasteLogs(

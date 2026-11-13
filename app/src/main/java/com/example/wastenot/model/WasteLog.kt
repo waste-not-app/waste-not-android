@@ -62,4 +62,5 @@ data class WasteLog(
     val createdAt: Instant,
     val updatedAt: Instant,
     val syncState: ActivitySyncState = ActivitySyncState.SYNCED,
+    val photoId: String? = null,
 )

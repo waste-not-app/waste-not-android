@@ -92,6 +92,8 @@ private fun classify(status: Int, code: String?): ApiFailureKind = when (status)
         "VERSION_CONFLICT" -> ApiFailureKind.VERSION_CONFLICT
         "IDEMPOTENCY_CONFLICT" -> ApiFailureKind.IDEMPOTENCY_CONFLICT
         "AI_ALREADY_LINKED" -> ApiFailureKind.AI_ALREADY_LINKED
+        "PHOTO_ALREADY_LINKED" -> ApiFailureKind.PHOTO_ALREADY_LINKED
+        "PHOTO_IN_USE" -> ApiFailureKind.PHOTO_IN_USE
         else -> ApiFailureKind.CONFLICT
     }
     410 -> if (code == "AI_SESSION_EXPIRED") ApiFailureKind.AI_EXPIRED else ApiFailureKind.DELETED

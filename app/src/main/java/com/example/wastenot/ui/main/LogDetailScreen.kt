@@ -7,6 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -36,6 +43,11 @@ fun LogDetailScreen(
     onHistory: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    photosEnabled: Boolean = false,
+    photoBytes: ByteArray? = null,
+    photoLoading: Boolean = false,
+    photoError: Boolean = false,
+    onRetryPhoto: () -> Unit = {},
 ) {
     ScrollPage(padding, modifier) {
         if (log == null) {
@@ -90,6 +102,51 @@ fun LogDetailScreen(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(R.string.notes_title), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
                 Text(log.notes.ifBlank { stringResource(R.string.no_notes) }, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (photosEnabled && log.photoId != null) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        stringResource(R.string.photo_detail_title),
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.semantics { heading() },
+                    )
+                    when {
+                        photoBytes != null -> {
+                            val bitmap = remember(photoBytes) {
+                                BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size)?.asImageBitmap()
+                            }
+                            if (bitmap != null) {
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                                ) {
+                                    Image(
+                                        bitmap = bitmap,
+                                        contentDescription = stringResource(R.string.photo_preview_description),
+                                        modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp)
+                                            .clip(RoundedCornerShape(12.dp)),
+                                        contentScale = ContentScale.Crop,
+                                    )
+                                }
+                            } else {
+                                MessageBanner(stringResource(R.string.photo_detail_error), isError = true)
+                                TextActionButton(stringResource(R.string.retry), onRetryPhoto)
+                            }
+                        }
+                        photoLoading -> {
+                            LinearProgressIndicator(Modifier.fillMaxWidth())
+                            Text(
+                                stringResource(R.string.photo_detail_loading),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        photoError -> {
+                            MessageBanner(stringResource(R.string.photo_detail_error), isError = true)
+                            TextActionButton(stringResource(R.string.retry), onRetryPhoto)
+                        }
+                    }
+                }
             }
             if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
             val canWrite = log.version > 0 && !loading && !loadError

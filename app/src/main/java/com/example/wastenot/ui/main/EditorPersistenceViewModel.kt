@@ -30,7 +30,7 @@ data class EditorPersistenceState(
 
 internal fun StoredEditorDraft.editorKey() = LogEditor(logId, requestId, guideId, scanCategory, scanMethod, scanRecommendationId)
 internal fun StoredEditorDraft.restoreForm(): EditorDraft {
-    require(fields.size in setOf(22, 28) && origin in MainTab.entries.map { it.name })
+    require(fields.size in setOf(22, 28, 34) && origin in MainTab.entries.map { it.name })
     return EditorDraft.fromSnapshot(fields).also {
         require((logId != null) == (it.original.version != null))
         require(!paused || it.outcomeUnknown)

@@ -7,6 +7,21 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Surface
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.relocation.BringIntoViewRequester
@@ -39,6 +54,7 @@ import com.example.wastenot.ui.components.DateField
 import com.example.wastenot.ui.components.MethodSelector
 import com.example.wastenot.ui.components.QuantityField
 import com.example.wastenot.ui.components.WasteTextField
+import com.example.wastenot.ui.components.TextActionButton
 import java.time.LocalDate
 
 @Composable
@@ -56,6 +72,13 @@ fun LogEditorScreen(
     onRetryPersistence: () -> Unit = {},
     saveConfirmed: Boolean = false,
     restored: Boolean = false,
+    photosEnabled: Boolean = false,
+    photoPreviewBytes: ByteArray? = null,
+    photoBusy: Boolean = false,
+    photoError: Int? = null,
+    onPickPhoto: (Uri) -> Unit = {},
+    onRemovePhoto: () -> Unit = {},
+    onDismissPhotoError: () -> Unit = {},
 ) {
     val focus = remember { EditorField.entries.associateWith { FocusRequester() } }
     val reveal = remember { EditorField.entries.associateWith { BringIntoViewRequester() } }
@@ -122,6 +145,80 @@ fun LogEditorScreen(
                 fieldModifier(EditorField.NOTES), helper = stringResource(R.string.notes_helper), singleLine = false,
                 errorText = draft.errors[EditorField.NOTES]?.let { stringResource(it) }, enabled = enabled, labelAbove = true,
                 placeholder = stringResource(R.string.notes_placeholder))
+            if (photosEnabled) {
+                val picker = rememberLauncherForActivityResult(
+                    ActivityResultContracts.PickVisualMedia(),
+                ) { uri ->
+                    if (uri != null) onPickPhoto(uri)
+                }
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(stringResource(R.string.photo_section_title), style = MaterialTheme.typography.titleSmall)
+                    if (photoBusy) {
+                        LinearProgressIndicator(Modifier.fillMaxWidth())
+                        Text(
+                            stringResource(R.string.photo_uploading),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    photoError?.let { errRes ->
+                        MessageBanner(stringResource(errRes), isError = true)
+                        TextActionButton(stringResource(R.string.photo_continue_without), onDismissPhotoError)
+                    }
+                    if (value.photoId != null) {
+                        val previewBitmap = remember(photoPreviewBytes) {
+                            photoPreviewBytes?.let { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }
+                        }
+                        if (previewBitmap != null) {
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            ) {
+                                Image(
+                                    bitmap = previewBitmap,
+                                    contentDescription = stringResource(R.string.photo_preview_description),
+                                    modifier = Modifier.fillMaxWidth().heightIn(max = 180.dp)
+                                        .clip(RoundedCornerShape(12.dp)),
+                                    contentScale = ContentScale.Crop,
+                                )
+                            }
+                        } else {
+                            Text(
+                                stringResource(R.string.photo_saved_summary),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            SecondaryActionButton(
+                                stringResource(R.string.photo_replace),
+                                { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                                modifier = Modifier.weight(1f),
+                                enabled = enabled && !photoBusy,
+                            )
+                            TextActionButton(
+                                stringResource(R.string.photo_remove),
+                                onRemovePhoto,
+                                enabled = enabled && !photoBusy,
+                            )
+                        }
+                    } else {
+                        SecondaryActionButton(
+                            stringResource(R.string.photo_choose),
+                            { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = enabled && !photoBusy,
+                        )
+                    }
+                }
+            }
             Text(if (value.version != null) stringResource(R.string.edit_progress_message) else stringResource(R.string.editor_date_helper, accountTimezone),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             draft.submissionError?.takeUnless { saveConfirmed }?.let { error ->

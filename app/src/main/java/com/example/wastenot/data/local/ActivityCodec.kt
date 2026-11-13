@@ -16,15 +16,17 @@ internal val activityJson = Json { ignoreUnknownKeys = true }
 internal data class StoredInput(
     val category: String, val method: String, val weight: Int?, val count: Int?,
     val date: String, val notes: String, val recommendation: String? = null,
+    val photoId: String? = null, val clearPhoto: Boolean = false,
 ) {
     fun input() = ActivityInput(WasteCategory.valueOf(category), DisposalMethod.valueOf(method),
         requireNotNull(Quantity.fromFields(if (weight != null) QuantityKind.WEIGHT else QuantityKind.COUNT, weight, count)),
-        LocalDate.parse(date), notes, recommendation?.let { AiLogProvenance(it, WasteCategory.valueOf(category)) })
+        LocalDate.parse(date), notes, recommendation?.let { AiLogProvenance(it, WasteCategory.valueOf(category)) },
+        photoId = photoId, clearPhoto = clearPhoto)
 }
 
 internal fun ActivityInput.encode(): String = activityJson.encodeToString(StoredInput.serializer(),
     StoredInput(category.name, method.name, (quantity as? Quantity.Weight)?.grams,
-        (quantity as? Quantity.Count)?.items, date.toString(), notes, aiProvenance?.recommendationId))
+        (quantity as? Quantity.Count)?.items, date.toString(), notes, aiProvenance?.recommendationId, photoId, clearPhoto))
 
 internal fun String.activityInput() = activityJson.decodeFromString(StoredInput.serializer(), this).input()
 
@@ -32,14 +34,13 @@ internal fun LocalActivity.log(zone: ZoneId): WasteLog {
     val input = payload.activityInput()
     return WasteLog(serverId ?: localId, input.category, input.method, input.quantity, input.date,
         zone, input.notes, revision, Instant.parse(createdAt), Instant.parse(updatedAt),
-        ActivitySyncState.valueOf(syncState))
+        ActivitySyncState.valueOf(syncState), photoId = input.photoId)
 }
 
-internal fun WasteLog.input() = ActivityInput(category, method, quantity, activityDate, notes)
+internal fun WasteLog.input() = ActivityInput(category, method, quantity, activityDate, notes, photoId = photoId)
 internal fun WasteLog.dto() = WasteLogDto(id, category.name, method.name, quantity.kind.name,
     (quantity as? Quantity.Weight)?.grams, (quantity as? Quantity.Count)?.items,
-    activityDate.toString(), activityTimezone.id, notes, version, createdAt.toString(), updatedAt.toString())
-
+    activityDate.toString(), activityTimezone.id, notes, version, createdAt.toString(), updatedAt.toString(), photoId = photoId)
 internal fun UserProgress.dto() = ProgressDto(activeLogCount, xp, level, xpIntoLevel, xpToNextLevel,
     currentStreak, bestStreak, hasLoggedToday)
 internal fun WasteSummary.dto() = SummaryDto(handled.weightGrams, handled.itemCount, avoided.weightGrams,

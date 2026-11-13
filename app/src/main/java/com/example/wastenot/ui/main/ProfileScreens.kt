@@ -41,6 +41,8 @@ fun ProfileScreen(
     onSettings: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier,
+    achievementsEnabled: Boolean = false,
+    onAchievements: () -> Unit = {},
 ) {
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
@@ -84,6 +86,9 @@ fun ProfileScreen(
                 ActionButton(stringResource(R.string.record_activity), onRecord, Modifier.fillMaxWidth())
             }
         } else if (!loading && error == null) MessageBanner(stringResource(R.string.profile_progress_unavailable))
+        if (achievementsEnabled) {
+            AccountMenuRow(stringResource(R.string.achievements_title), onAchievements, Modifier.fillMaxWidth())
+        }
         AccountMenuRow(stringResource(R.string.settings_title), onSettings, Modifier.fillMaxWidth())
         SecondaryActionButton(stringResource(R.string.logout_action), onLogout,
             Modifier.fillMaxWidth(), icon = R.drawable.ic_logout)
@@ -126,7 +131,14 @@ private fun StreakCallout(progress: UserProgress) {
 }
 
 @Composable
-fun SettingsScreen(user: User, theme: ThemeMode, padding: PaddingValues, onTheme: () -> Unit, modifier: Modifier = Modifier) {
+fun SettingsScreen(
+    user: User,
+    theme: ThemeMode,
+    padding: PaddingValues,
+    onTheme: () -> Unit,
+    modifier: Modifier = Modifier,
+    onReminderSettings: () -> Unit = {},
+) {
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
         Text(stringResource(R.string.theme_title), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
         Text(stringResource(R.string.theme_application), style = MaterialTheme.typography.titleSmall,
@@ -141,6 +153,7 @@ fun SettingsScreen(user: User, theme: ThemeMode, padding: PaddingValues, onTheme
             Text(stringResource(theme.label), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
             Icon(painterResource(R.drawable.ic_next), null, Modifier.size(24.dp).rotate(90f))
         }
+        AccountMenuRow(stringResource(R.string.reminder_title), onReminderSettings, Modifier.fillMaxWidth())
         Text(stringResource(R.string.personal_data), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
         Text(stringResource(R.string.privacy_account), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(stringResource(R.string.privacy_optional_photo), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
