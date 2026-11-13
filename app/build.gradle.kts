@@ -125,6 +125,7 @@ android {
       compose = true
       aidl = false
       buildConfig = true
+      resValues = true
       shaders = false
     }
 
