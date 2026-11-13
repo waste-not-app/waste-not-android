@@ -27,6 +27,8 @@ data class EditorValues(
     val category: WasteCategory?, val method: DisposalMethod?, val quantity: QuantityInput,
     val date: LocalDate, val notes: String, val version: Int?,
     val aiProvenance: AiLogProvenance? = null,
+    val photoId: String? = null,
+    val clearPhoto: Boolean = false,
 )
 
 class EditorDraft(original: EditorValues) {
@@ -83,6 +85,21 @@ class EditorDraft(original: EditorValues) {
         values = updated
         errors = errors - field
         if (!needsConflictResolution) submissionError = null
+    }
+
+    fun attachPhoto(photoId: String) {
+        if (locked) return
+        values = values.copy(photoId = photoId, clearPhoto = false)
+        submissionError = null
+    }
+
+    fun removePhoto() {
+        if (locked) return
+        values = values.copy(
+            photoId = null,
+            clearPhoto = original.photoId != null,
+        )
+        submissionError = null
     }
 
     fun validateField(field: EditorField, referenceDate: LocalDate) {
@@ -142,7 +159,14 @@ class EditorDraft(original: EditorValues) {
         val sources = listOf(original, values, submittedValues).flatMap { value ->
             listOf(value?.aiProvenance?.recommendationId.orEmpty(), value?.aiProvenance?.category?.name.orEmpty())
         }
-        return if (sources.any(String::isNotEmpty)) base + sources else base
+        val photos = listOf(original, values, submittedValues).flatMap { value ->
+            listOf(value?.photoId.orEmpty(), if (value?.clearPhoto == true) "1" else "")
+        }
+        return when {
+            photos.any(String::isNotEmpty) -> base + sources + photos
+            sources.any(String::isNotEmpty) -> base + sources
+            else -> base
+        }
     }
 
     companion object {
@@ -152,7 +176,7 @@ class EditorDraft(original: EditorValues) {
 
         private fun input(value: EditorValues) = ActivityInput(checkNotNull(value.category), checkNotNull(value.method),
             (parseQuantity(value.quantity.rawText, value.quantity.unit) as QuantityParseResult.Valid).quantity,
-            value.date, value.notes.trim(), value.aiProvenance)
+            value.date, value.notes.trim(), value.aiProvenance, photoId = value.photoId, clearPhoto = value.clearPhoto)
 
         fun from(log: WasteLog?, date: LocalDate) = EditorDraft(valuesFrom(log, date))
         private fun valuesFrom(log: WasteLog?, date: LocalDate) = EditorValues(log?.category, log?.method,
@@ -160,8 +184,7 @@ class EditorDraft(original: EditorValues) {
                 is Quantity.Weight -> QuantityInput(quantity.grams.toString(), QuantityUnit.GRAM)
                 is Quantity.Count -> QuantityInput(quantity.items.toString(), QuantityUnit.ITEM)
                 null -> QuantityInput()
-            }, log?.activityDate ?: date, log?.notes.orEmpty(), log?.version)
-
+            }, log?.activityDate ?: date, log?.notes.orEmpty(), log?.version, photoId = log?.photoId)
         private fun encode(value: EditorValues) = listOf(value.category?.name.orEmpty(), value.method?.name.orEmpty(),
             value.quantity.rawText, value.quantity.unit.name, value.date.toString(), value.notes, value.version?.toString().orEmpty())
         private fun decode(value: List<String>) = EditorValues(value[0].takeIf(String::isNotEmpty)?.let(WasteCategory::valueOf),
@@ -169,21 +192,31 @@ class EditorDraft(original: EditorValues) {
             LocalDate.parse(value[4]), value[5], value[6].takeIf(String::isNotEmpty)?.toInt()?.also { require(it > 0) })
 
         fun fromSnapshot(snapshot: List<String>): EditorDraft {
-            require(snapshot.size in setOf(14, 21, 22, 28))
+            require(snapshot.size in setOf(14, 21, 22, 28, 34))
             fun source(index: Int): AiLogProvenance? {
-                if (snapshot.size != 28) return null
+                if (snapshot.size < 28) return null
                 val id = snapshot[22 + index * 2]
                 val category = snapshot[23 + index * 2]
                 require(id.isEmpty() == category.isEmpty())
                 return id.takeIf(String::isNotEmpty)?.let { AiLogProvenance(it, WasteCategory.valueOf(category)) }
             }
-            return EditorDraft(decode(snapshot.take(7)).copy(aiProvenance = source(0))).apply {
-                values = decode(snapshot.drop(7).take(7)).copy(aiProvenance = source(1))
+            fun photo(index: Int): Pair<String?, Boolean> {
+                if (snapshot.size < 34) return null to false
+                val id = snapshot[28 + index * 2].takeIf(String::isNotEmpty)
+                val clear = snapshot[29 + index * 2] == "1"
+                require(!(id != null && clear))
+                return id to clear
+            }
+            val origPhoto = photo(0)
+            val valPhoto = photo(1)
+            val subPhoto = photo(2)
+            return EditorDraft(decode(snapshot.take(7)).copy(aiProvenance = source(0), photoId = origPhoto.first, clearPhoto = origPhoto.second)).apply {
+                values = decode(snapshot.drop(7).take(7)).copy(aiProvenance = source(1), photoId = valPhoto.first, clearPhoto = valPhoto.second)
                 require(values.version == original.version)
                 require(original.aiProvenance == null && (values.version == null || values.aiProvenance == null))
                 if (snapshot.getOrNull(14)?.isNotEmpty() == true) submittedValues =
-                    decode(snapshot.drop(14).take(7)).copy(aiProvenance = source(2))
-                else require(snapshot.drop(14).take(7).all(String::isEmpty) && source(2) == null)
+                    decode(snapshot.drop(14).take(7)).copy(aiProvenance = source(2), photoId = subPhoto.first, clearPhoto = subPhoto.second)
+                else require(snapshot.drop(14).take(7).all(String::isEmpty) && source(2) == null && subPhoto.first == null && !subPhoto.second)
                 submittedValues?.let { submitted ->
                     require(values == submitted && submitted.category != null && submitted.method != null)
                     require(parseQuantity(submitted.quantity.rawText, submitted.quantity.unit) is QuantityParseResult.Valid)

@@ -21,8 +21,13 @@ data class ActivityInput(
     val date: LocalDate,
     val notes: String,
     val aiProvenance: AiLogProvenance? = null,
+    val photoId: String? = null,
+    val clearPhoto: Boolean = false,
 ) {
-    init { require(aiProvenance == null || (aiProvenance.category == category && method != DisposalMethod.REDUCE)) }
+    init {
+        require(aiProvenance == null || (aiProvenance.category == category && method != DisposalMethod.REDUCE))
+        require(!(photoId != null && clearPhoto))
+    }
 }
 
 data class ActivityCreation(val log: WasteLog, val created: Boolean)

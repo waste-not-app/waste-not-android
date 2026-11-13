@@ -54,7 +54,8 @@ class MainActivity : ComponentActivity() {
                         preference.failure?.let { AppearanceProblemBanner(it, appearance::retry) }
                         MainNavigation(container.accountSession, container.core, container.guides, container.ai,
                             mode, appearance::choose, Modifier.weight(1f),
-                            activityStoreFactory = container::activityStore, scanRepositoryFactory = container::scanRepository)
+                            activityStoreFactory = container::activityStore, scanRepositoryFactory = container::scanRepository,
+                            reminderStore = container.reminders, reminderScheduler = container.reminderScheduler)
                     }
                 }
             }

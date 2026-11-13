@@ -90,14 +90,16 @@ data class WasteLogDto(
     val version: Int,
     @SerialName("created_at") val createdAt: String,
     @SerialName("updated_at") val updatedAt: String,
+    @SerialName("photo_id") val photoId: String? = null,
 ) {
     fun toModel(): WasteLog {
         require(uuid.matches(id) && version >= 1 && notes.length <= 500)
+        require(photoId == null || uuid.matches(photoId))
         require(activityTimezone in ZoneId.getAvailableZoneIds())
         val quantity = requireNotNull(Quantity.fromFields(QuantityKind.valueOf(quantityKind), weightG, itemCount))
         return WasteLog(id, WasteCategory.valueOf(category), DisposalMethod.valueOf(method), quantity,
             LocalDate.parse(activityDate), ZoneId.of(activityTimezone), notes, version,
-            Instant.parse(createdAt), Instant.parse(updatedAt))
+            Instant.parse(createdAt), Instant.parse(updatedAt), photoId = photoId)
     }
 }
 

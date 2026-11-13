@@ -12,6 +12,11 @@ import com.example.wastenot.data.network.dto.DashboardDto
 import com.example.wastenot.data.network.dto.StatisticsDto
 import com.example.wastenot.data.network.dto.GuideDto
 import com.example.wastenot.data.repository.RequestCredential
+import com.example.wastenot.data.network.dto.AchievementDto
+import com.example.wastenot.data.network.dto.PhotoDto
+import okhttp3.MultipartBody
+import retrofit2.http.Multipart
+import retrofit2.http.Part
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -82,4 +87,14 @@ interface WasteNotApi {
 
     @POST("auth/logout")
     suspend fun logout(@Tag credential: RequestCredential): Response<Unit>
+
+    @GET("achievements")
+    suspend fun achievements(@Tag credential: RequestCredential? = null): Response<DataEnvelope<List<AchievementDto>>>
+
+    @Multipart
+    @POST("photos")
+    suspend fun uploadPhoto(@Part image: MultipartBody.Part, @Tag credential: RequestCredential? = null): Response<DataEnvelope<PhotoDto>>
+
+    @DELETE("photos/{id}")
+    suspend fun deletePhoto(@Path("id") id: String, @Tag credential: RequestCredential? = null): Response<Unit>
 }

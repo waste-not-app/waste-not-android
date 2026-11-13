@@ -3,6 +3,14 @@ package com.example.wastenot.ui.main
 import com.example.wastenot.data.local.ScanPhotoCache
 import com.example.wastenot.data.repository.ScanRepository
 import com.example.wastenot.data.repository.ActivityStore
+import com.example.wastenot.data.local.AttachmentImagePreparer
+import com.example.wastenot.data.local.PrepareAttachmentResult
+import com.example.wastenot.data.local.ReminderScheduler
+import com.example.wastenot.data.local.ReminderSetting
+import com.example.wastenot.data.local.ReminderStore
+import com.example.wastenot.data.network.ApiResult
+import com.example.wastenot.data.repository.CoreRepository
+import com.example.wastenot.model.Metadata
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.LocalIndication
@@ -58,6 +66,8 @@ import java.time.Clock
 import java.time.LocalDate
 import java.util.UUID
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 
 enum class MainTab(val key: NavKey, val label: Int, val icon: Int) {
     HOME(Home, R.string.tab_home, R.drawable.ic_home),
@@ -84,6 +94,9 @@ fun AccountNavigation(
     clock: Clock = Clock.systemUTC(),
     restorePhotoReview: Boolean = false,
     onPhotoReviewChanged: (Boolean) -> Unit = {},
+    coreRepository: CoreRepository? = null,
+    reminderStore: ReminderStore? = null,
+    reminderScheduler: ReminderScheduler? = null,
 ) {
     val context = LocalContext.current.applicationContext
     val factory = remember(activityStore) { viewModelFactory { initializer {
@@ -144,6 +157,32 @@ fun AccountNavigation(
     val keyboard = LocalSoftwareKeyboardController.current
     LaunchedEffect(model) { model.load() }
     var selected by rememberSaveable { mutableStateOf(MainTab.HOME) }
+    var metadata by remember(coreRepository) { mutableStateOf<Metadata?>(null) }
+    LaunchedEffect(coreRepository, selected, data.mutationRevision) {
+        if (coreRepository != null && metadata == null) {
+            val meta = coreRepository.metadata()
+            if (meta is ApiResult.Success) metadata = meta.value
+        }
+    }
+    val achievementsEnabled = metadata?.isEnabled("achievements") == true
+    val photosEnabled = metadata?.isEnabled("photos") == true
+    val achievementsFactory = remember(coreRepository) {
+        coreRepository?.let { repo -> viewModelFactory { initializer { AchievementsViewModel(repo) } } }
+    }
+    val achievementsModel: AchievementsViewModel? = achievementsFactory?.let { viewModel(factory = it) }
+    val achievementsState = achievementsModel?.state?.collectAsStateWithLifecycle()?.value ?: AchievementsUiState()
+    LaunchedEffect(achievementsModel, achievementsEnabled, data.mutationRevision) {
+        if (achievementsEnabled && data.mutationRevision > 0) achievementsModel?.refresh()
+    }
+    val reminderSetting by (reminderStore?.observe(user.id) ?: remember { flowOf(ReminderSetting()) })
+        .collectAsStateWithLifecycle(initialValue = ReminderSetting())
+    val coroutineScope = rememberCoroutineScope()
+    var photoBytesCache by remember { mutableStateOf<Map<String, ByteArray>>(emptyMap()) }
+    var detailPhotoLoadingId by remember { mutableStateOf<String?>(null) }
+    var detailPhotoErrorId by remember { mutableStateOf<String?>(null) }
+    var detailPhotoAttempt by remember { mutableIntStateOf(0) }
+    var editorPhotoBusyRequest by remember { mutableStateOf<String?>(null) }
+    var editorPhotoError by remember { mutableStateOf<Pair<String, Int>?>(null) }
     val stacks = MainTab.entries.associateWith { rememberNavBackStack(it.key) }
     val stack = stacks.getValue(selected)
     val current = stack.last()
@@ -339,20 +378,71 @@ fun AccountNavigation(
             }
             entry<Profile> { ProfileScreen(user, summaryData.dashboard.value?.progress, summaryData.dashboard.loading, summaryData.dashboard.error, pageInsets,
                 { summaries.dashboard(true) }, { edit() }, { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Settings) },
-                { leaving = true }, Modifier.fillMaxSize()) }
-            entry<Settings> { SettingsScreen(user, theme, pageInsets, onTheme, Modifier.fillMaxSize()) }
+                { leaving = true }, Modifier.fillMaxSize(),
+                achievementsEnabled = achievementsEnabled,
+                onAchievements = { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Achievements) }) }
+            entry<Achievements> {
+                LaunchedEffect(achievementsModel) { achievementsModel?.load() }
+                AchievementsScreen(
+                    state = achievementsState,
+                    accountTimezone = user.timezone,
+                    padding = pageInsets,
+                    onRetry = { achievementsModel?.refresh() },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+            entry<Settings> {
+                SettingsScreen(
+                    user = user,
+                    theme = theme,
+                    padding = pageInsets,
+                    onTheme = onTheme,
+                    modifier = Modifier.fillMaxSize(),
+                    onReminderSettings = { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Settings) stacks.getValue(MainTab.PROFILE).add(ReminderSettings) },
+                )
+            }
+            entry<ReminderSettings> {
+                ReminderSettingsScreen(
+                    setting = reminderSetting,
+                    padding = pageInsets,
+                    onSave = { next ->
+                        coroutineScope.launch {
+                            reminderStore?.save(user.id, next)
+                            if (next.enabled) reminderScheduler?.schedule(user.id, next.hour, next.minute, user.timezone)
+                            else reminderScheduler?.cancel(user.id)
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
             entry<LogDetail> { key ->
                 val read = data.detail?.takeIf { it.id == key.id }
                 val log = if (read != null) read.log else data.records.find { it.id == key.id }
                 val missing = read?.error == ApiFailureKind.NOT_FOUND || read?.error == ApiFailureKind.DELETED
+                val photoId = log?.photoId
+                LaunchedEffect(photosEnabled, photoId, detailPhotoAttempt) {
+                    if (photosEnabled && photoId != null && photoId !in photoBytesCache && coreRepository != null) {
+                        detailPhotoLoadingId = photoId
+                        detailPhotoErrorId = null
+                        when (val res = coreRepository.downloadPhoto(photoId)) {
+                            is ApiResult.Success -> photoBytesCache = photoBytesCache + (photoId to res.value)
+                            is ApiResult.Failure -> detailPhotoErrorId = photoId
+                        }
+                        if (detailPhotoLoadingId == photoId) detailPhotoLoadingId = null
+                    }
+                }
                 if (current == key && savedNoticeId == key.id && log != null) SaveConfirmationScreen(log, savedWasCreated, pageInsets,
                     onView = { savedNoticeId = null }, onHome = ::home, modifier = Modifier.fillMaxSize(),
                     wasQueued = activityStore is com.example.wastenot.data.repository.OfflineActivityStore)
                 else LogDetailScreen(log, read == null || read.loading, read?.error != null && !missing, pageInsets,
                     onEdit = { edit(key.id) },
                     onDelete = { if (log != null && log.version > 0) { deletingId = log.id; deleteVersion = log.version } },
-                    onHistory = ::history, onRetry = { model.loadDetail(key.id) }, modifier = Modifier.fillMaxSize())
-            }
+                    onHistory = ::history, onRetry = { model.loadDetail(key.id) }, modifier = Modifier.fillMaxSize(),
+                    photosEnabled = photosEnabled,
+                    photoBytes = photoId?.let { photoBytesCache[it] },
+                    photoLoading = photoId != null && detailPhotoLoadingId == photoId,
+                    photoError = photoId != null && detailPhotoErrorId == photoId,
+                    onRetryPhoto = { detailPhotoAttempt++ }) }
             entry<LogEditor> { key ->
                 val cached = disk.active?.takeIf { it.requestId == key.requestId }
                 val initial = data.detail?.takeIf { it.id == key.logId }?.log ?: data.records.find { it.id == key.logId }
@@ -391,6 +481,13 @@ fun AccountNavigation(
                     }
                     val leavingAfterSave = current != key && form.locked && form.submissionError == null
                     val confirmed = data.save?.let { it.requestId == key.requestId && it.id != null } == true
+                    val editorPhotoId = form.values.photoId
+                    LaunchedEffect(photosEnabled, editorPhotoId) {
+                        if (photosEnabled && editorPhotoId != null && editorPhotoId !in photoBytesCache && coreRepository != null) {
+                            val res = coreRepository.downloadPhoto(editorPhotoId)
+                            if (res is ApiResult.Success) photoBytesCache = photoBytesCache + (editorPhotoId to res.value)
+                        }
+                    }
                     LogEditorScreen(form, date, user.timezone.id, data.saving || disk.busy || leavingAfterSave, pageInsets,
                         { input -> persistence.checkpoint(form.stored(key, selected),
                             { if (stack.lastOrNull() == key) model.save(input, key.logId, form.values.version, key.requestId,
@@ -401,7 +498,52 @@ fun AccountNavigation(
                         } },
                         { if (stack.lastOrNull() == key) conflictRequest = key.requestId }, Modifier.fillMaxSize(),
                         persistence = disk, restored = wasRestored, saveConfirmed = confirmed,
-                        onRetryPersistence = { if (confirmed) finishSave() else persistence.update(form.stored(key, selected)) })
+                        onRetryPersistence = { if (confirmed) finishSave() else persistence.update(form.stored(key, selected)) },
+                        photosEnabled = photosEnabled,
+                        photoPreviewBytes = editorPhotoId?.let { photoBytesCache[it] },
+                        photoBusy = editorPhotoBusyRequest == key.requestId,
+                        photoError = editorPhotoError?.takeIf { it.first == key.requestId }?.second,
+                        onPickPhoto = { uri ->
+                            if (coreRepository != null && editorPhotoBusyRequest == null) {
+                                editorPhotoBusyRequest = key.requestId
+                                editorPhotoError = null
+                                coroutineScope.launch {
+                                    try {
+                                        when (val prep = AttachmentImagePreparer.prepare(context, uri)) {
+                                            is PrepareAttachmentResult.UnsupportedFormat ->
+                                                editorPhotoError = key.requestId to R.string.photo_error_format
+                                            PrepareAttachmentResult.TooLarge, PrepareAttachmentResult.Unreadable ->
+                                                editorPhotoError = key.requestId to R.string.photo_error_too_large
+                                            is PrepareAttachmentResult.Success -> {
+                                                when (val uploaded = coreRepository.uploadPhoto(prep.photo.mimeType, prep.photo.bytes, prep.photo.fileName)) {
+                                                    is ApiResult.Success -> {
+                                                        val prevStaged = form.values.photoId?.takeIf { it != form.original.photoId }
+                                                        photoBytesCache = photoBytesCache + (uploaded.value.id to prep.photo.bytes)
+                                                        form.attachPhoto(uploaded.value.id)
+                                                        if (prevStaged != null) {
+                                                            coreRepository.deletePhoto(prevStaged)
+                                                        }
+                                                    }
+                                                    is ApiResult.Failure ->
+                                                        editorPhotoError = key.requestId to R.string.photo_error_upload
+                                                }
+                                            }
+                                        }
+                                    } finally {
+                                        if (editorPhotoBusyRequest == key.requestId) editorPhotoBusyRequest = null
+                                    }
+                                }
+                            }
+                        },
+                        onRemovePhoto = {
+                            val prevStaged = form.values.photoId?.takeIf { it != form.original.photoId }
+                            form.removePhoto()
+                            editorPhotoError = null
+                            if (prevStaged != null && coreRepository != null) {
+                                coroutineScope.launch { coreRepository.deletePhoto(prevStaged) }
+                            }
+                        },
+                        onDismissPhotoError = { editorPhotoError = null })
                 } else if (canStart) {
                     ScrollPage(pageInsets, Modifier.fillMaxSize()) {
                         LinearProgressIndicator(Modifier.fillMaxWidth())
@@ -475,6 +617,8 @@ private fun AccountPage(
                 is LogEditor -> if (route.logId == null) R.string.log_create else R.string.log_edit
                 is GuideDetail -> R.string.guide_detail
                 Settings -> R.string.settings_title
+                Achievements -> R.string.achievements_title
+                ReminderSettings -> R.string.reminder_title
                 else -> tab.label
             }), style = MaterialTheme.typography.headlineMedium) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent), navigationIcon = {
                 if (route != tab.key && !confirmation) IconActionButton(R.drawable.ic_back, stringResource(R.string.back),

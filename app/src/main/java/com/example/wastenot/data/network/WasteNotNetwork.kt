@@ -25,6 +25,7 @@ import okio.BufferedSink
 data class ApiDiagnostic(val status: Int?, val durationMillis: Long, val requestId: String?)
 
 class WasteNotNetwork private constructor(
+    val baseUrl: HttpUrl,
     val client: OkHttpClient,
     val api: WasteNotApi,
     val aiApi: WasteNotAiApi,
@@ -58,7 +59,7 @@ class WasteNotNetwork private constructor(
             val retrofit = Retrofit.Builder().baseUrl(base).client(client)
                 .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
                 .build()
-            return WasteNotNetwork(client, retrofit.create(WasteNotApi::class.java),
+            return WasteNotNetwork(base, client, retrofit.create(WasteNotApi::class.java),
                 retrofit.create(WasteNotAiApi::class.java), ApiExecutor(json, clock))
         }
     }

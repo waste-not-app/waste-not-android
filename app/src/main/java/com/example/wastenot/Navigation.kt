@@ -3,6 +3,8 @@ package com.example.wastenot
 import android.content.Context
 import com.example.wastenot.data.local.ScanPhotoCache
 import com.example.wastenot.data.repository.RemoteScanRepository
+import com.example.wastenot.data.local.ReminderScheduler
+import com.example.wastenot.data.local.ReminderStore
 import com.example.wastenot.data.repository.ScanRepository
 import com.example.wastenot.data.repository.RemoteActivityStore
 import com.example.wastenot.data.repository.ActivityStore
@@ -69,6 +71,8 @@ fun MainNavigation(
         { RemoteActivityStore(coreRepository) },
     scanRepositoryFactory: (ScanPhotoCache) -> ScanRepository =
         { RemoteScanRepository(aiRepository, it) },
+    reminderStore: ReminderStore? = null,
+    reminderScheduler: ReminderScheduler? = null,
 ) {
     val factory = remember(accountSession) { viewModelFactory { initializer { SessionViewModel(accountSession) } } }
     val model: SessionViewModel = viewModel(factory = factory)
@@ -126,8 +130,11 @@ fun MainNavigation(
                     AccountNavigation(phase.user, activities, guideStore, scanRepositoryFactory, themeMode,
                         { choosingTheme = true }, model::logout, Modifier.fillMaxSize(), logoutState = logout,
                         restorePhotoReview = photoReviewOwner == phase.user.id,
-                        onPhotoReviewChanged = { reviewing -> setPhotoReviewOwner(phase.user.id.takeIf { reviewing }) })
-                }
+                        onPhotoReviewChanged = { reviewing -> setPhotoReviewOwner(phase.user.id.takeIf { reviewing }) },
+                        coreRepository = coreRepository,
+                        reminderStore = reminderStore,
+                        reminderScheduler = reminderScheduler)
+                    }
             }
         },
       )

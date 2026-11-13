@@ -229,6 +229,29 @@ class EditorDraftTest {
         }
     }
 
+    @Test fun photoAttachmentAndClearPhotoSurviveSnapshotRestore() {
+        val photoId = "00000000-0000-4000-8000-000000000201"
+        val created = EditorDraft.from(null, today)
+        created.change(EditorField.METHOD, created.values.copy(category = WasteCategory.PLASTIC, method = DisposalMethod.RECYCLE, quantity = QuantityInput("2", QuantityUnit.ITEM)))
+        created.attachPhoto(photoId)
+        assertEquals(34, created.snapshot().size)
+        val restoredCreate = EditorDraft.fromSnapshot(created.snapshot())
+        assertEquals(photoId, restoredCreate.validate(today)!!.photoId)
+        assertFalse(restoredCreate.validate(today)!!.clearPhoto)
+
+        val existing = log().copy(photoId = photoId)
+        val edited = EditorDraft.from(existing, today)
+        assertEquals(photoId, edited.values.photoId)
+        edited.removePhoto()
+        assertNull(edited.values.photoId)
+        assertTrue(edited.values.clearPhoto)
+        assertTrue(edited.dirty)
+        val restoredEdit = EditorDraft.fromSnapshot(edited.snapshot())
+        val input = restoredEdit.prepareSubmission(today)!!
+        assertNull(input.photoId)
+        assertTrue(input.clearPhoto)
+    }
+
     private fun log() = WasteLog("00000000-0000-4000-8000-000000000001", WasteCategory.PLASTIC, DisposalMethod.RECYCLE,
         Quantity.Weight.of(250), today, ZoneId.of("Asia/Jakarta"), "", 1, Instant.EPOCH, Instant.EPOCH)
 }
