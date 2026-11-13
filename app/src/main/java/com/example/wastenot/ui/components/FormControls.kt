@@ -136,6 +136,7 @@ fun WasteTextField(
                 },
             shape = fieldShape,
             colors = wasteTextFieldColors(),
+            enabled = enabled,
             isError = errorText != null,
             singleLine = singleLine,
             minLines = if (singleLine) 1 else 3,
