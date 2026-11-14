@@ -148,7 +148,11 @@ class ScanSheetTest {
             compose.runOnIdle { dark = theme }
             states.forEachIndexed { index, next ->
                 compose.runOnIdle { state = next }
-                compose.onNodeWithText("Input manual").assertIsDisplayed().performClick()
+                if (next.phase in listOf(ScanPhase.CAMERA, ScanPhase.PHOTO, ScanPhase.FAILURE)) {
+                    compose.onNodeWithText("Input manual").assertIsDisplayed().performClick()
+                } else {
+                    compose.onNodeWithText("Input manual").assertDoesNotExist()
+                }
                 compose.onNodeWithText("Gunakan contoh simulasi").assertDoesNotExist()
                 compose.onNodeWithText("Pengaturan simulasi").assertDoesNotExist()
                 val markers = (0..3).map { compose.onNodeWithTag("scan-step-$it", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot }
@@ -159,7 +163,8 @@ class ScanSheetTest {
                 capture("scan-${if (theme) "dark" else "light"}-$index")
             }
         }
-        assertEquals(states.size * 2, manual)
+        val scanPhaseCount = states.count { it.phase in listOf(ScanPhase.CAMERA, ScanPhase.PHOTO, ScanPhase.FAILURE) }
+        assertEquals(scanPhaseCount * 2, manual)
     }
 
     @Test fun objectNeedsMaterialBeforeConfirmationAndOnlyExplicitChoiceUpdatesIt() {

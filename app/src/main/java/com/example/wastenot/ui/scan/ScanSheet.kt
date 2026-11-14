@@ -243,9 +243,19 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                                     { stringResource(it.labelResource) }, onMethod)
                             }
                             if (state.canChooseMethod) {
-                                ActionButton(stringResource(R.string.scan_use), onUse, Modifier.fillMaxWidth(), enabled = state.canUseRecommendation)
-                                Text(stringResource(R.string.scan_quantity_next), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            } else if (recommendation.scope == AiRecommendationScope.PREVENTION) Text(stringResource(R.string.ai_reduce_manual))
+                                if (recommendation.prototypeOnly) {
+                                    ActionButton(stringResource(R.string.ai_use_manual), {
+                                        if (state.confirmedMethod == null && state.method != null) onMethod(state.method)
+                                        onManual()
+                                    }, Modifier.fillMaxWidth())
+                                } else {
+                                    ActionButton(stringResource(R.string.scan_use), onUse, Modifier.fillMaxWidth(), enabled = state.canUseRecommendation)
+                                    Text(stringResource(R.string.scan_quantity_next), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            } else if (recommendation.scope == AiRecommendationScope.PREVENTION || recommendation.method == DisposalMethod.REDUCE) {
+                                Text(stringResource(R.string.ai_reduce_manual))
+                                ActionButton(stringResource(R.string.ai_use_manual), onManual, Modifier.fillMaxWidth())
+                            }
                         } else {
                             val guidanceTitle = if (recommendation?.specialHandling == true)
                                 R.string.scan_special_guidance else R.string.scan_initial_guidance
@@ -267,6 +277,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                                 recommendation.steps.forEachIndexed { index, step -> Text("${index + 1}. $step") }
                             }
                             recommendation?.let { ScanSources(it) }
+                            ActionButton(stringResource(R.string.manual_input), onManual, Modifier.fillMaxWidth())
                         }
                         ScanSecondary(R.string.scan_review_context, onReviewContext)
                         ScanSecondary(R.string.scan_correct_object, onCorrectObject)
@@ -289,11 +300,13 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                     }
                 }
             }
-            HorizontalDivider()
-            Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(stringResource(R.string.scan_manual_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                ScanSecondary(R.string.manual_input, onManual)
+            if (state.phase in listOf(ScanPhase.CAMERA, ScanPhase.PHOTO, ScanPhase.FAILURE)) {
+                HorizontalDivider()
+                Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(stringResource(R.string.scan_manual_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    ScanSecondary(R.string.manual_input, onManual)
+                }
             }
         }
     }

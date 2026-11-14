@@ -37,9 +37,10 @@ data class ScanState(val session: String = "", val phase: ScanPhase = ScanPhase.
     }
     val canChooseMethod: Boolean get() = recommendation?.let {
         it.status == AiRecommendationStatus.READY && it.scope == AiRecommendationScope.HANDLING &&
-            it.method != null && it.method != DisposalMethod.REDUCE && !it.prototypeOnly
+            it.method != null && it.method != DisposalMethod.REDUCE
     } == true
     val canUseRecommendation: Boolean get() = objectConfirmed && item != null && canChooseMethod && method != null &&
+        recommendation?.prototypeOnly != true &&
         (recommendation?.conditionsToVerify.isNullOrEmpty() || conditionsConfirmed)
     val step: Int get() = when (phase) {
         ScanPhase.CAMERA, ScanPhase.PHOTO, ScanPhase.DETECTING -> 0
