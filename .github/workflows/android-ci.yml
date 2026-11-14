@@ -39,7 +39,7 @@ jobs:
   verify:
     name: Test and Build
     runs-on: [self-hosted, android]
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - name: Checkout Repository
