@@ -56,6 +56,7 @@ import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.ui.components.labelResource
 import com.example.wastenot.ui.main.SheetDragHandle
+import com.example.wastenot.ui.main.sheetVerticalScroll
 import com.example.wastenot.ui.main.SheetSystemBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -95,7 +96,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
         containerColor = MaterialTheme.colorScheme.surface,
         dragHandle = null) {
         SheetSystemBar()
-        Column(Modifier.fillMaxWidth().fillMaxHeight(.94f).testTag("capture-sheet")) {
+        Column(Modifier.fillMaxWidth().fillMaxHeight(.94f).navigationBarsPadding().imePadding().testTag("capture-sheet")) {
             Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp, bottom = 10.dp).size(38.dp, 4.dp)
                 .background(MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(2.dp)))
             Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(bottom = 12.dp),
@@ -110,7 +111,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
             }
             HorizontalDivider()
             val scroll = remember(state.phase) { ScrollState(0) }
-            Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(scroll).padding(horizontal = horizontalPadding, vertical = 16.dp),
+            Column(Modifier.weight(1f).fillMaxWidth().sheetVerticalScroll(scroll).padding(horizontal = horizontalPadding, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 if (!pinSteps) ScanSteps(state.step)
                 if (state.error?.kind == ApiFailureKind.RATE_LIMITED) MessageBanner(stringResource(R.string.error_rate_limited), isError = true)

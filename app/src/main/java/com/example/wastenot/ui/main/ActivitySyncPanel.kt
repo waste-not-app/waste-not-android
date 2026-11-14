@@ -1,6 +1,8 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -22,6 +24,7 @@ import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.labelResource
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -54,7 +57,13 @@ internal class ActivitySyncViewModel(private val store: ActivityStore) : ViewMod
 
 @Composable
 internal fun ActivitySyncBar(count: Int, ready: Boolean, onOpen: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surfaceContainer) {
+    val tokens = LocalWasteNotSurfaceTokens.current
+    Surface(
+        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = tokens.glassTintStrong,
+        border = BorderStroke(1.dp, tokens.glassEdge),
+    ) {
         TextButton(onClick = onOpen, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(if (ready) R.string.sync_status else R.string.sync_initial, count), style = MaterialTheme.typography.bodySmall)
         }
@@ -66,8 +75,9 @@ internal fun ActivitySyncBar(count: Int, ready: Boolean, onOpen: () -> Unit, mod
 internal fun ActivitySyncSheet(issues: List<SyncIssue>, busy: Boolean, error: Boolean,
     onRetry: () -> Unit, onResolve: (String, Boolean) -> Unit, onDismiss: () -> Unit) {
     var decision by remember { mutableStateOf<Pair<SyncIssue, Boolean>?>(null) }
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(24.dp),
+    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+        val syncScroll = rememberScrollState()
+        Column(Modifier.fillMaxWidth().sheetVerticalScroll(syncScroll).navigationBarsPadding().padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(stringResource(R.string.sync_title), style = MaterialTheme.typography.headlineSmall)
             Text(stringResource(R.string.sync_explanation), style = MaterialTheme.typography.bodyMedium)

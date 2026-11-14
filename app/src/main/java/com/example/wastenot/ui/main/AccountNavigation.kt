@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -389,7 +390,8 @@ fun AccountNavigation(
                 { summaries.dashboard(true) }, { edit() }, { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Settings) },
                 { leaving = true }, Modifier.fillMaxSize(),
                 achievementsEnabled = achievementsEnabled,
-                onAchievements = { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Achievements) }) }
+                onAchievements = { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Achievements) },
+                onSync = if (activityStore is com.example.wastenot.data.repository.OfflineActivityStore) ({ showingSync = true }) else null) }
             entry<Achievements> {
                 LaunchedEffect(achievementsModel) { achievementsModel?.load() }
                 AchievementsScreen(
@@ -580,11 +582,30 @@ fun AccountNavigation(
                             if (selected == tab && stacks.getValue(selected).lastOrNull() == key) openCapture()
                         },
                         onFilter = { if (selected == tab && stacks.getValue(selected).lastOrNull() == History) historyFilterOpen = true }) {
-                        Column(Modifier.fillMaxSize()) {
-                            if (activityStore is com.example.wastenot.data.repository.OfflineActivityStore) {
-                                ActivitySyncBar(syncIssues.size, historyReady, { showingSync = true })
+                        val showSyncBar = activityStore is com.example.wastenot.data.repository.OfflineActivityStore && (!historyReady || syncIssues.isNotEmpty())
+                        if (showSyncBar) {
+                            val insets = LocalWasteNotScaffoldPadding.current
+                            val layoutDirection = LocalLayoutDirection.current
+                            Column(Modifier.fillMaxSize()) {
+                                ActivitySyncBar(
+                                    count = syncIssues.size,
+                                    ready = historyReady,
+                                    onOpen = { showingSync = true },
+                                    modifier = Modifier.padding(top = insets.calculateTopPadding() + 4.dp),
+                                )
+                                CompositionLocalProvider(
+                                    LocalWasteNotScaffoldPadding provides PaddingValues(
+                                        start = insets.calculateLeftPadding(layoutDirection),
+                                        top = 0.dp,
+                                        end = insets.calculateRightPadding(layoutDirection),
+                                        bottom = insets.calculateBottomPadding(),
+                                    ),
+                                ) {
+                                    Box(Modifier.weight(1f)) { entry.Content() }
+                                }
                             }
-                            Box(Modifier.weight(1f)) { entry.Content() }
+                        } else {
+                            entry.Content()
                         }
                     }
                 }
