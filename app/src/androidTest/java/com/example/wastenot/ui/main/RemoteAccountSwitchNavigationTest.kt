@@ -37,7 +37,7 @@ class RemoteAccountSwitchNavigationTest {
     @Test fun realSessionsKeepDraftsQueriesAndPrivateRootsBoundToTheirOwner() = runTest(timeout = 6.minutes) {
         assumeTrue(InstrumentationRegistry.getArguments().getString("verifyLiveAccountIsolation") == "true")
         assertTrue(BuildConfig.DEBUG)
-        assertEquals("https://pred-autoscaler.bccdev.id/wastenot/api/v1/", BuildConfig.API_BASE_URL)
+        assertEquals("https://waste-not-api.bccdev.id/v1/", BuildConfig.API_BASE_URL)
         assertTrue(container.accountSession is RemoteAccountSession)
         val runId = UUID.fromString(requireNotNull(InstrumentationRegistry.getArguments().getString("fixtureRunId"))).toString()
         val passwordA = UUID.randomUUID().toString() + "Az9!"

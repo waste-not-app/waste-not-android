@@ -23,7 +23,7 @@ class RemoteAccountIsolationTest {
         val args = InstrumentationRegistry.getArguments()
         assumeTrue(args.getString("verifyLiveAccountIsolation") == "true")
         assertTrue(BuildConfig.DEBUG)
-        val base = "https://pred-autoscaler.bccdev.id/wastenot/api/v1/"
+        val base = "https://waste-not-api.bccdev.id/v1/"
         assertEquals(base, BuildConfig.API_BASE_URL)
         val runId = UUID.fromString(requireNotNull(args.getString("fixtureRunId"))).toString()
         val network = requireNotNull(WasteNotNetwork.create(base))

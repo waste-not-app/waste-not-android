@@ -2,7 +2,7 @@
 
 Dokumen ini berisi panduan lengkap implementasi CI/CD untuk aplikasi Android WasteNot, konfigurasi server distribusi pada domain `oktaavsm.bccdev.id`, serta langkah-langkah manual penyiapan **GitHub Repository Secrets**.
 
-Workflow publikasi memakai adapter remote dan build native (`wastenot.hotReload=false`). Repository variable `WASTENOT_RELEASE_API_BASE_URL` wajib berisi URL HTTPS API, saat ini `https://pred-autoscaler.bccdev.id/wastenot/api/v1/`. Nilai kosong menghentikan build publikasi; secret signing/deployment tetap dikelola terpisah. Pemeriksaan shell memastikan mode native dikirim dan URL kosong tidak menjalankan Gradle.
+Workflow publikasi memakai adapter remote dan build native (`wastenot.hotReload=false`). Repository variable `WASTENOT_RELEASE_API_BASE_URL` wajib berisi URL HTTPS API, saat ini `https://waste-not-api.bccdev.id/v1/`. Nilai kosong menghentikan build publikasi; secret signing/deployment tetap dikelola terpisah. Pemeriksaan shell memastikan mode native dikirim dan URL kosong tidak menjalankan Gradle.
 
 ---
 

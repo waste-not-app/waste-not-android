@@ -81,7 +81,7 @@ def main():
 
     if sql(f"SELECT count(*) FROM users WHERE normalized_email = '{email}';") != "0":
         raise RuntimeError("Probe email already exists")
-    with urlopen("https://pred-autoscaler.bccdev.id/wastenot/api/health/ready", timeout=15) as ready:
+    with urlopen("https://waste-not-api.bccdev.id/health/ready", timeout=15) as ready:
         if not json.load(ready).get("ready"):
             raise RuntimeError("Backend readiness check failed")
         evidence["backend_release"] = ready.headers.get("X-WasteNot-Release")

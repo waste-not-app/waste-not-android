@@ -30,7 +30,7 @@ class RemoteHistoryNavigationTest {
         val args = InstrumentationRegistry.getArguments()
         assumeTrue(args.getString("verifyLiveHistory") == "true")
         assertTrue(BuildConfig.DEBUG)
-        assertEquals("https://pred-autoscaler.bccdev.id/wastenot/api/v1/", BuildConfig.API_BASE_URL)
+        assertEquals("https://waste-not-api.bccdev.id/v1/", BuildConfig.API_BASE_URL)
         val runId = UUID.fromString(requireNotNull(args.getString("fixtureRunId"))).toString()
         val email = "history-$runId@example.test"
         val container = (compose.activity.application as WasteNotApplication).container

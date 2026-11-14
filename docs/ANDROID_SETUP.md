@@ -38,7 +38,7 @@ Semua build aplikasi menggunakan akun dan data backend nyata. Instalasi baru men
 
 | Build type | Property Gradle | Default | Kebijakan |
 |---|---|---|---|
-| debug | `wastenot.debugApiBaseUrl` | `https://pred-autoscaler.bccdev.id/wastenot/api/v1/` | HTTPS; HTTP localhost/emulator hanya melalui override eksplisit |
+| debug | `wastenot.debugApiBaseUrl` | `https://waste-not-api.bccdev.id/v1/` | HTTPS; HTTP localhost/emulator hanya melalui override eksplisit |
 | staging | `wastenot.stagingApiBaseUrl` | alamat HTTPS yang sama | HTTPS; application ID `.staging` |
 | release | `wastenot.releaseApiBaseUrl` | alamat HTTPS yang sama | HTTPS; memerlukan signing untuk distribusi |
 
