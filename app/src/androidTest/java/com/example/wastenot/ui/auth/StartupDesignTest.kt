@@ -32,12 +32,13 @@ class StartupDesignTest {
         compose.setContent { WasteNotTheme(dark) {
             StartupScreen(error, { retries++ }, { logins++ }, Modifier.fillMaxSize())
         } }
+        val appName = compose.activity.getString(com.example.wastenot.R.string.app_name)
         for (theme in listOf(false, true)) for (failed in listOf(false, true)) {
             compose.runOnIdle { dark = theme; error = failed }
             val heading = if (failed) "Belum bisa memeriksa sesi" else "Menyiapkan catatanmu…"
-            assertReadable("WasteNot")
+            assertReadable(appName)
             assertReadable(heading)
-            compose.onNodeWithText("WasteNot").performScrollTo()
+            compose.onNodeWithText(appName).performScrollTo()
             capture("startup-${if (theme) "dark" else "light"}-${if (failed) "error" else "loading"}")
             compose.onNodeWithText("Simulasikan", substring = true).assertDoesNotExist()
             compose.onNodeWithText("Pratinjau", substring = true).assertDoesNotExist()

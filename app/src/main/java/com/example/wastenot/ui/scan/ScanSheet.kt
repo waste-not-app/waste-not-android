@@ -46,6 +46,7 @@ import com.example.wastenot.model.*
 import com.example.wastenot.theme.OnAccent
 import com.example.wastenot.theme.Pine900
 import com.example.wastenot.theme.LimeEnd
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.IconActionButton
@@ -222,9 +223,11 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                                 recommendation.conditionsToVerify.forEach { Text(stringResource(contextFieldLabel(it))) }
                             }
                             var expanded by remember(recommendation) { mutableStateOf(recommendation.conditionsToVerify.isNotEmpty()) }
-                            OutlinedButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), shape = MaterialTheme.shapes.small) {
-                                Text(stringResource(if (expanded) R.string.scan_hide_basis else R.string.scan_basis))
-                            }
+                            SecondaryActionButton(
+                                stringResource(if (expanded) R.string.scan_hide_basis else R.string.scan_basis),
+                                { expanded = !expanded },
+                                Modifier.fillMaxWidth(),
+                            )
                             if (expanded) {
                                 state.item?.label?.let { Text(it, style = MaterialTheme.typography.titleSmall) }
                                 recommendation.steps.forEachIndexed { index, step -> Text("${index + 1}. $step") }
@@ -331,15 +334,27 @@ private fun ScanSteps(current: Int) {
 internal fun <T> ScanChoice(label: String, value: String, options: List<T>, optionLabel: @Composable (T) -> String, onSelect: (T) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     val scroll = remember(options) { ScrollState(0) }
+    val tokens = LocalWasteNotSurfaceTokens.current
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(label, style = MaterialTheme.typography.labelLarge)
+        Text(label, style = MaterialTheme.typography.titleSmall)
         Box {
-            OutlinedButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
-                .semantics { contentDescription = label; stateDescription = value },
-                shape = MaterialTheme.shapes.small, colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)) {
-                Text(value, Modifier.weight(1f))
-                Icon(painterResource(R.drawable.ic_chevron_down), null, Modifier.padding(start = 8.dp).size(20.dp))
+            Surface(
+                onClick = { expanded = true },
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
+                    .semantics { contentDescription = label; stateDescription = value },
+                shape = RoundedCornerShape(15.dp),
+                color = tokens.fieldWell,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                border = BorderStroke(1.dp, tokens.fieldEdge),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(value, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+                    Icon(painterResource(R.drawable.ic_chevron_down), null, Modifier.padding(start = 8.dp).size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
             DropdownMenu(expanded, { expanded = false }, scrollState = scroll) {
                 options.forEach { option -> DropdownMenuItem(text = { Text(optionLabel(option)) },
@@ -353,13 +368,17 @@ internal fun <T> ScanChoice(label: String, value: String, options: List<T>, opti
     SecondaryActionButton(stringResource(label), onClick, Modifier.fillMaxWidth())
 }
 @Composable private fun ScanBusy(label: Int) {
-    LinearProgressIndicator(Modifier.fillMaxWidth())
-    Text(stringResource(label))
+    LinearProgressIndicator(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(8.dp)), gapSize = 0.dp)
+    Text(stringResource(label), color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 @Composable private fun ScanWarning(message: String) {
-    Surface(Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
-        shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.onSecondaryContainer) {
+    Surface(
+        Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+    ) {
         Text(message, Modifier.padding(14.dp), style = MaterialTheme.typography.bodySmall)
     }
 }

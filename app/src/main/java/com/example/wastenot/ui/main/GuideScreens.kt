@@ -21,6 +21,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
@@ -75,7 +76,7 @@ fun GuideListScreen(
                         data.query,
                         { onQuery(it); resetScroll() },
                         Modifier.fillMaxWidth().semantics { contentDescription = label },
-                        placeholder = { Text(stringResource(R.string.guide_search_hint)) },
+                        placeholder = { Text(stringResource(R.string.guide_search_hint), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                         singleLine = true,
                         shape = RoundedCornerShape(15.dp),
                         colors = wasteTextFieldColors(),
@@ -90,9 +91,10 @@ fun GuideListScreen(
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         SecondaryActionButton(stringResource(R.string.guide_search_action), ::submit,
                             Modifier.focusProperties { canFocus = true }.focusRequester(searchAction), icon = R.drawable.ic_search)
-                        TextActionButton(stringResource(R.string.guide_clear_action), ::clear,
-                            enabled = data.query.isNotEmpty() || data.category != null)
                         GuideCategory(data.category, { onCategory(it); resetScroll() })
+                        if (data.query.isNotEmpty() || data.category != null) {
+                            TextActionButton(stringResource(R.string.guide_clear_action), ::clear)
+                        }
                     }
                 }
             }

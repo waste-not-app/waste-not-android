@@ -58,9 +58,9 @@ class ProfileNavigationTest {
                 .config[SemanticsProperties.EditableText].text
             assertEquals("Masked password length for $label", 19, rendered.length)
         }
-        androidx.test.espresso.Espresso.closeSoftKeyboard()
-        compose.waitForIdle()
+        dismissSystemOverlay()
         compose.onNodeWithText("Buat akun").performScrollTo().performClick()
+        dismissSystemOverlay()
         capture("auth-register-submitted-light")
         listOf("Nama perlu", "Masukkan alamat email", "Kata sandi perlu", "Konfirmasi kata sandi belum sama", "Email ini sudah digunakan", "Permintaan belum berhasil").forEach {
             compose.onNodeWithText(it, substring = true).assertDoesNotExist()
@@ -79,14 +79,18 @@ class ProfileNavigationTest {
         logout()
         compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("pengguna@example.invalid")
         compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        dismissSystemOverlay()
         compose.onNodeWithText("Masuk").performScrollTo().performClick()
+        dismissSystemOverlay()
         compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
         compose.onNode(tabs and hasText("Profil")).performClick()
         compose.onNodeWithText("50 XP dari 5 catatan aktif").assertExists()
         logout()
         compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("profile.zero@example.invalid")
         compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        dismissSystemOverlay()
         compose.onNodeWithText("Masuk").performScrollTo().performClick()
+        dismissSystemOverlay()
         compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
         compose.onNode(tabs and hasText("Profil")).performClick()
         compose.onNodeWithText("Wulan Wijaya").assertIsDisplayed()
@@ -126,7 +130,7 @@ class ProfileNavigationTest {
     }
 
     private fun capture(name: String) {
-        compose.waitForIdle()
+        dismissSystemOverlay()
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val directory = File(instrumentation.targetContext.getExternalFilesDir(null), "profile-qa").apply { mkdirs() }
         val dark = name.endsWith("dark")
@@ -140,10 +144,14 @@ class ProfileNavigationTest {
                 listOf(16, 8, 0).mapIndexed { i, shift -> (lastPixel shr shift and 255) >= minima[i] }.all { it }
             }
         } catch (t: Throwable) {
+            instrumentation.uiAutomation.takeScreenshot()?.let { failShot ->
+                File(directory, "$name-timeout.png").outputStream().use { failShot.compress(Bitmap.CompressFormat.PNG, 100, it) }
+                failShot.recycle()
+            }
             val r = android.graphics.Color.red(lastPixel)
             val g = android.graphics.Color.green(lastPixel)
             val b = android.graphics.Color.blue(lastPixel)
-            throw AssertionError("capture($name) failed pixel(1,h/2)=($r,$g,$b) vs minima=${minima.toList()}", t)
+            throw AssertionError("capture($name) failed pixel(20,h/2)=($r,$g,$b) vs minima=${minima.toList()}", t)
         }
         val bitmap = instrumentation.uiAutomation.takeScreenshot()
         File(directory, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
@@ -159,6 +167,23 @@ class ProfileNavigationTest {
     private fun logout() {
         compose.onNodeWithText("Keluar").performScrollTo().performClick()
         compose.onNode(hasText("Keluar") and hasAnyAncestor(isDialog())).performClick()
-        compose.waitUntil(30_000) { compose.onAllNodesWithText("Belum punya akun? Daftar").fetchSemanticsNodes().isNotEmpty() }
+        compose.waitUntil(30_000) {
+            runCatching { compose.onAllNodesWithText("Belum punya akun? Daftar").fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
+        }
+    }
+
+    private fun dismissSystemOverlay() {
+        val automation = InstrumentationRegistry.getInstrumentation().uiAutomation
+        repeat(4) {
+            compose.waitForIdle()
+            var imeVisible = false
+            compose.runOnUiThread {
+                imeVisible = androidx.core.view.ViewCompat.getRootWindowInsets(compose.activity.window.decorView)
+                    ?.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime()) == true
+            }
+            if (compose.activity.hasWindowFocus() && !imeVisible) return
+            automation.executeShellCommand("input keyevent 4").close()
+            android.os.SystemClock.sleep(400)
+        }
     }
 }
