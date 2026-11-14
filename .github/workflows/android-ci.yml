@@ -38,7 +38,7 @@ concurrency:
 jobs:
   verify:
     name: Test and Build
-    runs-on: [self-hosted, android]
+    runs-on: [self-hosted, alberd-staging-android]
     timeout-minutes: 60
 
     steps:
@@ -53,6 +53,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6.4.0
+        with:
+          cache-disabled: true
 
       - name: Make Gradle executable
         run: chmod +x ./gradlew

@@ -21,7 +21,7 @@ permissions:
 jobs:
   release-and-deploy:
     name: Build, Sign, and Deploy APK
-    runs-on: [self-hosted, android]
+    runs-on: [self-hosted, alberd-staging-android]
     timeout-minutes: 60
 
     steps:
@@ -36,6 +36,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6.4.0
+        with:
+          cache-disabled: true
 
       - name: Make Gradle executable
         run: chmod +x ./gradlew
@@ -114,22 +116,9 @@ jobs:
           echo "versioned_apk=$VERSIONED_APK" >> "$GITHUB_OUTPUT"
           echo "Built APK: $VERSIONED_APK (Source: $APK_PATH)"
 
-      - name: Upload Release APK Artifact
-        uses: actions/upload-artifact@v7.0.2
-        continue-on-error: true
-        with:
-          name: ${{ steps.prepare_apk.outputs.versioned_apk }}
-          retention-days: 7
-          path: ${{ runner.temp }}/apk-release/*.apk
-          if-no-files-found: error
-
-      - name: Deploy APK to Backend VM
+      - name: Deploy APK to Staging VM
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.deploy_to_vm == 'true' }}
         env:
-          BACKEND_HOST: ${{ secrets.BACKEND_HOST || 'proxy.bccdev.id' }}
-          BACKEND_USER: ${{ secrets.BACKEND_USER || 'dev' }}
-          BACKEND_PORT: ${{ secrets.BACKEND_PORT || '11023' }}
-          BACKEND_SSH_KEY: ${{ secrets.BACKEND_SSH_KEY }}
           BACKEND_DIR: ${{ secrets.BACKEND_DIR || '/var/www/wastenot-apk' }}
           HAS_RELEASE_KEYSTORE: ${{ steps.keystore.outputs.has_keystore }}
           VERSIONED_APK: ${{ steps.prepare_apk.outputs.versioned_apk }}
@@ -141,34 +130,9 @@ jobs:
             exit 1
           fi
 
-          if [ -z "$BACKEND_SSH_KEY" ]; then
-            echo "Error: BACKEND_SSH_KEY secret is not set. Deployment skipped." >&2
-            exit 1
-          fi
-
-          SSH_KEY_PATH="$RUNNER_TEMP/backend_deploy_key"
-          printf '%s\n' "$BACKEND_SSH_KEY" > "$SSH_KEY_PATH"
-          chmod 600 "$SSH_KEY_PATH"
-
-          mkdir -p ~/.ssh
-          ssh-keyscan -p "$BACKEND_PORT" "$BACKEND_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
-
-          # Ensure destination directories exist
-          ssh -i "$SSH_KEY_PATH" -p "$BACKEND_PORT" "$BACKEND_USER@$BACKEND_HOST" \
-            "mkdir -p '$BACKEND_DIR/apk'"
-
-          # Copy versioned APK
-          scp -i "$SSH_KEY_PATH" -P "$BACKEND_PORT" \
-            "$RUNNER_TEMP/apk-release/$VERSIONED_APK" \
-            "$BACKEND_USER@$BACKEND_HOST:$BACKEND_DIR/apk/"
-
-          # Copy release management script
-          scp -i "$SSH_KEY_PATH" -P "$BACKEND_PORT" \
-            scripts/manage_releases.py \
-            "$BACKEND_USER@$BACKEND_HOST:$BACKEND_DIR/manage_releases.py"
-
-          # Execute release management: prune old versions (>3), sync latest.apk, regenerate index.html & versions.json
-          ssh -i "$SSH_KEY_PATH" -p "$BACKEND_PORT" "$BACKEND_USER@$BACKEND_HOST" \
-            "python3 '$BACKEND_DIR/manage_releases.py' '$BACKEND_DIR'"
+          mkdir -p "$BACKEND_DIR/apk"
+          cp "$RUNNER_TEMP/apk-release/$VERSIONED_APK" "$BACKEND_DIR/apk/"
+          cp scripts/manage_releases.py "$BACKEND_DIR/manage_releases.py"
+          python3 "$BACKEND_DIR/manage_releases.py" "$BACKEND_DIR"
 
           echo "Deployment successful! Check https://waste-not.bccdev.id/apk/"
