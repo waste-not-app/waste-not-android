@@ -53,6 +53,7 @@ import com.example.wastenot.theme.ThemePicker
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.ui.auth.AuthScreen
 import com.example.wastenot.ui.auth.SessionViewModel
+import com.example.wastenot.ui.auth.OnboardingScreen
 import com.example.wastenot.ui.auth.StartupScreen
 import com.example.wastenot.ui.main.AccountNavigation
 import com.github.skydoves.navgraph.annotations.NavGraphRoot
@@ -73,6 +74,8 @@ fun MainNavigation(
         { RemoteScanRepository(aiRepository, it) },
     reminderStore: ReminderStore? = null,
     reminderScheduler: ReminderScheduler? = null,
+    showOnboarding: Boolean = false,
+    onCompleteOnboarding: () -> Unit = {},
 ) {
     val factory = remember(accountSession) { viewModelFactory { initializer { SessionViewModel(accountSession) } } }
     val model: SessionViewModel = viewModel(factory = factory)
@@ -121,7 +124,7 @@ fun MainNavigation(
             }
             entry<AuthRoot> {
                 val phase = session.phase as? SessionState.SignedOut
-                if (phase != null) AuthNavigation(model, phase, { choosingTheme = true })
+                if (phase != null) AuthNavigation(model, phase, { choosingTheme = true }, showOnboarding, onCompleteOnboarding)
             }
             entry<AccountRoot> { key ->
                 val phase = session.phase as? SessionState.Authenticated
@@ -145,11 +148,23 @@ fun MainNavigation(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AuthNavigation(model: SessionViewModel, phase: SessionState.SignedOut, onTheme: () -> Unit) {
-    val stack = rememberNavBackStack(Login)
+private fun AuthNavigation(
+    model: SessionViewModel,
+    phase: SessionState.SignedOut,
+    onTheme: () -> Unit,
+    showOnboarding: Boolean = false,
+    onCompleteOnboarding: () -> Unit = {},
+) {
+    val stack = rememberNavBackStack(if (showOnboarding) Onboarding else Login)
     val form by model.auth.collectAsStateWithLifecycle()
     val logout by model.logoutState.collectAsStateWithLifecycle()
     fun back() { model.cancelSubmission(); if (stack.size > 1) stack.removeLastOrNull() }
+    fun finishOnboarding(register: Boolean) {
+        onCompleteOnboarding()
+        stack.clear()
+        stack.add(Login)
+        if (register) stack.add(Register)
+    }
     Scaffold(
         modifier = Modifier.background(LocalWasteNotGradients.current.canvas),
         containerColor = Color.Transparent,
@@ -166,6 +181,15 @@ private fun AuthNavigation(model: SessionViewModel, phase: SessionState.SignedOu
                 .padding(padding)
                 .consumeWindowInsets(padding),
             entryProvider = entryProvider {
+                entry<Onboarding> {
+                    OnboardingScreen(
+                        onSkip = { finishOnboarding(register = false) },
+                        onStartRegister = { finishOnboarding(register = true) },
+                        onStartLogin = { finishOnboarding(register = false) },
+                        onTheme = onTheme,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
                 entry<Login> {
                     AuthScreen(false, form, phase.reason, model::change, { model.submit(false) },
                         { model.clearPasswords(); if (stack.last() != Register) stack.add(Register) },

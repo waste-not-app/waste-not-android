@@ -34,6 +34,13 @@ import java.time.ZoneId
 import java.util.concurrent.ConcurrentHashMap
 
 open class AppContainer(context: Context) {
+    private val appContext = context.applicationContext
+    open val showOnboarding: Boolean = true
+    open fun onboardingCompleted(): Boolean =
+        appContext.getSharedPreferences("wastenot_onboarding", Context.MODE_PRIVATE).getBoolean("completed", false)
+    open fun completeOnboarding() {
+        appContext.getSharedPreferences("wastenot_onboarding", Context.MODE_PRIVATE).edit().putBoolean("completed", true).apply()
+    }
     open val appearance: ThemeStore = ThemePreferences.create(context)
     private val network = WasteNotNetwork.create(BuildConfig.API_BASE_URL, allowLocalHttp = BuildConfig.DEBUG)
     private val connectivity = context.getSystemService(ConnectivityManager::class.java)

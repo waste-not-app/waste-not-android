@@ -11,5 +11,8 @@ class WasteNotTestRunner : AndroidJUnitRunner() {
 
 class TestWasteNotApplication : WasteNotApplication() {
     var fixtureContainer: AppContainer? = null
-    override val container: AppContainer get() = fixtureContainer ?: super.container
+    private val defaultTestContainer by lazy {
+        object : AppContainer(this) { override val showOnboarding = false }
+    }
+    override val container: AppContainer get() = fixtureContainer ?: defaultTestContainer
 }

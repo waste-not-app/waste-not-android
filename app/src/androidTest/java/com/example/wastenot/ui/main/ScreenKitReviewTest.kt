@@ -68,7 +68,12 @@ class ScreenKitReviewTest {
             compose.waitUntil(10_000) { compose.onAllNodesWithText("Cara pengelolaan").fetchSemanticsNodes().isNotEmpty() }
             capture("S05", "Catat aktivitas", dark)
             back("Beranda")
-            compose.onNodeWithText("250 g").performScrollTo().performTouchInput { click() }
+            compose.onNodeWithText("Aktivitas terbaru").performScrollTo()
+            val bodyScroll = compose.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange) and !hasAnyDescendant(tabs))
+            val scrollMax = bodyScroll.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].maxValue()
+            bodyScroll.performSemanticsAction(SemanticsActions.ScrollBy) { it(0f, scrollMax) }
+            compose.waitForIdle()
+            compose.onNodeWithText("250 g").performClick()
             compose.waitUntil(10_000) { compose.onAllNodesWithText("Plastik").fetchSemanticsNodes().isNotEmpty() }
             capture("S08", "Detail catatan", dark)
             railCapture("S08", "Detail catatan", "Beranda")
@@ -290,7 +295,7 @@ class ScreenKitReviewTest {
                 compose.onNode(tabs and hasText(label)).assertWidthIsAtLeast(48.dp).assertHeightIsAtLeast(48.dp)
                 val bounds = node.boundsInWindow
                 val ink = count(Rect(bounds.center.x - px(12f), bounds.top + px(4f), bounds.center.x + px(12f), bounds.top + px(32f)),
-                    (if (node.config[SemanticsProperties.Selected]) OnAccent else scheme.onSurface).toArgb())
+                    (if (node.config[SemanticsProperties.Selected]) scheme.primary else scheme.onSurfaceVariant).toArgb())
                 if (ink < 20) violations.add("$id/$label icon has $ink painted pixels")
                 paint.put(JSONObject().put("label", label).put("glyph_pixels", ink))
             }

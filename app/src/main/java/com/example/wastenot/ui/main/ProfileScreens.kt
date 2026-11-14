@@ -50,6 +50,7 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     achievementsEnabled: Boolean = false,
     onAchievements: () -> Unit = {},
+    onSync: (() -> Unit)? = null,
 ) {
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
         InsetGroupCard(contentPadding = true) {
@@ -135,6 +136,14 @@ fun ProfileScreen(
                     label = stringResource(R.string.achievements_title),
                     icon = R.drawable.ic_check,
                     onClick = onAchievements,
+                    showDivider = true,
+                )
+            }
+            if (onSync != null) {
+                GroupedNavRow(
+                    label = stringResource(R.string.sync_title),
+                    icon = R.drawable.ic_clock,
+                    onClick = onSync,
                     showDivider = true,
                 )
             }

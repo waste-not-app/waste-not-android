@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,6 +25,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -163,4 +169,19 @@ internal fun SheetSystemBar() {
 internal fun SheetDragHandle(modifier: Modifier = Modifier) {
     Box(modifier.padding(vertical = 20.dp).size(width = 32.dp, height = 4.dp)
         .background(MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(2.dp)))
+}
+
+@Composable
+internal fun Modifier.sheetVerticalScroll(scroll: ScrollState): Modifier {
+    val lock = remember(scroll) {
+        object : NestedScrollConnection {
+            override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset =
+                if (available.y < 0f || scroll.value > 0 || source != NestedScrollSource.UserInput) Offset(0f, available.y)
+                else Offset.Zero
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity =
+                if (available.y < 0f || scroll.value > 0) available else Velocity.Zero
+        }
+    }
+    return this.nestedScroll(lock).verticalScroll(scroll, overscrollEffect = null)
 }

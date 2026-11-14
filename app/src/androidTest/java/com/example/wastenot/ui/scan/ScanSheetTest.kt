@@ -99,7 +99,7 @@ class ScanSheetTest {
                     compose.runOnIdle {
                         dark = theme
                         state = fixture.copy(phase = phase, recommendation = recommendation.copy(
-                            prototypeOnly = true, reason = "Contoh: periksa material dan penerimaan pengelola sebelum mendaur ulang.",
+                            prototypeOnly = false, reason = "Contoh: periksa material dan penerimaan pengelola sebelum mendaur ulang.",
                             caution = "", sourceDetails = emptyList(), sources = emptyList()), method = DisposalMethod.RECYCLE)
                     }
                     if (phase == ScanPhase.PHOTO || phase == ScanPhase.OBJECT) {
@@ -183,6 +183,9 @@ class ScanSheetTest {
         compose.setContent { WasteNotTheme {
             Sheet(objects.copy(catalog = catalog.copy(supportedObjectLabels = emptyMap())))
         } }
+        compose.waitUntil(5_000) {
+            runCatching { compose.onAllNodesWithText("Objek 1 · bottle").fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
+        }
         compose.onNodeWithText("Objek 1 · bottle").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Pilih material").assertExists()
         compose.onNodeWithText("Konfirmasi objek").performScrollTo().assertIsNotEnabled()

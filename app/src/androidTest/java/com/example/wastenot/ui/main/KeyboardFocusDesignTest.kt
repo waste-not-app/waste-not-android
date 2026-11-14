@@ -91,8 +91,11 @@ class KeyboardFocusDesignTest {
             record.performSemanticsAction(SemanticsActions.RequestFocus)
             record.assertIsFocused().performKeyInput { pressKey(Key.Enter) }
             compose.onNodeWithText("Scan sampah").assertIsDisplayed()
+            InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB)
+            compose.waitForIdle()
             compose.onNodeWithContentDescription("Tutup scan").performSemanticsAction(SemanticsActions.RequestFocus)
-            compose.onNodeWithContentDescription("Tutup scan").performKeyInput { pressKey(Key.Enter) }
+            compose.onNodeWithContentDescription("Tutup scan").assertIsFocused().performKeyInput { pressKey(Key.Enter) }
+            compose.waitUntil(5_000) { compose.onAllNodes(isRoot()).fetchSemanticsNodes().size == 1 }
             record.assertIsFocused()
             compose.onNode(tabs and hasText("Riwayat")).assertIsSelected()
             capture("returned-${if (theme) "dark" else "light"}", record)

@@ -166,6 +166,7 @@ fun AccountNavigation(
     val keyboard = LocalSoftwareKeyboardController.current
     LaunchedEffect(model) { model.load() }
     var selected by rememberSaveable { mutableStateOf(MainTab.HOME) }
+    var dismissedSyncKey by rememberSaveable { mutableStateOf<String?>(null) }
     var metadata by remember(coreRepository) { mutableStateOf<Metadata?>(null) }
     LaunchedEffect(coreRepository, selected, data.mutationRevision) {
         if (coreRepository != null && metadata == null) {
@@ -389,7 +390,8 @@ fun AccountNavigation(
                 { summaries.dashboard(true) }, { edit() }, { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Settings) },
                 { leaving = true }, Modifier.fillMaxSize(),
                 achievementsEnabled = achievementsEnabled,
-                onAchievements = { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Achievements) }) }
+                onAchievements = { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Achievements) },
+                onSync = if (activityStore is com.example.wastenot.data.repository.OfflineActivityStore) ({ showingSync = true }) else null) }
             entry<Achievements> {
                 LaunchedEffect(achievementsModel) { achievementsModel?.load() }
                 AchievementsScreen(
@@ -580,11 +582,20 @@ fun AccountNavigation(
                             if (selected == tab && stacks.getValue(selected).lastOrNull() == key) openCapture()
                         },
                         onFilter = { if (selected == tab && stacks.getValue(selected).lastOrNull() == History) historyFilterOpen = true }) {
-                        Column(Modifier.fillMaxSize()) {
+                        Box(Modifier.fillMaxSize()) {
+                            entry.Content()
                             if (activityStore is com.example.wastenot.data.repository.OfflineActivityStore) {
-                                ActivitySyncBar(syncIssues.size, historyReady, { showingSync = true })
+                                ActivitySyncToast(
+                                    count = syncIssues.size,
+                                    ready = historyReady,
+                                    dismissedKey = dismissedSyncKey,
+                                    onDismissedKeyChange = { dismissedSyncKey = it },
+                                    onOpen = { showingSync = true },
+                                    modifier = Modifier
+                                        .align(Alignment.TopCenter)
+                                        .padding(top = LocalWasteNotScaffoldPadding.current.calculateTopPadding() + 8.dp),
+                                )
                             }
-                            Box(Modifier.weight(1f)) { entry.Content() }
                         }
                     }
                 }

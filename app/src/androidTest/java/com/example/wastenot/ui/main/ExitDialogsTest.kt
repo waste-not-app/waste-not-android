@@ -146,7 +146,7 @@ class ExitDialogsTest {
             compose.onNodeWithText("Batal", useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(labels) }
             val expected = if (waiting) {
                 if (theme) com.example.wastenot.theme.OnSurfaceVariantDark else com.example.wastenot.theme.OnSurfaceVariant
-            } else if (theme) com.example.wastenot.theme.OnSurfaceDark else com.example.wastenot.theme.OnSurface
+            } else if (theme) com.example.wastenot.theme.OnPrimaryContainerDark else com.example.wastenot.theme.OnPrimaryContainer
             assertEquals("Cancel text must expose the disabled state without lowering readability", expected, labels.single().layoutInput.style.color)
             capture("logout-${if(theme) "dark" else "light"}-$name-actions")
         }

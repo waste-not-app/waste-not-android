@@ -3,6 +3,7 @@ package com.example.wastenot.ui.main
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
@@ -50,7 +51,12 @@ class NavigationTransitionTest {
 
     @Test fun confirmedEditKeepsItsFormUntilTheUpdatedReceiptAppears() {
         home()
-        compose.onNodeWithText("250 g").performScrollTo().performClick()
+        compose.onNodeWithText("Aktivitas terbaru").performScrollTo()
+        val bodyScroll = compose.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange) and !hasAnyDescendant(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)))
+        val scrollMax = bodyScroll.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].maxValue()
+        bodyScroll.performSemanticsAction(SemanticsActions.ScrollBy) { it(0f, scrollMax) }
+        compose.waitForIdle()
+        compose.onNodeWithText("250 g").performClick()
         compose.waitUntil(30_000) {
             compose.onAllNodes(hasText("Ubah catatan") and hasClickAction() and isEnabled()).fetchSemanticsNodes().isNotEmpty()
         }

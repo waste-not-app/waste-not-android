@@ -21,6 +21,7 @@ class NavigationFixtureRule : ExternalResource() {
     override fun before() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         app.fixtureContainer = object : AppContainer(context) {
+            override val showOnboarding = false
             override val accountSession: AccountSession = DummyAccountSession(context.getSharedPreferences("dummy_session", Context.MODE_PRIVATE))
             override val guides: GuideStore = DummyGuideStore()
             override fun activityStore(user: User): ActivityStore = navigationActivityFixture(context, user)

@@ -7,7 +7,7 @@
     <string name="close">Tutup</string>
     <string name="guide_intro">Kenali materialnya, tentukan langkah berikutnya.</string>
     <string name="guide_search">Cari panduan</string>
-    <string name="guide_search_hint">Cari botol, kardus, atau material lain</string>
+    <string name="guide_search_hint">Cari botol, kardus, atau material</string>
     <string name="guide_search_action">Cari</string>
     <string name="guide_clear">Hapus pencarian</string>
     <string name="guide_clear_action">Hapus</string>

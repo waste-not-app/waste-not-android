@@ -200,8 +200,10 @@ private fun HistoryFilterSheet(
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp), dragHandle = { SheetDragHandle() }) {
         SheetSystemBar()
+        val filterScroll = rememberScrollState()
         Column(
-            modifier = Modifier.fillMaxWidth().testTag("history-filter-sheet").verticalScroll(rememberScrollState())
+            modifier = Modifier.fillMaxWidth().testTag("history-filter-sheet").sheetVerticalScroll(filterScroll)
+                .navigationBarsPadding().imePadding()
                 .padding(horizontal = 24.dp).padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
