@@ -59,7 +59,7 @@ class IconActionButtonDesignTest {
             val bitmap = checkNotNull(automation.takeScreenshot())
             val tint = if (index == 0) scheme.onPrimaryContainer else scheme.onSurfaceVariant
             val samples = JSONArray()
-            for ((xDp, yDp) in listOf(4f to 4f, 24f to 4f, 44f to 4f)) {
+            for ((xDp, yDp) in listOf(8f to 8f, 24f to 6f, 40f to 8f)) {
                 val actual = bitmap.getPixel((bounds.left + with(compose.density) { xDp.dp.toPx() }).roundToInt(),
                     (bounds.top + with(compose.density) { yDp.dp.toPx() }).roundToInt())
                 if (!near(actual, scheme.surfaceContainer.toArgb())) violations.add("$label corner/background $actual != ${scheme.surfaceContainer.toArgb()}")

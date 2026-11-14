@@ -70,16 +70,22 @@ fun ProfileScreen(
                 }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(user.name, style = MaterialTheme.typography.titleLarge)
-                    Text(
-                        "${user.email} · ${user.timezone.id}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Text(user.email, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(user.timezone.id, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             if (progress != null) {
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 ProgressMeter(progress, Modifier.fillMaxWidth())
+                Text(
+                    stringResource(
+                        R.string.profile_xp_count,
+                        WasteFormat.integer(progress.xp.toLong()),
+                        WasteFormat.integer(progress.activeLogCount.toLong()),
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 if (progress.activeLogCount == 0) {
                     Text(stringResource(R.string.profile_empty), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     ActionButton(stringResource(R.string.record_activity), onRecord, Modifier.fillMaxWidth())
@@ -94,20 +100,31 @@ fun ProfileScreen(
             TextActionButton(stringResource(R.string.retry), onRetry)
         }
         if (progress != null) {
+            val hasStreak = progress.currentStreak != null || progress.bestStreak != null
             val streakLabel = progress.currentStreak?.let {
                 stringResource(R.string.profile_current_streak, WasteFormat.integer(it.toLong()))
             } ?: "—"
-            BoxWithConstraints(Modifier.fillMaxWidth()) {
-                val stacked = maxWidth < 280.dp || LocalDensity.current.fontScale >= 1.5f
-                if (stacked) {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_check, Modifier.fillMaxWidth())
-                        MetricTile(stringResource(R.string.streak_short_title), streakLabel, R.drawable.ic_clock, Modifier.fillMaxWidth(), limeHighlight = true)
-                    }
-                } else {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_check, Modifier.weight(1f))
-                        MetricTile(stringResource(R.string.streak_short_title), streakLabel, R.drawable.ic_clock, Modifier.weight(1f), limeHighlight = true)
+            val streakSubtitle = if (progress.currentStreak != null && progress.currentStreak > 0) {
+                stringResource(if (progress.hasLoggedToday) R.string.profile_streak_today_logged else R.string.profile_streak_today_pending)
+            } else null
+            val bestStreakSubtitle = progress.bestStreak?.let {
+                stringResource(R.string.profile_best_streak, WasteFormat.integer(it.toLong()))
+            }
+            if (!hasStreak) {
+                MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_check, Modifier.fillMaxWidth())
+            } else {
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                    val stacked = maxWidth < 280.dp || LocalDensity.current.fontScale >= 1.5f
+                    if (stacked) {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_check, Modifier.fillMaxWidth())
+                            MetricTile(stringResource(R.string.streak_short_title), streakLabel, R.drawable.ic_clock, Modifier.fillMaxWidth(), limeHighlight = true, subtitle = streakSubtitle, secondarySubtitle = bestStreakSubtitle)
+                        }
+                    } else {
+                        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_check, Modifier.weight(1f).fillMaxHeight())
+                            MetricTile(stringResource(R.string.streak_short_title), streakLabel, R.drawable.ic_clock, Modifier.weight(1f).fillMaxHeight(), limeHighlight = true, subtitle = streakSubtitle, secondarySubtitle = bestStreakSubtitle)
+                        }
                     }
                 }
             }
@@ -189,6 +206,13 @@ fun SettingsScreen(
         GroupSectionLabel(stringResource(R.string.personal_data))
         InsetGroupCard {
             SettingsMetaRow(stringResource(R.string.timezone_label), user.timezone.id, showDivider = true)
+            Text(
+                stringResource(R.string.timezone_read_only),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+            HorizontalDivider(Modifier.padding(start = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
             SettingsMetaRow(stringResource(R.string.app_version, BuildConfig.VERSION_NAME), "", showDivider = false)
         }
         InsetGroupCard(contentPadding = true) {

@@ -84,7 +84,7 @@ class CoreControlDesignTest {
             if (image.height + 1 < 56 * density) errors.add("$name: theme height ${image.height}px, expected >= ${56 * density}px")
             image.recycle()
             val layout = mutableListOf<TextLayoutResult>()
-            compose.onNodeWithText(label).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layout) }
+            compose.onNodeWithText(label, useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layout) }
             if (layout.single().layoutInput.style.fontSize.value != 16f) errors.add("$name: theme value is not 16sp")
             captureUiPreview(compose, "settings-fixture-$name", "core-control-review")
             control.performClick()

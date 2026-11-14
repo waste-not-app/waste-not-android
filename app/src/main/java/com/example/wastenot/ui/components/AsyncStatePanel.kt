@@ -35,7 +35,7 @@ internal fun AsyncStatePanel(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Surface(
-            modifier = Modifier.size(60.dp).testTag("async-state-symbol"),
+            modifier = Modifier.size(64.dp).testTag("async-state-symbol"),
             shape = RoundedCornerShape(20.dp),
             color = MaterialTheme.colorScheme.surfaceVariant,
         ) {

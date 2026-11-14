@@ -70,6 +70,7 @@ fun GuideListScreen(
                 val label = stringResource(R.string.guide_search)
                 InsetGroupCard(glass = true, contentPadding = true) {
                     Text(label, style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.guide_intro), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     OutlinedTextField(
                         data.query,
                         { onQuery(it); resetScroll() },
