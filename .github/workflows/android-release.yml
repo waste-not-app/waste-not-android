@@ -8,7 +8,7 @@ on:
         required: false
         default: ''
       deploy_to_vm:
-        description: 'Deploy APK to backend VM (oktaavsm.bccdev.id)?'
+        description: 'Deploy APK to staging VM (waste-not.bccdev.id)?'
         type: boolean
         required: true
         default: true
@@ -130,7 +130,7 @@ jobs:
           BACKEND_USER: ${{ secrets.BACKEND_USER || 'dev' }}
           BACKEND_PORT: ${{ secrets.BACKEND_PORT || '11023' }}
           BACKEND_SSH_KEY: ${{ secrets.BACKEND_SSH_KEY }}
-          BACKEND_DIR: ${{ secrets.BACKEND_DIR || '/var/www/wastenot' }}
+          BACKEND_DIR: ${{ secrets.BACKEND_DIR || '/var/www/wastenot-apk' }}
           HAS_RELEASE_KEYSTORE: ${{ steps.keystore.outputs.has_keystore }}
           VERSIONED_APK: ${{ steps.prepare_apk.outputs.versioned_apk }}
         run: |
@@ -171,4 +171,4 @@ jobs:
           ssh -i "$SSH_KEY_PATH" -p "$BACKEND_PORT" "$BACKEND_USER@$BACKEND_HOST" \
             "python3 '$BACKEND_DIR/manage_releases.py' '$BACKEND_DIR'"
 
-          echo "Deployment successful! Check https://oktaavsm.bccdev.id/wastenot/"
+          echo "Deployment successful! Check https://waste-not.bccdev.id/apk/"
