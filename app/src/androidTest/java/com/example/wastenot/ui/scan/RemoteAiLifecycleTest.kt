@@ -31,7 +31,7 @@ class RemoteAiLifecycleTest {
         assumeTrue(args.getString("verifyLiveAiFixture") == "true")
         assertTrue(BuildConfig.DEBUG)
         assertTrue((androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as com.example.wastenot.WasteNotApplication).container.accountSession is com.example.wastenot.data.repository.RemoteAccountSession)
-        val base = "https://pred-autoscaler.bccdev.id/wastenot/api/v1/"
+        val base = "https://waste-not-api.bccdev.id/v1/"
         assertEquals(base, BuildConfig.API_BASE_URL)
         val runId = UUID.fromString(requireNotNull(args.getString("fixtureRunId"))).toString()
         val instrumentation = InstrumentationRegistry.getInstrumentation()

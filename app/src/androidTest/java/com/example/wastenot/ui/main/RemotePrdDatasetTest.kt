@@ -37,7 +37,7 @@ class RemotePrdDatasetTest {
         val args = InstrumentationRegistry.getArguments()
         assumeTrue(args.getString("verifyLivePrdDataset") == "true")
         assertTrue(BuildConfig.DEBUG)
-        assertEquals("https://pred-autoscaler.bccdev.id/wastenot/api/v1/", BuildConfig.API_BASE_URL)
+        assertEquals("https://waste-not-api.bccdev.id/v1/", BuildConfig.API_BASE_URL)
         val container = (compose.activity.application as WasteNotApplication).container
         assertTrue(container.accountSession is RemoteAccountSession)
         val session = container.sessions

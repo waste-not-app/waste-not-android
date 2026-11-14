@@ -38,7 +38,8 @@ fun apiBaseUrl(property: String, defaultValue: String = "", allowLocalHttp: Bool
     require(uri.scheme.equals("https", ignoreCase = true) || localHttp) {
         "$property must use HTTPS; debug HTTP is limited to emulator/localhost."
     }
-    return uri.toASCIIString().trimEnd('/') + "/"
+    val normalized = uri.toASCIIString().trimEnd('/')
+    return if (normalized.endsWith("/v1")) "$normalized/" else "$normalized/v1/"
 }
 
 android {
@@ -91,7 +92,7 @@ android {
                 applicationIdSuffix = installSuffix
                 resValue("string", "app_name", "WasteNot QA")
             }
-            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.debugApiBaseUrl", "https://pred-autoscaler.bccdev.id/wastenot/api/v1/", allowLocalHttp = true)}\"")
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.debugApiBaseUrl", "https://waste-not-api.bccdev.id/v1/", allowLocalHttp = true)}\"")
         }
         create("staging") {
             initWith(getByName("debug"))
@@ -100,10 +101,10 @@ android {
             applicationIdSuffix = ".staging"
             versionNameSuffix = "-staging"
             matchingFallbacks += listOf("debug")
-            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.stagingApiBaseUrl", "https://pred-autoscaler.bccdev.id/wastenot/api/v1/")}\"")
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.stagingApiBaseUrl", "https://waste-not-api.bccdev.id/v1/")}\"")
         }
         release {
-            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.releaseApiBaseUrl", "https://pred-autoscaler.bccdev.id/wastenot/api/v1/")}\"")
+            buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl("wastenot.releaseApiBaseUrl", "https://waste-not-api.bccdev.id/v1/")}\"")
             isMinifyEnabled = false
             signingConfigs.findByName("release")?.let {
                 signingConfig = it

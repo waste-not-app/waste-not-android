@@ -27,7 +27,7 @@ Untuk review visual interaktif (termasuk AI scan flow): buka [`docs/WasteNot-Pro
 
 ## Kondisi implementasi
 
-Semua build aplikasi memakai adapter remote dan akun backend nyata. Instalasi baru menampilkan Masuk/Daftar; tidak ada autentikasi atau data aktivitas buatan lokal. Fixture berada hanya pada source test. Alamat default ketiga varian adalah `https://pred-autoscaler.bccdev.id/wastenot/api/v1/`.
+Semua build aplikasi memakai adapter remote dan akun backend nyata. Instalasi baru menampilkan Masuk/Daftar; tidak ada autentikasi atau data aktivitas buatan lokal. Fixture berada hanya pada source test. Alamat default ketiga varian adalah `https://waste-not-api.bccdev.id/v1/`.
 
 Seluruh screen wajib tersedia; penyelarasan UI, navigasi dan penerimaan akhir masih mengikuti [prioritas UI](docs/UI_FIRST_PLAN.md). Bukti fungsi dan build tidak menggantikan perbandingan screenshot dengan kit.
 
