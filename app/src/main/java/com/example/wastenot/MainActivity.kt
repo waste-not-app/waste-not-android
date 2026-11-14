@@ -13,6 +13,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +51,9 @@ class MainActivity : ComponentActivity() {
                 )
                 window.isNavigationBarContrastEnforced = false
             }
+            var onboardingPending by remember(container) {
+                mutableStateOf(container.showOnboarding && !container.onboardingCompleted())
+            }
             WasteNotTheme(darkTheme = dark) {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     if (mode != null) Column(Modifier.fillMaxSize()) {
@@ -55,7 +61,12 @@ class MainActivity : ComponentActivity() {
                         MainNavigation(container.accountSession, container.core, container.guides, container.ai,
                             mode, appearance::choose, Modifier.weight(1f),
                             activityStoreFactory = container::activityStore, scanRepositoryFactory = container::scanRepository,
-                            reminderStore = container.reminders, reminderScheduler = container.reminderScheduler)
+                            reminderStore = container.reminders, reminderScheduler = container.reminderScheduler,
+                            showOnboarding = onboardingPending,
+                            onCompleteOnboarding = {
+                                container.completeOnboarding()
+                                onboardingPending = false
+                            })
                     }
                 }
             }

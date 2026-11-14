@@ -7,6 +7,7 @@ import java.util.UUID
 @Serializable data object SessionRoot : NavKey
 @Serializable data object AuthRoot : NavKey
 @Serializable data class AccountRoot(val userId: String, val epoch: Long) : NavKey
+@Serializable data object Onboarding : NavKey
 @Serializable data object Login : NavKey
 @Serializable data object Register : NavKey
 @Serializable data object Home : NavKey
