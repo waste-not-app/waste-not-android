@@ -204,7 +204,7 @@ private fun SlideTrackingIllustration() {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Sampah ditangani hari ini",
+                        text = stringResource(R.string.handled_today),
                         style = MaterialTheme.typography.labelLarge,
                         color = SummarySecondaryText,
                     )
@@ -214,14 +214,14 @@ private fun SlideTrackingIllustration() {
                         contentColor = OnAccent,
                     ) {
                         Text(
-                            text = "Level 1 · +10 XP",
+                            text = stringResource(R.string.onboarding_preview_level_xp),
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         )
                     }
                 }
                 Text(
-                    text = "650 g",
+                    text = stringResource(R.string.onboarding_preview_weight),
                     style = MaterialTheme.typography.displayLarge,
                     color = SummaryText,
                 )
@@ -231,7 +231,7 @@ private fun SlideTrackingIllustration() {
                     border = BorderStroke(1.dp, Color.White.copy(alpha = 0.24f)),
                 ) {
                     Text(
-                        text = "3 aktivitas tercatat",
+                        text = stringResource(R.string.onboarding_preview_activities),
                         style = MaterialTheme.typography.labelMedium,
                         color = SummaryText,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
@@ -265,10 +265,10 @@ private fun SlideTrackingIllustration() {
                     )
                 }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Plastik", style = MaterialTheme.typography.titleSmall)
-                    Text("Recycle · Hari ini", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.category_plastic), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.onboarding_preview_item_subtitle), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Text("250 g", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
+                Text(stringResource(R.string.onboarding_preview_item_weight), style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
             }
         }
     }
@@ -294,7 +294,7 @@ private fun SlideScanIllustration() {
             ) {
                 Canvas(Modifier.matchParentSize()) {
                     drawRoundRect(
-                        color = Color(0xFFCEF067).copy(alpha = 0.72f),
+                        color = LimeStart.copy(alpha = 0.72f),
                         topLeft = Offset(34.dp.toPx(), 24.dp.toPx()),
                         size = Size(size.width - 68.dp.toPx(), size.height - 48.dp.toPx()),
                         cornerRadius = CornerRadius(18.dp.toPx()),
@@ -328,7 +328,7 @@ private fun SlideScanIllustration() {
                         contentColor = OnAccent,
                     ) {
                         Text(
-                            text = "Botol · 94% terdeteksi",
+                            text = stringResource(R.string.onboarding_preview_detected),
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
                         )
@@ -362,8 +362,8 @@ private fun SlideScanIllustration() {
                     )
                 }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Saran: Recycle", style = MaterialTheme.typography.titleSmall)
-                    Text("Kosongkan isi dan pisahkan tutup botol.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.onboarding_preview_advice_title), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.onboarding_preview_advice_body), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -390,8 +390,8 @@ private fun SlideInsightsIllustration() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("Tren 7 hari terakhir", style = MaterialTheme.typography.titleSmall)
-                    Text("1,4 kg", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
+                    Text(stringResource(R.string.onboarding_preview_trend), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.onboarding_preview_trend_weight), style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth().height(92.dp),
@@ -420,13 +420,13 @@ private fun SlideInsightsIllustration() {
         ) {
             MetricTile(
                 label = stringResource(R.string.rate_title),
-                value = "50%",
+                value = stringResource(R.string.onboarding_preview_rate),
                 icon = R.drawable.ic_recycle,
                 modifier = Modifier.weight(1f).fillMaxHeight(),
             )
             MetricTile(
                 label = stringResource(R.string.avoided_short_title),
-                value = "2 benda",
+                value = stringResource(R.string.onboarding_preview_avoided),
                 icon = R.drawable.ic_leaf,
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 limeHighlight = true,

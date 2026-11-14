@@ -98,8 +98,10 @@ fun HistoryScreen(
                     verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     filter.category?.let { FilterChip(true, onOpenFilter, label = { Text(stringResource(it.labelResource)) }, modifier = Modifier.heightIn(min = 48.dp)) }
                     filter.method?.let { FilterChip(true, onOpenFilter, label = { Text(stringResource(it.labelResource)) }, modifier = Modifier.heightIn(min = 48.dp)) }
-                    if (filter.from != null && filter.to != null) FilterChip(true, onOpenFilter, label = {
-                        Text(stringResource(R.string.history_date_range, WasteFormat.activityDate(filter.from!!), WasteFormat.activityDate(filter.to!!)))
+                    val from = filter.from
+                    val to = filter.to
+                    if (from != null && to != null) FilterChip(true, onOpenFilter, label = {
+                        Text(stringResource(R.string.history_date_range, WasteFormat.activityDate(from), WasteFormat.activityDate(to)))
                     }, modifier = Modifier.heightIn(min = 48.dp))
                     TextActionButton(stringResource(R.string.clear_filters), onClick = { applyFilter(HistoryFilter()) })
                 }
