@@ -1,6 +1,20 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
@@ -56,16 +70,87 @@ internal class ActivitySyncViewModel(private val store: ActivityStore) : ViewMod
 }
 
 @Composable
-internal fun ActivitySyncBar(count: Int, ready: Boolean, onOpen: () -> Unit, modifier: Modifier = Modifier) {
-    val tokens = LocalWasteNotSurfaceTokens.current
-    Surface(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-        shape = RoundedCornerShape(16.dp),
-        color = tokens.glassTintStrong,
-        border = BorderStroke(1.dp, tokens.glassEdge),
+internal fun ActivitySyncToast(
+    count: Int,
+    ready: Boolean,
+    dismissedKey: String?,
+    onDismissedKeyChange: (String?) -> Unit,
+    onOpen: () -> Unit,
+    modifier: Modifier = Modifier,
+    durationMillis: Int = 6_000,
+) {
+    val activeKey = if (!ready || count > 0) "$ready:$count" else null
+    val visible = activeKey != null && dismissedKey != activeKey
+    val timer = remember { Animatable(1f) }
+    val latestOnDismiss by rememberUpdatedState(onDismissedKeyChange)
+
+    LaunchedEffect(visible, activeKey) {
+        if (visible) {
+            timer.snapTo(1f)
+            timer.animateTo(0f, tween(durationMillis = durationMillis, easing = LinearEasing))
+            latestOnDismiss(activeKey)
+        }
+    }
+
+    AnimatedVisibility(
+        visible = visible,
+        modifier = modifier,
+        enter = fadeIn(tween(180)) + slideInVertically(tween(220)) { -it / 2 },
+        exit = fadeOut(tween(160)) + slideOutVertically(tween(180)) { -it / 2 },
     ) {
-        TextButton(onClick = onOpen, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(if (ready) R.string.sync_status else R.string.sync_initial, count), style = MaterialTheme.typography.bodySmall)
+        val tokens = LocalWasteNotSurfaceTokens.current
+        val shape = RoundedCornerShape(18.dp)
+        Surface(
+            modifier = Modifier
+                .widthIn(max = 560.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .testTag("sync-toast"),
+            shape = shape,
+            color = tokens.glassTintStrong,
+            border = BorderStroke(1.dp, tokens.glassEdge),
+            shadowElevation = if (tokens.isDark) 0.dp else 4.dp,
+        ) {
+            Column(Modifier.fillMaxWidth().clip(shape)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = stringResource(if (ready) R.string.sync_status else R.string.sync_initial, count),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable(role = Role.Button) {
+                                if (activeKey != null) latestOnDismiss(activeKey)
+                                onOpen()
+                            }
+                            .padding(vertical = 8.dp),
+                    )
+                    IconButton(
+                        onClick = { if (activeKey != null) latestOnDismiss(activeKey) },
+                        modifier = Modifier.size(48.dp).testTag("sync-toast-close"),
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_close),
+                            contentDescription = stringResource(R.string.close),
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                LinearProgressIndicator(
+                    progress = { timer.value },
+                    modifier = Modifier.fillMaxWidth().height(3.dp).testTag("sync-toast-progress"),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    gapSize = 0.dp,
+                    drawStopIndicator = {},
+                )
+            }
         }
     }
 }

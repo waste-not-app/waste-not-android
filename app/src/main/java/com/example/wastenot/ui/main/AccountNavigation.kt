@@ -44,7 +44,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -167,6 +166,7 @@ fun AccountNavigation(
     val keyboard = LocalSoftwareKeyboardController.current
     LaunchedEffect(model) { model.load() }
     var selected by rememberSaveable { mutableStateOf(MainTab.HOME) }
+    var dismissedSyncKey by rememberSaveable { mutableStateOf<String?>(null) }
     var metadata by remember(coreRepository) { mutableStateOf<Metadata?>(null) }
     LaunchedEffect(coreRepository, selected, data.mutationRevision) {
         if (coreRepository != null && metadata == null) {
@@ -582,30 +582,20 @@ fun AccountNavigation(
                             if (selected == tab && stacks.getValue(selected).lastOrNull() == key) openCapture()
                         },
                         onFilter = { if (selected == tab && stacks.getValue(selected).lastOrNull() == History) historyFilterOpen = true }) {
-                        val showSyncBar = activityStore is com.example.wastenot.data.repository.OfflineActivityStore && (!historyReady || syncIssues.isNotEmpty())
-                        if (showSyncBar) {
-                            val insets = LocalWasteNotScaffoldPadding.current
-                            val layoutDirection = LocalLayoutDirection.current
-                            Column(Modifier.fillMaxSize()) {
-                                ActivitySyncBar(
+                        Box(Modifier.fillMaxSize()) {
+                            entry.Content()
+                            if (activityStore is com.example.wastenot.data.repository.OfflineActivityStore) {
+                                ActivitySyncToast(
                                     count = syncIssues.size,
                                     ready = historyReady,
+                                    dismissedKey = dismissedSyncKey,
+                                    onDismissedKeyChange = { dismissedSyncKey = it },
                                     onOpen = { showingSync = true },
-                                    modifier = Modifier.padding(top = insets.calculateTopPadding() + 4.dp),
+                                    modifier = Modifier
+                                        .align(Alignment.TopCenter)
+                                        .padding(top = LocalWasteNotScaffoldPadding.current.calculateTopPadding() + 8.dp),
                                 )
-                                CompositionLocalProvider(
-                                    LocalWasteNotScaffoldPadding provides PaddingValues(
-                                        start = insets.calculateLeftPadding(layoutDirection),
-                                        top = 0.dp,
-                                        end = insets.calculateRightPadding(layoutDirection),
-                                        bottom = insets.calculateBottomPadding(),
-                                    ),
-                                ) {
-                                    Box(Modifier.weight(1f)) { entry.Content() }
-                                }
                             }
-                        } else {
-                            entry.Content()
                         }
                     }
                 }

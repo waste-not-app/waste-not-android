@@ -3,6 +3,7 @@ package com.example.wastenot.ui.main
 import android.graphics.Bitmap
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
@@ -64,6 +65,48 @@ class ActivitySyncUiTest {
         awaitContent()
         compose.onNodeWithText("Simpan sebagai catatan manual").performScrollTo().performClick()
         compose.onNode(hasText("Simpan isian ini sebagai catatan manual?", substring = true) and hasAnyAncestor(isDialog())).assertIsDisplayed()
+    }
+
+    @Test fun syncToastShowsProgressAutoHidesAndSupportsManualDismissOrOpen() {
+        var dismissedKey by mutableStateOf<String?>(null)
+        var opened = 0
+        compose.mainClock.autoAdvance = false
+        try {
+            compose.setContent {
+                WasteNotTheme {
+                    ActivitySyncToast(
+                        count = 2,
+                        ready = true,
+                        dismissedKey = dismissedKey,
+                        onDismissedKeyChange = { dismissedKey = it },
+                        onOpen = { opened++ },
+                        durationMillis = 1_000,
+                    )
+                }
+            }
+            compose.mainClock.advanceTimeBy(300)
+            compose.onNodeWithTag("sync-toast").assertIsDisplayed()
+            compose.onNodeWithTag("sync-toast-progress").assertIsDisplayed()
+            compose.onNodeWithContentDescription("Tutup").performClick()
+            compose.mainClock.advanceTimeBy(300)
+            compose.onNodeWithTag("sync-toast").assertDoesNotExist()
+
+            compose.runOnIdle { dismissedKey = null }
+            compose.mainClock.advanceTimeBy(300)
+            compose.onNodeWithTag("sync-toast").assertIsDisplayed()
+            compose.mainClock.advanceTimeBy(1_200)
+            compose.onNodeWithTag("sync-toast").assertDoesNotExist()
+            assertEquals(0, opened)
+
+            compose.runOnIdle { dismissedKey = null }
+            compose.mainClock.advanceTimeBy(300)
+            compose.onNodeWithText("Lihat sinkronisasi", substring = true).performClick()
+            compose.mainClock.advanceTimeBy(300)
+            compose.runOnIdle { assertEquals(1, opened) }
+            compose.onNodeWithTag("sync-toast").assertDoesNotExist()
+        } finally {
+            compose.mainClock.autoAdvance = true
+        }
     }
 
     private fun awaitContent() {
