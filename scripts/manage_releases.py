@@ -84,7 +84,7 @@ def manage_releases(base_dir="/var/www/wastenot"):
             "bytes": stat.st_size,
             "date": mtime.strftime("%d %b %Y, %H:%M WIB"),
             "is_latest": (idx == 0),
-            "download_url": f"/apk/apk/{fname}",
+            "download_url": f"/apk/{fname}",
             "sha256": get_sha256(apk_path)[:12]
         })
 
@@ -527,7 +527,7 @@ def generate_html(versions):
         <p class="tagline">Personal Waste Tracking & AI-Assisted Waste Detection (3R: Reduce, Reuse, Recycle, dan Trash).</p>
         
         <div class="hero-action">
-            <a href="/apk/apk/latest.apk" class="btn-main" id="btn-download-latest">
+            <a href="/apk/latest.apk" class="btn-main" id="btn-download-latest">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                 </svg>
@@ -632,7 +632,7 @@ def generate_html(versions):
         <p><strong>WasteNot Android</strong> &copy; 2026 WasteNot Engineering Team.</p>
         <p style="margin-top: 6px;">
             <a href="https://github.com/waste-not-app/waste-not-android" target="_blank" rel="noopener">GitHub Repository</a> · 
-            <a href="/apk/apk/latest.apk">Direct Download APK</a> · 
+            <a href="/apk/latest.apk">Direct Download APK</a> · 
             <a href="/apk/versions.json">Versions JSON</a>
         </p>
     </footer>

@@ -68,3 +68,31 @@ for label, override, ref_type, ref_name, expected in cases:
             assert (runner / "apk-release/latest.apk").read_bytes() == b"fixture-apk", label
             assert f"version={expected}\n" in output.read_text(), label
         print(f"PASS: release packaging {label}", flush=True)
+
+deploy_section = workflow.split("      - name: Deploy APK to Staging VM\n", 1)[1]
+deploy_script = textwrap.dedent(deploy_section.split("        run: |\n", 1)[1])
+with tempfile.TemporaryDirectory(prefix="wastenot-release-deploy-") as directory:
+    fixture = Path(directory)
+    prepared = fixture / "runner/apk-release"
+    prepared.mkdir(parents=True)
+    filename = "wastenot-v1.2.3.apk"
+    apk_bytes = b"release-download-fixture"
+    (prepared / filename).write_bytes(apk_bytes)
+    destination = fixture / "published"
+    result = subprocess.run(
+        ["bash", "-c", deploy_script], cwd=ROOT,
+        env={"PATH": os.environ["PATH"], "RUNNER_TEMP": str(prepared.parent),
+             "BACKEND_DIR": str(destination), "HAS_RELEASE_KEYSTORE": "true",
+             "VERSIONED_APK": filename},
+        text=True, capture_output=True, timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
+    latest = json.loads((destination / "versions.json").read_text())["latest"]
+    assert latest["download_url"] == "/apk/wastenot-v1.2.3.apk"
+    assert (destination / "apk" / filename).read_bytes() == apk_bytes
+    assert (destination / "apk/latest.apk").read_bytes() == apk_bytes
+    html = (destination / "index.html").read_text()
+    assert f'href="{latest["download_url"]}"' in html
+    assert 'href="/apk/latest.apk"' in html
+    assert "/apk/apk/" not in html
+    print("PASS: deployed release metadata and download links use /apk/", flush=True)
