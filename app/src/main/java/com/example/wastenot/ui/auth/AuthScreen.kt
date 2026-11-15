@@ -1,6 +1,7 @@
 package com.example.wastenot.ui.auth
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,16 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,11 +54,9 @@ import com.example.wastenot.model.AccountInputError
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.IconActionButton
-import com.example.wastenot.ui.components.BrandWordmark
 import com.example.wastenot.ui.components.InsetGroupCard
 import com.example.wastenot.ui.components.WasteTextField
-import com.example.wastenot.theme.LocalWasteNotGradients
-import com.example.wastenot.theme.OnAccent
+import com.example.wastenot.theme.WasteNotWordmark
 import com.example.wastenot.theme.WasteNotAuthHeading
 import kotlinx.coroutines.delay
 
@@ -121,18 +117,26 @@ fun AuthScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                BrandWordmark()
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.wastenot_brand_icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                    )
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        modifier = Modifier.weight(1f, fill = false),
+                        style = WasteNotWordmark,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (onBack != null) IconActionButton(R.drawable.ic_back, stringResource(R.string.back), onBack)
                     IconActionButton(R.drawable.ic_device, stringResource(R.string.theme_title), onTheme)
                 }
-            }
-            Box(
-                Modifier.padding(vertical = 10.dp).size(64.dp)
-                    .background(LocalWasteNotGradients.current.accent, RoundedCornerShape(20.dp)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(painterResource(if (register) R.drawable.ic_leaf else R.drawable.ic_recycle), null, Modifier.size(32.dp), tint = OnAccent)
             }
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(

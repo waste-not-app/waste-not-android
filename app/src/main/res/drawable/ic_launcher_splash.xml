@@ -1,35 +1,9 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
-    android:width="288dp"
-    android:height="288dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <path android:pathData="M43,31h22c6.627,0 12,5.373 12,12v22c0,6.627 -5.373,12 -12,12h-22c-6.627,0 -12,-5.373 -12,-12v-22c0,-6.627 5.373,-12 12,-12z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:endX="77"
-                android:endY="77"
-                android:startX="31"
-                android:startY="31"
-                android:type="linear">
-                <item android:color="#FF0E4D33" android:offset="0.0" />
-                <item android:color="#FF1E7A53" android:offset="1.0" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <group
-        android:pivotX="12"
-        android:pivotY="12"
-        android:scaleX="1.25"
-        android:scaleY="1.25"
-        android:translateX="42"
-        android:translateY="42">
-        <path
-            android:fillColor="@android:color/transparent"
-            android:pathData="M20,4C10,2 3,6 4,13c1,7 12,9 15,-1 1,-3 1,-6 1,-8zM3,21L15,9"
-            android:strokeColor="#FFCEF067"
-            android:strokeLineCap="round"
-            android:strokeLineJoin="round"
-            android:strokeWidth="2.3" />
-    </group>
-</vector>
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:width="288dp" android:height="288dp">
+        <bitmap
+            android:src="@drawable/wastenot_splash_mark"
+            android:gravity="fill"
+            android:filter="true" />
+    </item>
+</layer-list>

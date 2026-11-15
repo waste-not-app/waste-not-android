@@ -31,14 +31,21 @@ internal fun StartupScreen(error: Boolean, onRetry: () -> Unit, onLoginAgain: ()
         Column(Modifier.widthIn(max = 560.dp).fillMaxWidth().verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp).padding(top = 88.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)) {
-            BrandWordmark()
+            BrandWordmark(Modifier.align(Alignment.CenterHorizontally))
             Column(Modifier.align(Alignment.CenterHorizontally).widthIn(max = 400.dp).fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 32.dp), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Surface(shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surfaceContainer) {
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surfaceContainer,
+                ) {
                     Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
-                        Icon(painterResource(if (error) R.drawable.ic_alert else R.drawable.ic_clock), null,
-                            Modifier.size(30.dp), tint = MaterialTheme.colorScheme.primary)
+                        Icon(
+                            painterResource(if (error) R.drawable.ic_alert else R.drawable.ic_clock),
+                            null,
+                            Modifier.size(30.dp),
+                            tint = if (error) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.primary,
+                        )
                     }
                 }
                 Text(stringResource(if (error) R.string.session_connection_required else R.string.session_preparing),

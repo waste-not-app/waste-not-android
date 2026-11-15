@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.WasteNot" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowSplashScreenBackground">#142419</item>
+        <item name="android:windowSplashScreenBackground">#0C3023</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_splash</item>
     </style>
 </resources>
