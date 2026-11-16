@@ -5,11 +5,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -87,7 +88,10 @@ internal fun OnboardingScreen(
 
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.weight(1f).fillMaxWidth().testTag("onboarding-pager"),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .testTag("onboarding-pager"),
             ) { pageIndex ->
                 val page = onboardingPages[pageIndex]
                 Column(
@@ -96,6 +100,11 @@ internal fun OnboardingScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
                 ) {
+                    Text(
+                        stringResource(R.string.onboarding_preview_label),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                     when (pageIndex) {
                         0 -> SlideTrackingIllustration()
                         1 -> SlideScanIllustration()
@@ -125,59 +134,65 @@ internal fun OnboardingScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                }
-            }
-
-            InsetGroupCard(glass = true, contentPadding = true) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    repeat(onboardingPages.size) { idx ->
-                        val active = pagerState.currentPage == idx
-                        val width by animateDpAsState(
-                            targetValue = if (active) 28.dp else 8.dp,
-                            animationSpec = tween(220),
-                            label = "onboarding-dot-$idx",
-                        )
-                        val dotDesc = stringResource(R.string.onboarding_page_indicator, idx + 1, onboardingPages.size)
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 4.dp)
-                                .height(8.dp)
-                                .width(width)
-                                .clip(CircleShape)
-                                .background(
-                                    if (active) MaterialTheme.colorScheme.primary
-                                    else MaterialTheme.colorScheme.outlineVariant,
+                    InsetGroupCard(contentPadding = true) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().selectableGroup(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            repeat(onboardingPages.size) { idx ->
+                                val active = pagerState.currentPage == idx
+                                val width by animateDpAsState(
+                                    targetValue = if (active) 28.dp else 8.dp,
+                                    animationSpec = tween(220),
+                                    label = "onboarding-dot-$idx",
                                 )
-                                .clickable(role = Role.Tab) {
-                                    scope.launch { pagerState.animateScrollToPage(idx) }
+                                val dotDesc = stringResource(R.string.onboarding_page_indicator, idx + 1, onboardingPages.size)
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .selectable(
+                                            selected = active,
+                                            role = Role.Tab,
+                                            onClick = { scope.launch { pagerState.animateScrollToPage(idx) } },
+                                        )
+                                        .semantics { contentDescription = dotDesc },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Box(
+                                        Modifier
+                                            .height(8.dp)
+                                            .width(width)
+                                            .clip(CircleShape)
+                                            .background(
+                                                if (active) MaterialTheme.colorScheme.primary
+                                                else MaterialTheme.colorScheme.outline,
+                                            ),
+                                    )
                                 }
-                                .semantics { contentDescription = dotDesc },
-                        )
-                    }
-                }
+                            }
+                        }
 
-                if (pagerState.currentPage < onboardingPages.lastIndex) {
-                    ActionButton(
-                        label = stringResource(R.string.onboarding_next),
-                        onClick = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        ActionButton(
-                            label = stringResource(R.string.onboarding_start),
-                            onClick = onStartRegister,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        SecondaryActionButton(
-                            label = stringResource(R.string.onboarding_login),
-                            onClick = onStartLogin,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        if (pageIndex < onboardingPages.lastIndex) {
+                            ActionButton(
+                                label = stringResource(R.string.onboarding_next),
+                                onClick = { scope.launch { pagerState.animateScrollToPage(pageIndex + 1) } },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        } else {
+                            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                ActionButton(
+                                    label = stringResource(R.string.onboarding_start),
+                                    onClick = onStartRegister,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                                SecondaryActionButton(
+                                    label = stringResource(R.string.onboarding_login),
+                                    onClick = onStartLogin,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -187,7 +202,6 @@ internal fun OnboardingScreen(
 
 @Composable
 private fun SlideTrackingIllustration() {
-    val tokens = LocalWasteNotSurfaceTokens.current
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Box(
             modifier = Modifier
@@ -198,10 +212,10 @@ private fun SlideTrackingIllustration() {
                 modifier = Modifier.fillMaxWidth().padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Row(
+                FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
                         text = stringResource(R.string.handled_today),
@@ -242,8 +256,8 @@ private fun SlideTrackingIllustration() {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
-            color = tokens.glassTintStrong,
-            border = BorderStroke(1.dp, tokens.glassEdge),
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(14.dp),
@@ -267,8 +281,8 @@ private fun SlideTrackingIllustration() {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(stringResource(R.string.category_plastic), style = MaterialTheme.typography.titleSmall)
                     Text(stringResource(R.string.onboarding_preview_item_subtitle), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.onboarding_preview_item_weight), style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
                 }
-                Text(stringResource(R.string.onboarding_preview_item_weight), style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
             }
         }
     }
@@ -276,7 +290,6 @@ private fun SlideTrackingIllustration() {
 
 @Composable
 private fun SlideScanIllustration() {
-    val tokens = LocalWasteNotSurfaceTokens.current
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
@@ -288,8 +301,9 @@ private fun SlideScanIllustration() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(190.dp)
-                    .background(Brush.linearGradient(listOf(Color(0xFF13261D), Color(0xFF244935)))),
+                    .heightIn(min = 190.dp)
+                    .background(Brush.linearGradient(listOf(Color(0xFF13261D), Color(0xFF244935))))
+                    .padding(horizontal = 40.dp, vertical = 24.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Canvas(Modifier.matchParentSize()) {
@@ -339,8 +353,8 @@ private fun SlideScanIllustration() {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
-            color = tokens.glassTintStrong,
-            border = BorderStroke(1.dp, tokens.glassEdge),
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(14.dp),
@@ -372,23 +386,22 @@ private fun SlideScanIllustration() {
 
 @Composable
 private fun SlideInsightsIllustration() {
-    val tokens = LocalWasteNotSurfaceTokens.current
     val bars = remember { listOf(0.32f, 0.58f, 0.28f, 0.72f, 0.45f, 0.92f, 0.80f) }
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
-            color = tokens.glassTintStrong,
-            border = BorderStroke(1.dp, tokens.glassEdge),
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(18.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Row(
+                FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(stringResource(R.string.onboarding_preview_trend), style = MaterialTheme.typography.titleSmall)
                     Text(stringResource(R.string.onboarding_preview_trend_weight), style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
@@ -414,21 +427,21 @@ private fun SlideInsightsIllustration() {
                 }
             }
         }
-        Row(
-            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             MetricTile(
                 label = stringResource(R.string.rate_title),
                 value = stringResource(R.string.onboarding_preview_rate),
                 icon = R.drawable.ic_recycle,
-                modifier = Modifier.weight(1f).fillMaxHeight(),
+                modifier = Modifier.fillMaxWidth(),
             )
             MetricTile(
                 label = stringResource(R.string.avoided_short_title),
                 value = stringResource(R.string.onboarding_preview_avoided),
                 icon = R.drawable.ic_leaf,
-                modifier = Modifier.weight(1f).fillMaxHeight(),
+                modifier = Modifier.fillMaxWidth(),
                 limeHighlight = true,
             )
         }

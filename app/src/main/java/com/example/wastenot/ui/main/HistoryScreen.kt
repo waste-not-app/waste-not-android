@@ -77,10 +77,12 @@ fun HistoryScreen(
         onDismissFilter()
     })
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        if (deletedNotice) Row(Modifier.widthIn(max = 840.dp).fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            MessageBanner(stringResource(R.string.log_deleted_notice), Modifier.weight(1f))
-            TextActionButton(stringResource(R.string.close), onDismissNotice)
+        if (deletedNotice) Column(
+            Modifier.widthIn(max = 840.dp).fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            MessageBanner(stringResource(R.string.log_deleted_notice), Modifier.fillMaxWidth())
+            TextActionButton(stringResource(R.string.close), onDismissNotice, Modifier.align(Alignment.End))
         }
         PullToRefreshBox(isRefreshing = data.refreshing, onRefresh = onRetry,
             modifier = Modifier.weight(1f).widthIn(max = 840.dp).fillMaxWidth()) {
@@ -109,7 +111,10 @@ fun HistoryScreen(
             if (data.loading) item(key = "loading") {
                 if (data.records.isEmpty()) AsyncStatePanel(stringResource(R.string.logs_loading), R.drawable.ic_clock,
                     Modifier.fillMaxWidth(), loading = true)
-                else CircularProgressIndicator(Modifier.padding(vertical = 20.dp))
+                else Column(Modifier.padding(vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.logs_loading), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                }
             }
             if (data.error != null && (!data.loading || data.records.isNotEmpty())) item(key = "error") {
                 if (data.records.isEmpty()) AsyncStatePanel(stringResource(R.string.logs_load_failed), R.drawable.ic_alert,
@@ -209,9 +214,9 @@ private fun HistoryFilterSheet(
                 .padding(horizontal = 24.dp).padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(stringResource(R.string.filter_history), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f).semantics { heading() })
-                TextActionButton(stringResource(R.string.cancel), onDismiss)
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(stringResource(R.string.filter_history), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.semantics { heading() })
+                TextActionButton(stringResource(R.string.cancel), onDismiss, Modifier.align(Alignment.End))
             }
             Text(stringResource(R.string.filter_description), color = MaterialTheme.colorScheme.onSurfaceVariant)
             FilterChoice(draft.category, WasteCategory.entries, R.string.category, R.string.all_categories,

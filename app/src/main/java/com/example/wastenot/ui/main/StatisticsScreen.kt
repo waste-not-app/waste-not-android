@@ -112,32 +112,33 @@ fun StatisticsScreen(
                 val percent = BigDecimal(count).multiply(BigDecimal(100)).divide(BigDecimal(period.summary.activityCount), 1, RoundingMode.HALF_UP)
                 stringResource(R.string.rate_value, checkNotNull(WasteFormat.percentage(percent)))
             }
-            val measurer = rememberTextMeasurer()
-            val density = LocalDensity.current
             val labelStyle = MaterialTheme.typography.bodySmall
             val percentStyle = MaterialTheme.typography.labelMedium
-            val labelWidth = with(density) { methodLabels.maxOf { measurer.measure(it, labelStyle).size.width }.toDp() + 1.dp }.coerceAtLeast(66.dp)
-            val percentWidth = with(density) { percentages.maxOf { measurer.measure(it, percentStyle).size.width }.toDp() + 1.dp }.coerceAtLeast(38.dp)
             InsetGroupCard(contentPadding = true) {
                 DisposalMethod.entries.forEachIndexed { index, method ->
                     val count = period.methods.getValue(method)
                     val fraction = count.toFloat() / period.summary.activityCount
                     val description = stringResource(R.string.method_fraction, count, period.summary.activityCount)
-                    Row(
+                    Column(
                         Modifier.fillMaxWidth().semantics(mergeDescendants = true) { stateDescription = description },
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Text(methodLabels[index], Modifier.width(labelWidth), style = labelStyle)
+                        FlowRow(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Text(methodLabels[index], style = labelStyle)
+                            Text(percentages[index], style = percentStyle)
+                        }
                         LinearProgressIndicator(
                             progress = { fraction },
-                            modifier = Modifier.weight(1f).height(8.dp).clip(RoundedCornerShape(8.dp)).clearAndSetSemantics {},
+                            modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(8.dp)).clearAndSetSemantics {},
                             color = MaterialTheme.colorScheme.primary,
                             trackColor = MaterialTheme.colorScheme.surfaceVariant,
                             gapSize = 0.dp,
                             drawStopIndicator = {},
                         )
-                        Text(percentages[index], Modifier.width(percentWidth), textAlign = TextAlign.End, style = percentStyle)
                     }
                 }
                 Text(
@@ -164,8 +165,10 @@ fun StatisticsScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         CategoryIconBadge(category, category.iconResource, sizeDp = 34)
-                        Text(stringResource(category.labelResource), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                        Text(totalLabel, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold))
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(stringResource(category.labelResource), style = MaterialTheme.typography.bodyMedium)
+                            Text(totalLabel, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold))
+                        }
                     }
                     if (idx < WasteCategory.entries.lastIndex) {
                         HorizontalDivider(Modifier.padding(start = 62.dp), color = MaterialTheme.colorScheme.outlineVariant)

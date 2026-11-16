@@ -24,8 +24,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalInputModeManager
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -54,13 +64,22 @@ internal fun DeleteLogDialog(
     val needsVersion = conflict || error == ApiFailureKind.PRECONDITION_REQUIRED
     val unavailable = error == ApiFailureKind.NOT_FOUND || error == ApiFailureKind.DELETED
     val cancelFocus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { cancelFocus.requestFocus() }
     BasicAlertDialog(
         modifier = modifier,
         onDismissRequest = { if (!busy) onDismiss() },
     ) {
+        val focused = LocalWindowInfo.current.isWindowFocused
+        val inputMode = LocalInputModeManager.current.inputMode
+        LaunchedEffect(focused, inputMode, busy) {
+            if (focused && inputMode == InputMode.Keyboard && !busy) cancelFocus.requestFocus()
+        }
         Surface(
-            modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
+            modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().onPreviewKeyEvent {
+                if (it.key == Key.Escape) {
+                    if (it.type == KeyEventType.KeyUp && !busy) onDismiss()
+                    true
+                } else false
+            },
             color = MaterialTheme.colorScheme.surface,
             shape = MaterialTheme.shapes.extraLarge,
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
@@ -84,8 +103,9 @@ internal fun DeleteLogDialog(
                     needsVersion -> stringResource(R.string.log_conflict_message)
                     else -> stringResource(R.string.delete_log_message, stringResource(log.category.labelResource), WasteFormat.activityDate(log.activityDate))
                 }, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
-                if (error != null && !needsVersion && !unavailable) Text(stringResource(R.string.delete_failed), color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium)
+                if (error != null && !needsVersion && !unavailable) Text(stringResource(R.string.delete_failed),
+                    Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+                    color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
                 Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     when {
                         unavailable -> ActionButton(stringResource(R.string.see_history), onUnavailable, Modifier.fillMaxWidth(), enabled = !busy)

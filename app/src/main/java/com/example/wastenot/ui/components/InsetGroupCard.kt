@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -51,32 +51,23 @@ internal fun Modifier.ambientCanvasBackground(): Modifier {
     val bottomGlow = if (tokens.isDark) Accent.copy(alpha = 0.06f) else Primary.copy(alpha = 0.10f)
     return this
         .background(gradients.canvas)
-        .drawBehind {
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(topGlow, Color.Transparent),
-                    center = Offset(size.width * 0.86f, size.height * 0.12f),
-                    radius = size.maxDimension * 0.44f,
-                ),
-                center = Offset(size.width * 0.86f, size.height * 0.12f),
-                radius = size.maxDimension * 0.44f,
-            )
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(bottomGlow, Color.Transparent),
-                    center = Offset(size.width * 0.16f, size.height * 0.80f),
-                    radius = size.maxDimension * 0.48f,
-                ),
-                center = Offset(size.width * 0.16f, size.height * 0.80f),
-                radius = size.maxDimension * 0.48f,
-            )
+        .drawWithCache {
+            val topCenter = Offset(size.width * 0.86f, size.height * 0.12f)
+            val topRadius = size.maxDimension * 0.44f
+            val topBrush = Brush.radialGradient(listOf(topGlow, Color.Transparent), topCenter, topRadius)
+            val bottomCenter = Offset(size.width * 0.16f, size.height * 0.80f)
+            val bottomRadius = size.maxDimension * 0.48f
+            val bottomBrush = Brush.radialGradient(listOf(bottomGlow, Color.Transparent), bottomCenter, bottomRadius)
+            onDrawBehind {
+                drawCircle(topBrush, radius = topRadius, center = topCenter)
+                drawCircle(bottomBrush, radius = bottomRadius, center = bottomCenter)
+            }
         }
 }
 
 @Composable
 fun InsetGroupCard(
     modifier: Modifier = Modifier,
-    glass: Boolean = false,
     contentPadding: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -85,9 +76,8 @@ fun InsetGroupCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = shape,
-        color = if (glass) tokens.glassTintStrong else MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, if (glass) tokens.glassEdge else tokens.cardEdge),
-        shadowElevation = if (tokens.isDark) 0.dp else 1.dp,
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, tokens.cardEdge),
     ) {
         Column(
             modifier = if (contentPadding) Modifier.fillMaxWidth().padding(16.dp) else Modifier.fillMaxWidth(),

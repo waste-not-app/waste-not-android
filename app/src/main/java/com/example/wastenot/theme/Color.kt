@@ -8,7 +8,7 @@ val Surface = Color(0xFFFFFFFF)
 val SurfaceVariant = Color(0xFFE5F2EA)
 val OnSurface = Color(0xFF122118)
 val OnSurfaceVariant = Color(0xFF4B5E52)
-val Outline = Color(0xFF7A9082)
+val Outline = Color(0xFF728779)
 val OutlineVariant = Color(0xFFD6E4DA)
 val Primary = Color(0xFF0C3023)
 val OnPrimary = Color(0xFFF7F6E5)
@@ -40,7 +40,7 @@ val GlassTintStrong = Color(0xD9FFFFFF)
 val CardEdge = Color(0x1A146342)
 val FieldWell = Color(0xFFEBF4ED)
 val FieldWellFocus = Color(0xFFFFFFFF)
-val FieldEdge = Color(0x29146342)
+val FieldEdge = Outline
 
 // WasteNot Design System v1.5: Dark (Botanical Emerald + Liquid Glass)
 val BackgroundDark = Color(0xFF0B140F)
@@ -69,7 +69,7 @@ val GlassTintStrongDark = Color(0xD915221B)
 val CardEdgeDark = Color(0x1FA8F0CB)
 val FieldWellDark = Color(0xFF0F1B14)
 val FieldWellFocusDark = Color(0xFF182B21)
-val FieldEdgeDark = Color(0x2EA8F0CB)
+val FieldEdgeDark = OutlineDark
 
 // Material edges and shadows shared by both themes.
 val SummaryBorder = Color(0x38FFFFFF)

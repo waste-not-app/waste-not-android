@@ -49,8 +49,8 @@ android {
         applicationId = "com.example.wastenot"
         minSdk = 30
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.0.4"
+        versionCode = 4
+        versionName = "1.0.5"
         testInstrumentationRunner = "com.example.wastenot.WasteNotTestRunner"
     }
 

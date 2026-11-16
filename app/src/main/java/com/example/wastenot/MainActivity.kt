@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.SideEffect
@@ -56,7 +57,11 @@ class MainActivity : ComponentActivity() {
             }
             WasteNotTheme(darkTheme = dark) {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    if (mode != null) Column(Modifier.fillMaxSize()) {
+                    if (mode != null) Column(
+                        Modifier
+                            .fillMaxSize()
+                            .then(if (preference.failure != null) Modifier.statusBarsPadding() else Modifier),
+                    ) {
                         preference.failure?.let { AppearanceProblemBanner(it, appearance::retry) }
                         MainNavigation(container.accountSession, container.core, container.guides, container.ai,
                             mode, appearance::choose, Modifier.weight(1f),

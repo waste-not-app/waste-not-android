@@ -10,11 +10,20 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
@@ -38,7 +47,7 @@ import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.labelResource
-import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
+import com.example.wastenot.ui.components.focusOutline
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -83,11 +92,23 @@ internal fun ActivitySyncToast(
     val visible = activeKey != null && dismissedKey != activeKey
     val timer = remember { Animatable(1f) }
     val latestOnDismiss by rememberUpdatedState(onDismissedKeyChange)
+    val accessibility = LocalAccessibilityManager.current
+    val timeoutMillis = accessibility?.calculateRecommendedTimeoutMillis(
+        originalTimeoutMillis = durationMillis.toLong(),
+        containsIcons = true,
+        containsText = true,
+        containsControls = true,
+    ) ?: durationMillis.toLong()
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusedAsState()
+    val closeInteractions = remember { MutableInteractionSource() }
+    val closeFocused by closeInteractions.collectIsFocusedAsState()
 
-    LaunchedEffect(visible, activeKey) {
+    LaunchedEffect(visible, activeKey, timeoutMillis, focused, closeFocused) {
         if (visible) {
             timer.snapTo(1f)
-            timer.animateTo(0f, tween(durationMillis = durationMillis, easing = LinearEasing))
+            if (focused || closeFocused) return@LaunchedEffect
+            timer.animateTo(0f, tween(durationMillis = timeoutMillis.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(), easing = LinearEasing))
             latestOnDismiss(activeKey)
         }
     }
@@ -98,18 +119,18 @@ internal fun ActivitySyncToast(
         enter = fadeIn(tween(180)) + slideInVertically(tween(220)) { -it / 2 },
         exit = fadeOut(tween(160)) + slideOutVertically(tween(180)) { -it / 2 },
     ) {
-        val tokens = LocalWasteNotSurfaceTokens.current
         val shape = RoundedCornerShape(18.dp)
         Surface(
             modifier = Modifier
                 .widthIn(max = 560.dp)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .testTag("sync-toast"),
+                .testTag("sync-toast")
+                .semantics { liveRegion = LiveRegionMode.Polite },
             shape = shape,
-            color = tokens.glassTintStrong,
-            border = BorderStroke(1.dp, tokens.glassEdge),
-            shadowElevation = if (tokens.isDark) 0.dp else 4.dp,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         ) {
             Column(Modifier.fillMaxWidth().clip(shape)) {
                 Row(
@@ -123,16 +144,21 @@ internal fun ActivitySyncToast(
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .weight(1f)
-                            .clip(RoundedCornerShape(10.dp))
-                            .clickable(role = Role.Button) {
+                            .focusOutline(focused, RoundedCornerShape(10.dp), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.surfaceContainerHigh)
+                            .clickable(interactionSource = interactions, indication = LocalIndication.current, role = Role.Button) {
                                 if (activeKey != null) latestOnDismiss(activeKey)
                                 onOpen()
                             }
+                            .heightIn(min = 48.dp)
                             .padding(vertical = 8.dp),
                     )
                     IconButton(
                         onClick = { if (activeKey != null) latestOnDismiss(activeKey) },
-                        modifier = Modifier.size(48.dp).testTag("sync-toast-close"),
+                        modifier = Modifier
+                            .size(48.dp)
+                            .testTag("sync-toast-close")
+                            .focusOutline(closeFocused, RoundedCornerShape(10.dp), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.surfaceContainerHigh),
+                        interactionSource = closeInteractions,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_close),
@@ -144,7 +170,7 @@ internal fun ActivitySyncToast(
                 }
                 LinearProgressIndicator(
                     progress = { timer.value },
-                    modifier = Modifier.fillMaxWidth().height(3.dp).testTag("sync-toast-progress"),
+                    modifier = Modifier.fillMaxWidth().height(3.dp).testTag("sync-toast-progress").clearAndSetSemantics {},
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
                     gapSize = 0.dp,
@@ -160,17 +186,18 @@ internal fun ActivitySyncToast(
 internal fun ActivitySyncSheet(issues: List<SyncIssue>, busy: Boolean, error: Boolean,
     onRetry: () -> Unit, onResolve: (String, Boolean) -> Unit, onDismiss: () -> Unit) {
     var decision by remember { mutableStateOf<Pair<SyncIssue, Boolean>?>(null) }
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = MaterialTheme.colorScheme.surface) {
         val syncScroll = rememberScrollState()
         Column(Modifier.fillMaxWidth().sheetVerticalScroll(syncScroll).navigationBarsPadding().padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Text(stringResource(R.string.sync_title), style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.sync_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
             Text(stringResource(R.string.sync_explanation), style = MaterialTheme.typography.bodyMedium)
             if (error) MessageBanner(stringResource(R.string.sync_resolution_failed), isError = true)
-            if (issues.isEmpty()) Text(stringResource(R.string.sync_queue_empty))
+            if (issues.isEmpty() && !busy) Text(stringResource(R.string.sync_queue_empty))
             issues.forEach { issue ->
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(syncLabel(issue.local.syncState)), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(syncLabel(issue.local.syncState)), style = MaterialTheme.typography.titleSmall, modifier = Modifier.semantics { heading() })
                     SyncRecord(issue.local, stringResource(if (issue.deleting) R.string.sync_local_delete else R.string.sync_local))
                     if (issue.local.syncState in setOf(ActivitySyncState.CONFLICT, ActivitySyncState.FAILED)) {
                         issue.remote?.let { SyncRecord(it, stringResource(R.string.sync_remote)) }
@@ -189,7 +216,8 @@ internal fun ActivitySyncSheet(issues: List<SyncIssue>, busy: Boolean, error: Bo
                     HorizontalDivider()
                 }
             }
-            ActionButton(stringResource(R.string.sync_retry), onRetry, Modifier.fillMaxWidth(), enabled = !busy)
+            ActionButton(stringResource(R.string.sync_retry), onRetry, Modifier.fillMaxWidth(), enabled = !busy,
+                loading = busy, loadingLabel = stringResource(R.string.sync_in_progress))
         }
     }
     decision?.let { (issue, keep) -> AlertDialog(
@@ -200,8 +228,8 @@ internal fun ActivitySyncSheet(issues: List<SyncIssue>, busy: Boolean, error: Bo
             keep -> R.string.sync_keep_confirmation
             else -> R.string.sync_discard_confirmation
         })) },
-        confirmButton = { TextButton(onClick = { onResolve(issue.localId, keep); decision = null }) { Text(stringResource(R.string.sync_confirm_decision)) } },
-        dismissButton = { TextButton(onClick = { decision = null }) { Text(stringResource(R.string.cancel)) } },
+        confirmButton = { TextButton(onClick = { onResolve(issue.localId, keep); decision = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.sync_confirm_decision)) } },
+        dismissButton = { TextButton(onClick = { decision = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.cancel)) } },
     ) }
 }
 

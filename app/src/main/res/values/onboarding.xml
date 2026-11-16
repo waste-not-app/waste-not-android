@@ -16,6 +16,7 @@
     <string name="onboarding_slide3_title">Pantau tren dari waktu ke waktu.</string>
     <string name="onboarding_slide3_body">Bandingkan pola 7 dan 30 hari, jaga streak harian, dan tetap bisa mencatat meski koneksi terputus.</string>
 
+    <string name="onboarding_preview_label">Contoh tampilan</string>
     <string name="onboarding_preview_level_xp">Level 1 · +10 XP</string>
     <string name="onboarding_preview_weight">650 g</string>
     <string name="onboarding_preview_activities">3 aktivitas tercatat</string>

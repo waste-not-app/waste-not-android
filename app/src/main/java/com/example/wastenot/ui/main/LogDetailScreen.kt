@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -152,7 +151,10 @@ fun LogDetailScreen(
                     }
                 }
             }
-            if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+            if (loading) {
+                Text(stringResource(R.string.logs_loading), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                LinearProgressIndicator(Modifier.fillMaxWidth())
+            }
             val canWrite = log.version > 0 && !loading && !loadError
             ActionButton(stringResource(R.string.log_edit), onEdit, Modifier.fillMaxWidth(), enabled = canWrite)
             SecondaryActionButton(stringResource(R.string.delete_log), onDelete, Modifier.fillMaxWidth(), enabled = canWrite)
@@ -169,16 +171,9 @@ fun LogDetailScreen(
 @Composable
 private fun DetailMetadata(label: String, value: String, showDivider: Boolean, modifier: Modifier = Modifier) {
     Column(modifier.fillMaxWidth()) {
-        if (LocalDensity.current.fontScale >= 1.5f) {
-            Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
-                Text(value, style = MaterialTheme.typography.titleSmall)
-            }
-        } else {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 13.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(label, Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
-                Text(value, style = MaterialTheme.typography.titleSmall)
-            }
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+            Text(value, style = MaterialTheme.typography.titleSmall)
         }
         if (showDivider) HorizontalDivider(Modifier.padding(start = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
     }

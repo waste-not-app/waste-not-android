@@ -79,7 +79,10 @@ fun AuthScreen(
     val focus = LocalFocusManager.current
     val view = LocalView.current
     val requesters = remember { AccountField.entries.associateWith { FocusRequester() } }
-    val landscapeLogin = !register && LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val configuration = LocalConfiguration.current
+    val landscapeLogin = !register &&
+        configuration.orientation == Configuration.ORIENTATION_LANDSCAPE &&
+        configuration.screenWidthDp >= 600 && configuration.fontScale < 1.5f
     val submitRequester = remember { BringIntoViewRequester() }
     LaunchedEffect(state.focusRequest) {
         val first = state.errors.keys.firstOrNull() ?: state.serverFields.firstOrNull()
@@ -172,7 +175,7 @@ fun AuthScreen(
                     else -> Unit
                 }
             }
-            InsetGroupCard(glass = true, contentPadding = true) {
+            InsetGroupCard(contentPadding = true) {
                 if (register) AuthField(
                     AccountField.NAME, state, requesters.getValue(AccountField.NAME), onChange,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),

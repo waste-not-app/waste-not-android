@@ -8,6 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -30,7 +32,8 @@ internal fun DraftRestoreScreen(loading: Boolean, onRetry: () -> Unit, onDiscard
             }
         }
         Text(stringResource(if (loading) R.string.draft_checking else R.string.draft_read_failed),
-            Modifier.fillMaxWidth().semantics { heading() }, style = WasteNotStateHeading, textAlign = TextAlign.Center)
+            Modifier.fillMaxWidth().semantics { heading(); liveRegion = LiveRegionMode.Polite },
+            style = WasteNotStateHeading, textAlign = TextAlign.Center)
         if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
         else {
             Text(stringResource(R.string.draft_read_help), Modifier.widthIn(max = 270.dp),

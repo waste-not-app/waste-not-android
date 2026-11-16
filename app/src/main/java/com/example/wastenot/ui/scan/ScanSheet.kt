@@ -13,7 +13,6 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -55,7 +54,6 @@ import com.example.wastenot.ui.components.summarySurface
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.ui.components.labelResource
-import com.example.wastenot.ui.main.SheetDragHandle
 import com.example.wastenot.ui.main.sheetVerticalScroll
 import com.example.wastenot.ui.main.SheetSystemBar
 import kotlinx.coroutines.Dispatchers
@@ -89,7 +87,6 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
         ScanPhase.FAILURE -> R.string.scan_unavailable
     }
     val horizontalPadding = if (LocalConfiguration.current.screenWidthDp <= 400) 16.dp else 24.dp
-    val pinSteps = LocalConfiguration.current.screenHeightDp >= 640 && LocalDensity.current.fontScale < 1.5f
     ModalBottomSheet(onDismissRequest = onDismiss, modifier = modifier,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
@@ -97,23 +94,25 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
         dragHandle = null) {
         SheetSystemBar()
         Column(Modifier.fillMaxWidth().fillMaxHeight(.94f).navigationBarsPadding().imePadding().testTag("capture-sheet")) {
-            Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp, bottom = 10.dp).size(38.dp, 4.dp)
+            Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp).size(38.dp, 4.dp)
                 .background(MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(2.dp)))
-            Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding).padding(bottom = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            val scroll = remember(state.phase) { ScrollState(0) }
+            Column(
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .sheetVerticalScroll(scroll)
+                    .padding(horizontal = horizontalPadding, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
                     Text(stringResource(title), Modifier.weight(1f).semantics { heading() }, style = MaterialTheme.typography.headlineSmall)
                     IconActionButton(R.drawable.ic_close, stringResource(R.string.scan_close), onDismiss)
                 }
                 Text(stringResource(R.string.scan_capture_notice),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                if (pinSteps) Box(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 6.dp)) { ScanSteps(state.step) }
-            }
-            HorizontalDivider()
-            val scroll = remember(state.phase) { ScrollState(0) }
-            Column(Modifier.weight(1f).fillMaxWidth().sheetVerticalScroll(scroll).padding(horizontal = horizontalPadding, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                if (!pinSteps) ScanSteps(state.step)
+                HorizontalDivider()
+                ScanSteps(state.step)
                 if (state.error?.kind == ApiFailureKind.RATE_LIMITED) MessageBanner(stringResource(R.string.error_rate_limited), isError = true)
                 when (state.phase) {
                     ScanPhase.CAMERA -> camera()
@@ -293,18 +292,16 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
                             ScanProblem.RECOMMENDATION -> R.string.scan_recommendation_error
                             ScanProblem.DISABLED -> R.string.scan_disabled
                             else -> R.string.scan_detection_error
-                        }), style = MaterialTheme.typography.bodyLarge)
+                        }), Modifier.semantics { liveRegion = LiveRegionMode.Polite }, style = MaterialTheme.typography.bodyLarge)
                         if (state.problem == ScanProblem.EXPIRED && state.objectConfirmed && state.confirmedMethod != null)
                             Text(stringResource(R.string.scan_manual_choice_retained), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (state.problem != ScanProblem.DISABLED) ScanSecondary(R.string.retry, onRetry)
                     }
                 }
-            }
-            if (state.phase in listOf(ScanPhase.CAMERA, ScanPhase.PHOTO, ScanPhase.FAILURE)) {
-                HorizontalDivider()
-                Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(stringResource(R.string.scan_manual_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (state.phase == ScanPhase.CAMERA || state.phase == ScanPhase.PHOTO || state.phase == ScanPhase.FAILURE) {
+                    HorizontalDivider()
+                    Text(stringResource(R.string.scan_manual_hint), style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
                     ScanSecondary(R.string.manual_input, onManual)
                 }
             }
@@ -383,7 +380,8 @@ internal fun <T> ScanChoice(label: String, value: String, options: List<T>, opti
 }
 @Composable private fun ScanBusy(label: Int) {
     LinearProgressIndicator(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(8.dp)), gapSize = 0.dp)
-    Text(stringResource(label), color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Text(stringResource(label), Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+        color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 @Composable private fun ScanWarning(message: String) {
     Surface(

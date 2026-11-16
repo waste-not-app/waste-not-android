@@ -132,7 +132,7 @@ fun LogEditorScreen(
             MethodSelector(value.method, { draft.change(EditorField.METHOD, value.copy(method = it)) }, fieldModifier(EditorField.METHOD),
                 draft.errors[EditorField.METHOD]?.let { stringResource(it) }, enabled = enabled,
                 initialFocusModifier = inputModifier(EditorField.METHOD))
-            InsetGroupCard(glass = true, contentPadding = true) {
+            InsetGroupCard(contentPadding = true) {
                 CategoryPicker(value.category, { draft.change(EditorField.CATEGORY, value.copy(category = it)) }, fieldModifier(EditorField.CATEGORY),
                     draft.errors[EditorField.CATEGORY]?.let { stringResource(it) }, enabled = enabled)
                 QuantityField(value.quantity, { draft.change(EditorField.QUANTITY, value.copy(quantity = it)) },
@@ -145,7 +145,7 @@ fun LogEditorScreen(
                     error = draft.errors[EditorField.DATE]?.let { stringResource(it) },
                     preservedDate = draft.original.date.takeIf { draft.original.version != null })
             }
-            InsetGroupCard(glass = true, contentPadding = true) {
+            InsetGroupCard(contentPadding = true) {
                 WasteTextField(value.notes, { draft.change(EditorField.NOTES, value.copy(notes = it)) }, stringResource(R.string.notes_optional),
                     fieldModifier(EditorField.NOTES), helper = stringResource(R.string.notes_helper), singleLine = false,
                     errorText = draft.errors[EditorField.NOTES]?.let { stringResource(it) }, enabled = enabled, labelAbove = true,

@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.AlertDialog
@@ -32,7 +34,10 @@ fun ThemePicker(
         modifier = modifier,
         title = { Text(stringResource(R.string.theme_title)) },
         text = {
-            Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(
+                Modifier.verticalScroll(rememberScrollState()).selectableGroup(),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 ThemeMode.entries.forEach { option ->
                     Row(
                         modifier = Modifier
@@ -43,7 +48,7 @@ fun ThemePicker(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(selected = mode == option, onClick = null)
-                        Text(stringResource(option.label), Modifier.padding(start = 12.dp))
+                        Text(stringResource(option.label), Modifier.weight(1f).padding(start = 12.dp))
                     }
                 }
             }

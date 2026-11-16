@@ -187,14 +187,14 @@ internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifi
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(title, color = SummarySecondaryText, style = MaterialTheme.typography.bodyMedium)
+                Text(title, modifier = Modifier.weight(1f), color = SummarySecondaryText, style = MaterialTheme.typography.bodyMedium)
                 if (personal) {
                     Surface(
                         onClick = { showMethodology = !showMethodology },
                         shape = CircleShape,
                         color = Color.White.copy(alpha = 0.16f),
                         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.24f)),
-                        modifier = Modifier.size(32.dp).semantics { contentDescription = infoToggleDesc },
+                        modifier = Modifier.size(48.dp).semantics { contentDescription = infoToggleDesc },
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text("i", color = SummaryText, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
@@ -273,7 +273,7 @@ private fun SummaryPillChip(label: String) {
 internal fun ProgressMeter(progress: UserProgress, modifier: Modifier = Modifier) {
     val xp = progress.xp
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Surface(
                 shape = RoundedCornerShape(999.dp),
                 color = MaterialTheme.colorScheme.primaryContainer,

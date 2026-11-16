@@ -29,6 +29,10 @@ import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.DisplayMode
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -98,6 +102,7 @@ fun DateField(
         if (error != null) Text(error, color = MaterialTheme.colorScheme.error)
     }
     if (choosing && enabled) {
+        val compact = LocalConfiguration.current.screenWidthDp < 360 || LocalDensity.current.fontScale >= 1.5f
         val firstYear = minOf(minimum.year, preservedDate?.year ?: minimum.year)
         val lastYear = maxOf(maximum.year, preservedDate?.year ?: maximum.year)
         val dates = remember(minimum, maximum, preservedDate) {
@@ -114,7 +119,11 @@ fun DateField(
             initialDisplayedMonthMillis = (date ?: maximum).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
             yearRange = minOf(date?.year ?: firstYear, firstYear)..maxOf(date?.year ?: lastYear, lastYear),
             selectableDates = dates,
+            initialDisplayMode = if (compact) DisplayMode.Input else DisplayMode.Picker,
         )
+        LaunchedEffect(compact, picker) {
+            if (compact) picker.displayMode = DisplayMode.Input
+        }
         DatePickerDialog(
             onDismissRequest = { choosing = false },
             confirmButton = {
@@ -128,6 +137,12 @@ fun DateField(
                 )
             },
             dismissButton = { TextActionButton(stringResource(R.string.cancel), onClick = { choosing = false }) },
-        ) { DatePicker(picker, modifier = Modifier.verticalScroll(rememberScrollState())) }
+        ) {
+            DatePicker(
+                picker,
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                showModeToggle = !compact,
+            )
+        }
     }
 }
