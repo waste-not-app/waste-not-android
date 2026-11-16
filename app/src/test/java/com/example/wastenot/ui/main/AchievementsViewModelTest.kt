@@ -11,15 +11,16 @@ import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.model.AchievementRequirement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.runCurrent
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
 import java.util.concurrent.CountDownLatch
@@ -34,7 +35,7 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AchievementsViewModelTest {
-    private val mainDispatcher = UnconfinedTestDispatcher()
+    private val mainDispatcher = StandardTestDispatcher()
     private lateinit var server: MockWebServer
     private lateinit var network: WasteNotNetwork
     private lateinit var viewModel: AchievementsViewModel
@@ -48,6 +49,11 @@ class AchievementsViewModelTest {
     private fun achievementResponse(current: Int) = MockResponse().setResponseCode(200).setBody(
         """{"data":[{"id":"00000000-0000-4000-8000-000000000101","code":"FIRST_STEP","title":"Langkah pertama","description":"Catat minimal 1 aktivitas.","requirement_type":"ACTIVE_LOG_COUNT","current_value":$current,"target_value":1,"is_unlocked":${current > 0},"unlocked_at":${if (current > 0) "\"2026-11-13T07:00:00Z\"" else "null"}}]}""",
     )
+
+    private suspend fun awaitState(predicate: (AchievementsUiState) -> Boolean): AchievementsUiState =
+        withContext(Dispatchers.Default) {
+            withTimeout(5_000) { viewModel.state.first(predicate) }
+        }
 
     @Before
     fun setUp() {
@@ -73,10 +79,10 @@ class AchievementsViewModelTest {
     }
 
     @Test
-    fun loadErrorAndRefreshPreserveExpectedState() = runBlocking {
+    fun loadErrorAndRefreshPreserveExpectedState() = runTest(mainDispatcher) {
         server.enqueue(MockResponse().setResponseCode(503).setBody("""{"error":{"code":"UNAVAILABLE","message":"down"}}"""))
         viewModel.load()
-        val failedState = withTimeout(5_000) { viewModel.state.first { !it.loading && it.error != null } }
+        val failedState = awaitState { !it.loading && it.error != null }
         assertNull(failedState.items)
         assertFalse(failedState.loading)
         assertEquals(ApiFailureKind.SERVER, failedState.error)
@@ -99,7 +105,7 @@ class AchievementsViewModelTest {
             ),
         )
         viewModel.refresh()
-        val refreshed = withTimeout(5_000) { viewModel.state.first { !it.loading && it.items != null } }
+        val refreshed = awaitState { !it.loading && it.items != null }
         val items = refreshed.items!!
         assertEquals(1, items.size)
         assertEquals(AchievementRequirement.ACTIVE_LOG_COUNT, items[0].requirementType)
@@ -107,19 +113,20 @@ class AchievementsViewModelTest {
     }
 
     @Test
-    fun delayedWorkerAcknowledgementRefreshesLoadedAchievementsButDuplicateRevisionsDoNotReload() = runBlocking {
+    fun delayedWorkerAcknowledgementRefreshesLoadedAchievementsButDuplicateRevisionsDoNotReload() = runTest(mainDispatcher) {
         server.enqueue(achievementResponse(0))
         viewModel.load()
-        withTimeout(5_000) { viewModel.state.first { !it.loading && it.items != null } }
+        awaitState { !it.loading && it.items != null }
         assertEquals(0L, viewModel.state.value.items!!.single().currentValue)
         assertEquals(1, server.requestCount)
 
         // No local mutation callback refreshes achievements. Only the later worker acknowledgement does.
         server.enqueue(achievementResponse(1))
         acknowledgements.emit("acknowledged-create")
-        withTimeout(5_000) { viewModel.state.first { !it.loading && it.items?.single()?.currentValue == 1L } }
+        awaitState { !it.loading && it.items?.single()?.currentValue == 1L }
         assertEquals(2, server.requestCount)
         acknowledgements.emit("acknowledged-create")
+        runCurrent()
         assertFalse(viewModel.state.value.loading)
         assertEquals(2, server.requestCount)
 
@@ -129,13 +136,13 @@ class AchievementsViewModelTest {
         assertEquals(2, server.requestCount)
         server.enqueue(achievementResponse(1))
         viewModel.load()
-        withTimeout(5_000) { viewModel.state.first { !it.loading && it.items != null } }
+        awaitState { !it.loading && it.items != null }
         assertEquals(1L, viewModel.state.value.items!!.single().currentValue)
         assertEquals(3, server.requestCount)
     }
 
     @Test
-    fun acknowledgementDuringAnOlderRequestCannotBeOverwrittenByItsDelayedResponse() = runBlocking {
+    fun acknowledgementDuringAnOlderRequestCannotBeOverwrittenByItsDelayedResponse() = runTest(mainDispatcher) {
         val firstStarted = CompletableDeferred<Unit>()
         val releaseFirst = CountDownLatch(1)
         val calls = AtomicInteger()
@@ -150,11 +157,9 @@ class AchievementsViewModelTest {
         }
         try {
             viewModel.load()
-            withTimeout(5_000) { firstStarted.await() }
+            withContext(Dispatchers.Default) { withTimeout(5_000) { firstStarted.await() } }
             acknowledgements.emit("acknowledged-update")
-            val current = withTimeout(5_000) {
-                viewModel.state.first { !it.loading && it.items?.single()?.currentValue == 1L }
-            }
+            val current = awaitState { !it.loading && it.items?.single()?.currentValue == 1L }
             releaseFirst.countDown()
             assertEquals(1L, current.items!!.single().currentValue)
             assertEquals(2, calls.get())

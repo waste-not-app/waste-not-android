@@ -27,6 +27,8 @@ Perubahan untuk Android 1.0.4 (versionCode 3), terpisah dari snapshot checklist 
 
 Verifikasi host terarah: `OfflineActivityStoreTest`, `SummariesViewModelTest`, `AchievementsViewModelTest`, `EditorDraftTest`, `AccountManagementTest`, dan `AccountManagementViewModelTest` lulus; source instrumentation berhasil dikompilasi. Dua regresi UI Robolectric memastikan pemulihan izin tidak menjadi opt-in tanpa gesture dan tidak menyimpan otomatis. Empat smoke render native memeriksa pemulihan akun, konfirmasi hapus, serta daftar-ke-detail titik pengumpulan pada lebar 320 dp, termasuk gelap/font 200%; harness sementara sudah dihapus.
 
+CI awal menemukan timeout pada regresi respons achievement tertunda. Tes tersebut kini menjalankan state holder pada `StandardTestDispatcher` terserialisasi, seperti main thread Android; penantian HTTP nyata tetap memakai deadline nyata di `Dispatchers.Default`. Tidak ada kenaikan timeout atau penghapusan assertion. Tiga tes achievement terarah lulus setelah perubahan scheduler.
+
 Belum dianggap selesai:
 
 - SMTP produksi belum dikonfigurasi. Kunci konfigurasi tidak ada di runtime maupun nama secret/variable repository backend; pengiriman email nyata belum dapat dibuktikan.
