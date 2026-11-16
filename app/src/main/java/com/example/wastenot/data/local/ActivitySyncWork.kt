@@ -17,6 +17,10 @@ class ActivitySyncScheduler(context: Context) {
         // Appending preserves a write queued while the previous worker is finishing.
         work.enqueueUniqueWork("activity-sync-$owner", ExistingWorkPolicy.APPEND_OR_REPLACE, request)
     }
+
+    fun cancel(owner: String) {
+        work.cancelUniqueWork("activity-sync-$owner")
+    }
 }
 
 class ActivitySyncWorker(context: Context, parameters: WorkerParameters) : CoroutineWorker(context, parameters) {

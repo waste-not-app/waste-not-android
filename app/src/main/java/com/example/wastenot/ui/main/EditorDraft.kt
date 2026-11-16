@@ -50,6 +50,20 @@ class EditorDraft(original: EditorValues) {
     val needsConflictResolution: Boolean get() = original.version != null &&
         submissionError in setOf(ApiFailureKind.VERSION_CONFLICT, ApiFailureKind.PRECONDITION_REQUIRED)
     val outcomeUnknown: Boolean get() = locked && submissionError != null && !retryBlocked && !needsConflictResolution
+    private val aiReferenceRejected: Boolean get() = when (submissionError) {
+        ApiFailureKind.AI_EXPIRED, ApiFailureKind.AI_REFERENCE_INVALID, ApiFailureKind.AI_ALREADY_LINKED -> true
+        else -> false
+    }
+    val manualConversionReason: Int? get() {
+        val source = values.aiProvenance ?: return null
+        if (locked) return null
+        return when {
+            aiReferenceRejected -> R.string.ai_reference_rejected
+            values.category != source.category -> R.string.ai_category_changed
+            values.method == DisposalMethod.REDUCE -> R.string.ai_reduce_manual
+            else -> null
+        }
+    }
 
     fun resolveConflict(latest: WasteLog, keepDraft: Boolean): Boolean {
         if (!needsConflictResolution || locked || latest.version <= (original.version ?: 0)) return false
@@ -84,13 +98,13 @@ class EditorDraft(original: EditorValues) {
         if (locked) return
         values = updated
         errors = errors - field
-        if (!needsConflictResolution) submissionError = null
+        if (!needsConflictResolution && !aiReferenceRejected) submissionError = null
     }
 
     fun attachPhoto(photoId: String) {
         if (locked) return
         values = values.copy(photoId = photoId, clearPhoto = false)
-        submissionError = null
+        if (!aiReferenceRejected) submissionError = null
     }
 
     fun removePhoto() {
@@ -99,7 +113,7 @@ class EditorDraft(original: EditorValues) {
             photoId = null,
             clearPhoto = original.photoId != null,
         )
-        submissionError = null
+        if (!aiReferenceRejected) submissionError = null
     }
 
     fun validateField(field: EditorField, referenceDate: LocalDate) {

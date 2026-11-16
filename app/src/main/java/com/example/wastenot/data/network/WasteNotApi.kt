@@ -14,6 +14,10 @@ import com.example.wastenot.data.network.dto.GuideDto
 import com.example.wastenot.data.repository.RequestCredential
 import com.example.wastenot.data.network.dto.AchievementDto
 import com.example.wastenot.data.network.dto.PhotoDto
+import com.example.wastenot.data.network.dto.PasswordResetRequestDto
+import com.example.wastenot.data.network.dto.PasswordResetConfirmationDto
+import com.example.wastenot.data.network.dto.PasswordResetAcknowledgementDto
+import com.example.wastenot.data.network.dto.DeleteAccountDto
 import okhttp3.MultipartBody
 import retrofit2.http.Multipart
 import retrofit2.http.Part
@@ -87,6 +91,15 @@ interface WasteNotApi {
 
     @POST("auth/logout")
     suspend fun logout(@Tag credential: RequestCredential): Response<Unit>
+
+    @POST("auth/password-reset")
+    suspend fun requestPasswordReset(@Body input: PasswordResetRequestDto): Response<DataEnvelope<PasswordResetAcknowledgementDto>>
+
+    @POST("auth/password-reset/confirm")
+    suspend fun confirmPasswordReset(@Body input: PasswordResetConfirmationDto): Response<Unit>
+
+    @retrofit2.http.HTTP(method = "DELETE", path = "me", hasBody = true)
+    suspend fun deleteAccount(@Body input: DeleteAccountDto, @Tag credential: RequestCredential): Response<Unit>
 
     @GET("achievements")
     suspend fun achievements(@Tag credential: RequestCredential? = null): Response<DataEnvelope<List<AchievementDto>>>

@@ -49,8 +49,8 @@ android {
         applicationId = "com.example.wastenot"
         minSdk = 30
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.0.3"
+        versionCode = 3
+        versionName = "1.0.4"
         testInstrumentationRunner = "com.example.wastenot.WasteNotTestRunner"
     }
 
@@ -130,6 +130,10 @@ android {
       shaders = false
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     packaging {
       resources {
         excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -177,6 +181,8 @@ dependencies {
   val composeBom = platform(libs.androidx.compose.bom)
   implementation(composeBom)
   androidTestImplementation(composeBom)
+  testImplementation(composeBom)
+  testImplementation(libs.androidx.compose.ui.test.junit4)
 
   // Core Android dependencies
   implementation(libs.androidx.core.ktx)

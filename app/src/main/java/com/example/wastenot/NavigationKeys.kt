@@ -10,6 +10,7 @@ import java.util.UUID
 @Serializable data object Onboarding : NavKey
 @Serializable data object Login : NavKey
 @Serializable data object Register : NavKey
+@Serializable data object PasswordRecovery : NavKey
 @Serializable data object Home : NavKey
 @Serializable data object History : NavKey
 @Serializable data object Guide : NavKey
@@ -19,6 +20,9 @@ import java.util.UUID
 @Serializable data object Settings : NavKey
 @Serializable data object Achievements : NavKey
 @Serializable data object ReminderSettings : NavKey
+@Serializable data object DeleteAccount : NavKey
+@Serializable data object RecyclingPointList : NavKey
+@Serializable data class RecyclingPointDetail(val pointId: String) : NavKey
 @Serializable data class LogDetail(val id: String, val instanceId: String = UUID.randomUUID().toString()) : NavKey
 @Serializable data class LogEditor(val logId: String?, val requestId: String, val guideId: String? = null,
     val scanCategory: String? = null, val scanMethod: String? = null,

@@ -73,7 +73,8 @@ private class BearerInterceptor(private val base: HttpUrl, private val token: ()
         val request = chain.request()
         val builder = request.newBuilder().removeHeader("Authorization").removeHeader("Cookie")
         val publicAuth = request.url.encodedPath in setOf(
-            "${base.encodedPath}auth/login", "${base.encodedPath}auth/register", "${base.encodedPath}auth/refresh")
+            "${base.encodedPath}auth/login", "${base.encodedPath}auth/register", "${base.encodedPath}auth/refresh",
+            "${base.encodedPath}auth/password-reset", "${base.encodedPath}auth/password-reset/confirm")
         if (request.url.isApiUrl(base) && !publicAuth) {
             (request.tag(RequestCredential::class.java)?.token?.value ?: token())
                 ?.let { builder.header("Authorization", "Bearer $it") }

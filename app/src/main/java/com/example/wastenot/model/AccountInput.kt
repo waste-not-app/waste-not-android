@@ -29,12 +29,18 @@ private fun hasValidEmailFormat(email: String): Boolean {
         labels.all { domainLabel.matches(it) } && labels.last().any { it.isLetter() }
 }
 
+fun isValidAccountEmail(email: String): Boolean {
+    val normalized = normalizeAccountEmail(email)
+    return normalized.length <= 254 && hasValidEmailFormat(normalized)
+}
+
+fun isValidAccountPassword(password: String): Boolean = password.codePointCount(0, password.length) in 12..128
+
 fun validateLoginInput(email: String, password: String): Map<AccountField, AccountInputError> = buildMap {
-    val normalizedEmail = normalizeAccountEmail(email)
-    if (normalizedEmail.length > 254 || !hasValidEmailFormat(normalizedEmail)) {
+    if (!isValidAccountEmail(email)) {
         put(AccountField.EMAIL, AccountInputError.EMAIL_FORMAT)
     }
-    if (password.codePointCount(0, password.length) !in 12..128) {
+    if (!isValidAccountPassword(password)) {
         put(AccountField.PASSWORD, AccountInputError.PASSWORD_LENGTH)
     }
 }

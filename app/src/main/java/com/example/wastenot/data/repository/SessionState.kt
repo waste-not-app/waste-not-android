@@ -12,7 +12,7 @@ sealed interface SessionState {
 
 enum class SignOutReason {
     NONE, EXPIRED, INVALID_CREDENTIAL, ROTATION_UNCERTAIN, STORAGE_UNAVAILABLE,
-    LOGOUT_LOCAL_ONLY, LOGOUT_CONFIRMED,
+    LOGOUT_LOCAL_ONLY, LOGOUT_CONFIRMED, ACCOUNT_DELETED, ACCOUNT_DELETION_PENDING, DELETION_CLEANUP_FAILED,
 }
 
 data class LogoutResult(val localCleared: Boolean, val serverRevoked: Boolean)

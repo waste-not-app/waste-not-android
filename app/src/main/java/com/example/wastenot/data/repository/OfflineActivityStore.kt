@@ -9,6 +9,8 @@ import com.example.wastenot.model.*
 import java.time.Instant
 import java.util.UUID
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -26,6 +28,9 @@ class OfflineActivityStore(
     private val synchronization = Mutex()
     override val referenceDate = null
     override val changes = database.invalidationTracker.createFlow("activities", "server_snapshots", emitInitialState = false).map { Unit }
+    override val synchronizationAcknowledgements = dao.observeSnapshots(user.id).map { snapshots ->
+        snapshots.firstOrNull { it.key == "acknowledgement" }?.payload?.takeIf { isOwnerActive() }
+    }.filterNotNull().distinctUntilChanged()
     override val historyReady = dao.observeSnapshots(user.id).map { snapshots -> snapshots.any { it.key == "history" } }
     override val pending = dao.observePending(user.id).map { rows -> rows.map { row ->
         SyncIssue(row.localId, row.log(user.timezone), row.remotePayload?.activityInput()?.let { input ->
@@ -36,21 +41,43 @@ class OfflineActivityStore(
     } }
 
     override fun requestSync() { if (isOwnerActive()) schedule() }
+
+    suspend fun deleteLocalData() = synchronization.withLock { dao.clearOwner(user.id) }
     override suspend fun isPhotoScanDisabled() = remote.isPhotoScanDisabled()
 
     override suspend fun dashboard(): ApiResult<DashboardSnapshot> = read {
         val snapshot = dao.snapshot(user.id, "dashboard") ?: return@read missingSnapshot()
         val confirmed = activityJson.decodeFromString(DashboardDto.serializer(), snapshot.payload).toModel()
         val recent = dao.page(user.id, null, null, null, null, 3, 0).map { it.log(user.timezone) }
-        ApiResult.Success(confirmed.copy(recentLogs = recent))
+        ApiResult.Success(confirmed.copy(recentLogs = recent, freshness = freshness(snapshot)))
     }
 
     override suspend fun statistics(range: ActivityDateRange): ApiResult<StatisticsSnapshot> = read {
-        val snapshot = dao.snapshot(user.id, statisticsKey(range)) ?: return@read missingSnapshot()
-        ApiResult.Success(activityJson.decodeFromString(StatisticsDto.serializer(), snapshot.payload).toModel())
+        val snapshot = dao.snapshot(user.id, statisticsKey(range))
+            ?: dao.statisticsSnapshots(user.id).firstOrNull {
+                val saved = activityJson.decodeFromString(StatisticsDto.serializer(), it.payload).toModel()
+                java.time.temporal.ChronoUnit.DAYS.between(saved.range.from, saved.range.to) ==
+                    java.time.temporal.ChronoUnit.DAYS.between(range.from, range.to)
+            } ?: return@read missingSnapshot()
+        val confirmed = activityJson.decodeFromString(StatisticsDto.serializer(), snapshot.payload).toModel()
+        ApiResult.Success(confirmed.copy(freshness = freshness(snapshot)))
     }
 
-    private fun missingSnapshot(): ApiResult.Failure = failure(ApiFailureKind.NETWORK)
+    private suspend fun missingSnapshot(): ApiResult.Failure {
+        val status = dao.snapshot(user.id, "summary-refresh")?.payload
+        return failure(status?.takeUnless { it == "OK" }?.let(ApiFailureKind::valueOf) ?: ApiFailureKind.NETWORK)
+    }
+
+    private suspend fun freshness(snapshot: ServerSnapshot): SnapshotFreshness {
+        val status = dao.snapshot(user.id, "summary-refresh")
+        val error = status?.payload?.takeUnless { it == "OK" }?.let(ApiFailureKind::valueOf)
+        return SnapshotFreshness(cached = true, confirmedAt = Instant.ofEpochMilli(snapshot.savedAt), refreshError = error)
+    }
+
+    private suspend fun refreshFailed(kind: ApiFailureKind): Boolean {
+        if (isOwnerActive()) dao.snapshot(ServerSnapshot(user.id, "summary-refresh", kind.name, now().toEpochMilli()))
+        return kind !in transientFailures
+    }
 
     override suspend fun load() = page()
     override suspend fun visiblePage(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, limit: Int): ApiResult<List<WasteLog>> = read {
@@ -189,10 +216,11 @@ class OfflineActivityStore(
             when (result) {
                 is ApiResult.Success -> acknowledge(operation, result.value)
                 is ApiResult.Failure -> {
-                    if (result.error.kind in transientFailures) return@withLock false
-                    if (result.error.kind == ApiFailureKind.UNAUTHENTICATED) return@withLock true
+                    if (result.error.kind in transientFailures || result.error.kind == ApiFailureKind.UNAUTHENTICATED)
+                        return@withLock refreshFailed(result.error.kind)
                     val latest = row.serverId?.let { remote.get(it) }
-                    if (latest is ApiResult.Failure && latest.error.kind in transientFailures) return@withLock false
+                    if (latest is ApiResult.Failure && latest.error.kind in transientFailures)
+                        return@withLock refreshFailed(latest.error.kind)
                     val server = (latest as? ApiResult.Success)?.value
                     // A lost PATCH response is successful only if precisely that next version has the same fields.
                     if (operation.kind == "UPDATE" && result.error.kind == ApiFailureKind.VERSION_CONFLICT &&
@@ -218,6 +246,7 @@ class OfflineActivityStore(
     private suspend fun acknowledge(operation: ActivityMutation, server: WasteLog?) = database.withTransaction {
         val current = dao.find(user.id, operation.localId) ?: return@withTransaction
         dao.acknowledge(user.id, operation.sequence)
+        dao.snapshot(ServerSnapshot(user.id, "acknowledgement", UUID.randomUUID().toString(), now().toEpochMilli()))
         val remaining = dao.outstanding(user.id, current.localId) > 0
         if (server == null) {
             if (!remaining) dao.remove(user.id, current.localId)
@@ -238,11 +267,13 @@ class OfflineActivityStore(
         do {
             if (!isOwnerActive()) return true
             val result = remote.page(cursor = cursor)
-            if (result is ApiResult.Failure) return result.error.kind !in transientFailures
+            if (!isOwnerActive()) return true
+            if (result is ApiResult.Failure) return refreshFailed(result.error.kind)
             result as ApiResult.Success
-            val page = result.page ?: return false
+            val page = result.page ?: return refreshFailed(ApiFailureKind.MALFORMED_RESPONSE)
             if (result.value.size > 20 || page.hasMore != (page.nextCursor != null) ||
-                (page.hasMore && result.value.isEmpty()) || page.nextCursor?.let { !cursors.add(it) } == true) return false
+                (page.hasMore && result.value.isEmpty()) || page.nextCursor?.let { !cursors.add(it) } == true)
+                return refreshFailed(ApiFailureKind.MALFORMED_RESPONSE)
             database.withTransaction {
                 for (log in result.value) {
                     val existing = dao.find(user.id, log.id)
@@ -271,7 +302,7 @@ class OfflineActivityStore(
                 }
                 is ApiResult.Failure -> if (result.error.kind in setOf(ApiFailureKind.DELETED, ApiFailureKind.NOT_FOUND)) {
                     database.withTransaction { if (dao.find(user.id, row.localId)?.syncState == "SYNCED") dao.remove(user.id, row.localId) }
-                } else if (result.error.kind in transientFailures) return false
+                } else if (result.error.kind in transientFailures) return refreshFailed(result.error.kind)
             }
         }
         dao.snapshot(ServerSnapshot(user.id, "history", "{}", now().toEpochMilli()))
@@ -281,21 +312,26 @@ class OfflineActivityStore(
     private suspend fun refreshSnapshots(): Boolean {
         if (!isOwnerActive()) return true
         val dashboard = remote.dashboard()
-        if (dashboard is ApiResult.Success) {
-            dao.snapshot(ServerSnapshot(user.id, "dashboard", dashboard.value.encode(), now().toEpochMilli()))
-            for (days in listOf(7, 30)) {
-                val range = ActivityDateRange.lastDays(dashboard.value.date, days)
-                val result = remote.statistics(range)
-                if (result is ApiResult.Success) dao.snapshot(ServerSnapshot(user.id, statisticsKey(range), result.value.encode(), now().toEpochMilli()))
-                else if (result is ApiResult.Failure && result.error.kind in transientFailures) return false
-            }
+        if (!isOwnerActive()) return true
+        if (dashboard is ApiResult.Failure) return refreshFailed(dashboard.error.kind)
+        dashboard as ApiResult.Success
+        dao.snapshot(ServerSnapshot(user.id, "dashboard", dashboard.value.encode(), now().toEpochMilli()))
+        for (days in listOf(7, 30)) {
+            val range = ActivityDateRange.lastDays(dashboard.value.date, days)
+            val result = remote.statistics(range)
+            if (!isOwnerActive()) return true
+            if (result is ApiResult.Failure) return refreshFailed(result.error.kind)
+            result as ApiResult.Success
+            dao.snapshot(ServerSnapshot(user.id, statisticsKey(range), result.value.encode(), now().toEpochMilli()))
         }
-        return dashboard !is ApiResult.Failure || dashboard.error.kind !in transientFailures
+        dao.snapshot(ServerSnapshot(user.id, "summary-refresh", "OK", now().toEpochMilli()))
+        return true
     }
 
     private suspend fun <T> read(block: suspend () -> ApiResult<T>): ApiResult<T> {
         if (!isOwnerActive()) return failure(ApiFailureKind.UNAUTHENTICATED)
-        return try { block() } catch (error: CancellationException) { throw error }
+        return try { block().let { if (isOwnerActive()) it else failure(ApiFailureKind.UNAUTHENTICATED) } }
+        catch (error: CancellationException) { throw error }
         catch (_: android.database.sqlite.SQLiteException) { failure(ApiFailureKind.STORAGE) }
     }
 

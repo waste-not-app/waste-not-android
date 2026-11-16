@@ -16,6 +16,5 @@
     <string name="personal_data">Data pribadi</string>
     <string name="privacy_account">Catatan pribadi terhubung dengan akunmu. Keluar dari akun untuk menutup akses di aplikasi.</string>
     <string name="privacy_optional_photo">Akses kamera atau foto hanya digunakan saat kamu memilih fitur tersebut. Lampiran foto bersifat opsional.</string>
-    <string name="privacy_policy_pending">Ringkasan ini bukan kebijakan privasi resmi. Tautan kebijakan akan tersedia setelah dokumennya diterbitkan.</string>
     <string name="timezone_read_only">Zona akun ditetapkan saat pendaftaran.</string>
 </resources>

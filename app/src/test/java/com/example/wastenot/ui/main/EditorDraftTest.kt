@@ -31,12 +31,14 @@ class EditorDraftTest {
     @Test fun methodCorrectionRetainsInitialAiReferenceButCategoryAndReduceRequireExplicitManualEntry() {
         val draft = aiDraft()
         val source = draft.values.aiProvenance
+        assertNull(draft.manualConversionReason)
         draft.change(EditorField.METHOD, draft.values.copy(method = DisposalMethod.TRASH))
         assertEquals(source, draft.validate(today)!!.aiProvenance)
         draft.change(EditorField.CATEGORY, draft.values.copy(category = WasteCategory.METAL))
         assertNull(draft.validate(today))
         assertTrue(EditorField.CATEGORY in draft.errors)
         assertEquals(source, draft.values.aiProvenance)
+        assertEquals(com.example.wastenot.R.string.ai_category_changed, draft.manualConversionReason)
         draft.change(EditorField.METHOD, draft.values.copy(method = DisposalMethod.REDUCE))
         assertNull(draft.validate(today))
         assertTrue(EditorField.METHOD in draft.errors)
@@ -52,8 +54,13 @@ class EditorDraftTest {
             draft.submissionFailed(error)
             assertFalse(draft.locked)
             assertNotNull(draft.values.aiProvenance)
+            assertEquals(com.example.wastenot.R.string.ai_reference_rejected, draft.manualConversionReason)
+            draft.change(EditorField.NOTES, draft.values.copy(notes = "Koreksi catatan"))
+            val restored = EditorDraft.fromSnapshot(draft.snapshot())
+            assertEquals(com.example.wastenot.R.string.ai_reference_rejected, restored.manualConversionReason)
             draft.useManualEntry()
             assertNull(draft.prepareSubmission(today)!!.aiProvenance)
+            assertNull(draft.manualConversionReason)
         }
     }
 

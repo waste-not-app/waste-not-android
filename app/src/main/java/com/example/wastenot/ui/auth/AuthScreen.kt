@@ -73,6 +73,8 @@ fun AuthScreen(
     logoutState: LogoutUiState = LogoutUiState.None,
     onRetryCleanup: () -> Unit = {},
     onBack: (() -> Unit)? = null,
+    onPasswordRecovery: (() -> Unit)? = null,
+    onPrivacy: (() -> Unit)? = null,
 ) {
     val focus = LocalFocusManager.current
     val view = LocalView.current
@@ -147,8 +149,16 @@ fun AuthScreen(
                 Text(stringResource(if (register) R.string.register_description else R.string.login_description),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            if (logoutState == LogoutUiState.None && state.failure == null && reason !in setOf(SignOutReason.NONE, SignOutReason.LOGOUT_CONFIRMED, SignOutReason.LOGOUT_LOCAL_ONLY)) {
+            if (logoutState == LogoutUiState.None && state.failure == null && reason !in setOf(
+                    SignOutReason.NONE, SignOutReason.LOGOUT_CONFIRMED, SignOutReason.LOGOUT_LOCAL_ONLY,
+                    SignOutReason.ACCOUNT_DELETED, SignOutReason.ACCOUNT_DELETION_PENDING, SignOutReason.DELETION_CLEANUP_FAILED)) {
                 MessageBanner(stringResource(R.string.session_expired_message))
+            }
+            when (reason) {
+                SignOutReason.ACCOUNT_DELETED -> MessageBanner(stringResource(R.string.delete_account_success))
+                SignOutReason.ACCOUNT_DELETION_PENDING -> MessageBanner(stringResource(R.string.delete_account_cleanup_pending))
+                SignOutReason.DELETION_CLEANUP_FAILED -> MessageBanner(stringResource(R.string.delete_account_local_cleanup_failed), isError = true)
+                else -> Unit
             }
             when (logoutState) {
                 LogoutUiState.None -> Unit
@@ -203,8 +213,13 @@ fun AuthScreen(
                     AuthSubmit(register, state.submitting, onSubmit, Modifier.fillMaxWidth())
                 }
             }
+            if (!register && onPasswordRecovery != null) TextActionButton(
+                stringResource(R.string.password_recovery_open), onPasswordRecovery,
+                Modifier.fillMaxWidth(), enabled = !state.submitting,
+            )
             TextActionButton(stringResource(if (register) R.string.go_to_login else R.string.go_to_register),
                 onSwitchForm, Modifier.fillMaxWidth(), enabled = !state.submitting)
+            if (onPrivacy != null) TextActionButton(stringResource(R.string.privacy_policy_open), onPrivacy, Modifier.fillMaxWidth())
         }
     }
 }

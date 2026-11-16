@@ -30,7 +30,7 @@ import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
-class CoreRepository(private val network: WasteNotNetwork?, private val session: SessionRepository? = null) {
+class CoreRepository(private val network: WasteNotNetwork?, private val session: SessionRepository? = null) : AchievementStore {
     suspend fun guides(query: String, category: WasteCategory? = null, cursor: String? = null): ApiResult<List<WasteGuide>> {
         val search = query.trim()
         if (search.codePointCount(0, search.length) > 100 || cursor?.isBlank() == true) return invalidRequest()
@@ -79,7 +79,7 @@ class CoreRepository(private val network: WasteNotNetwork?, private val session:
         network?.executor?.execute({ it.toModel() }) { network.api.metadata(credential) } ?: notConfigured()
     }
 
-    suspend fun achievements(): ApiResult<List<Achievement>> = protected { credential ->
+    override suspend fun achievements(): ApiResult<List<Achievement>> = protected { credential ->
         network?.executor?.executeWithStatus({ dtos, status ->
             require(status == 200)
             dtos.map { it.toModel() }

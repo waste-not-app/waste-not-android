@@ -35,6 +35,8 @@ data class ActivityCreation(val log: WasteLog, val created: Boolean)
 interface ActivityStore {
     val referenceDate: LocalDate?
     val changes: Flow<Unit> get() = emptyFlow()
+    /** Durable, account-scoped revision changed only after a server mutation acknowledgement. */
+    val synchronizationAcknowledgements: Flow<String> get() = emptyFlow()
     val pending: Flow<List<SyncIssue>> get() = emptyFlow()
     val historyReady: Flow<Boolean> get() = kotlinx.coroutines.flow.flowOf(true)
     fun requestSync() = Unit

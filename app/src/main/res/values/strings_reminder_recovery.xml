@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="reminder_settings_unavailable">Pengaturan notifikasi tidak dapat dibuka. Buka Pengaturan perangkat, pilih WasteNot, lalu izinkan notifikasi.</string>
+</resources>

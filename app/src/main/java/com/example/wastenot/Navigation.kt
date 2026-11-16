@@ -44,6 +44,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.wastenot.data.repository.AccountSession
+import com.example.wastenot.data.repository.AccountManagement
 import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.data.repository.AiRepository
 import com.example.wastenot.data.repository.GuideStore
@@ -55,6 +56,10 @@ import com.example.wastenot.ui.auth.AuthScreen
 import com.example.wastenot.ui.auth.SessionViewModel
 import com.example.wastenot.ui.auth.OnboardingScreen
 import com.example.wastenot.ui.auth.StartupScreen
+import com.example.wastenot.ui.auth.PasswordRecoveryViewModel
+import com.example.wastenot.ui.auth.PasswordRecoveryState
+import com.example.wastenot.ui.auth.PasswordRecoveryScreen
+import com.example.wastenot.ui.components.rememberPrivacyPolicyAction
 import com.example.wastenot.ui.main.AccountNavigation
 import com.github.skydoves.navgraph.annotations.NavGraphRoot
 
@@ -76,6 +81,7 @@ fun MainNavigation(
     reminderScheduler: ReminderScheduler? = null,
     showOnboarding: Boolean = false,
     onCompleteOnboarding: () -> Unit = {},
+    accountManagement: AccountManagement? = null,
 ) {
     val factory = remember(accountSession) { viewModelFactory { initializer { SessionViewModel(accountSession) } } }
     val model: SessionViewModel = viewModel(factory = factory)
@@ -124,7 +130,7 @@ fun MainNavigation(
             }
             entry<AuthRoot> {
                 val phase = session.phase as? SessionState.SignedOut
-                if (phase != null) AuthNavigation(model, phase, { choosingTheme = true }, showOnboarding, onCompleteOnboarding)
+                if (phase != null) AuthNavigation(model, phase, { choosingTheme = true }, showOnboarding, onCompleteOnboarding, accountManagement)
             }
             entry<AccountRoot> { key ->
                 val phase = session.phase as? SessionState.Authenticated
@@ -136,7 +142,8 @@ fun MainNavigation(
                         onPhotoReviewChanged = { reviewing -> setPhotoReviewOwner(phase.user.id.takeIf { reviewing }) },
                         coreRepository = coreRepository,
                         reminderStore = reminderStore,
-                        reminderScheduler = reminderScheduler)
+                        reminderScheduler = reminderScheduler,
+                        accountManagement = accountManagement)
                     }
             }
         },
@@ -154,11 +161,23 @@ private fun AuthNavigation(
     onTheme: () -> Unit,
     showOnboarding: Boolean = false,
     onCompleteOnboarding: () -> Unit = {},
+    accountManagement: AccountManagement? = null,
 ) {
     val stack = rememberNavBackStack(if (showOnboarding) Onboarding else Login)
     val form by model.auth.collectAsStateWithLifecycle()
     val logout by model.logoutState.collectAsStateWithLifecycle()
-    fun back() { model.cancelSubmission(); if (stack.size > 1) stack.removeLastOrNull() }
+    val openPrivacy = rememberPrivacyPolicyAction()
+    val recoveryFactory = remember(accountManagement) {
+        accountManagement?.let { accounts -> viewModelFactory { initializer { PasswordRecoveryViewModel(accounts) } } }
+    }
+    val recoveryModel: PasswordRecoveryViewModel? = recoveryFactory?.let { viewModel(factory = it) }
+    val recoveryState = recoveryModel?.state?.collectAsStateWithLifecycle()?.value ?: remember { PasswordRecoveryState() }
+    fun back() {
+        if (stack.lastOrNull() == PasswordRecovery && recoveryState.submitting) return
+        model.cancelSubmission()
+        if (stack.lastOrNull() == PasswordRecovery) recoveryModel?.requestAnother()
+        if (stack.size > 1) stack.removeLastOrNull()
+    }
     fun finishOnboarding(register: Boolean) {
         onCompleteOnboarding()
         stack.clear()
@@ -193,11 +212,21 @@ private fun AuthNavigation(
                 entry<Login> {
                     AuthScreen(false, form, phase.reason, model::change, { model.submit(false) },
                         { model.clearPasswords(); if (stack.last() != Register) stack.add(Register) },
-                        onTheme, Modifier.fillMaxSize(), logout, model::logout)
+                        onTheme, Modifier.fillMaxSize(), logout, model::logout,
+                        onPasswordRecovery = recoveryModel?.let { recovery -> ({
+                            model.clearPasswords()
+                            recovery.requestAnother()
+                            if (stack.lastOrNull() != PasswordRecovery) stack.add(PasswordRecovery)
+                        }) },
+                        onPrivacy = openPrivacy)
                 }
                 entry<Register> {
                     AuthScreen(true, form, phase.reason, model::change, { model.submit(true) }, ::back,
-                        onTheme, Modifier.fillMaxSize(), logout, model::logout, onBack = ::back)
+                        onTheme, Modifier.fillMaxSize(), logout, model::logout, onBack = ::back, onPrivacy = openPrivacy)
+                }
+                if (recoveryModel != null) entry<PasswordRecovery> {
+                    PasswordRecoveryScreen(recoveryState, recoveryModel::change, recoveryModel::submit,
+                        recoveryModel::requestAnother, recoveryModel::useExistingCode, ::back, Modifier.fillMaxSize())
                 }
             },
         )

@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,9 +46,16 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.wastenot.R
 import com.example.wastenot.ReminderSettings
 import com.example.wastenot.data.local.ReminderSetting
+import com.example.wastenot.data.local.ReminderPermissionPreferences
+import com.example.wastenot.data.local.ReminderPermissionAction
+import com.example.wastenot.data.local.reminderPermissionAction
 import com.example.wastenot.theme.WasteNotTheme
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
@@ -71,8 +79,41 @@ fun ReminderSettingsScreen(
     var hour by rememberSaveable(setting) { mutableIntStateOf(setting.hour) }
     var minute by rememberSaveable(setting) { mutableIntStateOf(setting.minute) }
     var pickingTime by rememberSaveable { mutableStateOf(false) }
-    var permissionDenied by rememberSaveable { mutableStateOf(false) }
+    val permissionPreferences = remember(context) { ReminderPermissionPreferences(context) }
+    var permissionDenied by rememberSaveable { mutableStateOf(permissionPreferences.denied) }
+    var pendingEnable by rememberSaveable { mutableStateOf(false) }
+    var settingsFailed by remember { mutableStateOf(false) }
     var savedMessage by remember { mutableStateOf<String?>(null) }
+
+    fun notificationsAllowed(): Boolean = NotificationManagerCompat.from(context).areNotificationsEnabled() &&
+        (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
+
+    fun openNotificationSettings() {
+        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        settingsFailed = runCatching { context.startActivity(intent) }.isFailure
+    }
+
+    val reconcilePermission by rememberUpdatedState {
+        if (notificationsAllowed()) {
+            if (permissionPreferences.denied) permissionPreferences.recordResult(granted = true)
+            permissionDenied = false
+            if (pendingEnable) enabled = true
+            pendingEnable = false
+            settingsFailed = false
+        } else {
+            permissionDenied = permissionPreferences.denied || enabled
+        }
+    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner, permissionPreferences) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            reconcilePermission()
+        }
+    }
 
     LaunchedEffect(setting) {
         enabled = setting.enabled
@@ -83,6 +124,8 @@ fun ReminderSettingsScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
+        permissionPreferences.recordResult(granted)
+        pendingEnable = false
         if (granted) {
             permissionDenied = false
             enabled = true
@@ -144,15 +187,26 @@ fun ReminderSettingsScreen(
                         savedMessage = null
                         if (!checked) {
                             enabled = false
-                            permissionDenied = false
-                        } else if (
-                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-                        ) {
-                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        } else {
-                            permissionDenied = false
-                            enabled = true
+                            pendingEnable = false
+                        } else when (reminderPermissionAction(
+                            notificationsAllowed = notificationsAllowed(),
+                            deniedBefore = permissionPreferences.denied,
+                            runtimePermissionRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
+                        )) {
+                            ReminderPermissionAction.ENABLE -> {
+                                permissionPreferences.recordResult(granted = true)
+                                permissionDenied = false
+                                enabled = true
+                            }
+                            ReminderPermissionAction.SETTINGS -> {
+                                permissionDenied = true
+                                pendingEnable = true
+                                openNotificationSettings()
+                            }
+                            ReminderPermissionAction.REQUEST -> {
+                                pendingEnable = true
+                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
                         }
                     },
                 )
@@ -163,15 +217,12 @@ fun ReminderSettingsScreen(
             MessageBanner(stringResource(R.string.reminder_permission_denied), isError = true)
             SecondaryActionButton(
                 label = stringResource(R.string.reminder_open_settings),
-                onClick = {
-                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                    runCatching { context.startActivity(intent) }
-                },
+                onClick = ::openNotificationSettings,
                 modifier = Modifier.fillMaxWidth(),
             )
+        }
+        if (settingsFailed) {
+            MessageBanner(stringResource(R.string.reminder_settings_unavailable), isError = true)
         }
 
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {

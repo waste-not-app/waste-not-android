@@ -73,9 +73,14 @@ class ScanPhotoCache(private val directory: File, owner: String, private val sch
         directory.listFiles()?.filter { it.isFile && now - it.lastModified() >= TimeUnit.HOURS.toMillis(1) }?.forEach { it.delete() }
     }
 
-    fun removeOwnerPhotos() {
-        directory.listFiles()?.filter { it.isFile && it.name.startsWith(prefix) && it.name.endsWith(".jpg") }
-            ?.forEach { it.delete() }
+    fun removeOwnerPhotos(): Boolean {
+        val files = directory.listFiles() ?: return !directory.exists()
+        var cleared = true
+        for (file in files) {
+            if (file.isFile && file.name.startsWith(prefix) && file.name.endsWith(".jpg") &&
+                !file.delete() && file.exists()) cleared = false
+        }
+        return cleared
     }
 
     companion object {

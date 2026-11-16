@@ -13,6 +13,7 @@ import com.example.wastenot.data.network.dto.RefreshDto
 import com.example.wastenot.data.network.dto.RegisterDto
 import com.example.wastenot.data.network.dto.SessionTokens
 import com.example.wastenot.model.User
+import com.example.wastenot.data.network.dto.DeleteAccountDto
 import com.example.wastenot.model.normalizeAccountEmail
 import java.io.IOException
 import java.time.ZoneId
@@ -147,6 +148,34 @@ class SessionRepository(
             }
             if (revoked && localCleared) setState(operation.epoch, SessionState.SignedOut(SignOutReason.LOGOUT_CONFIRMED))
             LogoutResult(localCleared, revoked)
+        }
+    }
+
+    suspend fun deleteAccount(password: String, clearDeletedAccount: suspend (String) -> Unit): ApiResult<Unit> {
+        val account = state.value as? SessionState.Authenticated ?: return failure(ApiFailureKind.UNAUTHENTICATED)
+        if (account.offline) return failure(ApiFailureKind.NETWORK)
+        val connection = network ?: return failure(ApiFailureKind.NOT_CONFIGURED)
+        val result = authenticated { credential ->
+            connection.executor.executeEmpty { connection.api.deleteAccount(DeleteAccountDto(password), credential) }
+        }
+        val cleanupPending = result is ApiResult.Failure && result.error.code == "ACCOUNT_DELETION_PENDING"
+        if (result is ApiResult.Failure && !cleanupPending) return result
+        val caller = currentCoroutineContext()[Job] ?: error("Account deletion needs a caller job.")
+        return withContext(NonCancellable) {
+            val reason = if (cleanupPending) SignOutReason.ACCOUNT_DELETION_PENDING else SignOutReason.ACCOUNT_DELETED
+            val operation = transition(SessionState.SignedOut(reason),
+                caller, expected = account.epoch, trackCaller = false)
+            val wiped = operation?.let { wipe(it.epoch, it.previous) } ?: true
+            val purged = try {
+                clearDeletedAccount(account.user.id)
+                true
+            } catch (_: IOException) {
+                false
+            }
+            if (!wiped || !purged) {
+                operation?.let { setState(it.epoch, SessionState.SignedOut(SignOutReason.DELETION_CLEANUP_FAILED)) }
+                failure(ApiFailureKind.STORAGE)
+            } else if (cleanupPending) result else ApiResult.Success(Unit)
         }
     }
 
