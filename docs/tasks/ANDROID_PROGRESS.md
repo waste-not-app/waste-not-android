@@ -24,6 +24,7 @@ Perubahan untuk Android 1.0.4 (versionCode 3), terpisah dari snapshot checklist 
 - Pemulihan kata sandi memakai kode rahasia sekali pakai 15 menit, tanpa token di URL atau respons HTTP. Isian rahasia tidak masuk SavedStateHandle. Layanan email yang belum tersedia tetap error, bukan pesan email berhasil dikirim.
 - Pengaturan dan layar autentikasi membuka [kebijakan privasi publik](https://waste-not.bccdev.id/privacy/). Landing PR #3 dan CD `43777050967` lulus; browser publik menampilkan dokumen kebijakan yang benar.
 - Daftar titik pengumpulan berisi tiga lokasi e-waste Jakarta berdasarkan sumber pemerintah, dengan tanggal pemeriksaan sumber dan batas penerimaan. Ini bukan cakupan nasional, inspeksi lokasi, atau klaim fasilitas masih menerima semua material. Pencarian Maps tidak meminta izin lokasi.
+- Seluruh 16 Panduan disetujui peninjau Alberd pada 16 November 2026. Bundle mencatat peninjau/tanggal sebenarnya dan status PUBLISHED; CD backend mengimpor artikel secara transaksional sesudah migrasi. Provenance dan aturan review ulang berada pada `waste-not-backend/guides/README.md`.
 
 Verifikasi host terarah: `OfflineActivityStoreTest`, `SummariesViewModelTest`, `AchievementsViewModelTest`, `EditorDraftTest`, `AccountManagementTest`, dan `AccountManagementViewModelTest` lulus; source instrumentation berhasil dikompilasi. Dua regresi UI Robolectric memastikan pemulihan izin tidak menjadi opt-in tanpa gesture dan tidak menyimpan otomatis. Empat smoke render native memeriksa pemulihan akun, konfirmasi hapus, serta daftar-ke-detail titik pengumpulan pada lebar 320 dp, termasuk gelap/font 200%; harness sementara sudah dihapus.
 
@@ -31,8 +32,7 @@ CI menemukan timeout pada gate HTTP di regresi respons achievement tertunda; men
 
 Belum dianggap selesai:
 
-- SMTP produksi belum dikonfigurasi. Kunci konfigurasi tidak ada di runtime maupun nama secret/variable repository backend; pengiriman email nyata belum dapat dibuktikan.
-- Enam belas Panduan sudah diperiksa terhadap sumber dan diperbaiki, tetapi tetap DRAFT. Publikasi menunggu penanggung jawab konten yang benar-benar meninjau, menyetujui, dan mencatat identitas/tanggal review; nama pemilik repository tidak dipakai sebagai persetujuan rekaan.
+- SMTP produksi belum memiliki kredensial pengirim. File privat `/home/dev/wastenot-smtp.env` sudah disiapkan dengan mode 0600 dan dimuat oleh CD sebagai overlay. `SMTP_PORT=587`; `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`, dan `SMTP_FROM` masih harus diisi operator. Pengiriman email nyata belum dapat dibuktikan.
 - Penerimaan kamera, Photo Picker, notifikasi sistem, TalkBack, dan perjalanan menyeluruh di ponsel fisik belum dijalankan. Emulator tidak diakses; pemeriksaan perangkat menunggu permintaan pemilik.
 - Angka checklist GitHub di atas tidak dihitung ulang sebagai persentase kesiapan rilis. Bukti per checkpoint tidak otomatis menutup seluruh issue awal.
 
