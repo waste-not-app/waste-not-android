@@ -27,7 +27,7 @@ Perubahan untuk Android 1.0.4 (versionCode 3), terpisah dari snapshot checklist 
 
 Verifikasi host terarah: `OfflineActivityStoreTest`, `SummariesViewModelTest`, `AchievementsViewModelTest`, `EditorDraftTest`, `AccountManagementTest`, dan `AccountManagementViewModelTest` lulus; source instrumentation berhasil dikompilasi. Dua regresi UI Robolectric memastikan pemulihan izin tidak menjadi opt-in tanpa gesture dan tidak menyimpan otomatis. Empat smoke render native memeriksa pemulihan akun, konfirmasi hapus, serta daftar-ke-detail titik pengumpulan pada lebar 320 dp, termasuk gelap/font 200%; harness sementara sudah dihapus.
 
-CI awal menemukan timeout pada regresi respons achievement tertunda. Tes tersebut kini menjalankan state holder pada `StandardTestDispatcher` terserialisasi, seperti main thread Android; penantian HTTP nyata tetap memakai deadline nyata di `Dispatchers.Default`. Tidak ada kenaikan timeout atau penghapusan assertion. Tiga tes achievement terarah lulus setelah perubahan scheduler.
+CI menemukan timeout pada gate HTTP di regresi respons achievement tertunda; mengganti scheduler saja belum menyelesaikannya di runner. Urutan respons kini diuji melalui `AchievementStore` yang dipakai state holder dan diimplementasikan langsung oleh CoreRepository, mengikuti pola Store yang sudah ada tanpa adapter tambahan. Respons lama sengaja tetap selesai setelah dibatalkan dan sesudah respons baru, lalu state akhir diperiksa tetap terbaru. Tes HTTP error/refresh dan acknowledgement tetap memakai transport nyata; tidak ada kenaikan timeout.
 
 Belum dianggap selesai:
 

@@ -6,6 +6,10 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.wastenot.data.network.ApiFailureKind
+import com.example.wastenot.data.network.ApiResult
+import com.example.wastenot.data.repository.AchievementStore
+import com.example.wastenot.model.Achievement
+import java.time.Instant
 import com.example.wastenot.data.network.WasteNotNetwork
 import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.model.AchievementRequirement
@@ -21,11 +25,9 @@ import okhttp3.mockwebserver.MockWebServer
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -42,8 +44,8 @@ class AchievementsViewModelTest {
     private val acknowledgements = MutableSharedFlow<String>(replay = 1)
     private val owner = object : ViewModelStoreOwner { override val viewModelStore = ViewModelStore() }
 
-    private fun createModel() = ViewModelProvider.create(owner, viewModelFactory { initializer {
-        AchievementsViewModel(CoreRepository(network), acknowledgements)
+    private fun createModel(store: AchievementStore = CoreRepository(network)) = ViewModelProvider.create(owner, viewModelFactory { initializer {
+        AchievementsViewModel(store, acknowledgements)
     } })[AchievementsViewModel::class]
 
     private fun achievementResponse(current: Int) = MockResponse().setResponseCode(200).setBody(
@@ -143,29 +145,46 @@ class AchievementsViewModelTest {
 
     @Test
     fun acknowledgementDuringAnOlderRequestCannotBeOverwrittenByItsDelayedResponse() = runTest(mainDispatcher) {
-        val firstStarted = CompletableDeferred<Unit>()
-        val releaseFirst = CountDownLatch(1)
-        val calls = AtomicInteger()
-        server.dispatcher = object : okhttp3.mockwebserver.Dispatcher() {
-            override fun dispatch(request: okhttp3.mockwebserver.RecordedRequest): MockResponse {
-                return if (calls.incrementAndGet() == 1) {
-                    firstStarted.complete(Unit)
-                    check(releaseFirst.await(5, TimeUnit.SECONDS))
-                    achievementResponse(0)
-                } else achievementResponse(1)
+        val firstResponse = CompletableDeferred<Achievement>()
+        var firstFinished = false
+        var calls = 0
+        val latest = Achievement(
+            id = "00000000-0000-4000-8000-000000000101",
+            code = "FIRST_STEP", title = "Langkah pertama", description = "Catat minimal 1 aktivitas.",
+            requirementType = AchievementRequirement.ACTIVE_LOG_COUNT,
+            currentValue = 1, targetValue = 1, isUnlocked = true,
+            unlockedAt = Instant.parse("2026-11-13T07:00:00Z"),
+        )
+        val store = object : AchievementStore {
+            override suspend fun achievements(): ApiResult<List<Achievement>> {
+                calls++
+                return if (calls == 1) withContext(NonCancellable) {
+                    val response = firstResponse.await()
+                    firstFinished = true
+                    ApiResult.Success(listOf(response))
+                } else ApiResult.Success(listOf(latest))
             }
         }
+        owner.viewModelStore.clear()
+        viewModel = createModel(store)
         try {
             viewModel.load()
-            withContext(Dispatchers.Default) { withTimeout(5_000) { firstStarted.await() } }
+            runCurrent()
+            assertEquals(1, calls)
             acknowledgements.emit("acknowledged-update")
-            val current = awaitState { !it.loading && it.items?.single()?.currentValue == 1L }
-            releaseFirst.countDown()
-            assertEquals(1L, current.items!!.single().currentValue)
-            assertEquals(2, calls.get())
-            assertNull(current.error)
+            runCurrent()
+            assertEquals(1L, viewModel.state.value.items!!.single().currentValue)
+            assertFalse(viewModel.state.value.loading)
+            firstResponse.complete(latest.copy(currentValue = 0, isUnlocked = false, unlockedAt = null))
+            runCurrent()
+            assertEquals(true, firstFinished)
+            assertEquals(2, calls)
+            assertEquals(1L, viewModel.state.value.items!!.single().currentValue)
+            assertFalse(viewModel.state.value.loading)
+            assertNull(viewModel.state.value.error)
         } finally {
-            releaseFirst.countDown()
+            firstResponse.cancel()
+            runCurrent()
         }
     }
 }

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
-import com.example.wastenot.data.repository.CoreRepository
+import com.example.wastenot.data.repository.AchievementStore
 import com.example.wastenot.model.Achievement
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -24,7 +24,7 @@ data class AchievementsUiState(
 )
 
 class AchievementsViewModel(
-    private val core: CoreRepository,
+    private val store: AchievementStore,
     synchronizationAcknowledgements: Flow<String>,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(AchievementsUiState())
@@ -49,7 +49,7 @@ class AchievementsViewModel(
         loadingJob = viewModelScope.launch {
             mutableState.update { it.copy(loading = true, error = null) }
             try {
-                val result = core.achievements()
+                val result = store.achievements()
                 currentCoroutineContext().ensureActive()
                 when (result) {
                     is ApiResult.Success -> if (generation == currentGen) {
