@@ -28,9 +28,15 @@ import com.example.wastenot.ui.components.BrandWordmark
 @Composable
 internal fun StartupScreen(error: Boolean, onRetry: () -> Unit, onLoginAgain: () -> Unit, modifier: Modifier = Modifier) {
     Box(modifier.background(LocalWasteNotGradients.current.canvas).safeDrawingPadding(), contentAlignment = Alignment.TopCenter) {
-        Column(Modifier.widthIn(max = 560.dp).fillMaxWidth().verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp).padding(top = 88.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        Column(
+            Modifier
+                .widthIn(max = 560.dp)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
+                .padding(top = 32.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+        ) {
             BrandWordmark(Modifier.align(Alignment.CenterHorizontally))
             Column(Modifier.align(Alignment.CenterHorizontally).widthIn(max = 400.dp).fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 32.dp), horizontalAlignment = Alignment.CenterHorizontally,

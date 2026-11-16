@@ -14,6 +14,16 @@ Ada 52 issue Android; delapan memiliki checklist awal tercentang seluruhnya. Sel
 
 Persentase dihitung dari checkbox pada bagian backlog awal, sebelum marker `wastenot-backlog`. Riwayat komentar/progres tidak dihitung ulang. Angka ini menunjukkan status checklist yang tercatat; setiap klaim selesai tetap memerlukan bukti sesuai lingkupnya. Persentase kesiapan rilis belum ditetapkan. Kriteria tambahan dari audit desain atau kontrak backend/AI harus dicatat dan denominator diperbarui ketika cakupannya berubah.
 
+## Audit UI liquid glass 16 November 2026
+
+Android 1.0.5 (versionCode 4) mempertahankan logo W, pinus/krem/lime dan Plus Jakarta Sans. Glass dibatasi pada dock/header dengan fallback opak; form, pesan dan dialog tetap solid. Header tumbuh mengikuti teks; dock font besar dapat digulir satu baris agar tidak mengambil mayoritas ruang baca.
+
+Audit sumber mencakup seluruh keluarga layar. Perbaikan meliputi label aksi, edge field/kontras, onboarding, auth/akun, reminder/tema, riwayat/panduan, statistik/pencapaian, detail, sinkronisasi, scan dan dialog. Render nyata menemukan kalender terpotong pada 320 dp/font 200%; mode input tanggal menggantikannya pada ruang sempit/font besar.
+
+Verifikasi host: 129 state/surface × tiga viewport × dua tema, 1.002 PNG termasuk dialog; lima regresi UI, dua kontrak kontras, dan dua regresi pemulihan izin. Build debug, lint dan kompilasi instrumentation lulus. Capture memakai native graphics/View.draw, bukan bukti blur GPU atau perjalanan di ponsel. Fixture gallery sementara sudah dihapus.
+
+[Temuan, alasan desain, bukti terpilih dan batas verifikasi](../qa/iteration-2/LIQUID_GLASS_AUDIT.md). SMTP tetap ditunda atas permintaan pemilik; kamera/Photo Picker, keyboard sistem, TalkBack, insets perangkat dan performa blur menunggu pemeriksaan ponsel fisik.
+
 ## Audit lanjutan 16 November 2026
 
 Perubahan untuk Android 1.0.4 (versionCode 3), terpisah dari snapshot checklist historis di atas:

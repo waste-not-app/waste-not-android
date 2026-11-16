@@ -14,10 +14,10 @@ import com.example.wastenot.data.repository.AccountManagement
 import com.example.wastenot.model.Metadata
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
-import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import com.example.wastenot.ui.components.ambientCanvasBackground
@@ -76,6 +76,11 @@ import com.example.wastenot.ui.auth.AccountDeletionState
 import com.example.wastenot.ui.auth.AccountDeletionScreen
 import com.example.wastenot.ui.components.rememberPrivacyPolicyAction
 import com.example.wastenot.ui.components.IconActionButton
+import com.example.wastenot.ui.components.GlassChromeSurface
+import com.example.wastenot.ui.components.focusOutline
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import kotlin.math.roundToInt
 import java.time.Clock
 import java.time.LocalDate
 import java.util.UUID
@@ -654,7 +659,7 @@ fun AccountNavigation(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AccountPage(
+internal fun AccountPage(
     route: NavKey,
     tab: MainTab,
     rail: Boolean,
@@ -664,20 +669,24 @@ private fun AccountPage(
     onSelect: (MainTab) -> Unit,
     onRecord: () -> Unit,
     onFilter: () -> Unit,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val hazeState = rememberHazeState()
     val tokens = LocalWasteNotSurfaceTokens.current
-    val glassStyle = HazeStyle(
-        backgroundColor = MaterialTheme.colorScheme.surface,
-        tint = HazeTint(tokens.glassTintStrong),
-        blurRadius = 26.dp,
-        noiseFactor = 0f,
-        fallbackTint = HazeTint(tokens.glassTintStrong),
-    )
+    val colors = MaterialTheme.colorScheme
+    val glassStyle = remember(tokens, colors.surface) {
+        HazeStyle(
+            backgroundColor = colors.surface,
+            tint = HazeTint(tokens.glassTintStrong),
+            blurRadius = 22.dp,
+            noiseFactor = 0f,
+            fallbackTint = HazeTint(colors.surface),
+        )
+    }
     val headerShape = androidx.compose.foundation.shape.RoundedCornerShape(22.dp)
-    // Each fading entry keeps its own chrome so the outgoing list cannot resize and clamp its scroll.
-    Box(Modifier.fillMaxSize()) {
+    // Each fading entry owns its chrome so an outgoing list keeps its scroll constraints.
+    Box(modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().ambientCanvasBackground().hazeSource(hazeState, zIndex = 0f))
         Row(Modifier.fillMaxSize()) {
             if (rail && route !is LogEditor) TabRail(tab, onSelect, onRecord, Modifier.width(railWidth).fillMaxHeight())
@@ -686,19 +695,26 @@ private fun AccountPage(
                 containerColor = Color.Transparent,
                 topBar = {
                     if (route != Home) {
-                        Surface(
+                        GlassChromeSurface(
+                            hazeState = hazeState,
+                            style = glassStyle,
+                            shape = headerShape,
                             modifier = Modifier
                                 .statusBarsPadding()
                                 .padding(horizontal = 16.dp, vertical = 6.dp)
-                                .fillMaxWidth()
-                                .clip(headerShape)
-                                .hazeEffect(state = hazeState, style = glassStyle),
-                            shape = headerShape,
-                            color = Color.Transparent,
-                            border = androidx.compose.foundation.BorderStroke(1.dp, tokens.glassEdge),
+                                .fillMaxWidth(),
                         ) {
-                        TopAppBar(
-                            title = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(min = 64.dp)
+                                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                if (route != tab.key && !confirmation) {
+                                    IconActionButton(R.drawable.ic_back, stringResource(R.string.back), onBack)
+                                }
                                 Text(
                                     stringResource(
                                         when (route) {
@@ -713,35 +729,16 @@ private fun AccountPage(
                                             else -> tab.label
                                         },
                                     ),
+                                    modifier = Modifier.weight(1f).semantics { heading() },
                                     style = MaterialTheme.typography.titleLarge,
                                 )
-                            },
-                            windowInsets = WindowInsets(0.dp),
-                            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                            navigationIcon = {
-                                if (route != tab.key && !confirmation) {
-                                    IconActionButton(
-                                        R.drawable.ic_back,
-                                        stringResource(R.string.back),
-                                        onBack,
-                                        Modifier.padding(start = 8.dp),
-                                    )
-                                }
-                            },
-                            actions = {
                                 if (route == History) {
-                                    IconActionButton(
-                                        R.drawable.ic_filter,
-                                        stringResource(R.string.filter_history),
-                                        onFilter,
-                                        Modifier.padding(end = 8.dp),
-                                    )
+                                    IconActionButton(R.drawable.ic_filter, stringResource(R.string.filter_history), onFilter)
                                 }
-                            },
-                        )
+                            }
+                        }
                     }
-                }
-            },
+                },
                 bottomBar = { if (!rail && route == tab.key) TabDock(tab, onSelect, onRecord, hazeState, glassStyle) },
             ) { padding ->
                 CompositionLocalProvider(LocalWasteNotScaffoldPadding provides padding) {
@@ -766,36 +763,38 @@ private fun TabDock(
     glassStyle: HazeStyle,
     modifier: Modifier = Modifier,
 ) {
-    val tokens = LocalWasteNotSurfaceTokens.current
     val dockShape = androidx.compose.foundation.shape.RoundedCornerShape(30.dp)
     BoxWithConstraints(modifier.navigationBarsPadding().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
         val measurer = rememberTextMeasurer()
-        val style = MaterialTheme.typography.labelMedium
+        val density = LocalDensity.current
+        val labelStyle = MaterialTheme.typography.labelMedium
         val labels = MainTab.entries.map { stringResource(it.label) }
-        val widest = with(LocalDensity.current) {
-            labels.maxOf { measurer.measure(it, style = style, softWrap = false).size.width }.toDp()
+        val widest = with(density) {
+            labels.maxOf { measurer.measure(it, style = labelStyle, softWrap = false).size.width }.toDp()
         }
-        // Reflow whole labels when larger text needs more room than five columns provide.
-        val columns = listOf(5, 3, 2, 1).firstOrNull {
-            val cellWidth = (maxWidth - 4.dp) / it
-            cellWidth >= 48.dp && widest + 8.dp <= cellWidth
-        } ?: 1
-        Surface(
+        val cellWidth = maxOf((maxWidth - 8.dp) / MainTab.entries.size, widest + 8.dp, 48.dp)
+        val scroll = rememberScrollState()
+        LaunchedEffect(selected, cellWidth) {
+            scroll.scrollTo(with(density) { (selected.ordinal * cellWidth.toPx()).roundToInt() })
+        }
+        GlassChromeSurface(
+            hazeState = hazeState,
+            style = glassStyle,
+            shape = dockShape,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp)
-                .clip(dockShape)
-                .hazeEffect(state = hazeState, style = glassStyle),
-            color = Color.Transparent,
-            shape = dockShape,
-            border = androidx.compose.foundation.BorderStroke(1.dp, tokens.glassEdge),
+                .padding(top = 24.dp),
         ) {
-            FlowRow(
-                modifier = Modifier.padding(top = 28.dp, bottom = 7.dp, start = 4.dp, end = 4.dp).selectableGroup(),
-                maxItemsInEachRow = columns,
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(scroll)
+                    .height(IntrinsicSize.Max)
+                    .padding(top = 28.dp, bottom = 7.dp, start = 4.dp, end = 4.dp)
+                    .selectableGroup(),
             ) {
-                MainTab.entries.forEach { tab -> TabItem(tab, tab == selected, { onSelect(tab) }, Modifier.weight(1f)) }
+                MainTab.entries.forEach { tab ->
+                    TabItem(tab, tab == selected, { onSelect(tab) }, Modifier.width(cellWidth).fillMaxHeight())
+                }
             }
         }
         RecordAction(onRecord, Modifier.align(Alignment.TopCenter))
@@ -823,13 +822,15 @@ private fun TabRail(selected: MainTab, onSelect: (MainTab) -> Unit, onRecord: ()
 private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
-    val shape = androidx.compose.foundation.shape.RoundedCornerShape(19.dp)
-    val pillShape = androidx.compose.foundation.shape.RoundedCornerShape(999.dp)
+    val shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
+    val colors = MaterialTheme.colorScheme
+    val contentColor = if (selected) colors.onTertiary else colors.onSurfaceVariant
     Column(
         modifier = modifier
             .heightIn(min = 54.dp)
-            .then(if (focused) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, shape) else Modifier)
+            .focusOutline(focused, shape, if (selected) colors.onTertiary else colors.primary, colors.surface)
             .clip(shape)
+            .then(if (selected) Modifier.background(colors.tertiary, shape) else Modifier)
             .selectable(selected, role = Role.Tab, onClick = onClick,
                 interactionSource = interactions, indication = LocalIndication.current)
             .padding(horizontal = 2.dp, vertical = 4.dp),
@@ -837,18 +838,14 @@ private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifi
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Box(
-            Modifier.size(width = 48.dp, height = 28.dp)
-                .then(
-                    if (selected) Modifier.background(MaterialTheme.colorScheme.primaryContainer, pillShape)
-                    else Modifier,
-                ),
+            Modifier.size(width = 48.dp, height = 28.dp),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 painterResource(tab.icon),
                 null,
                 Modifier.size(20.dp),
-                tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = contentColor,
             )
         }
         Text(
@@ -857,7 +854,7 @@ private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifi
             style = MaterialTheme.typography.labelMedium,
             textAlign = TextAlign.Center,
             maxLines = 1,
-            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            color = contentColor,
         )
     }
 }

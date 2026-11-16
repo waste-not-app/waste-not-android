@@ -61,7 +61,7 @@ fun PasswordRecoveryScreen(
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 IconActionButton(R.drawable.ic_back, stringResource(R.string.back), onBack, enabled = !state.submitting)
                 Text(stringResource(R.string.password_recovery_title), style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.semantics { heading() })
+                    modifier = Modifier.weight(1f).semantics { heading() })
             }
             when (state.phase) {
                 RecoveryPhase.REQUEST -> {

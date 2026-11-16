@@ -10,8 +10,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalInputModeManager
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -29,11 +39,20 @@ import com.example.wastenot.ui.components.labelResource
 internal fun EditConflictDialog(draft: EditorValues, read: ConflictReadState?, onDismiss: () -> Unit,
     onLoad: () -> Unit, onUse: (WasteLog, Boolean) -> Unit, modifier: Modifier = Modifier) {
     val cancel = remember { FocusRequester() }
-    LaunchedEffect(Unit) { cancel.requestFocus() }
     val latest = read?.latest
     val missing = read?.error in setOf(ApiFailureKind.NOT_FOUND, ApiFailureKind.DELETED)
     BasicAlertDialog(onDismissRequest = onDismiss, modifier = modifier) {
-        Surface(Modifier.widthIn(max = 400.dp).fillMaxWidth(), shape = MaterialTheme.shapes.extraLarge,
+        val focused = LocalWindowInfo.current.isWindowFocused
+        val inputMode = LocalInputModeManager.current.inputMode
+        LaunchedEffect(focused, inputMode) {
+            if (focused && inputMode == InputMode.Keyboard) cancel.requestFocus()
+        }
+        Surface(Modifier.widthIn(max = 400.dp).fillMaxWidth().onPreviewKeyEvent {
+            if (it.key == Key.Escape) {
+                if (it.type == KeyEventType.KeyUp) onDismiss()
+                true
+            } else false
+        }, shape = MaterialTheme.shapes.extraLarge,
             color = MaterialTheme.colorScheme.surface, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline), shadowElevation = 6.dp) {
             Column(Modifier.verticalScroll(rememberScrollState()).padding(28.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Surface(shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surfaceContainer) {
@@ -49,10 +68,12 @@ internal fun EditConflictDialog(draft: EditorValues, read: ConflictReadState?, o
                     else -> R.string.conflict_preserve_message
                 }), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                 if (read?.loading == true) {
-                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                    LinearProgressIndicator(Modifier.fillMaxWidth()
+                        .semantics { liveRegion = LiveRegionMode.Polite })
                 }
                 if (read?.error != null && !missing) Text(stringResource(
                     if (read.error == ApiFailureKind.PRECONDITION_REQUIRED) R.string.conflict_latest_stale else R.string.conflict_reload_failed),
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                     color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
                 if (latest != null) {
                     ConflictValues(stringResource(R.string.conflict_latest, latest.version), EditorDraft.from(latest, latest.activityDate).values)

@@ -12,6 +12,7 @@
     <string name="sync_saved_local">Tersimpan di HP ini. Aktivitas menunggu sinkronisasi; XP diperbarui setelah server menerimanya.</string>
     <string name="sync_saved_confirmed">Catatan sudah tersinkron. Ringkasan dan XP mengikuti data server.</string>
     <string name="sync_retry">Sinkronkan saat terhubung</string>
+    <string name="sync_in_progress">Menyinkronkan aktivitas…</string>
     <string name="sync_save_manual">Simpan sebagai catatan manual</string>
     <string name="sync_confirm_decision">Konfirmasi</string>
     <string name="sync_manual_confirmation">Simpan isian ini sebagai catatan manual? Saran AI sebelumnya tidak dipakai.</string>

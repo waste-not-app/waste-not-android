@@ -112,7 +112,7 @@ fun MethodSelector(
                             Surface(
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
                                 shape = RoundedCornerShape(17.dp),
-                                color = if (selected) MaterialTheme.colorScheme.primaryContainer else tokens.glassTintStrong,
+                                color = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
                                 border = BorderStroke(
                                     if (selected) 1.5.dp else 1.dp,
                                     if (selected) MaterialTheme.colorScheme.primary else tokens.cardEdge,
@@ -135,7 +135,7 @@ fun MethodSelector(
                                             disabledSelectedColor = MaterialTheme.colorScheme.primary,
                                             disabledUnselectedColor = MaterialTheme.colorScheme.outline,
                                         ))
-                                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                         Text(stringResource(option.labelResource), style = MaterialTheme.typography.titleSmall)
                                         Text(stringResource(option.descriptionResource), style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -167,7 +167,7 @@ fun RangeSelector(days: Int, onChange: (Int) -> Unit, modifier: Modifier = Modif
             listOf(7, 30).forEach { range ->
                 val selected = days == range
                 Surface(
-                    modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 42.dp)
+                    modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 48.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .selectable(selected, role = Role.RadioButton, onClick = { onChange(range) }),
                     shape = RoundedCornerShape(10.dp),

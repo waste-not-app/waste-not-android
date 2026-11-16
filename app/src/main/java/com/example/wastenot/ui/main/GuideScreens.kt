@@ -2,6 +2,9 @@ package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.text.KeyboardActions
@@ -43,6 +48,7 @@ import com.example.wastenot.ui.components.CategoryIconBadge
 import com.example.wastenot.ui.components.GroupSectionLabel
 import com.example.wastenot.ui.components.InsetGroupCard
 import com.example.wastenot.ui.components.wasteTextFieldColors
+import com.example.wastenot.ui.components.focusOutline
 import kotlinx.coroutines.launch
 
 @Composable
@@ -69,7 +75,7 @@ fun GuideListScreen(
             contentPadding = pagePadding(padding), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             item(key = "search") {
                 val label = stringResource(R.string.guide_search)
-                InsetGroupCard(glass = true, contentPadding = true) {
+                InsetGroupCard(contentPadding = true) {
                     Text(label, style = MaterialTheme.typography.titleSmall)
                     Text(stringResource(R.string.guide_intro), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     OutlinedTextField(
@@ -170,10 +176,18 @@ private fun GuideCategory(category: WasteCategory?, onCategory: (WasteCategory?)
 
 @Composable
 private fun GuideRow(article: WasteGuide, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val rowFocus = remember { FocusRequester() }
-    Row(modifier.fillMaxWidth().focusProperties { canFocus = true }.focusRequester(rowFocus)
-        .clickable { rowFocus.requestFocus(); onClick() }.padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusedAsState()
+    Row(
+        modifier
+            .fillMaxWidth()
+            .clickable(interactionSource = interactions, indication = LocalIndication.current, role = Role.Button, onClick = onClick)
+            .heightIn(min = 48.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .focusOutline(focused, RoundedCornerShape(12.dp), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.surface),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
         CategoryIconBadge(article.category, article.category.iconResource, sizeDp = 44)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(article.name, style = MaterialTheme.typography.titleMedium)
@@ -262,15 +276,20 @@ fun GuideDetailScreen(
                 if (review == null) {
                     var showEditorial by rememberSaveable(article.id) { mutableStateOf(false) }
                     InsetGroupCard(contentPadding = true) {
-                        Row(
+                        FlowRow(
                             Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             Surface(color = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer, shape = RoundedCornerShape(999.dp)) {
                                 Text(stringResource(R.string.guide_editorial_draft), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium)
                             }
-                            TextActionButton(stringResource(R.string.editorial_details_toggle), { showEditorial = !showEditorial })
+                            val editorialState = stringResource(if (showEditorial) R.string.daily_expanded else R.string.daily_collapsed)
+                            TextActionButton(
+                                stringResource(R.string.editorial_details_toggle),
+                                { showEditorial = !showEditorial },
+                                Modifier.semantics { stateDescription = editorialState },
+                            )
                         }
                         if (showEditorial) {
                             Text(stringResource(R.string.guide_review_pending), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

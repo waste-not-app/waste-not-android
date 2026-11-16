@@ -1,6 +1,5 @@
 package com.example.wastenot.ui.main
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,7 +13,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -65,9 +64,12 @@ fun ProfileScreen(
                 val initials = user.name.split(' ').filter(String::isNotBlank).take(2)
                     .joinToString("") { String(Character.toChars(it.codePointAt(0))).uppercase(Locale.forLanguageTag("id-ID")) }
                 Box(
-                    Modifier.size(54.dp)
+                    Modifier
+                        .sizeIn(minWidth = 54.dp, minHeight = 54.dp)
                         .clip(RoundedCornerShape(18.dp))
-                        .background(LocalWasteNotGradients.current.accent),
+                        .background(LocalWasteNotGradients.current.accent)
+                        .padding(12.dp)
+                        .clearAndSetSemantics {},
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(initials, color = OnAccent, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
@@ -183,7 +185,6 @@ fun SettingsScreen(
     onDeleteAccount: (() -> Unit)? = null,
     onRecyclingPoints: (() -> Unit)? = null,
 ) {
-    val tokens = LocalWasteNotSurfaceTokens.current
     val openPrivacy = com.example.wastenot.ui.components.rememberPrivacyPolicyAction()
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
         GroupSectionLabel(stringResource(R.string.theme_title))
@@ -193,14 +194,13 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
-                    .clickable(onClick = onTheme)
-                    .semantics { contentDescription = themeLabel }
+                    .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onTheme)
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
-                    modifier = Modifier.size(32.dp).clip(RoundedCornerShape(9.dp)).background(MaterialTheme.colorScheme.surfaceVariant),
+                    modifier = Modifier.size(32.dp).clip(RoundedCornerShape(9.dp)).background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(painterResource(R.drawable.ic_device), null, Modifier.size(17.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
@@ -216,7 +216,7 @@ fun SettingsScreen(
                 label = stringResource(R.string.reminder_title),
                 icon = R.drawable.ic_clock,
                 onClick = onReminderSettings,
-                showDivider = false,
+                showDivider = onRecyclingPoints != null,
             )
             if (onRecyclingPoints != null) GroupedNavRow(
                 label = stringResource(R.string.recycling_points_open),
@@ -252,10 +252,10 @@ fun SettingsScreen(
 @Composable
 private fun SettingsMetaRow(label: String, value: String, showDivider: Boolean) {
     Column(Modifier.fillMaxWidth()) {
-        Row(
+        FlowRow(
             Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (value.isNotEmpty()) Text(value, style = MaterialTheme.typography.titleSmall)

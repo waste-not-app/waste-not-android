@@ -2,6 +2,9 @@ package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,6 +47,7 @@ import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.AsyncStatePanel
 import com.example.wastenot.ui.components.TextActionButton
+import com.example.wastenot.ui.components.focusOutline
 import com.github.skydoves.navgraph.annotations.NavDestination
 import com.github.skydoves.navgraph.annotations.NavPreview
 import java.time.Instant
@@ -80,7 +85,10 @@ fun AchievementsScreen(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        if (state.loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+        if (state.loading) {
+            Text(stringResource(R.string.achievements_loading), style = MaterialTheme.typography.bodySmall)
+            LinearProgressIndicator(Modifier.fillMaxWidth())
+        }
         if (state.error != null) {
             MessageBanner(stringResource(R.string.refresh_failed), isError = true)
             TextActionButton(stringResource(R.string.retry), onRetry)
@@ -117,8 +125,10 @@ private fun AchievementCard(
 ) {
     val statusLabel = stringResource(if (item.isUnlocked) R.string.achievement_unlocked else R.string.achievement_locked)
     val toggleHint = stringResource(if (expanded) R.string.achievement_hide_details else R.string.achievement_toggle_details)
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusedAsState()
     Surface(
-        modifier = modifier,
+        modifier = modifier.focusOutline(focused, MaterialTheme.shapes.medium, MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.surface),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(
@@ -129,6 +139,8 @@ private fun AchievementCard(
         Column(
             modifier = Modifier
                 .clickable(
+                    interactionSource = interactions,
+                    indication = LocalIndication.current,
                     role = Role.Button,
                     onClickLabel = toggleHint,
                     onClick = onToggle,
@@ -137,14 +149,13 @@ private fun AchievementCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
                     item.title,
-                    modifier = Modifier.weight(1f).semantics { heading() },
+                    modifier = Modifier.semantics { heading() },
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -168,10 +179,9 @@ private fun AchievementCard(
                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 gapSize = 0.dp,
             )
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
                     stringResource(
@@ -188,6 +198,7 @@ private fun AchievementCard(
                 ) {
                     Text(
                         toggleHint,
+                        modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                     )

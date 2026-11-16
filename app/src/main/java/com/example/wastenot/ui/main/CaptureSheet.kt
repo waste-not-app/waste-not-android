@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -86,8 +88,8 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
             ) {
                 Icon(painterResource(R.drawable.ic_camera), null, Modifier.size(24.dp), tint = OnAccent)
-                Text(stringResource(R.string.scan_action), color = OnAccent,
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.ExtraBold))
+                Text(stringResource(R.string.scan_action), Modifier.weight(1f, fill = false), color = OnAccent,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.ExtraBold), textAlign = TextAlign.Center)
             }
         }
     }
@@ -147,7 +149,13 @@ internal fun CaptureSheet(userId: String, repositoryFactory: (ScanPhotoCache) ->
                 if (model.state.value.photo == photo) onPhotoReviewChanged(true)
             }, { model.problem(session, it) })
         } else {
-            LinearProgressIndicator(Modifier.fillMaxWidth())
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LinearProgressIndicator(Modifier.fillMaxWidth())
+                Text(stringResource(R.string.scan_camera_preparing),
+                    Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium)
+            }
         }
     }
 }

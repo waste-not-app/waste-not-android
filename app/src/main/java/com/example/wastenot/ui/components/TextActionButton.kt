@@ -3,9 +3,7 @@ package com.example.wastenot.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -43,6 +41,6 @@ fun TextActionButton(
         ),
         border = if (enabled) null else BorderStroke(1.dp, colors.outlineVariant),
     ) {
-        Text(label, Modifier.width(IntrinsicSize.Max), textAlign = TextAlign.Center)
+        Text(label, Modifier.weight(1f, fill = false), textAlign = TextAlign.Center)
     }
 }
