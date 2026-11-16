@@ -10,6 +10,8 @@ Akun yang pernah diverifikasi dapat membuka data lokal tanpa jaringan jika crede
 
 Keluar menghapus identitas aktif dan credential. Antrean milik akun tetap tersimpan agar dapat dilanjutkan setelah akun yang sama masuk lagi; dialog keluar menjelaskan hal tersebut. Worker akun A tidak boleh berjalan di bawah akun B. Database dan credential dikecualikan dari backup/cloud/transfer melalui aturan backup yang sudah ada.
 
+Penghapusan akun berbeda dari keluar: setelah server mengonfirmasi DELETE akun dan sesi/work akun dihentikan, `ActivityDao.clearOwner` menghapus aktivitas, antrean, receipt, snapshot dan identitas pemilik tersebut dalam satu transaksi. Data pemilik lain tidak ikut dihapus. Operasi ini tidak dipakai saat logout biasa.
+
 ## Alur perubahan
 
 1. Create menyimpan UUID request, payload asli, identitas lokal dan operasi CREATE. Receipt menjaga UUID/payload tetap sama setelah respons hilang atau aplikasi dibuka ulang.
@@ -33,6 +35,10 @@ Riwayat menggunakan pagination lokal 20 baris beserta filter kategori, metode da
 Penarikan tidak menimpa aktivitas yang masih mempunyai perubahan lokal. Pagination server bukan snapshot database, sehingga aktivitas yang tidak terlihat di hasil penarikan diverifikasi melalui GET sebelum dihapus dari cache. Penarikan terputus tidak menghapus cache yang belum terlihat.
 
 Ringkasan, statistik, XP dan streak memakai snapshot terakhir yang dikonfirmasi server. Aktivitas terbaru di beranda dibaca dari Room. Simpan lokal tidak mengumumkan tambahan XP. Panel sinkronisasi menjelaskan perbedaan perubahan lokal dan ringkasan server, termasuk ketika koneksi tersedia tetapi belum ada pengakuan server.
+
+Snapshot yang dibaca dari Room membawa waktu konfirmasi server dan penanda cache. Beranda, profil dan statistik menampilkan penanda tersebut; data dari hari/periode sebelumnya diberi peringatan, bukan dianggap hasil hari ini. Kegagalan refresh disimpan terpisah dari payload sehingga snapshot lama tetap bisa dibaca tanpa menyembunyikan kesalahan. Pada pergantian hari, statistik dapat menampilkan periode tersimpan dengan panjang yang sama dan tanggal aslinya.
+
+Pengakuan CREATE, UPDATE atau DELETE menyimpan revisi acak pada metadata snapshot dalam transaksi pengakuan yang sama. `ActivityStore.synchronizationAcknowledgements` memutar ulang revisi terakhir milik akun, dengan deduplikasi; simpan lokal, penarikan riwayat dan refresh ringkasan tidak mengubah revisi ini. `AchievementsViewModel` menerima flow tersebut dan memuat ulang pencapaian yang sudah diminta setelah pengakuan, termasuk jika worker berjalan lebih lambat daripada simpan lokal atau ViewModel baru mulai mengamati. Tidak ada tambahan XP yang dihitung lokal.
 
 ## Verifikasi
 

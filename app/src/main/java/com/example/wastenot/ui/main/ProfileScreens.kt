@@ -23,6 +23,7 @@ import com.example.wastenot.BuildConfig
 import com.example.wastenot.R
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.model.User
+import com.example.wastenot.model.SnapshotFreshness
 import com.example.wastenot.model.UserProgress
 import com.example.wastenot.model.WasteFormat
 import com.example.wastenot.theme.*
@@ -51,6 +52,8 @@ fun ProfileScreen(
     achievementsEnabled: Boolean = false,
     onAchievements: () -> Unit = {},
     onSync: (() -> Unit)? = null,
+    freshness: SnapshotFreshness? = null,
+    stale: Boolean = false,
 ) {
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
         InsetGroupCard(contentPadding = true) {
@@ -96,6 +99,7 @@ fun ProfileScreen(
             }
         }
         if (loading) LinearProgressIndicator(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)))
+        if (progress != null) SnapshotFreshnessBanner(freshness, stale)
         if (error != null) {
             MessageBanner(stringResource(R.string.profile_refresh_failed), isError = true)
             TextActionButton(stringResource(R.string.retry), onRetry)
@@ -105,7 +109,7 @@ fun ProfileScreen(
             val streakLabel = progress.currentStreak?.let {
                 stringResource(R.string.profile_current_streak, WasteFormat.integer(it.toLong()))
             } ?: "—"
-            val streakSubtitle = if (progress.currentStreak != null && progress.currentStreak > 0) {
+            val streakSubtitle = if (!stale && progress.currentStreak != null && progress.currentStreak > 0) {
                 stringResource(if (progress.hasLoggedToday) R.string.profile_streak_today_logged else R.string.profile_streak_today_pending)
             } else null
             val bestStreakSubtitle = progress.bestStreak?.let {
@@ -176,8 +180,11 @@ fun SettingsScreen(
     onTheme: () -> Unit,
     modifier: Modifier = Modifier,
     onReminderSettings: () -> Unit = {},
+    onDeleteAccount: (() -> Unit)? = null,
+    onRecyclingPoints: (() -> Unit)? = null,
 ) {
     val tokens = LocalWasteNotSurfaceTokens.current
+    val openPrivacy = com.example.wastenot.ui.components.rememberPrivacyPolicyAction()
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
         GroupSectionLabel(stringResource(R.string.theme_title))
         InsetGroupCard {
@@ -211,6 +218,12 @@ fun SettingsScreen(
                 onClick = onReminderSettings,
                 showDivider = false,
             )
+            if (onRecyclingPoints != null) GroupedNavRow(
+                label = stringResource(R.string.recycling_points_open),
+                icon = R.drawable.ic_guide,
+                onClick = onRecyclingPoints,
+                showDivider = false,
+            )
         }
         GroupSectionLabel(stringResource(R.string.personal_data))
         InsetGroupCard {
@@ -227,8 +240,12 @@ fun SettingsScreen(
         InsetGroupCard(contentPadding = true) {
             Text(stringResource(R.string.privacy_account), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(stringResource(R.string.privacy_optional_photo), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(stringResource(R.string.privacy_policy_pending), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.privacy_policy_description), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            TextActionButton(stringResource(R.string.privacy_policy_open), openPrivacy, Modifier.fillMaxWidth())
         }
+        if (onDeleteAccount != null) TextActionButton(
+            stringResource(R.string.delete_account_title), onDeleteAccount, Modifier.fillMaxWidth(),
+        )
     }
 }
 

@@ -1,0 +1,36 @@
+<resources>
+    <string name="password_recovery_title">Pulihkan kata sandi</string>
+    <string name="password_recovery_open">Lupa kata sandi?</string>
+    <string name="password_recovery_description">Masukkan email akunmu untuk meminta kode pemulihan.</string>
+    <string name="password_recovery_request">Minta kode pemulihan</string>
+    <string name="password_recovery_requested">Jika email terdaftar, permintaan pemulihan akan diproses. Periksa kotak masuk dan folder spam.</string>
+    <string name="password_recovery_token">Kode pemulihan dari email</string>
+    <string name="password_recovery_token_helper">Tempel seluruh kode dari email. Kode berlaku 15 menit dan hanya dapat digunakan sekali. Permintaan baru membatalkan kode sebelumnya.</string>
+    <string name="password_recovery_new_password">Kata sandi baru</string>
+    <string name="password_recovery_confirm_password">Ulangi kata sandi baru</string>
+    <string name="password_recovery_confirm">Simpan kata sandi baru</string>
+    <string name="password_recovery_existing">Saya sudah memiliki kode</string>
+    <string name="password_recovery_another">Minta kode baru</string>
+    <string name="password_recovery_success">Kata sandi sudah diganti. Semua sesi lama dicabut. Masuk lagi dengan kata sandi barumu.</string>
+    <string name="password_recovery_invalid_token">Kode tidak valid atau sudah kedaluwarsa. Periksa kode atau minta yang baru.</string>
+    <string name="password_recovery_unavailable">Pengiriman email pemulihan belum tersedia. Coba lagi nanti atau hubungi pengelola melalui kebijakan privasi.</string>
+    <string name="account_management_network_error">Layanan belum dapat dijangkau. Isian tetap tersedia; coba lagi saat tersambung.</string>
+    <string name="account_management_rate_limited">Terlalu banyak permintaan. Tunggu sebentar sebelum mencoba lagi.</string>
+    <string name="account_management_failed">Permintaan belum dapat diselesaikan. Coba lagi nanti.</string>
+    <string name="account_management_processing">Memproses…</string>
+    <string name="delete_account_title">Hapus akun</string>
+    <string name="delete_account_warning">Penghapusan tidak dapat dibatalkan. Akun, catatan, progres, lampiran privat, serta antrean dan draf lokal akun ini akan dihapus. Data yang belum disinkronkan juga akan hilang.</string>
+    <string name="delete_account_backup_notice">Penghapusan layanan aktif tidak menjamin setiap salinan cadangan atau arsip lama langsung hilang. Baca kebijakan privasi untuk batasnya.</string>
+    <string name="delete_account_password">Kata sandi akun saat ini</string>
+    <string name="delete_account_acknowledge">Saya memahami penghapusan ini dan ingin menghapus akun beserta datanya.</string>
+    <string name="delete_account_confirm">Hapus akun dan data</string>
+    <string name="delete_account_wrong_password">Kata sandi saat ini belum benar.</string>
+    <string name="delete_account_confirm_required">Konfirmasikan bahwa kamu memahami penghapusan akun.</string>
+    <string name="delete_account_success">Akun dan data pada layanan aktif sudah dihapus.</string>
+    <string name="delete_account_local_cleanup_failed">Akun pada layanan aktif sudah dihapus, tetapi pembersihan data perangkat belum selesai. Hapus data aplikasi melalui Pengaturan Android sebelum menyerahkan perangkat kepada orang lain.</string>
+    <string name="delete_account_cleanup_pending">Akun pada layanan aktif sudah dihapus. Pembersihan lampiran server masih dalam antrean; kamu tidak perlu mengulang penghapusan akun.</string>
+    <string name="privacy_policy_open">Kebijakan privasi</string>
+    <string name="privacy_policy_description">Data, foto, pemulihan akun, penghapusan, serta kontak pengelola.</string>
+    <string name="external_link_unavailable">Tidak ada aplikasi yang dapat membuka tautan ini.</string>
+    <string name="recycling_points_open">Titik pengumpulan sampah</string>
+</resources>

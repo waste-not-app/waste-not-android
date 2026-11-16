@@ -10,6 +10,7 @@ import com.example.wastenot.data.local.ReminderSetting
 import com.example.wastenot.data.local.ReminderStore
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.repository.CoreRepository
+import com.example.wastenot.data.repository.AccountManagement
 import com.example.wastenot.model.Metadata
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -70,6 +71,10 @@ import com.example.wastenot.theme.ThemeMode
 import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.LocalWasteNotDockEdge
 import com.example.wastenot.ui.auth.LogoutUiState
+import com.example.wastenot.ui.auth.AccountDeletionViewModel
+import com.example.wastenot.ui.auth.AccountDeletionState
+import com.example.wastenot.ui.auth.AccountDeletionScreen
+import com.example.wastenot.ui.components.rememberPrivacyPolicyAction
 import com.example.wastenot.ui.components.IconActionButton
 import java.time.Clock
 import java.time.LocalDate
@@ -106,6 +111,7 @@ fun AccountNavigation(
     coreRepository: CoreRepository? = null,
     reminderStore: ReminderStore? = null,
     reminderScheduler: ReminderScheduler? = null,
+    accountManagement: AccountManagement? = null,
 ) {
     val context = LocalContext.current.applicationContext
     val factory = remember(activityStore) { viewModelFactory { initializer {
@@ -119,6 +125,12 @@ fun AccountNavigation(
     val historyReady by syncModel.historyReady.collectAsStateWithLifecycle()
     val syncBusy by syncModel.busy.collectAsStateWithLifecycle()
     val syncError by syncModel.error.collectAsStateWithLifecycle()
+    val accountDeletionFactory = remember(accountManagement) {
+        accountManagement?.let { accounts -> viewModelFactory { initializer { AccountDeletionViewModel(accounts) } } }
+    }
+    val accountDeletionModel: AccountDeletionViewModel? = accountDeletionFactory?.let { viewModel(factory = it) }
+    val accountDeletionState = accountDeletionModel?.state?.collectAsStateWithLifecycle()?.value ?: remember { AccountDeletionState() }
+    val openPrivacy = rememberPrivacyPolicyAction()
     var showingSync by rememberSaveable { mutableStateOf(false) }
     if (showingSync) ActivitySyncSheet(syncIssues, syncBusy, syncError, syncModel::retry, syncModel::resolve, { showingSync = false })
     val persistenceFactory = remember(user.id) { viewModelFactory { initializer {
@@ -176,14 +188,11 @@ fun AccountNavigation(
     }
     val achievementsEnabled = metadata?.isEnabled("achievements") == true
     val photosEnabled = metadata?.isEnabled("photos") == true
-    val achievementsFactory = remember(coreRepository) {
-        coreRepository?.let { repo -> viewModelFactory { initializer { AchievementsViewModel(repo) } } }
+    val achievementsFactory = remember(coreRepository, activityStore) {
+        coreRepository?.let { repo -> viewModelFactory { initializer { AchievementsViewModel(repo, activityStore.synchronizationAcknowledgements) } } }
     }
     val achievementsModel: AchievementsViewModel? = achievementsFactory?.let { viewModel(factory = it) }
     val achievementsState = achievementsModel?.state?.collectAsStateWithLifecycle()?.value ?: AchievementsUiState()
-    LaunchedEffect(achievementsModel, achievementsEnabled, data.mutationRevision) {
-        if (achievementsEnabled && data.mutationRevision > 0) achievementsModel?.refresh()
-    }
     val reminderSetting by (reminderStore?.observe(user.id) ?: remember { flowOf(ReminderSetting()) })
         .collectAsStateWithLifecycle(initialValue = ReminderSetting())
     val coroutineScope = rememberCoroutineScope()
@@ -230,7 +239,11 @@ fun AccountNavigation(
         if (recovered != null && !recovered.paused) resumeDraft()
         navigationReady = true
     }
-    fun selectTab(tab: MainTab) { focus.clearFocus(); keyboard?.hide(); selected = tab }
+    fun selectTab(tab: MainTab) {
+        if (accountDeletionState.submitting) return
+        if (current == DeleteAccount) accountDeletionModel?.dismiss()
+        focus.clearFocus(); keyboard?.hide(); selected = tab
+    }
     fun guideList() {
         val guideStack = stacks.getValue(MainTab.GUIDE)
         while (guideStack.size > 1) guideStack.removeLastOrNull()
@@ -251,6 +264,8 @@ fun AccountNavigation(
         selected = MainTab.HOME
     }
     fun back() {
+        if (accountDeletionState.submitting) return
+        if (current == DeleteAccount) accountDeletionModel?.dismiss()
         if (data.deletingId != null || disk.busy || (editor != null && data.saving)) return
         if (editor != null && draft == null && disk.active?.requestId == editor.requestId) return
         if (editor != null && data.save?.let { it.requestId == editor.requestId && it.id != null } == true) return
@@ -277,6 +292,7 @@ fun AccountNavigation(
     }
     fun edit(id: String? = null) { openEditor(LogEditor(id, UUID.randomUUID().toString())) }
     fun openCapture() {
+        if (accountDeletionState.submitting) return
         if (disk.active?.paused == true) resumingPrompt = true
         else if (!disk.busy) capture = UUID.randomUUID().toString()
     }
@@ -391,7 +407,8 @@ fun AccountNavigation(
                 { leaving = true }, Modifier.fillMaxSize(),
                 achievementsEnabled = achievementsEnabled,
                 onAchievements = { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Achievements) },
-                onSync = if (activityStore is com.example.wastenot.data.repository.OfflineActivityStore) ({ showingSync = true }) else null) }
+                onSync = if (activityStore is com.example.wastenot.data.repository.OfflineActivityStore) ({ showingSync = true }) else null,
+                freshness = summaryData.dashboard.freshness, stale = summaryData.dashboard.stale) }
             entry<Achievements> {
                 LaunchedEffect(achievementsModel) { achievementsModel?.load() }
                 AchievementsScreen(
@@ -410,7 +427,30 @@ fun AccountNavigation(
                     onTheme = onTheme,
                     modifier = Modifier.fillMaxSize(),
                     onReminderSettings = { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Settings) stacks.getValue(MainTab.PROFILE).add(ReminderSettings) },
+                    onDeleteAccount = accountDeletionModel?.let { deletion -> ({
+                        deletion.dismiss()
+                        if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Settings) stacks.getValue(MainTab.PROFILE).add(DeleteAccount)
+                    }) },
+                    onRecyclingPoints = {
+                        if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Settings) stacks.getValue(MainTab.PROFILE).add(RecyclingPointList)
+                    },
                 )
+            }
+            entry<DeleteAccount> {
+                if (accountDeletionModel != null) AccountDeletionScreen(
+                    state = accountDeletionState, padding = pageInsets,
+                    onPassword = accountDeletionModel::password, onAcknowledge = accountDeletionModel::acknowledge,
+                    onDelete = accountDeletionModel::delete, onPrivacy = openPrivacy, onBack = ::back,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+            entry<RecyclingPointList> {
+                RecyclingPointListScreen(pageInsets, onDetail = { id ->
+                    if (stack.lastOrNull() == RecyclingPointList) stack.add(RecyclingPointDetail(id))
+                }, modifier = Modifier.fillMaxSize())
+            }
+            entry<RecyclingPointDetail> { key ->
+                RecyclingPointDetailScreen(key.pointId, pageInsets, onList = ::back, modifier = Modifier.fillMaxSize())
             }
             entry<ReminderSettings> {
                 ReminderSettingsScreen(
@@ -668,6 +708,8 @@ private fun AccountPage(
                                             Settings -> R.string.settings_title
                                             Achievements -> R.string.achievements_title
                                             ReminderSettings -> R.string.reminder_title
+                                            DeleteAccount -> R.string.delete_account_title
+                                            RecyclingPointList, is RecyclingPointDetail -> R.string.recycling_points_open
                                             else -> tab.label
                                         },
                                     ),

@@ -1,5 +1,10 @@
 package com.example.wastenot.ui.main
 
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.WasteNotNetwork
 import com.example.wastenot.data.repository.CoreRepository
@@ -15,6 +20,11 @@ import okhttp3.mockwebserver.MockWebServer
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.MutableSharedFlow
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -28,6 +38,16 @@ class AchievementsViewModelTest {
     private lateinit var server: MockWebServer
     private lateinit var network: WasteNotNetwork
     private lateinit var viewModel: AchievementsViewModel
+    private val acknowledgements = MutableSharedFlow<String>(replay = 1)
+    private val owner = object : ViewModelStoreOwner { override val viewModelStore = ViewModelStore() }
+
+    private fun createModel() = ViewModelProvider.create(owner, viewModelFactory { initializer {
+        AchievementsViewModel(CoreRepository(network), acknowledgements)
+    } })[AchievementsViewModel::class]
+
+    private fun achievementResponse(current: Int) = MockResponse().setResponseCode(200).setBody(
+        """{"data":[{"id":"00000000-0000-4000-8000-000000000101","code":"FIRST_STEP","title":"Langkah pertama","description":"Catat minimal 1 aktivitas.","requirement_type":"ACTIVE_LOG_COUNT","current_value":$current,"target_value":1,"is_unlocked":${current > 0},"unlocked_at":${if (current > 0) "\"2026-11-13T07:00:00Z\"" else "null"}}]}""",
+    )
 
     @Before
     fun setUp() {
@@ -40,11 +60,12 @@ class AchievementsViewModelTest {
                 allowLocalHttp = true,
             ),
         )
-        viewModel = AchievementsViewModel(CoreRepository(network))
+        viewModel = createModel()
     }
 
     @After
     fun tearDown() {
+        owner.viewModelStore.clear()
         Dispatchers.resetMain()
         network.client.dispatcher.executorService.shutdown()
         network.client.connectionPool.evictAll()
@@ -83,5 +104,63 @@ class AchievementsViewModelTest {
         assertEquals(1, items.size)
         assertEquals(AchievementRequirement.ACTIVE_LOG_COUNT, items[0].requirementType)
         assertNull(refreshed.error)
+    }
+
+    @Test
+    fun delayedWorkerAcknowledgementRefreshesLoadedAchievementsButDuplicateRevisionsDoNotReload() = runBlocking {
+        server.enqueue(achievementResponse(0))
+        viewModel.load()
+        withTimeout(5_000) { viewModel.state.first { !it.loading && it.items != null } }
+        assertEquals(0L, viewModel.state.value.items!!.single().currentValue)
+        assertEquals(1, server.requestCount)
+
+        // No local mutation callback refreshes achievements. Only the later worker acknowledgement does.
+        server.enqueue(achievementResponse(1))
+        acknowledgements.emit("acknowledged-create")
+        withTimeout(5_000) { viewModel.state.first { !it.loading && it.items?.single()?.currentValue == 1L } }
+        assertEquals(2, server.requestCount)
+        acknowledgements.emit("acknowledged-create")
+        assertFalse(viewModel.state.value.loading)
+        assertEquals(2, server.requestCount)
+
+        owner.viewModelStore.clear()
+        viewModel = createModel()
+        assertNull(viewModel.state.value.items)
+        assertEquals(2, server.requestCount)
+        server.enqueue(achievementResponse(1))
+        viewModel.load()
+        withTimeout(5_000) { viewModel.state.first { !it.loading && it.items != null } }
+        assertEquals(1L, viewModel.state.value.items!!.single().currentValue)
+        assertEquals(3, server.requestCount)
+    }
+
+    @Test
+    fun acknowledgementDuringAnOlderRequestCannotBeOverwrittenByItsDelayedResponse() = runBlocking {
+        val firstStarted = CompletableDeferred<Unit>()
+        val releaseFirst = CountDownLatch(1)
+        val calls = AtomicInteger()
+        server.dispatcher = object : okhttp3.mockwebserver.Dispatcher() {
+            override fun dispatch(request: okhttp3.mockwebserver.RecordedRequest): MockResponse {
+                return if (calls.incrementAndGet() == 1) {
+                    firstStarted.complete(Unit)
+                    check(releaseFirst.await(5, TimeUnit.SECONDS))
+                    achievementResponse(0)
+                } else achievementResponse(1)
+            }
+        }
+        try {
+            viewModel.load()
+            withTimeout(5_000) { firstStarted.await() }
+            acknowledgements.emit("acknowledged-update")
+            val current = withTimeout(5_000) {
+                viewModel.state.first { !it.loading && it.items?.single()?.currentValue == 1L }
+            }
+            releaseFirst.countDown()
+            assertEquals(1L, current.items!!.single().currentValue)
+            assertEquals(2, calls.get())
+            assertNull(current.error)
+        } finally {
+            releaseFirst.countDown()
+        }
     }
 }

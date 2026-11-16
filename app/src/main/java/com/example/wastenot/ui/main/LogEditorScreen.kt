@@ -124,8 +124,10 @@ fun LogEditorScreen(
             if (value.aiProvenance != null) {
                 Text(stringResource(R.string.ai_provenance_attached), style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
-                SecondaryActionButton(stringResource(R.string.ai_use_manual), draft::useManualEntry,
-                    Modifier.fillMaxWidth(), enabled = enabled)
+            }
+            draft.manualConversionReason?.let { reason ->
+                MessageBanner(stringResource(reason), isError = true)
+                TextActionButton(stringResource(R.string.ai_use_manual), draft::useManualEntry, enabled = enabled)
             }
             MethodSelector(value.method, { draft.change(EditorField.METHOD, value.copy(method = it)) }, fieldModifier(EditorField.METHOD),
                 draft.errors[EditorField.METHOD]?.let { stringResource(it) }, enabled = enabled,

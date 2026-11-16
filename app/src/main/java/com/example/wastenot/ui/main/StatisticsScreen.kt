@@ -49,7 +49,7 @@ fun StatisticsScreen(
     var expanded by rememberSaveable(days) { mutableStateOf(false) }
     ScrollPage(padding, modifier) {
         RangeSelector(days, onDays)
-        SummaryStatus(data.loading, data.error, data.value != null, onRetry)
+        SummaryStatus(data.loading, data.error, data.value != null, onRetry, data.freshness, data.stale)
         val period = data.value ?: return@ScrollPage
         val previousPeriod = period.daily.size != days
         Text(

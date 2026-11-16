@@ -32,6 +32,13 @@ import com.example.wastenot.data.local.WorkManagerReminderScheduler
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.concurrent.ConcurrentHashMap
+import com.example.wastenot.data.repository.AccountManagement
+import com.example.wastenot.data.repository.RemoteAccountManagement
+import com.example.wastenot.data.network.ApiResult
+import com.example.wastenot.data.local.LocalEditorDraftStore
+import java.io.IOException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 open class AppContainer(context: Context) {
     private val appContext = context.applicationContext
@@ -64,6 +71,23 @@ open class AppContainer(context: Context) {
     open val guides: GuideStore = RemoteGuideStore(core)
 
     private val activities = ConcurrentHashMap<String, OfflineActivityStore>()
+    open val accountManagement: AccountManagement = RemoteAccountManagement(network, sessions, ::clearDeletedAccount)
+
+    private suspend fun clearDeletedAccount(owner: String) = withContext(Dispatchers.IO) {
+        scheduler.cancel(owner)
+        try {
+            val store = activities.remove(owner)
+            if (store != null) store.deleteLocalData() else database.activities().clearOwner(owner)
+        } catch (error: android.database.sqlite.SQLiteException) {
+            throw IOException("Unable to clear deleted account storage", error)
+        }
+        if (LocalEditorDraftStore.create(appContext, owner).clear() is ApiResult.Failure) {
+            throw IOException("Unable to clear deleted account draft")
+        }
+        if (!ScanPhotoCache.create(appContext, owner).removeOwnerPhotos()) {
+            throw IOException("Unable to clear deleted account photo cache")
+        }
+    }
 
     open fun activityStore(user: User): ActivityStore = offlineActivities(user).also { it.requestSync() }
 

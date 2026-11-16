@@ -87,12 +87,14 @@ fun OverviewScreen(user: User, data: SnapshotState<DashboardSnapshot>, padding: 
             }
             IconActionButton(R.drawable.ic_profile, stringResource(R.string.open_profile), onProfile, circle = true)
         }
-        SummaryStatus(data.loading, data.error, true, onRetry)
+        SummaryStatus(data.loading, data.error, true, onRetry, data.freshness, data.stale)
         if (onResumeDraft != null) PausedDraftNotice(onResumeDraft)
-        if (snapshot.summary.activityCount == 0L && snapshot.recentLogs.none {
+        if (!data.stale && snapshot.summary.activityCount == 0L && snapshot.recentLogs.none {
                 it.activityDate == snapshot.date || it.syncState != ActivitySyncState.SYNCED
             }) MessageBanner(stringResource(R.string.home_empty_today))
-        SummaryBlock(snapshot.summary, stringResource(R.string.handled_today), personal = true)
+        SummaryBlock(snapshot.summary, if (data.stale) stringResource(
+            R.string.freshness_handled_date, WasteFormat.activityDate(snapshot.date),
+        ) else stringResource(R.string.handled_today), personal = true)
         InsetGroupCard(contentPadding = true) {
             ProgressMeter(snapshot.progress)
         }
@@ -122,7 +124,8 @@ fun OverviewScreen(user: User, data: SnapshotState<DashboardSnapshot>, padding: 
 }
 
 @Composable
-internal fun SummaryStatus(loading: Boolean, error: ApiFailureKind?, hasValue: Boolean, onRetry: () -> Unit) {
+internal fun SummaryStatus(loading: Boolean, error: ApiFailureKind?, hasValue: Boolean, onRetry: () -> Unit,
+    freshness: SnapshotFreshness? = null, stale: Boolean = false) {
     if (!hasValue) {
         AsyncStatePanel(
             title = stringResource(if (loading) R.string.summary_loading else R.string.summary_load_failed),
@@ -138,9 +141,24 @@ internal fun SummaryStatus(loading: Boolean, error: ApiFailureKind?, hasValue: B
     if (loading) {
         LinearProgressIndicator(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)))
     }
+    SnapshotFreshnessBanner(freshness, stale)
     if (error != null) {
         MessageBanner(stringResource(R.string.summary_refresh_failed), isError = true)
         TextActionButton(stringResource(R.string.retry), onRetry)
+    }
+}
+
+@Composable
+internal fun SnapshotFreshnessBanner(freshness: SnapshotFreshness?, stale: Boolean) {
+    if (stale) MessageBanner(stringResource(R.string.freshness_previous_period))
+    if (freshness?.cached == true) {
+        val confirmedAt = freshness.confirmedAt
+        val label = if (confirmedAt == null) stringResource(R.string.freshness_cached) else stringResource(
+            R.string.freshness_cached_at,
+            DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm 'UTC'", Locale.forLanguageTag("id-ID"))
+                .withZone(java.time.ZoneOffset.UTC).format(confirmedAt),
+        )
+        MessageBanner(label)
     }
 }
 

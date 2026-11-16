@@ -50,6 +50,47 @@ class EditorSubmissionTest {
     @Test fun followupRejectionKeepsTheLightDraftFrozenAcrossRestoration() = followupRejection(false)
     @Test fun followupRejectionKeepsTheDarkDraftFrozenAcrossRestoration() = followupRejection(true)
 
+    @Test fun normalAiEditorKeepsAttributionWithoutRedundantManualAction() {
+        val form = aiDraft()
+        compose.setContent { EditorHost(false) {
+            LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(), {}, {}, {})
+        } }
+        compose.onNodeWithText("Lanjutkan sebagai catatan manual").assertDoesNotExist()
+        compose.onNodeWithText(InstrumentationRegistry.getInstrumentation().targetContext.getString(
+            com.example.wastenot.R.string.ai_provenance_attached)).assertIsDisplayed()
+        compose.runOnIdle {
+            assertNotNull(form.values.aiProvenance)
+            form.change(EditorField.METHOD, form.values.copy(method = DisposalMethod.REDUCE))
+        }
+        compose.onNodeWithText("Lanjutkan sebagai catatan manual").performScrollTo().assertIsDisplayed().performClick()
+        compose.runOnIdle {
+            assertNull(form.values.aiProvenance)
+            assertEquals(DisposalMethod.REDUCE, form.values.method)
+        }
+        compose.onNodeWithText("Lanjutkan sebagai catatan manual").assertDoesNotExist()
+    }
+
+    @Test fun expiredAiEditorOffersExplicitManualRecoveryWithoutChangingFields() {
+        val form = aiDraft().apply {
+            prepareSubmission(today)
+            submissionFailed(ApiFailureKind.AI_EXPIRED)
+        }
+        val before = form.values
+        compose.setContent { EditorHost(true) {
+            LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(), {}, {}, {})
+        } }
+        compose.onNodeWithText("Lanjutkan sebagai catatan manual").performScrollTo().assertIsEnabled().performClick()
+        compose.runOnIdle {
+            assertEquals(before.copy(aiProvenance = null), form.values)
+            assertNull(form.prepareSubmission(today)!!.aiProvenance)
+        }
+    }
+
+    private fun aiDraft() = draft().apply {
+        applyScan(com.example.wastenot.LogEditor(null, "ai-editor-ui", scanCategory = "PLASTIC",
+            scanMethod = "RECYCLE", scanRecommendationId = "00000000-0000-4000-8000-000000000002"))
+    }
+
     private fun followupRejection(dark: Boolean) {
         val restoration = StateRestorationTester(compose)
         val received = mutableListOf<ActivityInput>()

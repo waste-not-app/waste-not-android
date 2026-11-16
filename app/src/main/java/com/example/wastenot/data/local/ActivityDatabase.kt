@@ -92,9 +92,32 @@ interface ActivityDao {
 
     @Query("SELECT * FROM server_snapshots WHERE owner = :owner AND `key` = :key")
     suspend fun snapshot(owner: String, key: String): ServerSnapshot?
+    @Query("SELECT * FROM server_snapshots WHERE owner = :owner AND `key` LIKE 'statistics:%' ORDER BY savedAt DESC")
+    suspend fun statisticsSnapshots(owner: String): List<ServerSnapshot>
     @Query("SELECT * FROM server_snapshots WHERE owner = :owner")
     fun observeSnapshots(owner: String): Flow<List<ServerSnapshot>>
     @Upsert suspend fun snapshot(snapshot: ServerSnapshot)
+
+    @Query("DELETE FROM activity_outbox WHERE owner = :owner")
+    suspend fun deleteOwnerMutations(owner: String)
+    @Query("DELETE FROM activity_receipts WHERE owner = :owner")
+    suspend fun deleteOwnerReceipts(owner: String)
+    @Query("DELETE FROM activities WHERE owner = :owner")
+    suspend fun deleteOwnerActivities(owner: String)
+    @Query("DELETE FROM server_snapshots WHERE owner = :owner")
+    suspend fun deleteOwnerSnapshots(owner: String)
+    @Query("DELETE FROM account_identity WHERE owner = :owner")
+    suspend fun deleteOwnerIdentity(owner: String)
+
+    /** Only after confirmed remote account deletion and cancellation of that account's work. */
+    @Transaction
+    suspend fun clearOwner(owner: String) {
+        deleteOwnerMutations(owner)
+        deleteOwnerReceipts(owner)
+        deleteOwnerActivities(owner)
+        deleteOwnerSnapshots(owner)
+        deleteOwnerIdentity(owner)
+    }
 }
 
 @Database(entities = [LocalActivity::class, ActivityMutation::class, ActivityReceipt::class, AccountIdentity::class, ServerSnapshot::class],

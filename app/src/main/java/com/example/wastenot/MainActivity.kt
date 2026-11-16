@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
                             mode, appearance::choose, Modifier.weight(1f),
                             activityStoreFactory = container::activityStore, scanRepositoryFactory = container::scanRepository,
                             reminderStore = container.reminders, reminderScheduler = container.reminderScheduler,
+                            accountManagement = container.accountManagement,
                             showOnboarding = onboardingPending,
                             onCompleteOnboarding = {
                                 container.completeOnboarding()

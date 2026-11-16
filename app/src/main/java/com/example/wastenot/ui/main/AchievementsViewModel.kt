@@ -8,6 +8,10 @@ import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.model.Achievement
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,20 +23,35 @@ data class AchievementsUiState(
     val error: ApiFailureKind? = null,
 )
 
-class AchievementsViewModel(private val core: CoreRepository) : ViewModel() {
+class AchievementsViewModel(
+    private val core: CoreRepository,
+    synchronizationAcknowledgements: Flow<String>,
+) : ViewModel() {
     private val mutableState = MutableStateFlow(AchievementsUiState())
     val state = mutableState.asStateFlow()
     private var loadingJob: Job? = null
     private var generation = 0
+    private var requested = false
+
+    init {
+        viewModelScope.launch {
+            synchronizationAcknowledgements.distinctUntilChanged().collect {
+                if (requested) load(force = true)
+            }
+        }
+    }
 
     fun load(force: Boolean = false) {
         if (!force && (loadingJob?.isActive == true || mutableState.value.items != null)) return
+        requested = true
         loadingJob?.cancel()
         val currentGen = ++generation
         loadingJob = viewModelScope.launch {
             mutableState.update { it.copy(loading = true, error = null) }
             try {
-                when (val result = core.achievements()) {
+                val result = core.achievements()
+                currentCoroutineContext().ensureActive()
+                when (result) {
                     is ApiResult.Success -> if (generation == currentGen) {
                         mutableState.update { it.copy(items = result.value, loading = false, error = null) }
                     }
@@ -49,6 +68,7 @@ class AchievementsViewModel(private val core: CoreRepository) : ViewModel() {
     fun refresh() = load(force = true)
 
     override fun onCleared() {
+        generation++
         loadingJob?.cancel()
     }
 }

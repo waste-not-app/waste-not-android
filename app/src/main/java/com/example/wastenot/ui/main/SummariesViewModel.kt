@@ -9,6 +9,7 @@ import com.example.wastenot.data.repository.ActivityStore
 import com.example.wastenot.model.ActivityDateRange
 import com.example.wastenot.model.DashboardSnapshot
 import com.example.wastenot.model.StatisticsSnapshot
+import com.example.wastenot.model.SnapshotFreshness
 import java.time.LocalDate
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
@@ -18,7 +19,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class SnapshotState<T>(val value: T? = null, val loading: Boolean = true, val error: ApiFailureKind? = null)
+data class SnapshotState<T>(
+    val value: T? = null,
+    val loading: Boolean = true,
+    val error: ApiFailureKind? = null,
+    val freshness: SnapshotFreshness? = null,
+    val stale: Boolean = false,
+)
 
 data class SummariesUiState(
     val dashboard: SnapshotState<DashboardSnapshot> = SnapshotState(),
@@ -37,6 +44,7 @@ class SummariesViewModel(
     private var dashboardJob: Job? = null
     private var statisticsJob: Job? = null
     private var dashboardStarted = false
+    private var dashboardDate: LocalDate? = null
     private var statisticsStarted = false
     private var dashboardGeneration = 0
     private var statisticsGeneration = 0
@@ -50,19 +58,25 @@ class SummariesViewModel(
     }
 
     fun dashboard(retry: Boolean = false) {
-        if (dashboardStarted && !retry) return
+        val date = today()
+        if (dashboardStarted && dashboardDate == date && !retry) return
         if (retry) store.requestSync()
         dashboardStarted = true
+        dashboardDate = date
         val generation = ++dashboardGeneration
         dashboardJob?.cancel()
-        mutableState.update { it.copy(dashboard = it.dashboard.copy(loading = true, error = null)) }
+        mutableState.update { it.copy(dashboard = it.dashboard.copy(
+            loading = true, stale = it.dashboard.value?.date?.let { saved -> saved != date } == true)) }
         dashboardJob = viewModelScope.launch {
             val result = store.dashboard()
             currentCoroutineContext().ensureActive()
             if (generation != dashboardGeneration) return@launch
             mutableState.update { it.copy(dashboard = when (result) {
-                is ApiResult.Success -> SnapshotState(result.value, loading = false)
-                is ApiResult.Failure -> it.dashboard.copy(loading = false, error = result.error.kind)
+                is ApiResult.Success -> SnapshotState(result.value, loading = false,
+                    error = result.value.freshness.refreshError, freshness = result.value.freshness,
+                    stale = result.value.date != today())
+                is ApiResult.Failure -> it.dashboard.copy(loading = false, error = result.error.kind,
+                    stale = it.dashboard.value?.date?.let { date -> date != today() } == true)
             }) }
         }
     }
@@ -79,15 +93,20 @@ class SummariesViewModel(
         statisticsJob?.cancel()
         savedState["statistics_days"] = days
         mutableState.update { it.copy(days = days, statistics = SnapshotState(
-            value = it.statistics.value?.takeIf { value -> value.range == range }, loading = true)) }
+            value = it.statistics.value?.takeIf { value -> value.range == range }, loading = true,
+            freshness = it.statistics.freshness, error = it.statistics.error)) }
         statisticsJob = viewModelScope.launch {
             val result = store.statistics(range)
             currentCoroutineContext().ensureActive()
             if (generation != statisticsGeneration) return@launch
             if (result is ApiResult.Success) lastStatistics = result.value
             mutableState.update { it.copy(statistics = when (result) {
-                is ApiResult.Success -> SnapshotState(result.value, loading = false)
-                is ApiResult.Failure -> SnapshotState(lastStatistics, loading = false, error = result.error.kind)
+                is ApiResult.Success -> SnapshotState(result.value, loading = false,
+                    error = result.value.freshness.refreshError, freshness = result.value.freshness,
+                    stale = result.value.range != ActivityDateRange.lastDays(today(), days))
+                is ApiResult.Failure -> SnapshotState(lastStatistics, loading = false, error = result.error.kind,
+                    freshness = lastStatistics?.freshness,
+                    stale = lastStatistics?.range?.let { saved -> saved != ActivityDateRange.lastDays(today(), days) } == true)
             }) }
         }
     }

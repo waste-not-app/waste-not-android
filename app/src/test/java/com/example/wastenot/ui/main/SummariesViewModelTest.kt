@@ -15,6 +15,7 @@ import com.example.wastenot.model.*
 import java.time.ZoneId
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -160,5 +161,65 @@ class SummariesViewModelTest {
         assertNull(vm.state.value.dashboard.value)
         assertNull(vm.state.value.statistics.value)
         assertFalse(vm.state.value.dashboard.loading)
+    }
+
+    @Test fun cachedSuccessCarriesRefreshFailureAndOriginalDatesAcrossAccountMidnight() = runTest {
+        var date = source.referenceDate
+        val savedAt = java.time.Instant.parse("2026-09-21T07:00:00Z")
+        var freshness = SnapshotFreshness(cached = true, confirmedAt = savedAt)
+        val confirmedDashboard = source.dashboard().value
+        val confirmedRange = ActivityDateRange.lastDays(date, 7)
+        val confirmedStatistics = source.statistics(confirmedRange).value
+        val changes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+        val gateway = object : ActivityStore by source {
+            override val changes = changes
+            override suspend fun dashboard() = ApiResult.Success(confirmedDashboard.copy(freshness = freshness))
+            override suspend fun statistics(range: ActivityDateRange) =
+                ApiResult.Success(confirmedStatistics.copy(freshness = freshness))
+        }
+        val vm = model(gateway, today = { date })
+        vm.dashboard(); vm.statistics(); advanceUntilIdle()
+        assertTrue(vm.state.value.dashboard.freshness!!.cached)
+        assertEquals(savedAt, vm.state.value.statistics.freshness!!.confirmedAt)
+        assertFalse(vm.state.value.dashboard.stale)
+        assertFalse(vm.state.value.statistics.stale)
+        assertNull(vm.state.value.dashboard.error)
+
+        freshness = freshness.copy(refreshError = ApiFailureKind.NETWORK)
+        changes.emit(Unit); advanceUntilIdle()
+        assertEquals(ApiFailureKind.NETWORK, vm.state.value.dashboard.error)
+        assertEquals(ApiFailureKind.NETWORK, vm.state.value.statistics.error)
+        assertEquals(confirmedDashboard.progress, vm.state.value.dashboard.value!!.progress)
+        date = date.plusDays(1)
+        vm.dashboard(); vm.statistics(); advanceUntilIdle()
+        assertTrue(vm.state.value.dashboard.stale)
+        assertTrue(vm.state.value.statistics.stale)
+        assertEquals(confirmedDashboard.date, vm.state.value.dashboard.value!!.date)
+        assertEquals(confirmedRange, vm.state.value.statistics.value!!.range)
+        assertEquals(savedAt, vm.state.value.dashboard.freshness!!.confirmedAt)
+        assertEquals(ApiFailureKind.NETWORK, vm.state.value.dashboard.error)
+        assertFalse(vm.state.value.dashboard.loading)
+    }
+
+    @Test fun cachedRefreshErrorPersistsUntilTheStoreConfirmsSuccessfulRefresh() = runTest {
+        var failed = true
+        val changes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+        val gateway = object : ActivityStore by source {
+            override val changes = changes
+            override suspend fun dashboard() = source.dashboard().let { response ->
+                ApiResult.Success(response.value.copy(freshness = SnapshotFreshness(cached = true,
+                    confirmedAt = java.time.Instant.parse("2026-09-21T07:00:00Z"),
+                    refreshError = ApiFailureKind.TIMEOUT.takeIf { failed })))
+            }
+        }
+        val vm = model(gateway)
+        vm.dashboard(); advanceUntilIdle()
+        assertEquals(ApiFailureKind.TIMEOUT, vm.state.value.dashboard.error)
+        vm.refresh(); advanceUntilIdle()
+        assertEquals(ApiFailureKind.TIMEOUT, vm.state.value.dashboard.error)
+        failed = false
+        changes.emit(Unit); advanceUntilIdle()
+        assertNull(vm.state.value.dashboard.error)
+        assertTrue(vm.state.value.dashboard.freshness!!.cached)
     }
 }

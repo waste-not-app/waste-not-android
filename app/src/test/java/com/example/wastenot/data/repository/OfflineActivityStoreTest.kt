@@ -2,14 +2,20 @@ package com.example.wastenot.data.repository
 
 import android.app.Application
 import androidx.room.Room
+import com.example.wastenot.data.demo.DemoActivityStore
 import com.example.wastenot.data.local.ActivityDatabase
+import com.example.wastenot.data.local.AccountIdentity
+import com.example.wastenot.data.local.ServerSnapshot
 import com.example.wastenot.data.network.*
 import com.example.wastenot.model.*
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import org.junit.*
 import org.junit.Assert.*
 import org.junit.runner.RunWith
@@ -235,6 +241,179 @@ class OfflineActivityStoreTest {
         assertEquals(0, server.created)
     }
 
+    @Test fun acknowledgementWaitsForWorkerResponseAndReplaysAcrossRestartWithoutLocalSaveEmissions() = runBlocking {
+        val store = store()
+        val acknowledgements = Channel<String>(Channel.UNLIMITED)
+        val observer = launch(Dispatchers.Default) {
+            store.synchronizationAcknowledgements.collect { acknowledgements.send(it) }
+        }
+        try {
+            val id = store.create(input, request()).value().log.id
+            assertNull(database.activities().snapshot(owner.id, "acknowledgement"))
+            server.createStarted = CompletableDeferred()
+            server.finishCreate = CompletableDeferred()
+            val worker = async { store.synchronize() }
+            server.createStarted!!.await()
+            assertNull(database.activities().snapshot(owner.id, "acknowledgement"))
+            assertTrue(acknowledgements.tryReceive().isFailure)
+            server.finishCreate!!.complete(Unit)
+            assertTrue(worker.await())
+            val first = withTimeout(5_000) { acknowledgements.receive() }
+            assertEquals(database.activities().snapshot(owner.id, "acknowledgement")!!.payload, first)
+
+            store.update(id, store.get(id).value().version, input.copy(notes = "baru")).value()
+            assertEquals(first, database.activities().snapshot(owner.id, "acknowledgement")!!.payload)
+            assertTrue(store.synchronize())
+            val second = withTimeout(5_000) { acknowledgements.receive() }
+            assertNotEquals(first, second)
+            assertEquals(database.activities().snapshot(owner.id, "acknowledgement")!!.payload, second)
+            observer.cancelAndJoin()
+            database.close(); database = openDatabase()
+            assertEquals(second, withTimeout(5_000) { store().synchronizationAcknowledgements.first() })
+            val other = owner.copy(id = request())
+            store(other).synchronize()
+            assertNull(database.activities().snapshot(other.id, "acknowledgement"))
+        } finally {
+            server.finishCreate?.complete(Unit)
+            observer.cancelAndJoin()
+        }
+    }
+
+    @Test fun lostResponseDoesNotAcknowledgeUntilReplayConfirmsTheServerCommit() = runBlocking {
+        val store = store()
+        store.create(input, request()).value()
+        server.loseCreate = true
+        assertFalse(store.synchronize())
+        assertEquals(1, server.created)
+        assertNull(database.activities().snapshot(owner.id, "acknowledgement"))
+        assertTrue(store.synchronize())
+        assertNotNull(database.activities().snapshot(owner.id, "acknowledgement"))
+        assertEquals(1, server.created)
+    }
+
+    @Test fun cachedRefreshFailureSurvivesRestartAndDayRolloverWithoutInventingTotals() = runBlocking {
+        val source = DemoActivityStore(owner.timezone)
+        val expectedDashboard = source.dashboard().value
+        val expectedRange = ActivityDateRange.lastDays(source.referenceDate, 7)
+        val expectedStatistics = source.statistics(expectedRange).value
+        server.summaries = source
+        val confirmedAt = Instant.parse("2026-11-13T07:00:00Z")
+        var instant = confirmedAt
+        fun cachedStore() = OfflineActivityStore(owner, database, server, { active }, {}, { instant })
+        val store = cachedStore()
+        assertTrue(store.synchronize())
+        assertEquals(confirmedAt, store.dashboard().value().freshness.confirmedAt)
+        assertTrue(store.dashboard().value().freshness.cached)
+        assertNull(store.dashboard().value().freshness.refreshError)
+        val local = store.create(input, request()).value()
+        assertEquals(expectedDashboard.progress, store.dashboard().value().progress)
+        assertEquals(expectedDashboard.summary, store.dashboard().value().summary)
+        assertEquals(ActivitySyncState.PENDING, local.log.syncState)
+
+        instant = instant.plusSeconds(86_400)
+        server.summaryFailure = ApiFailureKind.TIMEOUT
+        assertFalse(store.synchronize())
+        database.close(); database = openDatabase()
+        val dashboard = cachedStore().dashboard().value()
+        val statistics = cachedStore().statistics(ActivityDateRange.lastDays(source.referenceDate.plusDays(1), 7)).value()
+        assertEquals(expectedDashboard.date, dashboard.date)
+        assertEquals(expectedDashboard.progress, dashboard.progress)
+        assertEquals(expectedStatistics.range, statistics.range)
+        assertEquals(expectedStatistics.summary, statistics.summary)
+        assertEquals(confirmedAt, statistics.freshness.confirmedAt)
+        assertEquals(ApiFailureKind.TIMEOUT, dashboard.freshness.refreshError)
+        assertEquals(ApiFailureKind.TIMEOUT, statistics.freshness.refreshError)
+        assertEquals(ApiFailureKind.NETWORK, store(owner.copy(id = request())).dashboard().kind())
+
+        server.summaryFailure = null
+        assertTrue(cachedStore().synchronize())
+        assertNull(cachedStore().dashboard().value().freshness.refreshError)
+        assertEquals(instant, cachedStore().dashboard().value().freshness.confirmedAt)
+    }
+
+    @Test fun confirmedAccountPurgeDeletesOnlyItsOwnerAndLeavesOtherAccountsQueuesAndIdentity() = runBlocking {
+        val other = owner.copy(id = request(), email = "other@example.com")
+        val firstRequest = request()
+        val otherRequest = request()
+        val firstId = store().create(input, firstRequest).value().log.id
+        val otherId = store(other).create(input.copy(notes = "milik akun lain"), otherRequest).value().log.id
+        val dao = database.activities()
+        dao.snapshot(ServerSnapshot(owner.id, "acknowledgement", "first", 1))
+        dao.snapshot(ServerSnapshot(other.id, "acknowledgement", "other", 2))
+        dao.identify(AccountIdentity(owner = other.id, payload = "{}"))
+
+        dao.clearOwner(owner.id)
+        assertNull(dao.find(owner.id, firstId))
+        assertTrue(dao.mutations(owner.id).isEmpty())
+        assertNull(dao.receipt(owner.id, firstRequest))
+        assertNull(dao.snapshot(owner.id, "acknowledgement"))
+        assertEquals(other.id, dao.identity()!!.owner)
+        assertNotNull(dao.find(other.id, otherId))
+        assertEquals(1, dao.mutations(other.id).size)
+        assertNotNull(dao.receipt(other.id, otherRequest))
+        assertEquals("other", dao.snapshot(other.id, "acknowledgement")!!.payload)
+
+        dao.identify(AccountIdentity(owner = owner.id, payload = "{}"))
+        dao.clearOwner(owner.id)
+        assertNull(dao.identity())
+        database.close(); database = openDatabase()
+        assertNull(database.activities().find(owner.id, firstId))
+        assertNotNull(database.activities().find(other.id, otherId))
+        assertEquals(1, database.activities().mutations(other.id).size)
+        assertNotNull(database.activities().receipt(other.id, otherRequest))
+        assertEquals("other", database.activities().snapshot(other.id, "acknowledgement")!!.payload)
+    }
+
+    @Test fun ownerBecomingInactiveDuringWorkerResponseCannotPublishAnAcknowledgement() = runBlocking {
+        val store = store()
+        store.create(input, request()).value()
+        val started = CompletableDeferred<Unit>()
+        val finish = CompletableDeferred<Unit>()
+        server.createStarted = started
+        server.finishCreate = finish
+        val worker = async { store.synchronize() }
+        try {
+            withTimeout(5_000) { started.await() }
+            active = false
+            finish.complete(Unit)
+            assertTrue(worker.await())
+            assertNull(database.activities().snapshot(owner.id, "acknowledgement"))
+            assertEquals(1, database.activities().mutations(owner.id).size)
+            assertEquals(1, server.created)
+
+            active = true
+            assertTrue(store.synchronize())
+            assertNotNull(database.activities().snapshot(owner.id, "acknowledgement"))
+            assertTrue(database.activities().mutations(owner.id).isEmpty())
+            assertEquals(1, server.created)
+        } finally {
+            finish.complete(Unit)
+        }
+    }
+
+    @Test fun failedStatisticsRefreshKeepsItsLastConfirmationUntilTheWholeRefreshSucceeds() = runBlocking {
+        val source = DemoActivityStore(owner.timezone)
+        server.summaries = source
+        var instant = Instant.parse("2026-09-21T07:00:00Z")
+        val store = OfflineActivityStore(owner, database, server, { active }, {}, { instant })
+        val range = ActivityDateRange.lastDays(source.referenceDate, 7)
+        assertTrue(store.synchronize())
+        val before = store.statistics(range).value()
+        instant = instant.plusSeconds(3_600)
+        server.statisticsFailure = ApiFailureKind.RATE_LIMITED
+        assertFalse(store.synchronize())
+        val failed = store.statistics(range).value()
+        assertEquals(before.summary, failed.summary)
+        assertEquals(before.range, failed.range)
+        assertEquals(before.freshness.confirmedAt, failed.freshness.confirmedAt)
+        assertEquals(ApiFailureKind.RATE_LIMITED, failed.freshness.refreshError)
+        server.statisticsFailure = null
+        assertTrue(store.synchronize())
+        val refreshed = store.statistics(range).value()
+        assertEquals(instant, refreshed.freshness.confirmedAt)
+        assertNull(refreshed.freshness.refreshError)
+    }
+
     private inner class TestServer : ActivityStore {
         override val referenceDate: LocalDate? = null
         val rows = linkedMapOf<String, WasteLog>()
@@ -246,9 +425,17 @@ class OfflineActivityStoreTest {
         var loseUpdate = false
         var rejectWrites: ApiFailureKind? = null
         var rejectCreate: ApiFailureKind? = null
+        var createStarted: CompletableDeferred<Unit>? = null
+        var finishCreate: CompletableDeferred<Unit>? = null
+        var summaries: ActivityStore? = null
+        var summaryFailure: ApiFailureKind? = null
+        var statisticsFailure: ApiFailureKind? = null
         private fun failure(kind: ApiFailureKind) = ApiResult.Failure(ApiFailure(kind))
-        override suspend fun dashboard(): ApiResult<DashboardSnapshot> = failure(ApiFailureKind.NOT_CONFIGURED)
-        override suspend fun statistics(range: ActivityDateRange): ApiResult<StatisticsSnapshot> = failure(ApiFailureKind.NOT_CONFIGURED)
+        override suspend fun dashboard(): ApiResult<DashboardSnapshot> =
+            summaryFailure?.let(::failure) ?: summaries?.dashboard() ?: failure(ApiFailureKind.NOT_CONFIGURED)
+        override suspend fun statistics(range: ActivityDateRange): ApiResult<StatisticsSnapshot> =
+            statisticsFailure?.let(::failure) ?: summaryFailure?.let(::failure)
+                ?: summaries?.statistics(range) ?: failure(ApiFailureKind.NOT_CONFIGURED)
         override suspend fun load() = page()
         override suspend fun page(category: WasteCategory?, method: DisposalMethod?, dates: LogDateRange?, cursor: String?): ApiResult<List<WasteLog>> {
             val offset = cursor?.toInt() ?: 0
@@ -258,6 +445,8 @@ class OfflineActivityStoreTest {
         }
         override suspend fun get(id: String): ApiResult<WasteLog> = rows[id]?.let { ApiResult.Success(it) } ?: failure(ApiFailureKind.NOT_FOUND)
         override suspend fun create(input: ActivityInput, clientRequestId: String): ApiResult<ActivityCreation> {
+            createStarted?.complete(Unit)
+            finishCreate?.await()
             rejectCreate?.let { return failure(it) }
             requests += clientRequestId
             receipts[clientRequestId]?.let { return ApiResult.Success(ActivityCreation(rows.getValue(it), false)) }

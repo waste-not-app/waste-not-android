@@ -66,3 +66,28 @@ class ReminderPreferences(private val dataStore: DataStore<Preferences>) : Remin
         fun create(context: Context) = ReminderPreferences(context.applicationContext.reminderDataStore)
     }
 }
+
+/** Notification permission belongs to the installation, not to a signed-in account. */
+class ReminderPermissionPreferences(context: Context) {
+    private val preferences = context.applicationContext.getSharedPreferences(
+        "reminder_notification_permission", Context.MODE_PRIVATE,
+    )
+
+    val denied: Boolean get() = preferences.getBoolean("denied", false)
+
+    fun recordResult(granted: Boolean) {
+        preferences.edit().putBoolean("denied", !granted).apply()
+    }
+}
+
+internal enum class ReminderPermissionAction { ENABLE, REQUEST, SETTINGS }
+
+internal fun reminderPermissionAction(
+    notificationsAllowed: Boolean,
+    deniedBefore: Boolean,
+    runtimePermissionRequired: Boolean,
+): ReminderPermissionAction = when {
+    notificationsAllowed -> ReminderPermissionAction.ENABLE
+    deniedBefore || !runtimePermissionRequired -> ReminderPermissionAction.SETTINGS
+    else -> ReminderPermissionAction.REQUEST
+}
