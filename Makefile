@@ -42,7 +42,7 @@ $(if $(wildcard $(GRADLEW)),,$(error "gradlew tidak ditemukan. Pastikan kamu di 
         branch branch-feature branch-fix branch-release branch-hotfix \
         merge-dev merge-main pr-ready \
         week1 week2 week3 week4 \
-        setup setup-hooks device-info screenshots
+        setup setup-hooks device-info screenshots check-ci docker-apk docker-ci
 
 
 # =============================================================================
@@ -71,6 +71,10 @@ help: ## Tampilkan semua perintah yang tersedia
 	@echo ""
 	@echo "  $(BOLD)WEEKLY GATES$(RESET)"
 	@grep -E '^week[0-9]+:.*##' $(MAKEFILE_LIST) \
+		| awk 'BEGIN{FS=":.*##"}{printf "  $(GREEN)%-28s$(RESET) %s\n", $$1, $$2}'
+	@echo ""
+	@echo "  $(BOLD)DOCKER$(RESET)"
+	@grep -E '^docker-[^:]+:.*##' $(MAKEFILE_LIST) \
 		| awk 'BEGIN{FS=":.*##"}{printf "  $(GREEN)%-28s$(RESET) %s\n", $$1, $$2}'
 	@echo ""
 	@echo "  $(BOLD)SETUP & DEVICE$(RESET)"
@@ -165,6 +169,10 @@ lint: ## Jalankan Android Lint
 
 check: lint test-unit ## Lint + unit test (jalankan sebelum commit)
 	@echo "$(GREEN)✔ check selesai — aman untuk commit$(RESET)"
+
+check-ci: ## Gate CI lengkap: lint semua varian, unit test, build semua APK
+	$(GRADLEW) lintDebug lintStaging lintRelease testDebugUnitTest -Pwastenot.hotReload=false
+	$(GRADLEW) assembleDebug assembleStaging assembleRelease assembleDebugAndroidTest -Pwastenot.hotReload=false
 
 
 # =============================================================================
@@ -420,3 +428,16 @@ screenshots: ## Ambil screenshot dari semua device yang terkoneksi
 		adb -s $$DEV exec-out screencap -p > "$$FILE" && \
 		echo "  $(GREEN)✔ $$FILE$(RESET)"; \
 	done
+
+
+# =============================================================================
+# DOCKER
+# =============================================================================
+
+docker-apk: ## Build APK debug + unit test di container, hasil ke dist/apk
+	docker build --target apk --output type=local,dest=dist/apk .
+	@echo "$(GREEN)✔ APK: dist/apk/$(RESET)"
+
+docker-ci: ## Jalankan gate CI di container tanpa Android SDK lokal
+	docker build --target apk --output type=local,dest=dist/apk \
+		--build-arg GRADLE_TASKS="lintDebug testDebugUnitTest assembleDebug assembleStaging" .
