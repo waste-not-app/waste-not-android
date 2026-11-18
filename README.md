@@ -30,6 +30,17 @@ python3 scripts/verify_release_workflow.py
 python3 scripts/verify_live_data.py app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/staging/app-staging.apk app/build/outputs/apk/release/app-release-unsigned.apk
 ```
 
+Pintasan Make untuk alur yang sama:
+
+| Target | Fungsi |
+|---|---|
+| `make check` | Lint debug + unit test, untuk sebelum commit |
+| `make check-ci` | Lint semua varian, unit test, dan build semua APK seperti CI |
+| `make docker-apk` | Unit test + APK debug di container, hasil ke `dist/apk/` |
+| `make docker-ci` | Lint, unit test, APK debug dan staging di container tanpa Android SDK lokal |
+
+Image build (`Dockerfile`) memakai JDK 17 dan Android SDK Platform 36 resmi, dengan cache Gradle BuildKit, sehingga APK bisa dibangun ulang secara reproducible tanpa Android Studio. Dependabot memperbarui dependency Gradle, GitHub Actions, dan base image setiap minggu; action di workflow dipin ke commit SHA.
+
 Alamat bawaan ketiga varian: `https://waste-not-api.bccdev.id/v1/`. Override lingkungan memakai `wastenot.debugApiBaseUrl`, `wastenot.stagingApiBaseUrl`, atau `wastenot.releaseApiBaseUrl`; nilai kosong ditolak. HTTP hanya diizinkan pada debug dengan override localhost/emulator yang eksplisit. Staging memakai package `.staging` dan HTTPS. Release memerlukan signing sebelum distribusi; pipeline publikasi tetap mewajibkan variable `WASTENOT_RELEASE_API_BASE_URL`.
 
 Data terkontrol dan adapter lokal untuk pengujian berada di `app/src/testFixtures` dan `app/src/androidTest`, tidak masuk APK debug/staging/release. Pengujian perjalanan UI mengaktifkan sumber tersebut melalui runner pengujian saja; pengujian backend nyata tetap opt-in dan memakai adapter remote. Pemeriksaan `verify_live_data.py` menolak adapter lokal dalam source aplikasi maupun DEX APK.
