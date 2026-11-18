@@ -1,0 +1,10 @@
+.git
+.github
+.gradle
+.idea
+.kotlin
+**/build
+docs
+local.properties
+*.keystore
+*.jks
