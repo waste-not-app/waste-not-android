@@ -1,4 +1,4 @@
-11 November 2026 — Android 17 / API 37, Go QA 8087405 and isolated PostgreSQL 18.
+11 November 2026, Android 17 / API 37, Go QA 8087405 and isolated PostgreSQL 18.
 LocalScanRecoveryTest#rejectsInvalidAdviceAndKeepsSpecialHandlingManual
 
 CameraX uploaded one image. A controlled loopback worker returned malformed

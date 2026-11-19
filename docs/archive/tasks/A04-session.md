@@ -1,4 +1,4 @@
-# A04 — Credential storage dan refresh sesi
+# A04: Credential storage dan refresh sesi
 
 Issue [#21](https://github.com/waste-not-app/waste-not-android/issues/21) · branch `codex/android-session-a04` · **Siap review client**.
 

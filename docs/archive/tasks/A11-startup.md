@@ -1,4 +1,4 @@
-# A11 — Pemulihan sesi startup
+# A11: Pemulihan sesi startup
 
 Issue [#34](https://github.com/waste-not-app/waste-not-android/issues/34) · **Siap review client**. Bagian repository disediakan oleh [PR #91](https://github.com/waste-not-app/waste-not-android/pull/91) dan [A04](A04-session.md).
 

@@ -62,7 +62,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     // ── COMPOSE ───────────────────────────────────────────────────
-    // BOM ngatur semua versi Compose sekaligus — ga perlu tulis versi satu-satu
+    // BOM ngatur semua versi Compose sekaligus, ga perlu tulis versi satu-satu
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     implementation(libs.androidx.compose.ui)
@@ -75,25 +75,25 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     // ── NETWORKING ────────────────────────────────────────────────
-    // Retrofit sama persis kayak di XML — interface API, converter JSON
+    // Retrofit sama persis kayak di XML, interface API, converter JSON
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp.logging) // biar bisa liat log request/response di Logcat
 
     // ── HILT ──────────────────────────────────────────────────────
-    // Dependency injection — nanti aku jelasin waktu kita pakai
+    // Dependency injection, nanti aku jelasin waktu kita pakai
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
     // ── ROOM ──────────────────────────────────────────────────────
-    // Local database — untuk caching data biar ga reload terus
+    // Local database, untuk caching data biar ga reload terus
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
     // ── DATASTORE ─────────────────────────────────────────────────
-    // Untuk simpan JWT token — pengganti SharedPreferences yang lebih modern
+    // Untuk simpan JWT token, pengganti SharedPreferences yang lebih modern
     implementation(libs.datastore.preferences)
 
     // ── IMAGE LOADING ─────────────────────────────────────────────

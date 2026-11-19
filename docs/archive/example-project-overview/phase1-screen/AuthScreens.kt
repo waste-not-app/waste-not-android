@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
-// Placeholder — nanti di Phase 1 kita ganti dengan UI asli
+// Placeholder, nanti di Phase 1 kita ganti dengan UI asli
 @Composable
 fun LoginScreen(
     onNavigateToRegister: () -> Unit = {},

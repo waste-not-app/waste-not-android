@@ -1,8 +1,8 @@
-# AGENT_INDEX.md — WasteNot Design Kit Quick Index
+# AGENT_INDEX.md: WasteNot Design Kit Quick Index
 
 Indeks cepat untuk AI coding agent. Gunakan ini sebagai peta untuk menemukan informasi spesifik tanpa harus baca seluruh dokumen.
 
-> **Versi kit ini: v1.3 · 28 September 2026** — Core + AI extension (YOLO + LLM recommendation pipeline, S21–S25, C35–C39)
+> **Versi kit ini: v1.3 · 28 September 2026**, Core + AI extension (YOLO + LLM recommendation pipeline, S21–S25, C35–C39)
 
 ## Peta dokumen
 
@@ -11,7 +11,7 @@ CLAUDE.md (root)          ← Baca ini dulu. Konteks proyek + aturan utama.
 AGENT.md (root)           ← Quick reference, task-based reading guide.
 docs/design-kit/
   ├── README.md            ← Ikhtisar kit v1.3 dan cara pakai design-system.html
-  ├── AI_SPEC.md           ← ★ BARU — Spesifikasi penuh AI pipeline (YOLO/Guide/LLM)
+  ├── AI_SPEC.md           ← ★ BARU, Spesifikasi penuh AI pipeline (YOLO/Guide/LLM)
   ├── PRD.md               ← Domain rules, scope, metrik, AI increment v1.2
   ├── DESIGN.md            ← Design system + komponen AI (C35–C39) v1.3
   ├── SCREEN_SPEC.md       ← Layar + komponen termasuk S21–S25 AI scan v1.3
@@ -20,15 +20,15 @@ docs/design-kit/
   ├── IMPLEMENTATION_PLAN.md ← Backlog 4 minggu + AI increment stages §10 v1.2
   ├── QA.md                ← QA HTML prototype
   ├── design-system.html   ← Mockup visual interaktif incl. AI scan flow (buka di browser)
-  ├── ai-demo.js           ← ★ BARU — Script demo AI untuk HTML prototype
+  ├── ai-demo.js           ← ★ BARU, Script demo AI untuk HTML prototype
   ├── verify.cjs           ← Automated test inti
-  ├── verify-ai.cjs        ← ★ BARU — Automated test khusus AI scan flow
+  ├── verify-ai.cjs        ← ★ BARU, Automated test khusus AI scan flow
   ├── assets/
-  │   ├── preview-ai.png   ← ★ BARU — Preview layar AI scan
-  │   ├── qa-core-v1.2/1.3.json ← ★ BARU — QA core hasil versioned
-  │   └── qa-ai-v1.2/1.3.json  ← ★ BARU — QA AI hasil versioned
+  │   ├── preview-ai.png   ← ★ BARU, Preview layar AI scan
+  │   ├── qa-core-v1.2/1.3.json ← ★ BARU, QA core hasil versioned
+  │   └── qa-ai-v1.2/1.3.json  ← ★ BARU, QA AI hasil versioned
   ├── sources/
-  │   └── AI_PLAN_ORIGINAL.md ← ★ BARU — Dokumen source plan tim (referensi, bukan spec final)
+  │   └── AI_PLAN_ORIGINAL.md ← ★ BARU, Dokumen source plan tim (referensi, bukan spec final)
   └── AGENT_INDEX.md       ← Dokumen ini
 ```
 
@@ -36,7 +36,7 @@ docs/design-kit/
 
 ## Cari informasi berdasarkan topik
 
-### ★ AI Pipeline (BARU — v1.2/1.3)
+### ★ AI Pipeline (BARU: v1.2/1.3)
 - Overview pipeline (Camera → YOLO → Mapping → Guide → LLM → User confirm) → [`AI_SPEC.md §1–2`](AI_SPEC.md)
 - Kamera & siklus hidup CameraX (izin, capture, cancel, EXIF, process death) → [`AI_SPEC.md §3`](AI_SPEC.md)
 - Confidence bands (≥0.70 OFFERED / 0.50–0.69 UNCERTAIN / <0.50 MANUAL_REQUIRED) → [`AI_SPEC.md §4`](AI_SPEC.md)
@@ -62,7 +62,7 @@ docs/design-kit/
 - C38: Object context (select/radio untuk 3 dimensi kondisi + unknown default) → [`SCREEN_SPEC.md §4`](SCREEN_SPEC.md)
 - C39: Recommendation review (source, reason, caution; confirm; special handling) → [`SCREEN_SPEC.md §4`](SCREEN_SPEC.md)
 
-### ★ API AI (BARU — v1.2)
+### ★ API AI (BARU: v1.2)
 - GET /v1/ai/objects (catalog object_key/category + mapping version) → [`API.md §10`](API.md)
 - POST /v1/ai/detections (upload foto ephemeral, YOLO, simpan session) → [`API.md §10`](API.md)
 - POST /v1/ai/recommendations (confirm/correct object, guide, LLM suggestion) → [`API.md §10`](API.md)
@@ -71,14 +71,14 @@ docs/design-kit/
 - Error codes baru: AI_TIMEOUT (504), AI_UNAVAILABLE (503), AI_SESSION_EXPIRED (410) → [`API.md §10`](API.md)
 - REDUCE tidak boleh dari rekomendasi AI (manual only, no provenance) → [`API.md §10`](API.md)
 
-### ★ Arsitektur AI Android (BARU — §13)
+### ★ Arsitektur AI Android (BARU: §13)
 - ScanViewModel + WasteDetectionRepository + package feature/scan, data/ai, core/camera → [`ARCHITECTURE.md §13`](ARCHITECTURE.md)
 - Tombol Catat/Scan = action di tengah atas dock lima tab (bukan tab ke-6) → [`ARCHITECTURE.md §13`](ARCHITECTURE.md)
 - Go (auth, domain, mapping, LLM validation) vs Python (inference only, no DB/LLM key) → [`ARCHITECTURE.md §13`](ARCHITECTURE.md)
 - AI config vars (AI_SCAN_ENABLED, AI_INFERENCE_URL, LLM_PROVIDER, dll.) → [`ARCHITECTURE.md §13`](ARCHITECTURE.md)
 - CI tambahan untuk AI (schema/model adapter, mapping, cleanup, camera lifecycle, E2E) → [`ARCHITECTURE.md §13`](ARCHITECTURE.md)
 
-### ★ Implementation Roadmap AI (BARU — §10)
+### ★ Implementation Roadmap AI (BARU: §10)
 - 8 AI stages (AI-01 Contract & taxonomy → ... → AI-08 Evaluation & pilot) → [`IMPLEMENTATION_PLAN.md §10`](IMPLEMENTATION_PLAN.md)
 - AT-AI-01–18 acceptance tests AI → [`IMPLEMENTATION_PLAN.md §10`](IMPLEMENTATION_PLAN.md)
 - Demo script AI (2–3 menit, kamera + fallback) → [`IMPLEMENTATION_PLAN.md §10`](IMPLEMENTATION_PLAN.md)
@@ -86,7 +86,7 @@ docs/design-kit/
 
 ---
 
-## Cari informasi berdasarkan topik (Core — tidak berubah)
+## Cari informasi berdasarkan topik (Core: tidak berubah)
 
 ### Warna & tema
 - Token semantik (primary, surface, error, dll.) → [`DESIGN.md §2`](DESIGN.md)
@@ -105,7 +105,7 @@ docs/design-kit/
 - <600 dp / 600–839 dp / ≥840 dp → [`DESIGN.md §5`](DESIGN.md)
 - Safe area, insets, keyboard → [`ARCHITECTURE.md §7`](ARCHITECTURE.md)
 
-### Komponen UI (C01–C34) — core
+### Komponen UI (C01–C34): core
 - Inventaris C01–C39 (termasuk AI) → [`SCREEN_SPEC.md §4`](SCREEN_SPEC.md)
 - Aturan visual per kelompok → [`DESIGN.md §6`](DESIGN.md)
 
@@ -141,9 +141,9 @@ docs/design-kit/
 
 ## Apa yang TIDAK ada di design kit ini
 
-- Backend implementation (Go, PostgreSQL, Python YOLO worker) — hanya kontrak di `API.md` dan `ARCHITECTURE.md`
-- Trained/fine-tuned YOLO model — belum dipilih, lihat `AI_SPEC.md §9`
-- LLM provider yang sudah dipilih — belum diputuskan tim
+- Backend implementation (Go, PostgreSQL, Python YOLO worker), hanya kontrak di `API.md` dan `ARCHITECTURE.md`
+- Trained/fine-tuned YOLO model, belum dipilih, lihat `AI_SPEC.md §9`
+- LLM provider yang sudah dipilih, belum diputuskan tim
 - APK atau Android project yang sudah di-build
 - Credential, token, atau data pengguna nyata
 - Dataset fine-tuning (lisensi belum diputuskan)

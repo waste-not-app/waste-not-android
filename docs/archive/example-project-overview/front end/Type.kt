@@ -29,7 +29,7 @@ val DmSansFamily = FontFamily(
 // Mapping design system → Material 3 typography roles
 val TitipinTypography = Typography(
 
-    // Display — Fraunces Italic Light — hero text, branding
+    // Display, Fraunces Italic Light, hero text, branding
     // Contoh: "Jastip & Preloved" di splash/home header
     displayLarge = TextStyle(
         fontFamily = FrauncesFamily,
@@ -55,7 +55,7 @@ val TitipinTypography = Typography(
         lineHeight = 28.sp,
     ),
 
-    // Headline — Fraunces Regular/Medium — section titles, screen titles
+    // Headline, Fraunces Regular/Medium, section titles, screen titles
     // Contoh: "Temukan di Malang", "Jastip Terdekat"
     headlineLarge = TextStyle(
         fontFamily = FrauncesFamily,
@@ -77,7 +77,7 @@ val TitipinTypography = Typography(
         lineHeight = 22.sp,
     ),
 
-    // Title — DM Sans SemiBold — card titles, list item titles
+    // Title, DM Sans SemiBold, card titles, list item titles
     titleLarge = TextStyle(
         fontFamily = DmSansFamily,
         fontWeight = FontWeight.SemiBold,
@@ -99,7 +99,7 @@ val TitipinTypography = Typography(
         letterSpacing = 0.1.sp,
     ),
 
-    // Body — DM Sans Regular — deskripsi, konten utama
+    // Body, DM Sans Regular, deskripsi, konten utama
     bodyLarge = TextStyle(
         fontFamily = DmSansFamily,
         fontWeight = FontWeight.Normal,
@@ -119,7 +119,7 @@ val TitipinTypography = Typography(
         lineHeight = 18.sp,
     ),
 
-    // Label — DM Sans Medium — badge, chip, caption, metadata
+    // Label, DM Sans Medium, badge, chip, caption, metadata
     // Contoh: "2 km · 45 menit lagi · Aktif"
     labelLarge = TextStyle(
         fontFamily = DmSansFamily,
