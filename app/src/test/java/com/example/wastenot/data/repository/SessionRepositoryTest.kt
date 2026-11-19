@@ -98,7 +98,7 @@ class SessionRepositoryTest {
     @Test
     fun registerUsesServerIdentityAndNeverSendsConfirmationPassword() = runTest {
         server.enqueue(json(fixture("auth-session")).setResponseCode(201))
-        assertTrue(session.register(" Nama ", " FIXTURE-A@example.com ", "fixture-password", java.time.ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
+        assertTrue(session.register(" Name ", " FIXTURE-A@example.com ", "fixture-password", java.time.ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
         val body = Json.parseToJsonElement(server.takeRequest().body.readUtf8()).jsonObject
         assertEquals(setOf("name", "email", "password", "timezone"), body.keys)
         assertEquals("Name", body["name"]?.jsonPrimitive?.content)
