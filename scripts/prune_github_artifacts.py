@@ -51,10 +51,10 @@ def fetch_paged(endpoint: str, key: str) -> List[Dict[str, Any]]:
 
 
 def clean_artifacts(repo: str, keep: int, dry_run: bool) -> int:
-    print(f"\n📦 \033[1;34m[Artifacts]\033[0m Memeriksa artifact di \033[1m{repo}\033[0m...")
+    print(f"\n📦 \033[1;34m[Artifacts]\033[0m Checking artifacts in \033[1m{repo}\033[0m...")
     artifacts = fetch_paged(f"repos/{repo}/actions/artifacts", "artifacts")
     if not artifacts:
-        print("   Tidak ada artifact ditemukan.")
+        print("   No artifacts found.")
         return 0
 
     by_name: Dict[str, List[Dict[str, Any]]] = {}
@@ -70,7 +70,7 @@ def clean_artifacts(repo: str, keep: int, dry_run: bool) -> int:
         print(f"   - Group \033[36m'{name}'\033[0m: total {len(group)} | keep {len(kept)} | delete {len(pruned)}")
 
     if not to_delete:
-        print("   Semua artifact sudah sesuai limit (≤ {} versi per nama).".format(keep))
+        print("   All artifacts are within the limit (≤ {} versions per name).".format(keep))
         return 0
 
     reclaimed_bytes = 0
@@ -81,34 +81,34 @@ def clean_artifacts(repo: str, keep: int, dry_run: bool) -> int:
         asize = a.get("size_in_bytes", 0)
         size_mb = asize / (1024 * 1024)
         if dry_run:
-            print(f"   [DRY-RUN] Akan menghapus artifact: #{aid} '{aname}' ({size_mb:.2f} MB)")
+            print(f"   [DRY-RUN] Would delete artifact: #{aid} '{aname}' ({size_mb:.2f} MB)")
             deleted_count += 1
             reclaimed_bytes += asize
         else:
             del_res = run_command(["gh", "api", "--method", "DELETE", f"repos/{repo}/actions/artifacts/{aid}"])
             if del_res.returncode == 0:
-                print(f"   \033[32m✔ Terhapus:\033[0m #{aid} '{aname}' ({size_mb:.2f} MB)")
+                print(f"   \033[32m✔ Deleted:\033[0m #{aid} '{aname}' ({size_mb:.2f} MB)")
                 deleted_count += 1
                 reclaimed_bytes += asize
             else:
-                print(f"   \033[31m✖ Gagal menghapus:\033[0m #{aid} - {del_res.stderr.strip()}")
+                print(f"   \033[31m✖ Failed to delete:\033[0m #{aid} - {del_res.stderr.strip()}")
 
-    print(f"   \033[1mTotal artifact dihapus: {deleted_count} ({reclaimed_bytes / (1024*1024):.2f} MB dibebaskan)\033[0m")
+    print(f"   \033[1mArtifacts deleted: {deleted_count} ({reclaimed_bytes / (1024*1024):.2f} MB freed)\033[0m")
     return deleted_count
 
 
 def clean_caches(repo: str, keep: int, dry_run: bool) -> int:
-    print(f"\n⚡ \033[1;33m[Actions Caches]\033[0m Memeriksa cache di \033[1m{repo}\033[0m...")
+    print(f"\n⚡ \033[1;33m[Actions Caches]\033[0m Checking caches in \033[1m{repo}\033[0m...")
     caches = fetch_paged(f"repos/{repo}/actions/caches", "actions_caches")
     if not caches:
-        print("   Tidak ada cache ditemukan.")
+        print("   No caches found.")
         return 0
 
     caches.sort(key=lambda x: x.get("created_at", ""), reverse=True)
     kept = caches[:keep]
     to_delete = caches[keep:]
 
-    print(f"   Total cache: {len(caches)} | Simpan: {len(kept)} | Hapus: {len(to_delete)}")
+    print(f"   Total cache: {len(caches)} | Keep: {len(kept)} | Delete: {len(to_delete)}")
 
     deleted_count = 0
     reclaimed_bytes = 0
@@ -118,27 +118,27 @@ def clean_caches(repo: str, keep: int, dry_run: bool) -> int:
         csize = c.get("size_in_bytes", 0)
         size_mb = csize / (1024 * 1024)
         if dry_run:
-            print(f"   [DRY-RUN] Akan menghapus cache: #{cid} '{ckey[:50]}...' ({size_mb:.2f} MB)")
+            print(f"   [DRY-RUN] Would delete cache: #{cid} '{ckey[:50]}...' ({size_mb:.2f} MB)")
             deleted_count += 1
             reclaimed_bytes += csize
         else:
             del_res = run_command(["gh", "api", "--method", "DELETE", f"repos/{repo}/actions/caches/{cid}"])
             if del_res.returncode == 0:
-                print(f"   \033[32m✔ Terhapus cache:\033[0m #{cid} ({size_mb:.2f} MB)")
+                print(f"   \033[32m✔ Deleted cache:\033[0m #{cid} ({size_mb:.2f} MB)")
                 deleted_count += 1
                 reclaimed_bytes += csize
             else:
-                print(f"   \033[31m✖ Gagal menghapus cache:\033[0m #{cid} - {del_res.stderr.strip()}")
+                print(f"   \033[31m✖ Failed to delete cache:\033[0m #{cid} - {del_res.stderr.strip()}")
 
-    print(f"   \033[1mTotal cache dihapus: {deleted_count} ({reclaimed_bytes / (1024*1024):.2f} MB dibebaskan)\033[0m")
+    print(f"   \033[1mCaches deleted: {deleted_count} ({reclaimed_bytes / (1024*1024):.2f} MB freed)\033[0m")
     return deleted_count
 
 
 def clean_runs(repo: str, keep: int, dry_run: bool) -> int:
-    print(f"\n🚀 \033[1;35m[Workflow Runs]\033[0m Memeriksa workflow runs di \033[1m{repo}\033[0m...")
+    print(f"\n🚀 \033[1;35m[Workflow Runs]\033[0m Checking workflow runs in \033[1m{repo}\033[0m...")
     runs = fetch_paged(f"repos/{repo}/actions/runs", "workflow_runs")
     if not runs:
-        print("   Tidak ada workflow run ditemukan.")
+        print("   No workflow runs found.")
         return 0
 
     by_wf: Dict[str, List[Dict[str, Any]]] = {}
@@ -159,17 +159,17 @@ def clean_runs(repo: str, keep: int, dry_run: bool) -> int:
         rid = r["database_id"] if "database_id" in r else r["id"]
         title = r.get("display_title", r.get("name", ""))
         if dry_run:
-            print(f"   [DRY-RUN] Akan menghapus run: #{rid} '{title[:40]}'")
+            print(f"   [DRY-RUN] Would delete run: #{rid} '{title[:40]}'")
             deleted_count += 1
         else:
             del_res = run_command(["gh", "api", "--method", "DELETE", f"repos/{repo}/actions/runs/{rid}"])
             if del_res.returncode == 0:
-                print(f"   \033[32m✔ Terhapus run:\033[0m #{rid}")
+                print(f"   \033[32m✔ Deleted run:\033[0m #{rid}")
                 deleted_count += 1
             else:
-                print(f"   \033[31m✖ Gagal menghapus run:\033[0m #{rid} - {del_res.stderr.strip()}")
+                print(f"   \033[31m✖ Failed to delete run:\033[0m #{rid} - {del_res.stderr.strip()}")
 
-    print(f"   \033[1mTotal run dihapus: {deleted_count}\033[0m")
+    print(f"   \033[1mRuns deleted: {deleted_count}\033[0m")
     return deleted_count
 
 
@@ -183,63 +183,63 @@ def get_org_repos(org: str) -> List[str]:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Bersihkan GitHub Actions artifacts, caches, atau workflow runs lama dan sisakan 2-3 versi terbaru."
+        description="Clean up old GitHub Actions artifacts, caches, or workflow runs, keeping the newest 2 or 3."
     )
     parser.add_argument(
         "--repo",
         type=str,
         default=None,
-        help="Target repository dalam format OWNER/REPO (default: repo git saat ini)",
+        help="Target repository as OWNER/REPO (default: the current git repository)",
     )
     parser.add_argument(
         "--org",
         type=str,
         default=None,
-        help="Target seluruh repository di bawah organization (contoh: waste-not-app)",
+        help="Target every repository in an organization (for example waste-not-app)",
     )
     parser.add_argument(
         "--keep",
         type=int,
         default=3,
-        help="Jumlah versi/item terbaru yang disimpan (default: 3)",
+        help="How many of the newest versions or items to keep (default: 3)",
     )
     parser.add_argument(
         "--caches",
         action="store_true",
-        help="Bersihkan GitHub Actions caches juga",
+        help="Also clean up GitHub Actions caches",
     )
     parser.add_argument(
         "--runs",
         action="store_true",
-        help="Bersihkan riwayat workflow runs lama juga",
+        help="Also clean up old workflow runs",
     )
     parser.add_argument(
         "--all",
         action="store_true",
-        help="Bersihkan artifacts, caches, dan runs sekaligus",
+        help="Clean up artifacts, caches, and runs together",
     )
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Tampilkan apa yang akan dihapus tanpa benar-benar menghapus",
+        help="Show what would be deleted without deleting anything",
     )
 
     args = parser.parse_args()
 
     targets = []
     if args.org:
-        print(f"🔍 Mencari repository di organization \033[1m{args.org}\033[0m...")
+        print(f"🔍 Looking for repositories in organization \033[1m{args.org}\033[0m...")
         targets = get_org_repos(args.org)
         if not targets:
-            print(f"Tidak ada repository ditemukan di organization {args.org}.")
+            print(f"No repositories found in organization {args.org}.")
             sys.exit(1)
-        print(f"Ditemukan {len(targets)} repository: {', '.join(targets)}")
+        print(f"Found {len(targets)} repositories: {', '.join(targets)}")
     elif args.repo:
         targets = [args.repo]
     else:
         detected = get_current_repo()
         if not detected:
-            print("Error: Tidak berada di repository git dan opsi --repo atau --org tidak diberikan.")
+            print("Error: not inside a git repository, and neither --repo nor --org was given.")
             sys.exit(1)
         targets = [detected]
 
@@ -252,7 +252,7 @@ def main():
     print(f"Target Repos : {', '.join(targets)}")
     print(f"Keep Latest  : {args.keep} item")
     print(f"Clean Types  : Artifacts{' + Caches' if clean_c else ''}{' + Runs' if clean_r else ''}")
-    print(f"Mode         : {'\033[33mDRY-RUN (Simulasi)\033[0m' if args.dry_run else '\033[31mEXECUTION (Hapus Nyata)\033[0m'}")
+    print(f"Mode         : {'\033[33mDRY-RUN (simulation)\033[0m' if args.dry_run else '\033[31mEXECUTION (deleting for real)\033[0m'}")
     print("=" * 60)
 
     for repo in targets:
@@ -263,7 +263,7 @@ def main():
         if clean_r:
             clean_runs(repo, args.keep, args.dry_run)
 
-    print("\n\033[1;32m✔ Selesai!\033[0m\n")
+    print("\n\033[1;32m✔ Done!\033[0m\n")
 
 
 if __name__ == "__main__":
