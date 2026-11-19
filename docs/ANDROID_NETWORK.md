@@ -1,7 +1,7 @@
 # Lapisan jaringan Android
 
-Acuan: [API v1.2](WasteNot-Product-Design-Kit%20update/WasteNot/API.md),
-[arsitektur §8](WasteNot-Product-Design-Kit%20update/WasteNot/ARCHITECTURE.md), [A03 #6](https://github.com/waste-not-app/waste-not-android/issues/6).
+Acuan: [API v1.2](design-kit/API.md),
+[arsitektur §8](design-kit/ARCHITECTURE.md), [A03 #6](https://github.com/waste-not-app/waste-not-android/issues/6).
 
 `WasteNotNetwork` menyediakan satu OkHttp client, satu converter kotlinx.serialization, API Retrofit, dan executor hasil terarah. `CoreRepository` memetakan DTO snake_case ke model. Base URL kosong menghasilkan `NOT_CONFIGURED`, bukan alamat produksi buatan.
 

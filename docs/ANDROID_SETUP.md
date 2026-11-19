@@ -1,10 +1,10 @@
 # Setup dan fondasi Android WasteNot
 
-Pekerjaan awal untuk [A01 / issue #3](https://github.com/waste-not-app/waste-not-android/issues/3). Acuan produk yang digunakan adalah [kit terbaru](<WasteNot-Product-Design-Kit update/WasteNot/README.md>), bukan salinan `docs/design-kit/` yang lama.
+Pekerjaan awal untuk [A01 / issue #3](https://github.com/waste-not-app/waste-not-android/issues/3). Acuan produk yang digunakan adalah [kit terbaru](<design-kit/README.md>), bukan salinan `docs/design-kit/` yang lama.
 
 ## Kondisi starter
 
-Bagian ini mencatat baseline audit pada `e923f3c`. Perkembangan implementasi setelah audit dicatat per issue di [docs/tasks](tasks/README.md).
+Bagian ini mencatat baseline audit pada `e923f3c`. Perkembangan implementasi setelah audit dicatat per issue di [docs/tasks](archive/tasks/README.md).
 
 Satu module `:app`, Kotlin 2.3.20, AGP 9.0.1, Gradle 9.1.0, JDK 17, Compose BOM 2026.03.01, Navigation 3, min SDK 24, compile/target SDK 36. Versi dipertahankan dari starter dan dicatat di version catalog serta Gradle wrapper.
 
