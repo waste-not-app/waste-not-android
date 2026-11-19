@@ -39,7 +39,7 @@ For an interactive visual reference, including the AI scan flow, open [`docs/des
 
 | Area | Choice |
 |---|---|
-| Language | Kotlin 2.3.20 |
+| Language | Kotlin 2.4.21 |
 | UI | Jetpack Compose with Material 3; dynamic color disabled |
 | Navigation | Navigation 3 (`androidx.navigation3`) only |
 | State | ViewModel with StateFlow and unidirectional data flow |
