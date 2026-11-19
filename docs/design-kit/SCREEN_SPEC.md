@@ -1,297 +1,297 @@
-# WasteNot: Spesifikasi Layar dan Komponen
+# WasteNot: Screen and Component Spec
 
-Versi 1.3 · 28 September 2026 · Core + AI extension · Rancangan implementasi
+Version 1.3 · 28 September 2026 · Core plus AI extension · Implementation design
 
-Lihat [PRD](PRD.md) untuk aturan produk dan [DESIGN](DESIGN.md) untuk styling. ID layar di sini juga dipakai pada [HTML design system](design-system.html). Layar opsi tidak otomatis menjadi scope MVP. Seluruh data visual adalah simulasi berlabel, dengan acuan 21 September 2026.
+See the [PRD](PRD.md) for product rules and [DESIGN](DESIGN.md) for styling. The screen IDs here are the same ones used in the [HTML design system](design-system.html). Optional screens don't automatically join the MVP scope. All visual data is labeled simulation, with a reference date of 21 September 2026.
 
-## 1. Pola bersama
+## 1. Shared patterns
 
-- App bar: judul layar, Back bila bukan tujuan utama, aksi maksimal dua yang benar-benar relevan.
-- Navigasi utama: Beranda, Riwayat, Panduan, Statistik, Profil. Setiap ikon memiliki label.
-- Scroll vertikal untuk konten yang panjang. CTA form tidak menutupi input atau keyboard.
-- Loading awal memakai progress dan teks konteks; refresh mempertahankan data terakhir.
-- Empty pertama berbeda dari hasil pencarian/filter kosong. Error jaringan berbeda dari validasi field.
-- Semua perubahan data menunggu konfirmasi server; jangan menampilkan keberhasilan hanya karena tombol diketuk.
-- Status penyimpanan dan error diumumkan ke layanan aksesibilitas. Fokus kembali ke pemicu dialog ketika dialog ditutup.
+- App bar: the screen title, Back when it isn't a main destination, and at most two actions that really matter.
+- Main navigation: Home, History, Guide, Statistics, Profile. Every icon has a label.
+- Long content scrolls vertically. Form CTAs never cover inputs or the keyboard.
+- The first load shows progress and context text; refreshes keep the last data.
+- A first-time empty state is different from an empty search or filter result. Network errors are different from field validation.
+- Every data change waits for the server to confirm; never show success just because a button was tapped.
+- Save status and errors are announced to accessibility services. Focus returns to the dialog's trigger when the dialog closes.
 
-## 2. Inventaris layar
+## 2. Screen inventory
 
-| ID | Nama | Prioritas | Tujuan utama | Route/overlay |
+| ID | Name | Priority | Main purpose | Route / overlay |
 |---|---|---|---|---|
-| S01 | Pemulihan sesi | Must | Menentukan akar navigasi | Session |
-| S02 | Masuk | Must | Memulai sesi | Login |
-| S03 | Daftar | Must | Membuat akun | Register |
-| S04 | Beranda | Must | Melihat hari ini dan mulai mencatat | Home |
-| S05 | Catat aktivitas | Must | Membuat satu catatan valid | LogCreate |
-| S06 | Catatan tersimpan | Must feedback | Mengonfirmasi hasil dan langkah berikutnya | Hasil di detail, bukan tab |
-| S07 | Riwayat | Must | Menemukan catatan pribadi | History |
-| S08 | Detail catatan | Must | Memeriksa dan mengoreksi data | LogDetail(id) |
-| S09 | Ubah catatan | Must rancangan | Memperbaiki data | LogEdit(id) |
-| S10 | Filter riwayat | Must | Memilih kriteria daftar | Bottom sheet |
-| S11 | Panduan | Must | Mencari informasi material | Guide |
-| S12 | Detail panduan | Must | Membaca penanganan dan sumber | GuideDetail(id) |
-| S13 | Statistik | Must | Menilai rentang 7/30 hari | Statistics |
-| S14 | Profil dan progres | Must + baseline XP | Melihat akun dan kebiasaan | Profile |
-| S15 | Achievement | Should | Melihat syarat dan progres | Achievements |
-| S16 | Pengaturan | Rancangan pendukung | Mengatur tampilan dan preferensi | Settings |
-| S17 | Pengingat | Should | Memilih pengingat sukarela | ReminderSettings |
-| S18 | Lampiran foto | Stretch | Menambahkan gambar pendukung | Panel editor |
-| S19 | Titik daur ulang | Could | Melihat fasilitas terverifikasi | RecyclingPoints |
-| S20 | State aplikasi | Dokumentasi | Membandingkan kondisi gagal/kosong/loading | Bukan route produksi tersendiri |
-| S21 | Kamera & scan | AI increment | Foto dan scan, fallback manual | Bottom sheet |
-| S22 | Konfirmasi objek | AI increment | Satu objek dan koreksi kategori | Fase sheet |
-| S23 | Kondisi objek | AI increment | Konteks dari pengguna | Fase sheet |
-| S24 | Konfirmasi saran | AI increment | Review metode sebelum jumlah | Fase sheet |
-| S25 | Fallback AI | AI increment | Pemulihan dan manual | Fase sheet |
+| S01 | Session restore | Must | Decide the navigation root | Session |
+| S02 | Sign in | Must | Start a session | Login |
+| S03 | Register | Must | Create an account | Register |
+| S04 | Home | Must | See today and start logging | Home |
+| S05 | Log activity | Must | Create one valid log | LogCreate |
+| S06 | Log saved | Must, feedback | Confirm the result and next steps | Result on the detail screen, not a tab |
+| S07 | History | Must | Find your own logs | History |
+| S08 | Log detail | Must | Check and correct data | LogDetail(id) |
+| S09 | Edit log | Must, by design | Fix data | LogEdit(id) |
+| S10 | History filters | Must | Choose list criteria | Bottom sheet |
+| S11 | Guide | Must | Look up material information | Guide |
+| S12 | Guide detail | Must | Read handling steps and sources | GuideDetail(id) |
+| S13 | Statistics | Must | Review a 7- or 30-day range | Statistics |
+| S14 | Profile and progress | Must + baseline XP | See the account and habits | Profile |
+| S15 | Achievements | Should | See requirements and progress | Achievements |
+| S16 | Settings | Supporting design | Set display and preferences | Settings |
+| S17 | Reminders | Should | Choose an optional reminder | ReminderSettings |
+| S18 | Photo attachment | Stretch | Add a supporting image | Editor panel |
+| S19 | Recycling points | Could | See verified facilities | RecyclingPoints |
+| S20 | App states | Documentation | Compare failure, empty, and loading states | Not its own production route |
+| S21 | Camera and scan | AI increment | Photo and scan, with manual fallback | Bottom sheet |
+| S22 | Object confirmation | AI increment | One object and category correction | Sheet phase |
+| S23 | Object condition | AI increment | Context from the user | Sheet phase |
+| S24 | Advice confirmation | AI increment | Review the method before the amount | Sheet phase |
+| S25 | AI fallback | AI increment | Recovery and manual entry | Sheet phase |
 
-## 3. Detail per layar
+## 3. Screen details
 
-### S01: Pemulihan sesi
+### S01: Session restore
 
-Tampilkan wordmark teks WasteNot dan “Menyiapkan catatanmu…”. Tidak ada splash berdurasi buatan atau carousel onboarding wajib. Session repository membaca credential, memverifikasi/memperbarui sesi bila perlu, lalu mengganti root menjadi Masuk atau Beranda. Jika tidak ada credential, segera ke Masuk.
+Show the WasteNot wordmark and "Getting your logs ready…". There's no artificial splash delay and no mandatory onboarding carousel. The session repository reads the credentials, verifies or refreshes the session if needed, then sets the root to Sign in or Home. With no credentials, go straight to Sign in.
 
-Ketika jaringan gagal memvalidasi sesi yang tidak dapat dipastikan: tampilkan “Belum bisa memeriksa sesi”, “Coba lagi”, dan “Masuk ulang”. Jangan memperlihatkan data pribadi dari identitas yang belum dipastikan. Back mengikuti perilaku sistem. HTML menyediakan tombol “Simulasikan sesi valid” karena tidak melakukan autentikasi sebenarnya.
+When the network can't validate an uncertain session, show "Can't check your session yet", "Try again", and "Sign in again". Never show personal data from an identity that isn't confirmed. Back follows system behavior. The HTML has a "Simulate a valid session" button because it doesn't really authenticate.
 
-### S02: Masuk
+### S02: Sign in
 
-Urutan: wordmark → judul “Catat kebiasaanmu lagi” → email → password dan tampil/sembunyikan → error form → “Masuk” → “Belum punya akun? Daftar”. Keyboard email untuk email, password masking untuk password, IME next/done sesuai urutan. Password manager dan paste diperbolehkan.
+Order: wordmark → the title "Pick up your habit again" → email → password with show/hide → form errors → "Sign in" → "New here? Create an account". Use the email keyboard for email, masking for the password, and IME next/done in order. Password managers and paste are allowed.
 
-Validasi kosong/format dilakukan sebelum request. Credential salah menampilkan pesan umum “Email atau kata sandi belum cocok.” Network error terpisah. Saat submitting, tombol menampilkan “Sedang masuk…” dan dinonaktifkan. Sukses menghapus auth stack. Jika sesi berakhir, banner menjelaskan alasan login ulang. Lupa password tidak ditampilkan sebagai tautan mati; fitur tersebut belum masuk baseline.
+Empty and format checks happen before the request. Wrong credentials show a generic "That email and password don't match." Network errors are separate. While submitting, the button says "Signing in…" and is disabled. Success clears the auth stack. If the session expired, a banner explains why the user has to sign in again. Forgot password isn't shown as a dead link; it's not in the baseline yet.
 
-### S03: Daftar
+### S03: Register
 
-Field nama, email, password, konfirmasi password, serta zona waktu awal yang terlihat. Label helper password minimum 12 karakter. Validasi lengkap pada PRD §8. Tombol “Buat akun”, link “Sudah punya akun? Masuk”. Tidak menambahkan centang persetujuan dokumen yang belum dibuat.
+Fields for name, email, password, password confirmation, and a visible starting time zone. The password helper says 12 characters minimum. Full validation is in PRD §8. A "Create account" button and an "Already have an account? Sign in" link. Don't add a checkbox agreeing to documents that don't exist yet.
 
-Email duplikat terasosiasi dengan field email. Kesalahan validasi tidak menghapus field lain. Password tidak dipersistenkan ketika proses aplikasi dihentikan. Sukses langsung masuk sesi jika API memang menerbitkannya; gunakan root Home. Kebijakan privasi dan persetujuan distribusi publik adalah pekerjaan release tersendiri.
+A duplicate email error is attached to the email field. Validation errors never clear other fields. Passwords aren't persisted when the app process is killed. On success, go straight into the session if the API issues one, with Home as the root. The privacy policy and consent for public distribution are separate release work.
 
-### S04: Beranda
+### S04: Home
 
-Fokus layar adalah total hari ini dan tindakan pencatatan. Susunan:
+The screen focuses on today's total and the logging action. Layout:
 
-1. Sapaan berdasarkan nama pengguna dan tanggal lokal.
-2. Ringkasan “Sampah ditangani hari ini” dengan berat; jumlah benda ditangani muncul terpisah jika ada.
-3. Reduce terpisah: “2 benda dihindari” pada dataset contoh.
-4. Recycling rate dengan keterangan basis aktivitas; contoh hari ini 50% dari 2 aktivitas penanganan.
-5. Tombol pendukung “Input manual”; action utama Catat/Scan berada di dock.
-6. Progres XP/level ringkas; contoh 50/100 XP di level 1.
-7. Tiga aktivitas terbaru, setiap baris membuka detail; “Lihat riwayat” menuju S07.
+1. A greeting with the user's name and local date.
+2. The "Waste handled today" summary by weight; items handled appear separately if there are any.
+3. Reduce shown separately: "2 items avoided" in the sample data.
+4. The recycling rate with its activity basis; today's sample is 50% of 2 handling activities.
+5. A supporting "Log manually" button; the main Log/Scan action lives in the dock.
+6. A compact XP and level progress; the sample is 50/100 XP at level 1.
+7. The three most recent activities, each opening its detail; "See history" goes to S07.
 
-Dashboard bukan daftar angka prestasi lingkungan. Empty pengguna baru: “Belum ada catatan hari ini”, CTA mencatat, dan akses panduan. Jika ada data kemarin tetapi hari ini kosong, jangan menyembunyikan progres sepanjang waktu. Error full-screen hanya untuk load pertama tanpa cache; gagal refresh memakai banner di atas data lama.
+The dashboard isn't a list of environmental achievement numbers. A new user's empty state says "Nothing logged today yet", with a CTA to log and access to guides. If there's data from yesterday but nothing today, don't hide all-time progress. A full-screen error is only for a first load with no cache; a failed refresh shows a banner over the old data.
 
-### S05: Catat aktivitas
+### S05: Log activity
 
-Form satu halaman scrollable, tanpa wizard. Field berurutan: metode → kategori → pilihan Berat/Jumlah → input nilai dan unit → tanggal aktivitas → catatan opsional → lampiran jika fitur aktif → CTA Simpan.
+A single scrollable form, no wizard. Fields in order: method → category → Weight or Count → value and unit → activity date → optional notes → attachment if the feature is on → the Save CTA.
 
-Metode memakai pilihan tunggal berlabel Reduce, Reuse, Recycle, Trash dengan satu kalimat arti. Kategori memakai menu/pilihan yang menampilkan label penuh. Berat default g; pilihan kg mengubah tampilan saja, payload tetap integer gram. Saat beralih ke Jumlah, field berat dinonaktifkan/dikosongkan dari payload dan label menjadi “Jumlah benda”.
+The method is a single choice labeled Reduce, Reuse, Recycle, Trash, each with a one-line meaning. The category uses a menu or picker that shows full labels. Weight defaults to g; choosing kg only changes the display, and the payload stays integer grams. Switching to Count disables the weight field, drops it from the payload, and relabels the field "Item count".
 
-Jika metode Reduce, ubah label menjadi “Jumlah yang dihindari” dan tampilkan “Dicatat terpisah dari sampah yang ditangani.” Pilihan kategori/metode tidak diisi diam-diam pada draf kosong. Prefill dari panduan terlihat dan dapat diganti.
+If the method is Reduce, change the label to "Amount avoided" and show "Tracked separately from waste you handled." Category and method are never quietly filled in on an empty draft. A prefill from a guide is visible and can be changed.
 
-Validasi saat blur dan submit; jangan menampilkan error sebelum pengguna berinteraksi. Submit invalid memfokuskan error pertama. Submit valid membuat satu request dengan client_request_id. Saat hasil request belum diketahui akibat timeout, isian awal dipertahankan untuk retry yang aman. Back pada dirty form membuka D03. Tanggal default hari ini menurut zona akun.
+Validate on blur and on submit; don't show errors before the user interacts. An invalid submit focuses the first error. A valid submit sends one request with a client_request_id. When a timeout leaves the outcome unknown, the original entries stay for a safe retry. Back on a dirty form opens D03. The date defaults to today in the account's time zone.
 
-### S06: Catatan tersimpan
+### S06: Log saved
 
-Feedback tampil setelah server mengirim ID. Ringkasan kategori, metode, nilai, tanggal, dan perubahan XP. Tombol “Lihat catatan” dan “Kembali ke beranda”. Teks “+10 XP” hanya setelah create baru, bukan replay/edit. Pada Android feedback dapat berupa banner/snackbar di detail S08 agar tidak menambah route yang tidak perlu. Di HTML ditampilkan tersendiri untuk memperjelas hasil transaksi.
+Feedback appears after the server returns an ID. It summarizes the category, method, value, date, and XP change, with "View log" and "Back to home" buttons. "+10 XP" only appears after a new create, not a replay or an edit. On Android this feedback can be a banner or snackbar on the S08 detail screen so there's no extra route. The HTML shows it separately to make the transaction result clear.
 
-Jangan memakai konfeti berulang, suara otomatis, atau klaim “menyelamatkan bumi”. TalkBack mendengar “Catatan tersimpan”. Feedback tidak otomatis hilang sebelum pengguna sempat membacanya bila memuat aksi penting.
+No repeating confetti, automatic sounds, or "saving the planet" claims. TalkBack hears "Log saved". If the feedback includes an important action, it doesn't disappear before the user can read it.
 
-### S07: Riwayat
+### S07: History
 
-Header Riwayat, filter, chip kriteria aktif, daftar kelompok tanggal menurun, serta tombol pendukung “Input manual”. Setiap baris berisi ikon kategori, kategori, metode, tanggal/catatan ringkas, dan nilai beserta unit. Reduce diberi label “dihindari”.
+The History header, filters, active criteria chips, a list grouped by date in descending order, and a supporting "Log manually" button. Each row has a category icon, the category, method, date or short note, and the value with its unit. Reduce rows are labeled "avoided".
 
-Baris membuka S08. Pagination bertahap 20 catatan; loading/error halaman lanjutan berada di bawah daftar. Filter menggabungkan kategori, metode, dan tanggal. Scroll dan filter bertahan saat detail dibuka lalu ditutup. Empty awal mengajak mencatat; filtered-empty menawarkan reset. Penghapusan menghapus item hanya setelah 204, lalu merefresh agregat.
+Rows open S08. Pagination loads 20 logs at a time; loading and errors for later pages sit at the bottom of the list. Filters combine category, method, and date. Scroll position and filters survive opening and closing a detail. The first empty state invites logging; a filtered empty state offers a reset. A deleted item only disappears after the 204, followed by an aggregate refresh.
 
-### S08: Detail catatan
+### S08: Log detail
 
-Judul kategori, metode, nilai besar, tanggal aktivitas dan zona, catatan atau “Tanpa catatan”, foto jika ada, serta waktu dibuat/diperbarui pada bagian sekunder. Tombol “Ubah catatan” menuju S09, aksi “Hapus catatan” membuka D01. Tidak ada share publik.
+A category title, the method, a large value, the activity date and time zone, the notes or "No notes", a photo if there is one, and created and updated times in a secondary section. "Edit log" goes to S09, and "Delete log" opens D01. There's no public sharing.
 
-Deleted/404 menunjukkan “Catatan tidak tersedia” dan kembali ke Riwayat. Tidak membedakan catatan milik orang lain. Jika detail lama tersimpan di cache, jangan izinkan edit/hapus tanpa version yang valid. Foto private kedaluwarsa dimuat ulang lewat endpoint terautentikasi, bukan mengganti menjadi public URL.
+Deleted or 404 shows "Log unavailable" and goes back to History. It doesn't reveal whether a log belongs to someone else. If an old detail is cached, editing and deleting aren't allowed without a valid version. An expired private photo reloads through the authenticated endpoint rather than switching to a public URL.
 
-### S09: Ubah catatan
+### S09: Edit log
 
-Menggunakan komponen editor S05 dengan data awal dan version. Judul “Ubah catatan”, CTA “Simpan perubahan”. Tambahkan catatan bantuan “Perubahan akan memperbarui statistik. Mengubah catatan tidak menambah XP.” Date masih mengikuti jendela validasi; jika catatan lama berada di luar jendela, mempertahankan activity_date lama diperbolehkan, tetapi tanggal baru harus lolos aturan create.
+Uses the S05 editor with the original data and version. The title is "Edit log" and the CTA is "Save changes". Add the helper text "Edits update your statistics but don't add XP." The date still follows the validation window; an old log outside the window may keep its old activity_date, but a new date must pass the create rules.
 
-Jika tidak berubah, CTA boleh disabled. Konflik version membuka D04; draf tidak hilang. Sukses kembali ke detail terbaru. Load gagal sebelum form tersedia tidak menampilkan nilai kosong sebagai nilai catatan sebenarnya.
+If nothing changed, the CTA may be disabled. A version conflict opens D04 and the draft is kept. Success returns to the latest detail. If loading fails before the form is ready, empty fields are never shown as the log's real values.
 
-### S10: Filter riwayat
+### S10: History filters
 
-Modal bottom sheet berjudul “Filter riwayat”, kategori tunggal (Semua + 7 kategori), metode tunggal (Semua + 4 metode), tanggal mulai/akhir, “Reset”, dan “Terapkan filter”. State edit di sheet terpisah dari filter aktif sampai Apply. Cancel/Back/dismiss tidak menerapkan perubahan.
+A modal bottom sheet titled "Filter history", with a single category choice (All + 7 categories), a single method choice (All + 4 methods), start and end dates, "Reset", and "Apply filters". The sheet's editing state stays separate from the active filters until Apply. Cancel, Back, or dismissing doesn't apply changes.
 
-Rentang awal tidak boleh setelah akhir. Tanpa salah satu tanggal, aplikasi mengosongkan keduanya atau meminta pasangan lengkap, sesuai validasi field yang terlihat. Reset langsung mengosongkan draft filter; Apply menutup sheet dan fetch ulang dari halaman pertama. Sheet scrollable pada font scale besar, fokus dibatasi pada modal saat terbuka.
+The start date can't be after the end date. If only one date is filled in, the app clears both or asks for the pair, as the visible field validation says. Reset clears the draft filters immediately; Apply closes the sheet and fetches from the first page again. The sheet scrolls at large font scales, and focus stays inside the modal while it's open.
 
-### S11: Panduan
+### S11: Guide
 
-Search field “Cari botol, kardus, atau material lain”, kategori opsional, daftar judul/item dengan metode rekomendasi dan ringkasan pendek. Debounce usulan 300 ms, cancel request lama; tombol clear memiliki contentDescription. Search q maksimum 100 karakter.
+A search field reading "Search bottles, cardboard, or other materials", an optional category, and a list of titles with their recommended method and a short summary. Proposed debounce is 300 ms, cancelling old requests; the clear button has a contentDescription. The search q is at most 100 characters.
 
-Hasil kosong: “Panduan belum ditemukan. Coba nama material yang lebih umum.” dengan “Hapus pencarian”. Error jaringan: “Panduan belum bisa dimuat” dan retry. Jika artikel contoh belum direview, HTML memberi label draf; produksi tidak memuat artikel DRAFT.
+Empty results: "No guides found. Try a more general material name." with "Clear search". Network errors: "Couldn't load the guides" with a retry. If a sample article hasn't been reviewed, the HTML labels it as a draft; production never loads DRAFT articles.
 
-### S12: Detail panduan
+### S12: Guide detail
 
-Susunan: judul item → kategori/metode → ringkasan → langkah bernomor → hal yang perlu diperhatikan → sumber dan tanggal review → “Catat aktivitas ini”. Tautan sumber membuka browser, dengan host yang jelas. Konten tidak mengklaim semua fasilitas menerima material yang sama.
+Layout: item title → category and method → summary → numbered steps → things to keep in mind → sources and review date → "Log this activity". Source links open the browser with a clear host. The content never claims every facility accepts the same materials.
 
-CTA membuka S05 dengan kategori/metode awal, tanpa membuat catatan otomatis. Artikel archived/404 memiliki jalan kembali. Jika sumber/tanggal review belum ada, layar prototype menyatakan “Contoh editorial; belum diverifikasi” dan tidak mengarang tautan atau tanggal.
+The CTA opens S05 with the starting category and method, without creating a log automatically. Archived or 404 articles have a way back. If a source or review date is missing, the prototype says "Editorial sample; not verified yet" and never invents links or dates.
 
-### S13: Statistik
+### S13: Statistics
 
-Toggle “7 hari” / “30 hari”, rentang tanggal eksplisit, ringkasan berat/jumlah ditangani dan Reduce terpisah, grafik harian dengan label unit, daftar kategori, serta distribusi metode empat baris. Tampilkan recycling rate berbasis aktivitas dengan numerator/denominator.
+A "7 days" / "30 days" toggle, an explicit date range, a summary of weight and count handled with Reduce shown separately, a daily chart with unit labels, a category list, and a four-row method breakdown. Show the activity-based recycling rate with its numerator and denominator.
 
-Dataset acuan 7 hari menghasilkan 1,4 kg, 5 aktivitas, 2 benda dihindari, recycling rate 50%. Chart g tidak menggabungkan count; gunakan selector/seri terpisah jika data COUNT penanganan tersedia. Hari tanpa data bernilai 0, bukan tidak ditampilkan. Semua chart punya uraian teks atau tabel. Rentang kosong: “Belum ada catatan pada periode ini”, pilihan periode lain dan Catat aktivitas.
+The 7-day reference dataset gives 1.4 kg, 5 activities, 2 items avoided, and a 50% recycling rate. The gram chart never mixes in counts; use a selector or separate series when handled COUNT data exists. Days with no data show 0 instead of disappearing. Every chart has a text description or table. An empty range shows "No logs in this period", a choice of other periods, and Log activity.
 
-Saat range berganti, loading hanya bagian statistik dan respons lama tidak menimpa range baru. Jika request gagal, range data lama tetap dilabeli dengan benar; jangan memasang judul 30 hari di atas angka 7 hari.
+When the range changes, only the statistics section shows loading, and an old response never overwrites the new range. If a request fails, the old range's data stays correctly labeled; never put a 30-day title over 7-day numbers.
 
-### S14: Profil dan progres
+### S14: Profile and progress
 
-Nama, email, timezone, level, XP bar, aktivitas sepanjang waktu, streak jika diaktifkan, link achievement, pengaturan, dan “Keluar”. Avatar awal menggunakan inisial, bukan foto orang fiktif. Nama/email contoh di mockup diberi identitas “Pengguna Demo”.
+Name, email, time zone, level, XP bar, all-time activity, streak if enabled, an achievements link, settings, and "Sign out". The avatar starts with initials, not a photo of a made-up person. The sample name and email in the mockup are labeled "Demo User".
 
-Progress bar di level 1 contoh 50/100, label “50 XP lagi ke level 2”. Streak menerangkan hari, bukan jumlah catatan. Belum mencatat: level 1, 0 XP, CTA mencatat. Profile fetch error tidak menampilkan data akun lama. Keluar membuka D02.
+At level 1 the sample progress bar shows 50/100 with the label "50 XP to level 2". The streak counts days, not logs. With nothing logged: level 1, 0 XP, and a CTA to log. A profile fetch error never shows old account data. Sign out opens D02.
 
-### S15: Achievement (Should)
+### S15: Achievements (Should)
 
-List judul, syarat, progres numerik dan bar, status terkunci/tercapai. Tidak mengandalkan opacity rendah untuk teks terkunci. Detail syarat dapat dibuka melalui accordion. Contoh: Langkah pertama 1/1 tercapai; Mulai terbiasa 5/5 tercapai; Pilah untuk daur ulang 2/3; Satu minggu konsisten 2/7.
+A list of titles, requirements, numeric progress with a bar, and locked or unlocked status. Locked text never relies on low opacity. Requirement details open in an accordion. Sample: First step 1/1 unlocked; Getting into the habit 5/5 unlocked; Sorted for recycling 2/3; A consistent week 2/7.
 
-Status dihitung dari data aktif, sehingga hapus dapat mengunci kembali. Bila capability mati, link layar disembunyikan pada aplikasi. HTML tetap menyertakan desain dengan penanda “Should”.
+Status comes from active data, so deleting a log can lock an achievement again. When the capability is off, the app hides the link. The HTML still includes the design, marked "Should".
 
-### S16: Pengaturan
+### S16: Settings
 
-Pilihan tema Sistem/Terang/Gelap; link pengingat bila fitur aktif; informasi versi aplikasi; ringkasan privasi yang menjelaskan data pribadi serta akses foto opsional. Pengaturan theme disimpan lokal dan berlaku segera. Zona akun ditampilkan read-only di baseline; jangan menyediakan editor yang belum didukung API.
+Theme choice (System, Light, Dark); a reminders link when the feature is on; the app version; and a privacy summary explaining personal data and optional photo access. The theme setting is stored locally and applies immediately. The account's time zone is read-only in the baseline; don't offer an editor the API doesn't support.
 
-Tautan privasi produksi hanya tersedia setelah dokumen benar-benar disediakan. HTML menampilkan penjelasan cakupan draft tanpa mengklaim sebagai kebijakan resmi.
+A production privacy link only appears once the document actually exists. The HTML shows an explanation of the draft scope without claiming to be an official policy.
 
-### S17: Pengingat (Should)
+### S17: Reminders (Should)
 
-Switch default off, waktu “Sekitar 20.00” yang dapat diubah, kalimat “Jadwal dapat terlambat mengikuti kondisi perangkat.” dan tombol “Simpan pengingat”. Permission notifikasi diminta setelah intent mengaktifkan. Permission denied memunculkan penjelasan dan akses pengaturan sistem; bukan prompt berulang.
+A switch that defaults to off, an adjustable time "Around 8:00 PM", the sentence "The reminder may arrive late depending on your device.", and a "Save reminder" button. Notification permission is requested after the user chooses to turn it on. If permission is denied, show an explanation and a link to system settings rather than asking again and again.
 
-Saat off, waktu disabled atau tetap terlihat sebagai preferensi tanpa jadwal aktif. Logout membatalkan reminder akun. HTML hanya menyimulasikan preference, tidak meminta izin browser atau mengirim notifikasi nyata.
+When off, the time is disabled or stays visible as a preference with no active schedule. Signing out cancels the account's reminders. The HTML only simulates the preference; it doesn't ask for browser permission or send real notifications.
 
-### S18: Foto (Stretch)
+### S18: Photo (Stretch)
 
-Panel editor dengan “Pilih foto”, preview, nama file/ukuran, “Ganti”, “Hapus foto”, status upload, dan “Lanjut tanpa foto”. Gunakan Photo Picker Android. Foto tidak menjadi input wajib. Jika tipe/ukuran salah, error menempel pada panel dan field catatan tetap tersedia.
+An editor panel with "Choose photo", a preview, the file name and size, "Replace", "Remove photo", upload status, and "Continue without a photo". Use the Android Photo Picker. Photos are never required. If the type or size is wrong, the error attaches to the panel and the notes field stays available.
 
-HTML memakai preview gambar lokal tanpa upload. Label menjelaskan ini simulasi. Tidak menambahkan foto stok yang seolah merupakan foto pengguna, tidak meminta akses kamera tanpa tindakan eksplisit.
+The HTML uses a local image preview without uploading, with a label saying it's a simulation. It never adds stock photos that look like the user's, and never asks for camera access without an explicit action.
 
-### S19: Titik daur ulang (Could)
+### S19: Recycling points (Could)
 
-Desain memuat judul, “Gunakan lokasiku”, pencarian area, daftar fasilitas, dan slot peta. Karena belum ada dataset lokasi, default mockup adalah “Data titik daur ulang belum tersedia” dengan penjelasan bahwa fitur memerlukan lokasi terverifikasi. Tidak ada pin atau jarak palsu.
+The design has a title, "Use my location", an area search, a list of facilities, and a map slot. Since there's no location dataset yet, the mockup defaults to "Recycling point data isn't available yet", explaining that the feature needs verified locations. There are no fake pins or distances.
 
-Saat diimplementasikan: bedakan loading, permission denied, location unavailable, hasil kosong, provider error, dan data kadaluwarsa. Lokasi device opsional; daftar manual tetap tersedia. Detail titik memuat nama, alamat, material diterima, jam jika ada sumber, tanggal verifikasi, dan action navigasi eksternal. Tidak menjamin operasional fasilitas tanpa verifikasi.
+When built: tell apart loading, permission denied, location unavailable, empty results, provider errors, and stale data. Device location is optional; the manual list stays available. A point's detail shows its name, address, accepted materials, hours if a source has them, the verification date, and an external navigation action. Never guarantee that a facility is open without verification.
 
-### S20: Galeri state
+### S20: State gallery
 
-Panel dokumentasi yang memungkinkan reviewer memilih loading, empty, filtered-empty, error, offline, session-expired, dan success. Ini bukan menu yang dikirim ke end user Android. State dipakai ulang pada layar terkait, dengan teks spesifik konteks.
+A documentation panel that lets reviewers pick loading, empty, filtered-empty, error, offline, session-expired, and success. This isn't a menu shipped to Android users. The states are reused on the relevant screens with context-specific text.
 
-| State | Contoh teks | Aksi |
+| State | Sample text | Action |
 |---|---|---|
-| Loading | “Memuat riwayat…” | Menunggu; konten tidak actionable |
-| Empty awal | “Belum ada catatan. Mulai dari aktivitas hari ini.” | Catat aktivitas |
-| Filter kosong | “Tidak ada catatan yang cocok dengan filter ini.” | Reset filter |
-| Error | “Riwayat belum bisa dimuat.” | Coba lagi |
-| Offline | “Koneksi terputus. Isianmu tetap tersedia.” | Coba simpan lagi |
-| Session expired | “Sesi berakhir. Masuk lagi untuk membuka catatanmu.” | Masuk |
-| Success | “Catatan tersimpan.” | Lihat catatan |
+| Loading | "Loading your history…" | Wait; content isn't actionable |
+| First empty | "No logs yet. Start with something you did today." | Log activity |
+| Empty filter | "No logs match these filters." | Reset filters |
+| Error | "Couldn't load your history." | Try again |
+| Offline | "You're offline. Your entries are still here." | Try saving again |
+| Session expired | "Your session ended. Sign in again to open your logs." | Sign in |
+| Success | "Log saved." | View log |
 
-## 4. Dialog dan sheet
+## 4. Dialogs and sheets
 
-| ID | Pemicu | Isi dan aksi | Cancel / Back |
+| ID | Trigger | Content and action | Cancel / Back |
 |---|---|---|---|
-| D01 Hapus catatan | S08 | Sebut kategori/tanggal; “Statistik dan XP akan dihitung ulang.”; tombol Hapus (destructive) | Batal, tidak mengubah data |
-| D02 Keluar | S14 | “Kamu perlu masuk lagi untuk membuka catatan.”; Keluar | Batal |
-| D03 Buang draf | Editor dirty + Back | “Perubahan belum disimpan.”; Buang perubahan | Lanjut mengisi |
-| D04 Konflik | PATCH/DELETE 409 | “Catatan telah berubah. Muat versi terbaru sebelum mencoba lagi.”; Muat versi terbaru | Tetap di draf; tidak overwrite |
+| D01 Delete log | S08 | Names the category and date; "Your statistics and XP will be recalculated."; a destructive Delete button | Cancel, data unchanged |
+| D02 Sign out | S14 | "You'll need to sign in again to open your logs."; Sign out | Cancel |
+| D03 Discard draft | Dirty editor + Back | "Your changes aren't saved."; Discard changes | Keep editing |
+| D04 Conflict | PATCH/DELETE 409 | "This log has changed. Load the latest version before you try again."; Load the latest version | Stay on the draft; nothing is overwritten |
 
-Tombol destructive memakai warna error, bukan warna CTA biasa. Request active menonaktifkan konfirmasi berulang. Error server tampil di dialog atau halaman, tidak menutup dialog lalu seolah berhasil. Keyboard Escape pada HTML setara cancel. Fokus kembali ke pemicu setelah cancel.
+Destructive buttons use the error color, not the regular CTA color. An active request disables repeat confirmation. Server errors show in the dialog or page; the dialog never closes as if it succeeded. Escape in the HTML acts as cancel. Focus returns to the trigger after cancelling.
 
-## 5. Katalog komponen dan pemetaan Compose
+## 5. Component catalog and Compose mapping
 
-| ID | Komponen | Properti penting | Variasi/state | Compose |
+| ID | Component | Key properties | Variants / states | Compose |
 |---|---|---|---|---|
-| C01 | Wordmark | text | Terang/gelap | Text + Plus Jakarta Sans ExtraBold |
+| C01 | Wordmark | text | Light/dark | Text + Plus Jakarta Sans ExtraBold |
 | C02 | App bar | title, back, actions | Root/detail | TopAppBar |
 | C03 | Primary button | label, enabled, loading | Default/pressed/focus/disabled/loading | Button |
 | C04 | Secondary button | label | Default/disabled/focus | OutlinedButton |
 | C05 | Text action | label | Normal/destructive | TextButton |
 | C06 | Icon button | icon, contentDescription | Selected/disabled | IconButton |
-| C07 | Input manual | label | Buka S05 | OutlinedButton pendukung; C35 untuk scan |
+| C07 | Log manually | label | Opens S05 | Supporting OutlinedButton; C35 for scanning |
 | C08 | Text field | value, label, helper, error | Empty/filled/focus/error/disabled | OutlinedTextField |
 | C09 | Password field | value, visibility | Masked/visible/error | TextField + visual transformation |
 | C10 | Search | query, onClear | Empty/query/no result | OutlinedTextField |
-| C11 | Quantity field | mode, unit, rawText, error | g/kg/benda; Reduce helper | TextField + single-choice unit |
-| C12 | Category picker | selected, options | Default/selected/error | ExposedDropdownMenuBox atau sheet |
-| C13 | Method selector | method | Four single-choice methods | RadioButton/list pilihan |
+| C11 | Quantity field | mode, unit, rawText, error | g/kg/items; Reduce helper | TextField + single-choice unit |
+| C12 | Category picker | selected, options | Default/selected/error | ExposedDropdownMenuBox or a sheet |
+| C13 | Method selector | method | Four single-choice methods | RadioButton or a choice list |
 | C14 | Filter chip | label, selected, onRemove | Selected/unselected/disabled | FilterChip/InputChip |
 | C15 | Range selector | 7d/30d | Selected/loading | SingleChoiceSegmentedButtonRow |
-| C16 | Method badge | method, label | Reduce/Reuse/Recycle/Trash | Surface + Text; bukan action |
+| C16 | Method badge | method, label | Reduce/Reuse/Recycle/Trash | Surface + Text; not an action |
 | C17 | Waste log row | log, onClick | Default/pressed | ListItem / Surface |
 | C18 | Summary surface | label, value, unit, caption | Zero/value/unknown | Surface + Text |
 | C19 | XP progress | current, target, level | Zero/partial/full | LinearProgressIndicator |
 | C20 | Achievement row | title, current, target | Locked/unlocked | ListItem + ProgressIndicator |
 | C21 | Guide row | title, category, method | Default/pressed | ListItem |
-| C22 | Bar chart | dailyValues, unit, labels | Empty/data | Canvas + semantics + teks alternatif |
+| C22 | Bar chart | dailyValues, unit, labels | Empty/data | Canvas + semantics + text alternative |
 | C23 | Method breakdown | four counts, total | Empty/data | Rows + progress + label |
 | C24 | Bottom navigation | route, destinations | Selected/unselected | NavigationBar |
 | C25 | Navigation rail | route, destinations | Medium/expanded | NavigationRail |
 | C26 | Modal sheet | title, content, actions | Open/closed/scroll | ModalBottomSheet |
 | C27 | Confirmation | title, body, primary, cancel | Default/destructive/busy/error | AlertDialog |
-| C28 | Snackbar/banner | message, action | Success/error/offline | SnackbarHost / Surface |
+| C28 | Snackbar / banner | message, action | Success/error/offline | SnackbarHost / Surface |
 | C29 | Async state | mode, message, onRetry | Loading/empty/error | Shared composable |
 | C30 | Reminder switch | checked, onChange | Off/on/denied | Switch |
-| C31 | Date/time input | value, range | Valid/invalid/disabled | DatePicker / TimePicker |
+| C31 | Date / time input | value, range | Valid/invalid/disabled | DatePicker / TimePicker |
 | C32 | Photo attachment | uri, status | Empty/preview/upload/error | Photo Picker + image surface |
-| C33 | Source link | title, URL | Reviewed/draft | TextButton/open URI |
+| C33 | Source link | title, URL | Reviewed/draft | TextButton / open URI |
 | C34 | Category icon | category, description | Seven categories | VectorDrawable / Icon |
 
-Bentuk komponen harus dipetakan ke token, bukan menyalin CSS px secara buta ke dp/sp. Komponen yang hanya tampil satu kali boleh tetap berada dalam screen; katalog adalah bahasa desain, bukan instruksi membuat 34 wrapper Kotlin.
+Map component shapes to tokens rather than blindly copying CSS px into dp or sp. Components that only appear once can stay inside their screen; the catalog is a design language, not an instruction to build 34 Kotlin wrappers.
 
-## 6. Matriks state wajib
+## 6. Required state matrix
 
-| Layar | Loading | Empty | Content | Error | Kasus tambahan |
+| Screen | Loading | Empty | Content | Error | Extra cases |
 |---|---|---|---|---|---|
-| S04 Beranda | Load awal / refresh | Hari ini kosong | Ringkasan + list | Retry / banner | Persentase null |
-| S07 Riwayat | Awal / halaman berikut | Baru / filter | Kelompok tanggal | Awal / load more | Scroll/filter dipertahankan |
-| S08 Detail | Fetch | 404 terarah | Record | Retry | Deleted / stale version |
-| S11 Panduan | Search/list | Tidak ada hasil | Artikel | Retry | Respons pencarian lama |
-| S12 Detail panduan | Fetch | Artikel tidak tersedia | Langkah/sumber | Retry | Draft tidak dipublikasikan |
-| S13 Statistik | Load/range | Rentang kosong | Agregat | Retry | Campuran unit / Reduce-only |
-| S14 Profil | Fetch | Progres 0 | Akun/progres | Retry | Sesi berakhir |
-| S15 Achievement | Fetch | Definisi belum tersedia | Progress | Retry | Capability disabled |
-| S05/S09 Form | Submit | Form awal, bukan empty page | Isian | Inline/server | Dirty, timeout, conflict |
+| S04 Home | First load / refresh | Nothing today | Summary + list | Retry / banner | Null percentage |
+| S07 History | First / next page | New / filtered | Date groups | First / load more | Scroll and filters kept |
+| S08 Detail | Fetch | Guided 404 | Record | Retry | Deleted / stale version |
+| S11 Guide | Search / list | No results | Articles | Retry | Old search responses |
+| S12 Guide detail | Fetch | Article unavailable | Steps and sources | Retry | Drafts not published |
+| S13 Statistics | Load / range | Empty range | Aggregates | Retry | Mixed units / Reduce only |
+| S14 Profile | Fetch | Zero progress | Account and progress | Retry | Session ended |
+| S15 Achievements | Fetch | Definitions not available | Progress | Retry | Capability disabled |
+| S05/S09 Form | Submit | The starting form, not an empty page | Entries | Inline / server | Dirty, timeout, conflict |
 
-## 7. Handoff dan evaluasi desain
+## 7. Handoff and design review
 
-Reviewer memeriksa setiap ID di HTML, lalu mencocokkan rule produk dengan PRD/API. Perbedaan HTML dan Android yang sengaja ada: HTML memakai browser form controls, dialog native, serta data simulasi; Android memakai komponen Compose dan API nyata. HTML tidak membuktikan autentikasi, upload privat, scheduling Android, server ownership, atau performa perangkat.
+Reviewers check every ID in the HTML, then match the product rules against the PRD and API. The intentional differences between the HTML and Android: the HTML uses browser form controls, native dialogs, and simulated data; Android uses Compose components and the real API. The HTML doesn't prove authentication, private uploads, Android scheduling, server ownership, or device performance.
 
-Checklist: seluruh field memiliki label; setiap action memiliki destination/feedback; warna tidak menjadi satu-satunya status; teks error dapat dibaca; font besar tidak menutupi CTA; chart menjelaskan unit; source data dan opsi fitur terlihat; semua sublayar dapat kembali ke asal tanpa kehilangan filter/draf yang memang harus dipertahankan.
+Checklist: every field has a label; every action has a destination or feedback; color is never the only status signal; error text is readable; large fonts don't cover CTAs; charts explain their units; data sources and feature options are visible; every sub-screen can go back without losing filters or drafts that should be kept.
 
-## 8. AI camera bottom sheet, S21–S25
+## 8. AI camera bottom sheet, S21 to S25
 
-Revisi 28 September menambahkan action Catat/Scan pada tengah atas dock, sambil mempertahankan lima tab. Ini tombol aksi, bukan tab keenam dan tidak memakai aria-current. Sheet opak, sudut atas 28, drag handle dekoratif, close ≥48 dp, judul dan fallback manual. Kamera hanya diaktifkan setelah aksi/izin. Android boleh langsung meminta izin ketika action scan diketuk; HTML menyediakan tombol Aktifkan kamera agar demo tidak memicu permission tanpa pilihan. Close/Escape/Back menghentikan kamera dan mengembalikan fokus ke pemicu.
+The 28 September revision added the Log/Scan action at the top center of the dock while keeping the five tabs. It's an action button, not a sixth tab, and doesn't use aria-current. The sheet is opaque, with 28 top corners, a decorative drag handle, a close button of at least 48 dp, a title, and a manual fallback. The camera only starts after a user action and permission. Android may ask for permission as soon as the scan action is tapped; the HTML has a Turn on camera button so the demo never triggers a permission prompt without a choice. Close, Escape, and Back stop the camera and return focus to the trigger.
 
-| ID | Panel / fokus | Field / aksi | Validasi & state |
+| ID | Panel / focus | Fields / actions | Validation and states |
 |---|---|---|---|
-| S21 | Kamera dan tinjau foto | Preview, aktifkan kamera, ambil foto, tinjau, scan, retake, manual | Permission denied, unavailable, capture belum siap; kirim hanya setelah konfirmasi |
-| S22 | Deteksi / konfirmasi satu objek | Bbox + daftar, skor, pemilihan objek, koreksi kategori, konfirmasi | Empty, low confidence, material unknown, multi-object; kategori tidak boleh kosong |
-| S23 | Kondisi objek | Cleanliness, integrity, reusable, reuse intention; cleanable/soiling saat kotor, former_contents untuk HDPE, dan risk_type saat ada risiko | UNKNOWN valid; NEEDS_CONTEXT meminta isian relevan; perubahan membatalkan saran lama |
-| S24 | Rekomendasi | Satu label Reduce/Reuse/Recycle/Trash, alasan, sumber/versi panduan, caution, ubah/gunakan | Tidak auto-save; special_handling menambahkan peringatan tanpa menghilangkan metode; lanjut S05 jumlah manual |
-| S25 | Gagal / tidak tersedia | Penyebab, ulang, manual, close | Kamera denied, unknown, offline, timeout, invalid LLM, no reviewed guide; tidak menambah XP |
+| S21 | Camera and photo review | Preview, turn on camera, take photo, review, scan, retake, manual | Permission denied, unavailable, capture not ready; send only after confirmation |
+| S22 | Detection / confirm one object | Boxes + list, scores, object choice, category correction, confirmation | Empty, low confidence, unknown material, multiple objects; the category can't be empty |
+| S23 | Object condition | Cleanliness, integrity, reusable, reuse intention; cleanable and soiling when dirty, former_contents for HDPE, and risk_type when there's a risk | UNKNOWN is valid; NEEDS_CONTEXT asks for the relevant fields; changes cancel old advice |
+| S24 | Recommendation | One Reduce/Reuse/Recycle/Trash label, reason, guide source and version, cautions, change or use | No auto-save; special_handling adds a warning without removing the method; continue to S05 for a manual amount |
+| S25 | Failed / unavailable | Cause, retry, manual, close | Camera denied, unknown, offline, timeout, invalid LLM output, no reviewed guide; never adds XP |
 
-S21–S25 adalah fase satu alur sheet dalam produk; ditampilkan sebagai lima entry galeri untuk handoff. Preview HTML memakai ilustrasi bbox berlabel, bukan bbox terhadap foto kamera. Skor/objek/LLM adalah fixture. Kamera browser menggunakan getUserMedia jika didukung konteks aman; tidak mengunggah gambar. Pengujian kamera Android dan API tetap terpisah.
+S21 to S25 are phases of one sheet flow in the product; they appear as five gallery entries for handoff. The HTML preview uses a labeled bounding box illustration, not boxes over a camera photo. Scores, objects, and the LLM are fixtures. The browser camera uses getUserMedia when the context is secure; nothing is uploaded. Android camera and API testing stay separate.
 
-S05 sesudah AI: prefill hanya kategori dan metode yang dikonfirmasi; jumlah kosong, unit default g; tanggal tetap aturan core. Pengguna dapat mengoreksi. Membatalkan scan tidak menciptakan log. Dirty draft existing harus dipertahankan atau meminta D03 sebelum diganti; jangan memaksa navigate dan membuang isian. Panduan default belum terverifikasi pada mockup tidak menjadi knowledge produksi.
+S05 after AI: only the confirmed category and method are prefilled; the amount is empty, the unit defaults to g, and the date follows the core rules. The user can correct everything. Cancelling a scan never creates a log. An existing dirty draft must be kept or confirmed with D03 before it's replaced; never force navigation and discard entries. Default guides that aren't verified in the mockup never become production knowledge.
 
-| Komponen tambahan | Padanan Compose | Perilaku |
+| Extra component | Compose equivalent | Behavior |
 |---|---|---|
-| C35 Scan action | Button / FAB | Lime, ikon kamera + label Catat/Scan, sentuh ≥48 dp |
-| C36 Camera sheet | ModalBottomSheet + camera preview | Height adaptif, scroll, izin, capture/retake, manual fallback |
-| C37 Detection review | Canvas overlay + selectable list | Bbox sesuai image transform; label accessible menyebut objek dan skor |
-| C38 Object context | Select/radio controls | Tiga dimensi terpisah dan unknown; tidak menyimpulkan kondisi dari gambar |
-| C39 Recommendation review | Surface + method selection | Satu label, sumber, reason, caution; special handling adalah peringatan tambahan; konfirmasi sebelum simpan |
+| C35 Scan action | Button / FAB | Lime, camera icon + Log/Scan label, touch target of at least 48 dp |
+| C36 Camera sheet | ModalBottomSheet + camera preview | Adaptive height, scrolling, permission, capture and retake, manual fallback |
+| C37 Detection review | Canvas overlay + selectable list | Boxes follow the image transform; accessible labels name the object and score |
+| C38 Object context | Select / radio controls | Three separate dimensions plus unknown; never infers condition from the image |
+| C39 Recommendation review | Surface + method selection | One label, sources, reason, cautions; special handling is an extra warning; confirm before saving |
 
-State prototipe bisa dipilih pada S21: satu objek, beberapa objek, skor rendah, tidak dikenali, penanganan khusus, jaringan gagal, rekomendasi gagal. Semua tersedia tanpa hardware kamera melalui “Gunakan contoh simulasi”. Tombol ini hanya untuk dokumentasi, tidak muncul sebagai fitur produksi. Refresh menghapus foto dan state sementara.
+Prototype states can be chosen on S21: one object, several objects, low score, unrecognized, special handling, network failure, failed recommendation. All of them work without camera hardware through "Use simulated example". That button is for documentation only and never appears as a production feature. Refreshing clears the photo and temporary state.
 
-## 9. Penyempurnaan mockup v1.3
+## 9. Mockup refinements in v1.3
 
-S21–S25 memakai isi komponen sheet yang sama, dengan field/aksi nyata sebagai preview inert. Buka “Coba bottom sheet” untuk interaksi. Tahap Foto → Objek → Kondisi → Saran mempunyai indikator current step. Pengaturan skenario simulasi berada pada disclosure agar jalur kamera lebih mudah dibaca. Input manual berada di footer opak yang menempel bagian bawah sheet.
+S21 to S25 use the same sheet components, with real fields and actions as inert previews. Open "Try the bottom sheet" to interact. The Photo → Object → Condition → Advice steps have a current-step indicator. Simulation scenario settings sit in a disclosure so the camera path is easier to read. Log manually sits in an opaque footer pinned to the bottom of the sheet.
 
-Kategori/objek/kondisi/niat penggunaan ulang tetap tersimpan ketika kembali untuk koreksi. Mengganti kategori mereset kondisi agar tidak memakai konteks benda lama. Memilih contoh simulasi menghentikan kamera aktif dan membuang hasil permission yang terlambat. Scan baru dari katalog ditolak dengan pesan saat editor mempunyai draf dirty; pengguna menyimpan atau kembali melalui D03 terlebih dahulu. Kamera/LLM tetap simulasi sebagaimana v1.2.
+The category, object, condition, and reuse intention are kept when going back to correct something. Changing the category resets the condition so it doesn't reuse the previous item's context. Choosing the simulated example stops an active camera and discards late permission results. A new scan from the catalog is refused with a message while the editor has a dirty draft; the user saves or goes back through D03 first. The camera and LLM stay simulated, as in v1.2.
 
-### Saran bersyarat saat kondisi kosong, policy-06
+### Conditional advice for blank conditions, policy-06
 
-Konteks biasa yang belum diisi tetap UNKNOWN/null. allow_conditional default true mengizinkan READY dengan recommendation_basis=CONDITIONAL dan conditions_to_verify; false mempertahankan mode ketat NEEDS_CONTEXT. UI menampilkan saran sementara dan syarat, tanpa mengisi data kosong atau menyimpan otomatis. Risiko ambigu, kontaminasi berbahaya dan riwayat isi HDPE tetap dibatasi. Lihat [perilaku terbaru, reproduksi dan hasil pengujian](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/CONDITIONAL_AND_BACKGROUND.md).
+Ordinary context the user hasn't filled in stays UNKNOWN or null. allow_conditional defaults to true, allowing READY with recommendation_basis=CONDITIONAL and conditions_to_verify; false keeps the strict NEEDS_CONTEXT mode. The UI shows provisional advice and its conditions, without filling in blank data or saving automatically. Ambiguous risks, hazardous contamination, and HDPE former contents stay restricted. See the [latest behavior, reproduction, and test results](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/CONDITIONAL_AND_BACKGROUND.md).

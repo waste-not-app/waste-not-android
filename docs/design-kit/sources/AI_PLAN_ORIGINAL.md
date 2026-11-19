@@ -220,9 +220,9 @@ Jika kamera mendeteksi beberapa objek:
 ```text
 Detected Objects:
 
-1. Plastic Bottle — 94%
-2. Aluminium Can — 89%
-3. Cardboard — 91%
+1. Plastic Bottle, 94%
+2. Aluminium Can, 89%
+3. Cardboard, 91%
 ```
 
 Pengguna dapat memilih satu objek untuk dicatat terlebih dahulu.
@@ -233,7 +233,7 @@ Iterasi lanjutan dapat mendukung batch logging beberapa objek sekaligus.
 
 ## 6. AI Pipeline
 
-## 6.1 Stage 1 — Camera Input
+## 6.1 Stage 1: Camera Input
 
 Android menggunakan CameraX untuk menyediakan:
 
@@ -250,7 +250,7 @@ Image / Camera Frame
 
 ---
 
-## 6.2 Stage 2 — YOLO Object Detection
+## 6.2 Stage 2: YOLO Object Detection
 
 Model yang direkomendasikan sebagai baseline:
 
@@ -281,7 +281,7 @@ Output:
 
 ---
 
-## 6.3 Stage 3 — Waste Mapping
+## 6.3 Stage 3: Waste Mapping
 
 Class dari YOLO dipetakan ke domain WasteNot.
 
@@ -309,7 +309,7 @@ Contoh object hasil mapping:
 
 ---
 
-## 6.4 Stage 4 — Additional Context
+## 6.4 Stage 4: Additional Context
 
 Karena objek yang sama dapat memiliki metode berbeda, pengguna dapat diminta memberi konteks sederhana.
 
@@ -337,7 +337,7 @@ Tujuannya bukan membuat form panjang, tetapi memberikan informasi yang tidak dap
 
 ---
 
-## 6.5 Stage 5 — Waste Guide Retrieval
+## 6.5 Stage 5: Waste Guide Retrieval
 
 Sistem mengambil knowledge berdasarkan `guide_key`.
 
@@ -360,7 +360,7 @@ Waste Guide berfungsi sebagai knowledge base yang dikurasi.
 
 ---
 
-## 6.6 Stage 6 — LLM Recommendation
+## 6.6 Stage 6: LLM Recommendation
 
 LLM menerima:
 
@@ -567,7 +567,7 @@ Go Backend
 
 YOLO dapat ditempatkan dalam dua pendekatan.
 
-### Option A — On-device
+### Option A: On-device
 
 ```text
 Android
@@ -585,7 +585,7 @@ Kekurangan:
 - optimasi model lebih kompleks;
 - resource device terbatas.
 
-### Option B — AI Inference Service
+### Option B: AI Inference Service
 
 ```text
 Android
@@ -981,7 +981,7 @@ AI extension dianggap berhasil jika:
 
 ## 20. Suggested Development Roadmap
 
-### Phase 1 — Core WasteNot
+### Phase 1: Core WasteNot
 
 Pastikan fitur inti PRD stabil:
 
@@ -994,7 +994,7 @@ Dashboard
 Statistics
 ```
 
-### Phase 2 — Camera + YOLO Prototype
+### Phase 2: Camera + YOLO Prototype
 
 ```text
 CameraX
@@ -1011,7 +1011,7 @@ Target:
 - tampilkan confidence;
 - user confirmation.
 
-### Phase 3 — Waste Mapping
+### Phase 3: Waste Mapping
 
 ```text
 YOLO Class
@@ -1021,7 +1021,7 @@ Waste Category
 Guide Key
 ```
 
-### Phase 4 — Waste Guide Retrieval
+### Phase 4: Waste Guide Retrieval
 
 ```text
 Guide Key
@@ -1029,7 +1029,7 @@ Guide Key
 Waste Guide
 ```
 
-### Phase 5 — LLM Recommendation
+### Phase 5: LLM Recommendation
 
 ```text
 Detection
@@ -1043,7 +1043,7 @@ LLM
 Method Recommendation
 ```
 
-### Phase 6 — Full Integration
+### Phase 6: Full Integration
 
 ```text
 Scan
@@ -1057,7 +1057,7 @@ Waste Log
 Dashboard / History / Statistics
 ```
 
-### Phase 7 — Fine-Tuning
+### Phase 7: Fine-Tuning
 
 Fine-tune YOLO menggunakan waste-specific dataset.
 
@@ -1067,7 +1067,7 @@ Target:
 - mengurangi false detection;
 - memperluas jenis sampah.
 
-### Phase 8 — Optimization
+### Phase 8: Optimization
 
 Optional:
 

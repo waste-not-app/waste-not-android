@@ -1,220 +1,220 @@
-# WasteNot: Rencana Implementasi dan Pengujian
+# WasteNot: Implementation and Test Plan
 
-Versi 1.2 · 28 September 2026 · Core + AI extension · Rancangan implementasi
+Version 1.2 · 28 September 2026 · Core plus AI extension · Implementation design
 
-## 1. Cara membagi pekerjaan
+## 1. Splitting the work
 
-Tentukan pemilik fungsi Android, backend/data, konten/desain, dan QA/demo. Satu orang boleh menangani lebih dari satu fungsi. Kerjakan satu alur vertikal memakai UI dan API nyata sebelum menyelesaikan seluruh layar secara paralel. Setiap tugas mempunyai hasil yang bisa diperiksa, bukan hanya persentase progres.
+Assign owners for Android, backend and data, content and design, and QA and demo. One person can cover more than one role. Build one vertical flow with the real UI and API before finishing every screen in parallel. Every task has a result someone can check, not just a progress percentage.
 
-Dokumen acuan: [PRD](PRD.md), [API](API.md), [ARCHITECTURE](ARCHITECTURE.md), [SCREEN_SPEC](SCREEN_SPEC.md), [DESIGN](DESIGN.md).
+Reference documents: [PRD](PRD.md), [API](API.md), [ARCHITECTURE](ARCHITECTURE.md), [SCREEN_SPEC](SCREEN_SPEC.md), [DESIGN](DESIGN.md).
 
-## 2. Backlog per minggu
+## 2. Weekly backlog
 
-### Minggu 1: fondasi dan autentikasi
+### Week 1: foundations and authentication
 
-| ID | Pekerjaan | Dependensi | Bukti selesai |
+| ID | Work | Depends on | Done when |
 |---|---|---|---|
-| W1-01 | Setujui unit, makna Reduce, recycling rate, XP dan cut scope | Review PRD | Catatan keputusan tim |
-| W1-02 | Buat Android project, pin toolchain/dependency | W1-01 | Build debug dan aplikasi kosong berjalan |
-| W1-03 | Theme, fonts, typography, basic components | DESIGN | Preview terang/gelap + font scale |
-| W1-04 | Navigasi lima tab, auth root, Back | W1-02 | Rekaman alur dan restore tab |
-| W1-05 | Backend, DB migration, env debug, health | API | Migration ulang berhasil, readiness teruji |
-| W1-06 | Register/login/refresh/logout + token store | W1-05 | Auth nyata, logout mencabut sesi |
-| W1-07 | Screen S01–S03 + validasi dan error | W1-03,06 | Invalid credential dan offline tidak crash |
+| W1-01 | Agree on units, what Reduce means, recycling rate, XP, and scope cuts | PRD review | The team's decision notes |
+| W1-02 | Create the Android project and pin the toolchain and dependencies | W1-01 | The debug build and empty app run |
+| W1-03 | Theme, fonts, typography, basic components | DESIGN | Light and dark previews + font scale |
+| W1-04 | Five-tab navigation, auth root, Back | W1-02 | A recording of the flow and tab restore |
+| W1-05 | Backend, DB migrations, debug env, health | API | Migrations rerun cleanly, readiness tested |
+| W1-06 | Register, login, refresh, logout + token store | W1-05 | Real auth, and logout revokes the session |
+| W1-07 | Screens S01 to S03 + validation and errors | W1-03,06 | Invalid credentials and offline don't crash |
 
-Gate minggu 1: satu akun dapat dibuat, login, logout, dan membuka sesi lagi. APK tidak memuat secret backend. Rahasia tidak muncul di log. Tema dan navigation bekerja pada perangkat demo.
+Week 1 gate: one account can be created, signed in, signed out, and restored. The APK holds no backend secrets. Secrets never show up in logs. The theme and navigation work on the demo device.
 
-### Minggu 2: tracking lengkap
+### Week 2: complete tracking
 
-| ID | Pekerjaan | Dependensi | Bukti selesai |
+| ID | Work | Depends on | Done when |
 |---|---|---|---|
-| W2-01 | Create log, constraint unit, idempotensi | W1-05 | Replay/paralel satu ID menghasilkan satu record |
-| W2-02 | Editor, parser unit, draft restore, feedback | W2-01 | Input g/kg/count, retry tanpa kehilangan isian |
-| W2-03 | List/detail/filter/pagination API dan UI | W2-01 | S07–S10 memakai data user |
-| W2-04 | Update/delete/version conflict | W2-03 | Dua editor versi sama memicu konflik yang benar |
-| W2-05 | Dashboard agregat dan invalidasi | W2-01,04 | Summary berubah setelah create/edit/delete |
-| W2-06 | Test isolasi akun dan cache | Auth + semua log API | Akun B tidak melihat data akun A |
+| W2-01 | Create log, unit constraints, idempotency | W1-05 | Replays and parallel requests with one ID create one record |
+| W2-02 | Editor, unit parser, draft restore, feedback | W2-01 | g/kg/count input, retry without losing entries |
+| W2-03 | List, detail, filters, pagination in API and UI | W2-01 | S07 to S10 use the user's data |
+| W2-04 | Update, delete, version conflicts | W2-03 | Two editors on the same version trigger the right conflict |
+| W2-05 | Dashboard aggregates and invalidation | W2-01,04 | The summary changes after create, edit, and delete |
+| W2-06 | Account and cache isolation tests | Auth + all log APIs | Account B can't see account A's data |
 
-Gate minggu 2: alur create → read → update → delete lengkap; restart tidak menghilangkan catatan tersimpan; data A/B terpisah; dashboard tidak memakai hardcoded angka.
+Week 2 gate: the full create → read → update → delete flow works; restarting never loses saved logs; A and B data stay separate; the dashboard uses no hardcoded numbers.
 
-### Minggu 3: panduan dan evaluasi
+### Week 3: guides and evaluation
 
-| ID | Pekerjaan | Dependensi | Bukti selesai |
+| ID | Work | Depends on | Done when |
 |---|---|---|---|
-| W3-01 | Tinjau 12–20 artikel awal (target usulan) | Sumber konten | URL dan tanggal review nyata |
-| W3-02 | Search/list/detail panduan | W3-01 | Keyword dan no-result teruji |
-| W3-03 | Statistik, seri harian, kategori/metode | W2-01 | Dataset acuan menghasilkan angka PRD |
-| W3-04 | Chart + alternatif teks + 7/30 hari | W3-03 | Pembaca layar mendapat unit dan nilai |
-| W3-05 | XP dan level baseline | W2-04 | 9/10/11 catatan menguji batas level |
-| W3-06 | Streak/achievement bila core sudah stabil | W3-05 | Hari kosong, backdate, delete/relock teruji |
+| W3-01 | Review 12 to 20 starting articles (proposed target) | Content sources | Real URLs and review dates |
+| W3-02 | Guide search, list, and detail | W3-01 | Keywords and no-result cases tested |
+| W3-03 | Statistics, daily series, categories and methods | W2-01 | The reference dataset produces the PRD's numbers |
+| W3-04 | Chart + text alternative + 7/30 days | W3-03 | Screen readers get units and values |
+| W3-05 | Baseline XP and levels | W2-04 | 9, 10, and 11 logs test the level boundary |
+| W3-06 | Streaks and achievements once the core is stable | W3-05 | Empty days, backdating, delete and relock tested |
 
-Gate minggu 3: demo dari login sampai statistik berjalan pada server nyata; Guide telah direview; angka lintas layar cocok. Jika core gagal, minggu 4 difokuskan pada perbaikan core.
+Week 3 gate: the demo from sign-in to statistics runs on a real server; guides are reviewed; numbers match across screens. If the core fails, week 4 focuses on fixing the core.
 
-### Minggu 4: ketahanan dan demo
+### Week 4: resilience and the demo
 
-| ID | Pekerjaan | Kondisi | Bukti selesai |
+| ID | Work | Condition | Done when |
 |---|---|---|---|
-| W4-01 | Regression test + perbaikan prioritas tinggi | Selalu | Matriks test terisi bukti |
-| W4-02 | Accessibility, font scale, insets, tema | Selalu | TalkBack/keyboard/200% font checks |
-| W4-03 | Build demo, konfigurasi staging, backup/restore | Selalu | Artifact dan prosedur restore |
-| W4-04 | Reminder opt-in | Hanya jika gate core lulus | Permission denied, off, logout cancellation |
-| W4-05 | Foto | Hanya jika kapasitas tersedia | Upload privat dan retry, bukan placeholder |
-| W4-06 | Maps | Paling akhir dan ada data fasilitas | Fasilitas terverifikasi, no-permission fallback |
-| W4-07 | Latihan presentasi dan catat keterbatasan | Selalu | Rekaman demo dan bug list final |
+| W4-01 | Regression tests + high-priority fixes | Always | The test matrix has evidence |
+| W4-02 | Accessibility, font scale, insets, themes | Always | TalkBack, keyboard, and 200% font checks |
+| W4-03 | Demo build, staging config, backup and restore | Always | Artifacts and a restore procedure |
+| W4-04 | Opt-in reminders | Only if the core gate passes | Permission denied, off, cancellation on logout |
+| W4-05 | Photos | Only if there's capacity | Private upload and retry, not a placeholder |
+| W4-06 | Maps | Last, and only with facility data | Verified facilities, a no-permission fallback |
+| W4-07 | Presentation practice and recording limitations | Always | A demo recording and the final bug list |
 
-Jangan mengisi checklist opsional “selesai” hanya karena mockup tersedia. Jadwal ini tidak mengasumsikan semua stretch goal selesai dalam satu bulan.
+Don't tick an optional checklist item as done just because a mockup exists. This schedule doesn't assume every stretch goal fits in one month.
 
-## 3. Kasus uji penerimaan utama
+## 3. Main acceptance tests
 
-| ID | Skenario | Hasil yang harus terjadi |
+| ID | Scenario | What must happen |
 |---|---|---|
-| AT-01 | Daftar akun baru lalu login ulang | Akun tersimpan; profile milik akun itu |
-| AT-02 | Email duplikat/password pendek/salah | Error tepat; tidak tercipta sesi palsu |
-| AT-03 | Tambah 250 g Plastik Recycle | Satu log, 10 XP, detail terbaca setelah restart |
-| AT-04 | Tap simpan dua kali / retry timeout | Satu record dan 10 XP, bukan dua |
-| AT-05 | Berat 0, negatif, terlalu besar, precision >3 kg | Ditolak client dan server |
-| AT-06 | COUNT 2,5 atau weight+count bersamaan | Ditolak; tidak konversi unit diam-diam |
-| AT-07 | Tambah 2 benda Reduce | avoided_count bertambah, handled totals tetap |
-| AT-08 | Hanya Reduce, tanpa penanganan | Recycling rate null, bukan 0/100/NaN |
-| AT-09 | Data campuran g dan benda | Ringkasan terpisah, tidak menjumlah unit |
-| AT-10 | Dataset 5 baris PRD §9.4 | Hari ini 650 g, periode 1.400 g, 50%, 50 XP, streak 2 |
-| AT-11 | Filter PLASTIC + RECYCLE | Hanya catatan memenuhi keduanya |
-| AT-12 | Ganti filter saat request lama masih aktif | Respons lama tidak mengganti hasil baru |
-| AT-13 | Edit 250 g menjadi 300 g | Total bertambah 50 g, XP tidak berubah |
-| AT-14 | Delete satu log | Record hilang dari aktif; XP -10; statistik/streak dihitung ulang |
-| AT-15 | Dua update dengan version lama | Update kedua 409; draf pengguna tetap tersedia |
-| AT-16 | Read/PATCH/DELETE objek akun lain | 404, data tidak berubah |
-| AT-17 | Logout A lalu login B | Cache/draf/stack A tidak muncul |
-| AT-18 | Access expired, refresh valid | Satu refresh, request berlanjut sekali |
-| AT-19 | Refresh revoked/expired | Masuk ulang, tidak refresh loop |
-| AT-20 | Cari panduan, variasi kapital, hasil kosong | Hasil konsisten dan jalur hapus pencarian |
-| AT-21 | Ganti rentang statistik 7/30 hari | Judul, tanggal, seri, dan summary sama periodenya |
-| AT-22 | Tepat pergantian hari Asia/Jakarta | Hari ini, streak, dan rentang bergeser konsisten |
-| AT-23 | Rotasi/process death pada draf | Draf nonrahasia pulih untuk user sama, password tidak |
-| AT-24 | Font scale 200%, TalkBack | Field/CTA terbaca dan dapat dicapai |
-| AT-25 | Dark/light + landscape + keyboard | Tidak ada teks hilang atau tombol tertutup |
-| AT-26 | 1.000 log, pagination, error halaman berikut | Data awal tetap; retry tidak menduplikasi item |
+| AT-01 | Register a new account and sign in again | The account is saved; the profile belongs to it |
+| AT-02 | Duplicate email, short password, wrong password | The right error; no fake session is created |
+| AT-03 | Add 250 g of Plastic, Recycle | One log, 10 XP, detail readable after a restart |
+| AT-04 | Tap save twice / retry after a timeout | One record and 10 XP, not two |
+| AT-05 | Weight of 0, negative, too large, more than 3 kg decimals | Rejected by client and server |
+| AT-06 | COUNT of 2.5, or weight and count together | Rejected; no silent unit conversion |
+| AT-07 | Add 2 items of Reduce | avoided_count goes up, handled totals stay the same |
+| AT-08 | Only Reduce, no handling | Recycling rate is null, not 0, 100, or NaN |
+| AT-09 | Mixed g and item data | Separate summaries; units are never added together |
+| AT-10 | The 5-row dataset from PRD §9.4 | Today 650 g, period 1,400 g, 50%, 50 XP, streak 2 |
+| AT-11 | Filter PLASTIC + RECYCLE | Only logs that match both |
+| AT-12 | Change filters while an old request is still running | The old response never replaces the new result |
+| AT-13 | Edit 250 g to 300 g | The total goes up 50 g, XP doesn't change |
+| AT-14 | Delete one log | The record leaves the active set; XP -10; statistics and streak recalculated |
+| AT-15 | Two updates with an old version | The second update gets 409; the user's draft stays |
+| AT-16 | Read, PATCH, or DELETE another account's object | 404, data unchanged |
+| AT-17 | Log out A, then sign in as B | A's cache, drafts, and stack don't appear |
+| AT-18 | Access token expired, refresh valid | One refresh, and the request continues once |
+| AT-19 | Refresh revoked or expired | Sign in again, no refresh loop |
+| AT-20 | Search guides with different capitalization and no results | Consistent results and a way to clear the search |
+| AT-21 | Switch the statistics range between 7 and 30 days | Title, dates, series, and summary all cover the same period |
+| AT-22 | Exactly at the Asia/Jakarta day rollover | Today, streak, and ranges shift consistently |
+| AT-23 | Rotation or process death on a draft | The non-secret draft comes back for the same user; the password doesn't |
+| AT-24 | 200% font scale, TalkBack | Fields and CTAs are readable and reachable |
+| AT-25 | Dark and light + landscape + keyboard | No missing text or covered buttons |
+| AT-26 | 1,000 logs, pagination, a later page fails | The first data stays; retry doesn't duplicate items |
 
-Khusus update tanggal: tanggal lama yang dipertahankan boleh di luar jendela create; perubahan ke tanggal baru tetap harus dalam 30 hari terakhir. Uji kasus ini agar koreksi catatan lama tidak diblokir tanpa alasan.
+For date updates specifically: an old date that's kept may be outside the create window, but changing to a new date must stay within the last 30 days. Test this so corrections to old logs aren't blocked for no reason.
 
-## 4. Kasus opsi tambahan
+## 4. Optional feature cases
 
-- Reminder: off by default, permission denied, aktif lalu logout, hari sudah tercatat, waktu berubah, timezone tetap konsisten, tidak menjanjikan exact time.
-- Foto: file valid/invalid, MIME palsu, file terlalu besar, image decoding limit, cancel picker, retry upload, unauthorized download, signed URL expired, orphan cleanup.
-- Maps: permission ditolak, GPS mati, data fasilitas kosong, lokasi lama, provider gagal, pembukaan navigasi eksternal dengan pilihan pengguna.
-- Achievement: threshold tepat, delete membuat relock, request berulang tidak menggandakan unlock event, tidak memberi nilai lingkungan ilmiah.
+- Reminders: off by default, permission denied, turned on then logged out, day already logged, time changed, time zone stays consistent, no promise of an exact time.
+- Photos: valid and invalid files, fake MIME types, files too large, image decoding limits, cancelling the picker, upload retries, unauthorized downloads, expired signed URLs, orphan cleanup.
+- Maps: permission denied, GPS off, no facility data, stale location, provider failure, opening external navigation with the user's choice.
+- Achievements: exact thresholds, delete causing a relock, repeated requests not duplicating unlock events, no scientific environmental value.
 
-## 5. Pengujian otomatis secukupnya
+## 5. Just enough automated testing
 
-Backend: domain test untuk rumus dan unit, integration test untuk authorization/idempotensi/transaksi. Android: ViewModel test untuk loading/save/error/refresh, parser jumlah, dan satu Compose UI journey login → tambah → riwayat dengan fake repository. End-to-end terpisah memakai staging nyata untuk membuktikan integrasi.
+Backend: domain tests for formulas and units, integration tests for authorization, idempotency, and transactions. Android: ViewModel tests for loading, save, error, and refresh, the amount parser, and one Compose UI journey of sign in → add → history with a fake repository. Separate end-to-end tests use real staging to prove the integration.
 
-Jangan membuat test yang hanya menyalin implementation. Pilih data yang mematahkan asumsi: zero denominator, Reduce-only, mixed-unit, version conflict, multi-account, dan hasil POST yang responsnya hilang. Chart tidak memerlukan screenshot test untuk setiap data point; cukup check struktur/semantics dan review visual keadaan penting.
+Don't write tests that just copy the implementation. Pick data that breaks assumptions: a zero denominator, Reduce only, mixed units, version conflicts, multiple accounts, and a POST whose response was lost. Charts don't need a screenshot test for every data point; check the structure and semantics and visually review the important states.
 
-## 6. Matriks perangkat dan lingkungan
+## 6. Device and environment matrix
 
-| Konfigurasi | Tujuan |
+| Configuration | Purpose |
 |---|---|
-| Perangkat demo utama, versi OS dicatat | Bukti alur presentasi |
-| Emulator compact 360 dp, font normal | Kepadatan minimum |
-| Compact dengan font 200% | Reflow teks dan form |
-| Landscape + keyboard tampil | Safe inset dan scroll |
-| Tablet/resize minimal 600 dp | Rail/width constraint |
-| API dengan notification runtime permission | Jika reminder dikerjakan |
-| Koneksi normal, offline, lambat/timeout | Ketahanan data dan feedback |
+| Main demo device, OS version recorded | Evidence for the presentation flow |
+| Compact 360 dp emulator, normal font | Minimum density |
+| Compact with 200% font | Text and form reflow |
+| Landscape + keyboard open | Safe insets and scrolling |
+| Tablet or a resize to at least 600 dp | Rail and width constraints |
+| An API level with runtime notification permission | If reminders are built |
+| Normal, offline, and slow or timed-out connections | Data resilience and feedback |
 
-Isi hasil nyata setelah pengujian. Paket dokumentasi tidak menetapkan angka latency/jank yang belum diukur.
+Fill in real results after testing. The documentation package doesn't set latency or jank numbers that haven't been measured.
 
-## 7. Template catatan pengujian
+## 7. Test record template
 
 ```text
-Tanggal:
-Build / commit Android:
-Build / commit backend:
-Perangkat dan OS:
-Lingkungan API:
-Kasus uji:
-Langkah:
-Hasil diharapkan:
-Hasil aktual:
-Bukti (screenshot/log teredaksi):
-Status: BELUM DIUJI / LULUS / GAGAL
-Issue dan pemilik:
+Date:
+Android build / commit:
+Backend build / commit:
+Device and OS:
+API environment:
+Test case:
+Steps:
+Expected result:
+Actual result:
+Evidence (screenshot / redacted log):
+Status: NOT TESTED / PASS / FAIL
+Issue and owner:
 ```
 
-## 8. Skenario demo 5–7 menit (usulan)
+## 8. A 5 to 7 minute demo script (proposed)
 
-1. Masuk dengan akun uji dan jelaskan bahwa catatan bersifat pribadi.
-2. Tambah satu catatan Recycle valid; buka detail/riwayat dan tunjukkan persistensi setelah refresh.
-3. Tambah Reduce berbasis benda; tunjukkan pemisahan dari berat ditangani.
-4. Buka statistik dan jelaskan denominator recycling rate.
-5. Cari panduan, buka sumber, lalu tunjukkan prefill catatan.
-6. Tunjukkan XP/level dan satu keadaan gagal yang pulih tanpa duplikasi.
-7. Logout dan login akun lain untuk membuktikan isolasi.
+1. Sign in with a test account and explain that logs are private.
+2. Add one valid Recycle log; open the detail and history and show it persists after a refresh.
+3. Add an item-based Reduce; show that it's kept apart from handled weight.
+4. Open statistics and explain the recycling rate's denominator.
+5. Search a guide, open its source, then show the log prefill.
+6. Show XP and level, and one failure state that recovers without duplicates.
+7. Sign out and sign in to another account to prove isolation.
 
-Hindari demo dengan angka palsu yang dipresentasikan sebagai data pengguna nyata. Akun uji dan catatan simulasi boleh dipakai jika identitasnya disebutkan. Jelaskan opsi yang belum diimplementasikan secara terbuka.
+Avoid demos with fake numbers presented as real user data. Test accounts and simulated logs are fine if they're identified as such. Be open about options that aren't built yet.
 
 ## 9. Release gate
 
-- [ ] Semua FR Must dan baseline XP/level selesai atau ada perubahan scope yang disetujui.
-- [ ] Tidak ada bug kehilangan data, kebocoran akun, crash blocker, atau request duplikat.
-- [ ] API berjalan dengan TLS dan secret tidak masuk APK/Git/log.
-- [ ] Konten panduan sudah ditinjau; sumber nyata dicantumkan.
-- [ ] Backup/restore diuji untuk host bersama.
-- [ ] Build dapat dipasang ulang dan alur demo diulang.
-- [ ] README implementasi memuat setup, versi aktual, env names, dan batasan.
-- [ ] Hasil test disertai bukti, tidak hanya checklist kosong.
+- [ ] Every Must FR and the baseline XP and level are done, or there's an approved scope change.
+- [ ] No data loss bugs, account leaks, blocking crashes, or duplicate requests.
+- [ ] The API runs with TLS, and secrets aren't in the APK, Git, or logs.
+- [ ] Guide content is reviewed, with real sources listed.
+- [ ] Backup and restore are tested for the shared host.
+- [ ] The build can be reinstalled and the demo flow repeated.
+- [ ] The implementation README covers setup, actual versions, env names, and limitations.
+- [ ] Test results come with evidence, not just an empty checklist.
 
-Peluncuran publik membutuhkan pekerjaan tambahan yang belum tercakup demo: password reset, kebijakan privasi/retensi, alur penghapusan akun, operasi berkelanjutan, review keamanan, dan persyaratan kanal distribusi aktual.
+A public launch needs extra work the demo doesn't cover: password reset, a privacy and retention policy, an account deletion flow, ongoing operations, a security review, and the requirements of the actual distribution channel.
 
-## 10. Increment AI setelah core (revisi 28 September)
+## 10. The AI increment after the core (28 September revision)
 
-Permintaan terbaru mencakup computer vision, rekomendasi dan mockup tombol Catat/Scan pada navbar yang membuka kamera di bottom sheet. Empat minggu §2 tetap rencana core historis; estimasi tambahan AI disepakati setelah spike model/perangkat, tidak dianggap otomatis muat di minggu 4. Prioritaskan AI di atas Maps/reminder/foto lampiran jika itu fokus demo tim.
+The latest request covers computer vision, recommendations, and a mockup of the Log/Scan button on the navbar that opens the camera in a bottom sheet. The four weeks in §2 stay as the historical core plan; the extra AI estimate is agreed after a model and device spike, and isn't assumed to fit into week 4. Put AI ahead of Maps, reminders, and photo attachments if that's the team's demo focus.
 
-| Tahap | Pemilik fungsi | Hasil / gate sebelum lanjut |
+| Stage | Owners | Result / gate before moving on |
 |---|---|---|
-| AI-01 Kontrak & taxonomy | AI + backend + konten | Pilih checkpoint kandidat, baca label aktual, audit lisensi dataset/bobot, tetapkan kelas pilot dan capability |
-| AI-02 Camera sheet & manual | Android + desain | S21 capture/izin/close/Back; manual membuka S05; kamera berhenti saat background |
-| AI-03 Detection service | AI + backend | Endpoint multipart, bounded worker, preprocessing/bbox, TTL/cleanup, laporan latency baseline |
-| AI-04 Review & mapping | Android + backend | S22 multi-object satu pilihan, uncertain/unknown, koreksi kategori server-validated |
-| AI-05 Guide & context | Konten + Android | S23 kondisi independent, panduan PUBLISHED versioned, unknown/no guide fallback |
-| AI-06 Recommendation | Backend + AI | Provider terstruktur, schema + evidence + allowed methods + special handling, secrets/budget |
-| AI-07 Integrasi log | Android + backend | S24 → S05 jumlah manual → create satu log; provenance, statistik, XP tidak ganda |
-| AI-08 Evaluasi & pilot | QA + seluruh pemilik | Holdout report per kelas, safety/fallback, privasi, biaya, perangkat; keputusan go/no-go tertulis |
+| AI-01 Contract and taxonomy | AI + backend + content | Pick a candidate checkpoint, read its actual labels, audit dataset and weight licenses, set the pilot classes and capabilities |
+| AI-02 Camera sheet and manual | Android + design | S21 capture, permission, close, Back; manual opens S05; the camera stops in the background |
+| AI-03 Detection service | AI + backend | Multipart endpoint, bounded worker, preprocessing and boxes, TTL and cleanup, a baseline latency report |
+| AI-04 Review and mapping | Android + backend | S22 multiple objects with one choice, uncertain and unknown, server-validated category correction |
+| AI-05 Guides and context | Content + Android | S23 independent conditions, versioned PUBLISHED guides, unknown and no-guide fallback |
+| AI-06 Recommendation | Backend + AI | Structured provider, schema + evidence + allowed methods + special handling, secrets and budget |
+| AI-07 Log integration | Android + backend | S24 → S05 manual amount → create one log; provenance, statistics, and no double XP |
+| AI-08 Evaluation and pilot | QA + all owners | Per-class holdout report, safety and fallback, privacy, cost, devices; a written go/no-go decision |
 
-Fine-tuning setelah baseline taxonomy, lalu benchmark on-device/quantization bila latency/biaya/privacy memang menuntutnya. Keduanya tidak menjadi alasan menunda fallback manual. Camera scan dan lampiran foto adalah pekerjaan terpisah.
+Fine-tune after the baseline taxonomy, then benchmark on-device and quantization if latency, cost, or privacy really call for it. Neither is a reason to delay the manual fallback. Camera scanning and photo attachments are separate work.
 
-### Acceptance tambahan yang harus diuji pada implementasi
+### Extra acceptance tests for the implementation
 
-| ID | Skenario | Hasil wajib |
+| ID | Scenario | Required result |
 |---|---|---|
-| AT-AI-01 | Tap action tengah dock dari lima tab | Satu sheet kamera; tab sebelumnya tetap; close mengembalikan fokus |
-| AT-AI-02 | Izin denied/permanently denied, kamera tidak ada | Pesan relevan dan manual; tidak meminta berulang |
-| AT-AI-03 | Capture, tinjau, retake, cancel | Tidak upload sebelum konfirmasi; file sementara dibersihkan |
-| AT-AI-04 | Rotate/background/process death saat kamera | Tidak leak kamera, draf pulih, capture ulang bila file hilang |
-| AT-AI-05 | Banyak bbox | Satu pilihan eksplisit, tidak auto-count atau batch save |
-| AT-AI-06 | Threshold 0,49/0,50/0,699/0,70, unknown | State sesuai ambang kandidat; tidak mengklaim kepastian |
-| AT-AI-07 | Class bottle tanpa material | Wajib konfirmasi; tidak auto-map ke PLASTIC |
-| AT-AI-08 | Objek/kondisi berubah saat LLM request | Hasil lama diabaikan, rekomendasi diulang dengan konteks baru |
-| AT-AI-09 | LLM JSON/enum/evidence tidak valid | Method null dan fallback; tidak disimpan sebagai keputusan |
-| AT-AI-10 | Baterai/tajam/risiko khusus | Policy override, method null, panduan terkurasi, manual tersedia |
-| AT-AI-11 | Reduce dari foto sampah | Tidak direkomendasikan otomatis; jalur manual untuk aktivitas pencegahan |
-| AT-AI-12 | Network, timeout, overload, budget habis | Draf tetap, no retry loop; tracking manual berjalan |
-| AT-AI-13 | Terima/ubah saran, isi 250 g, simpan dua kali | Satu log final, 10 XP; tidak memakai confidence sebagai statistik |
-| AT-AI-14 | Owner silang/expired/linked recommendation | 404/410/409 tepat, no cross-account access, pilihan manual eksplisit |
-| AT-AI-15 | File palsu, oversize, orientation, bbox invalid | Validasi tepat, tidak crash/decompression bomb, overlay sejajar |
-| AT-AI-16 | Cleanup pada sukses, gagal, disconnect, crash | Tidak ada raw image di log/backup; scavenger memenuhi batas retensi |
-| AT-AI-17 | TalkBack, 200% font, keyboard, small landscape | Daftar objek bisa dipilih tanpa bbox; CTA/manual dapat dicapai |
-| AT-AI-18 | AI capability off | Catat manual tetap bisa dari action utama, auth/history tidak terganggu |
+| AT-AI-01 | Tap the center dock action from each of the five tabs | One camera sheet; the previous tab stays; close returns focus |
+| AT-AI-02 | Permission denied or permanently denied, no camera | A relevant message and manual entry; no repeated prompts |
+| AT-AI-03 | Capture, review, retake, cancel | Nothing uploads before confirmation; temporary files are cleaned up |
+| AT-AI-04 | Rotation, background, or process death with the camera on | No camera leak, the draft comes back, recapture if the file is gone |
+| AT-AI-05 | Many boxes | One explicit choice; no auto-count or batch save |
+| AT-AI-06 | Thresholds 0.49, 0.50, 0.699, 0.70, unknown | States match the candidate thresholds; no claims of certainty |
+| AT-AI-07 | The bottle class without a material | Confirmation required; no automatic mapping to PLASTIC |
+| AT-AI-08 | Object or condition changes during an LLM request | The old result is ignored and the recommendation reruns with the new context |
+| AT-AI-09 | Invalid LLM JSON, enum, or evidence | Null method and fallback; never saved as a decision |
+| AT-AI-10 | Batteries, sharp items, special risks | Policy override, null method, curated guide, manual available |
+| AT-AI-11 | Reduce from a photo of waste | Never recommended automatically; a manual path for prevention activities |
+| AT-AI-12 | Network, timeout, overload, budget used up | The draft stays, no retry loop; manual tracking works |
+| AT-AI-13 | Accept or change the advice, enter 250 g, save twice | One final log, 10 XP; confidence is never used as a statistic |
+| AT-AI-14 | Cross-owner, expired, or already linked recommendation | The right 404/410/409, no cross-account access, an explicit manual option |
+| AT-AI-15 | Fake files, oversize, orientation, invalid boxes | Correct validation, no crash or decompression bomb, aligned overlay |
+| AT-AI-16 | Cleanup on success, failure, disconnect, crash | No raw images in logs or backups; the scavenger meets the retention limit |
+| AT-AI-17 | TalkBack, 200% font, keyboard, small landscape | The object list can be chosen without boxes; CTAs and manual are reachable |
+| AT-AI-18 | AI capability off | Manual logging still works from the main action; auth and history unaffected |
 
-### Demo AI tambahan 2–3 menit
+### An extra 2 to 3 minute AI demo
 
-Dari navbar buka kamera sheet, ambil foto, konfirmasi kirim, pilih/koreksi objek, isi kondisi, periksa sumber, terima/ubah metode, isi jumlah sendiri, simpan, tunjukkan satu record dan perubahan XP. Ulang dengan kamera ditolak atau model tidak yakin untuk membuktikan manual fallback. Jika hanya memakai HTML, sebutkan hasil deteksi/rekomendasi adalah fixture simulasi; jangan mempresentasikan demo sebagai inference nyata.
+From the navbar, open the camera sheet, take a photo, confirm sending it, choose or correct the object, fill in the condition, check the sources, accept or change the method, enter the amount yourself, save, and show one record and the XP change. Repeat with the camera denied or an unsure model to prove the manual fallback. If you're only using the HTML, say the detection and recommendation results are simulated fixtures; never present the demo as real inference.
 
-### Gate AI sebelum pilot
+### AI gate before the pilot
 
-- [ ] License/taxonomy/model/mapping/provider/guide versions tercatat.
-- [ ] Holdout evaluation dan target kelas pilot disepakati; belum ada angka akurasi yang diasumsikan.
-- [ ] AT-AI-01–18 mempunyai hasil dan bukti implementasi nyata.
-- [ ] Kamera, upload dan cleanup diuji pada perangkat Android; web test tidak menggantikannya.
-- [ ] Kebijakan special handling, penolakan invalid output dan manual fallback lulus.
-- [ ] Anggaran, rate limit, timeout, observability redaction dan rollback diuji.
+- [ ] License, taxonomy, model, mapping, provider, and guide versions are recorded.
+- [ ] Holdout evaluation and pilot class targets are agreed; no accuracy numbers are assumed yet.
+- [ ] AT-AI-01 to 18 have results and evidence from a real implementation.
+- [ ] Camera, upload, and cleanup are tested on Android devices; web tests don't replace that.
+- [ ] Special handling policy, invalid output rejection, and the manual fallback pass.
+- [ ] Budget, rate limits, timeouts, observability redaction, and rollback are tested.

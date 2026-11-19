@@ -1,170 +1,170 @@
-# WasteNot: Computer Vision dan Rekomendasi AI
+# WasteNot: Computer Vision and AI Recommendations
 
-Versi 1.2 · 28 September 2026 · Spesifikasi usulan, belum diimplementasikan
+Version 1.2 · 28 September 2026 · Proposed spec, not yet implemented
 
-Pembaruan 20 Oktober 2026: prototipe YOLO–Gemini lokal tersedia. Keputusan terbaru pengguna mengganti rekomendasi tiga metode/alternatif menjadi satu label REDUCE/REUSE/RECYCLE/TRASH + alasan + sumber. Rincian kontrak dan cara mencoba ada pada [kontrak rekomendasi terbaru](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/RECOMMENDATION_CONTRACT.md). Integrasi Go/Android tetap pekerjaan lanjutan.
+Update on 20 October 2026: a local YOLO and Gemini prototype is available. The user's latest decision replaced three-method recommendations with alternatives by a single REDUCE/REUSE/RECYCLE/TRASH label with a reason and sources. Contract details and how to try it are in the [latest recommendation contract](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/RECOMMENDATION_CONTRACT.md). Go and Android integration is still follow-up work.
 
-## 1. Sumber, scope, dan keputusan
+## 1. Sources, scope, and decisions
 
-Permintaan pengguna pada 28 September memperluas dokumentasi mengikuti [rencana teman tim](sources/AI_PLAN_ORIGINAL.md). Dokumen sumber adalah masukan produk, bukan instruksi untuk menjalankan deployment, mengunggah foto, atau mengaktifkan layanan. PRD PDF tetap sumber kebutuhan inti. Dokumen ini merinci tambahan AI dan menyelesaikan ambiguitas agar Android/backend memakai kontrak yang sama.
+The user's request on 28 September expanded the documentation to follow [a teammate's plan](sources/AI_PLAN_ORIGINAL.md). The source document is product input, not an instruction to deploy anything, upload photos, or turn on services. The PDF PRD stays the source of the core requirements. This document details the AI additions and resolves ambiguities so Android and the backend use the same contract.
 
-| Status | Keputusan |
+| Status | Decision |
 |---|---|
-| Kebutuhan dari rencana | CameraX, YOLO, confidence dan bounding box, koreksi objek, konteks, Waste Guide, LLM terstruktur, validasi, konfirmasi, input jumlah manual |
-| Baseline rancangan tambahan | Capture satu foto per request; inference server Python privat di belakang Go API; satu objek dipilih untuk satu catatan |
-| Tetap berlaku | Enum domain, jumlah integer gram/benda, ownership, idempotensi, statistik dari catatan tersimpan, 10 XP per log aktif |
-| Belum diputuskan tim | Model/checkpoint final, kelas rilis, dataset berlisensi, provider LLM, hardware, biaya, target performa numerik |
-| Ditunda | Real-time frame streaming, estimasi berat, batch save, klasifikasi kimia/kontaminasi otomatis, on-device inference, offline LLM |
+| Requirements from the plan | CameraX, YOLO, confidence and bounding boxes, object correction, context, the Waste Guide, a structured LLM, validation, confirmation, manual amount entry |
+| Additional design baseline | One photo captured per request; private Python inference behind the Go API; one object chosen for one log |
+| Still applies | Domain enums, integer grams or item counts, ownership, idempotency, statistics from saved logs, 10 XP per active log |
+| Not decided by the team | The final model or checkpoint, release classes, licensed datasets, the LLM provider, hardware, cost, numeric performance targets |
+| Postponed | Real-time frame streaming, weight estimation, batch save, automatic chemical or contamination classification, on-device inference, an offline LLM |
 
-Permintaan lanjutan pengguna: action utama di tengah navbar membuka kamera dalam bottom sheet, dengan tombol input manual. Lima tab tetap ada; action di tengah atas dock bukan destinasi keenam.
+The user's follow-up request: a main action in the center of the navbar opens the camera in a bottom sheet, with a manual entry button. The five tabs stay; the action at the top center of the dock isn't a sixth destination.
 
-AI merupakan increment setelah alur core stabil. Jadwal empat minggu lama adalah baseline core, bukan janji menyelesaikan semua AI dalam waktu yang sama. Lihat [rencana implementasi](IMPLEMENTATION_PLAN.md).
+AI is an increment after the core flow is stable. The old four-week schedule is the core baseline, not a promise to finish all the AI work in the same time. See the [implementation plan](IMPLEMENTATION_PLAN.md).
 
-## 2. Alur dan batas tanggung jawab
+## 2. Flow and responsibilities
 
-Keputusan integrasi 20 Oktober 2026: Python memiliki mapping, retrieval panduan, allowed methods, Gemini dan validasi evidence. Go memegang JWT, ownership, sesi/TTL, idempotensi/budget dan transaksi catatan. Interface privat terpisah untuk YOLO dan keputusan; Go tidak menyalin aturan AI. OpenAPI, mock dan contoh tersedia pada [kontrak HTTP v1](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/AI_HTTP_CONTRACT.md). Endpoint Go/Android masih perlu diimplementasikan.
+Integration decision on 20 October 2026: Python owns mapping, guide retrieval, allowed methods, Gemini, and evidence validation. Go holds JWTs, ownership, sessions and TTLs, idempotency and budgets, and log transactions. YOLO and decisions have separate private interfaces; Go never copies the AI rules. OpenAPI, a mock, and examples are in the [HTTP contract v1](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/AI_HTTP_CONTRACT.md). The Go and Android endpoints still need implementing.
 
 ```mermaid
 flowchart TD
-    A[Action Catat/Scan pada dock] --> B{Camera bottom sheet}
-    B --> M[Input manual]
-    B --> C[CameraX: ambil dan tinjau foto]
-    C --> D[Setujui kirim foto untuk scan]
-    D --> E[Go API: validasi gambar dan autentikasi]
-    E --> F[YOLO pada inference service privat]
-    F --> G[Pilih satu objek dan koreksi material]
-    G --> H[Isi kondisi dan niat penggunaan ulang]
-    H --> I[Mapping server dan panduan terkurasi]
-    I --> J[LLM terstruktur + validasi kebijakan]
-    J --> K[Pengguna konfirmasi atau ubah metode]
+    A[Log/Scan action on the dock] --> B{Camera bottom sheet}
+    B --> M[Log manually]
+    B --> C[CameraX: take and review a photo]
+    C --> D[Agree to send the photo for scanning]
+    D --> E[Go API: image validation and authentication]
+    E --> F[YOLO on a private inference service]
+    F --> G[Choose one object and correct the material]
+    G --> H[Fill in condition and reuse intention]
+    H --> I[Server mapping and curated guides]
+    I --> J[Structured LLM + policy validation]
+    J --> K[User confirms or changes the method]
     K --> M
-    M --> N[Isi berat atau jumlah, tanggal, catatan]
-    N --> O[Konfirmasi simpan melalui endpoint log]
-    O --> P[Riwayat, statistik, dashboard, XP]
-    E -. Gagal .-> M
-    F -. Tidak dikenali .-> M
-    I -. Panduan tidak tersedia .-> M
-    J -. Gagal atau tidak valid .-> M
+    M --> N[Enter weight or count, date, notes]
+    N --> O[Confirm saving through the log endpoint]
+    O --> P[History, statistics, dashboard, XP]
+    E -. Fails .-> M
+    F -. Not recognized .-> M
+    I -. No guide available .-> M
+    J -. Fails or invalid .-> M
 ```
 
-YOLO mengenali kelas visual, bukan menentukan material kimia, berat, keamanan, atau penerimaan fasilitas. Waste Guide menyediakan aturan yang ditinjau. LLM merangkum rekomendasi dari konteks tersebut. Pengguna mengonfirmasi tindakan yang benar-benar dilakukan. Rekomendasi untuk masa depan belum menjadi waste log.
+YOLO recognizes visual classes; it doesn't determine chemical material, weight, safety, or facility acceptance. The Waste Guide provides reviewed rules. The LLM summarizes a recommendation from that context. The user confirms the action they actually took. A recommendation for the future isn't a waste log yet.
 
-Reduce berarti benda/berat yang dihindari. Memotret sampah yang sudah ada tidak membuktikan Reduce. Sesuai keputusan pengguna 20 Oktober 2026, Gemini memilih satu dari REDUCE/REUSE/RECYCLE/TRASH sesuai panduan. REDUCE memakai recommendation_scope=PREVENTION, sebagai pencegahan penggunaan berikutnya; lainnya HANDLING. Saran pencegahan tidak berarti aktivitas sudah dilakukan. Pengguna mencatat tindakan Reduce yang benar-benar dilakukan melalui manual dengan jumlah yang dihindari, sampai backend mendukung validasi provenance pencegahan.
+Reduce means items or weight avoided. Photographing waste that already exists doesn't prove Reduce. Following the user's decision on 20 October 2026, Gemini picks one of REDUCE/REUSE/RECYCLE/TRASH as the guides allow. REDUCE uses recommendation_scope=PREVENTION, meaning prevention next time; the others use HANDLING. Prevention advice doesn't mean the activity has happened. Users log Reduce actions they actually took through manual entry with the amount avoided, until the backend supports validating prevention provenance.
 
-## 3. Kamera dan siklus hidup
+## 3. Camera and lifecycle
 
-- Minta izin kamera setelah pengguna memilih scan. Ditolak: beri input manual; jika izin diblokir permanen, tawarkan pengaturan sistem tanpa prompt berulang.
-- CameraX Preview + ImageCapture terikat lifecycle. Tutup kamera saat keluar/background; iterasi awal tidak menjalankan ImageAnalysis atau upload stream.
-- Capture menghasilkan file sementara app-internal. Tampilkan preview dengan Ambil ulang, Kirim untuk scan, dan Batal. Izin kamera tidak dianggap persetujuan upload.
-- Jelaskan sebelum upload: foto dikirim untuk pengenalan; tidak otomatis menjadi lampiran atau data latihan. Hindari memotret orang/dokumen pribadi.
-- Normalisasi orientasi dan buang EXIF sebelum upload. Backend memvalidasi dan menormalisasi ulang; jangan percaya client.
-- Batal sebelum kirim menghapus foto lokal. Batal setelah kirim membatalkan UI/request semampunya; server tetap menjalankan cleanup meskipun koneksi putus.
-- Draf kategori/metode/jumlah bertahan sesuai core. Setelah process death, foto sementara yang hilang memunculkan Ambil ulang; jangan mengunggah ulang diam-diam. Logout membuang sesi AI dan foto sementara akun tersebut.
+- Ask for camera permission after the user chooses to scan. If it's denied, offer manual entry; if it's permanently blocked, offer system settings without prompting again.
+- CameraX Preview + ImageCapture are bound to the lifecycle. Close the camera on exit or in the background; the first iteration doesn't run ImageAnalysis or stream uploads.
+- Capture produces a temporary app-internal file. Show a preview with Retake, Send for scanning, and Cancel. Camera permission doesn't count as consent to upload.
+- Explain before uploading: the photo is sent for recognition; it doesn't automatically become an attachment or training data. Avoid photographing people or personal documents.
+- Normalize orientation and strip EXIF before uploading. The backend validates and normalizes again; never trust the client.
+- Cancelling before sending deletes the local photo. Cancelling after sending cancels the UI and request where possible; the server still runs cleanup if the connection drops.
+- Category, method, and amount drafts survive as in the core. After process death, a missing temporary photo shows Retake; never quietly upload again. Logout discards the account's AI sessions and temporary photos.
 
-## 4. Deteksi dan mapping
+## 4. Detection and mapping
 
-YOLO11n adalah kandidat baseline dari rencana, bukan model yang sudah dipilih/diuji. Model pretrained COCO memiliki label umum seperti `bottle`; label itu tidak cukup untuk memastikan `plastic_bottle` versus `glass_bottle`. Daftar kelas harus dibaca dari artifact model aktual, bukan dibuat berdasarkan keinginan UI. Dokumentasi resmi: [YOLO11](https://docs.ultralytics.com/models/yolo11/) dan [COCO](https://docs.ultralytics.com/datasets/detect/coco/).
+YOLO11n is the plan's baseline candidate, not a model that's been chosen or tested. A COCO-pretrained model has general labels like `bottle`; that label isn't enough to tell `plastic_bottle` from `glass_bottle`. The class list must be read from the actual model artifact, not invented to suit the UI. Official documentation: [YOLO11](https://docs.ultralytics.com/models/yolo11/) and [COCO](https://docs.ultralytics.com/datasets/detect/coco/).
 
-| Label dari model yang benar-benar mendukungnya | Kategori usulan | Kunci panduan | Ketentuan |
+| Label from a model that actually supports it | Proposed category | Guide key | Conditions |
 |---|---|---|---|
-| bottle (umum) | null | null | Wajib pengguna memilih material; jangan otomatis PLASTIC |
-| plastic_bottle | PLASTIC | pet_bottle | Hanya jika model dilatih dan dievaluasi untuk kelas ini |
-| glass_bottle | GLASS | glass_bottle | Konfirmasi kondisi/pecah |
-| aluminium_can | METAL | aluminium_can | Bukan semua objek silinder |
-| cardboard / paper | PAPER | cardboard / paper | Konteks kotor/basah tetap dari pengguna |
-| food_waste | ORGANIC | food_waste | Tidak mengidentifikasi kandungan kimia |
-| battery / electronic_waste | ELECTRONIC | battery / electronic_waste | Special handling; flag bukan kategori baru |
-| Label tak dikenal | null | null | Pilih manual; OTHER hanya pilihan eksplisit pengguna |
+| bottle (general) | null | null | The user must choose the material; never automatically PLASTIC |
+| plastic_bottle | PLASTIC | pet_bottle | Only if the model is trained and evaluated for this class |
+| glass_bottle | GLASS | glass_bottle | Confirm the condition and whether it's broken |
+| aluminium_can | METAL | aluminium_can | Not every cylindrical object |
+| cardboard / paper | PAPER | cardboard / paper | Dirty or wet context still comes from the user |
+| food_waste | ORGANIC | food_waste | Doesn't identify chemical contents |
+| battery / electronic_waste | ELECTRONIC | battery / electronic_waste | Special handling; a flag, not a new category |
+| Unknown label | null | null | Choose manually; OTHER is only an explicit user choice |
 
-Mapping adalah tabel versioned milik modul Python: model_version + class_id → object_key + category nullable + guide_key nullable + special_handling. Go menyimpan snapshot hasil dan mengirim objek dari sesi miliknya ke interface keputusan privat. Client tidak dapat memaksakan snapshot/guide/confidence. Koreksi pengguna memakai katalog server; unknown/custom menuju manual bila tidak ada panduan cocok.
+Mapping is a versioned table owned by the Python module: model_version + class_id → object_key + nullable category + nullable guide_key + special_handling. Go stores a snapshot of the result and sends the object from its own session to the private decision interface. The client can't force the snapshot, guide, or confidence. User corrections use the server catalog; unknown or custom objects go to manual entry when no guide matches.
 
-Bbox memakai `[x_min,y_min,x_max,y_max]` normalized 0..1 terhadap gambar setelah orientasi dibetulkan; x_min < x_max dan y_min < y_max. Model adapter mengonversi output runtime ke kontrak ini. Android menghitung ulang posisi pada crop/letterbox preview. Pilihan daftar dan bbox merujuk detection_id yang sama.
+Bounding boxes use `[x_min,y_min,x_max,y_max]` normalized from 0 to 1 against the image after orientation is fixed, with x_min < x_max and y_min < y_max. The model adapter converts runtime output to this contract. Android recalculates positions for the preview's crop or letterbox. The list choice and the boxes refer to the same detection_id.
 
-### Confidence dan multi-object
+### Confidence and multiple objects
 
-| Score kandidat awal | State | Perilaku |
+| Initial candidate score | State | Behavior |
 |---|---|---|
-| ≥0,70 | OFFERED | Boleh ditawarkan, tetap wajib konfirmasi |
-| ≥0,50 dan <0,70 | UNCERTAIN | Teks belum yakin; koreksi atau scan ulang |
-| <0,50 / tidak ada kandidat | MANUAL_REQUIRED | Tidak prefill kategori/metode; manual atau ulang |
+| ≥0.70 | OFFERED | May be offered, still needs confirmation |
+| ≥0.50 and <0.70 | UNCERTAIN | "Not sure" text; correct it or scan again |
+| <0.50 / no candidates | MANUAL_REQUIRED | No category or method prefill; manual entry or retry |
 
-Ambang adalah hipotesis pengujian, bukan akurasi terukur. Skor 0,94 ditulis “Skor deteksi 94%”, bukan “94% pasti benar” atau akurasi model. Kalibrasi dan ambang per kelas dievaluasi pada validation set; test set tetap terpisah. Satu foto boleh menghasilkan banyak bbox; pengguna memilih satu. Tidak menghitung benda dari banyak bbox, tidak menggandakan XP, tidak membuat batch log.
+The thresholds are a test hypothesis, not measured accuracy. A score of 0.94 reads "Detection score 94%", never "94% sure it's right" or model accuracy. Calibration and per-class thresholds are evaluated on a validation set; the test set stays separate. One photo can produce many boxes; the user picks one. Never count items from multiple boxes, double XP, or create batch logs.
 
-## 5. Konteks dan panduan
+## 5. Context and guides
 
-Kondisi bukan satu pilihan yang saling meniadakan. Gunakan tiga field: cleanliness CLEAN/DIRTY/UNKNOWN, integrity INTACT/DAMAGED/UNKNOWN, reusable YES/NO/UNKNOWN. `reuse_intention` boolean nullable terpisah. Default UNKNOWN/null; kamera tidak mengisi kondisi sebagai fakta.
+Condition isn't one mutually exclusive choice. Use three fields: cleanliness CLEAN/DIRTY/UNKNOWN, integrity INTACT/DAMAGED/UNKNOWN, reusable YES/NO/UNKNOWN. `reuse_intention` is a separate nullable boolean. Defaults are UNKNOWN or null; the camera never fills in the condition as fact.
 
-Policy-04 menambahkan condition.cleanable=YES/NO/UNKNOWN dan condition.soiling=FOOD_DRINK/DUST/HAZARDOUS/UNKNOWN, serta risk_type=UNKNOWN/SHARP/CHEMICAL/BIOLOGICAL/ELECTRICAL/OTHER. Pada peralatan makan/minum, kotor biasa yang dikonfirmasi bisa dibersihkan dapat memenuhi REUSE dengan langkah mencuci dahulu, jika utuh, layak dan ingin dipakai kembali. DIRTY tidak otomatis diubah menjadi CLEAN. Centang risiko yang belum dijelaskan menghasilkan NEEDS_CONTEXT + missing_context sebelum memanggil Gemini. Metadata sumber tercatat pada registri, dengan penerbit, wilayah, tanggal pemeriksaan referensi dan batas cakupan; bukan persetujuan ahli lokal.
+Policy-04 adds condition.cleanable=YES/NO/UNKNOWN and condition.soiling=FOOD_DRINK/DUST/HAZARDOUS/UNKNOWN, plus risk_type=UNKNOWN/SHARP/CHEMICAL/BIOLOGICAL/ELECTRICAL/OTHER. For eating and drinking items, ordinary dirt confirmed as cleanable can qualify for REUSE with washing first, if the item is intact, usable, and the user wants to reuse it. DIRTY is never automatically turned into CLEAN. A risk checkbox without an explanation gives NEEDS_CONTEXT + missing_context before Gemini is called. Source metadata is recorded in the registry, with the publisher, region, reference check date, and scope limits; it isn't local expert approval.
 
-Retrieval awal memakai lookup object_key/guide_key dan filter category + publication_status=PUBLISHED. Tidak perlu vector database atau embeddings. Panduan harus memiliki version, reviewed_at, sumber, metode yang diizinkan, syarat konteks, steps, cautions, special_handling. Artikel draft dalam HTML lama tidak boleh menjadi knowledge produksi. Jika kosong/kedaluwarsa menurut kebijakan editorial, tampilkan UNAVAILABLE dan pilihan manual; jangan mengisi kekosongan dengan pengetahuan bebas LLM.
+Initial retrieval uses an object_key or guide_key lookup with a filter on category + publication_status=PUBLISHED. There's no need for a vector database or embeddings. Guides must have a version, reviewed_at, sources, allowed methods, context conditions, steps, cautions, and special_handling. Draft articles in the old HTML must never become production knowledge. If a guide is missing or stale under the editorial policy, show UNAVAILABLE and the manual option; never fill the gap with the LLM's free-form knowledge.
 
-Rekomendasi mengacu pada snapshot panduan dan kondisi yang dikonfirmasi. Mengubah objek/kategori/kondisi membatalkan rekomendasi lama; request lama tidak boleh menimpa state baru. Perubahan metode manual tetap diperbolehkan dan dicatat sebagai koreksi pengguna.
+Recommendations refer to the guide snapshot and the confirmed condition. Changing the object, category, or condition cancels the old recommendation, and an old request must never overwrite the new state. Changing the method manually is still allowed and recorded as a user correction.
 
-## 6. LLM dan validasi
+## 6. LLM and validation
 
-Provider berada di backend. Kirim hanya object_key, kategori, konteks, metode yang diizinkan, dan potongan panduan yang diperlukan. Jangan kirim foto, nama, email, lokasi, token, atau catatan pribadi ke LLM baseline. Jangan beri LLM tool database atau browsing bebas.
+The provider lives on the backend. Send only the object_key, category, context, allowed methods, and the guide excerpts needed. Never send photos, names, emails, locations, tokens, or personal notes to the baseline LLM. Never give the LLM a database tool or open browsing.
 
-Output internal Gemini mempunyai tepat satu recommended_method wajib (REDUCE/REUSE/RECYCLE/TRASH), reason, special_handling, caution, dan evidence_ids; tidak memiliki alternative_method. Respons READY menambahkan recommendation_scope, source_urls dan steps dari evidence/panduan yang tervalidasi. special_handling adalah flag peringatan dan tidak menghilangkan metode READY. Server memvalidasi JSON/schema, batas panjang (reason 500, caution 500 karakter), enum, referensi evidence, dan kesesuaian aturan panduan. Prototipe merender alasan dari evidence pilihan, bukan prosa bebas model. JSON yang valid saja belum membuktikan rekomendasi benar. Teks panduan diperlakukan sebagai data; instruksi tersembunyi di dalamnya tidak boleh mengubah kebijakan sistem. Tidak memakai OCR/teks gambar sebagai instruksi.
+Gemini's internal output has exactly one required recommended_method (REDUCE/REUSE/RECYCLE/TRASH), a reason, special_handling, a caution, and evidence_ids; it has no alternative_method. A READY response adds recommendation_scope, source_urls, and steps from validated evidence and guides. special_handling is a warning flag and doesn't remove the READY method. The server validates the JSON and schema, length limits (reason 500, caution 500 characters), enums, evidence references, and whether the guide rules are met. The prototype renders the reason from the chosen evidence, not the model's free prose. Valid JSON alone doesn't prove the recommendation is right. Guide text is treated as data; hidden instructions inside it must never change system policy. OCR or text in images is never used as instructions.
 
-Server menghitung allowed methods dari panduan dan konteks, lalu memeriksa satu hasil LLM terhadap subset itu. Evidence hanya boleh mendukung metode terpilih. recommendation_goal=AUTO/PREVENTION/HANDLING mengatur fokus; AUTO/HANDLING memilih penanganan saat ini, REDUCE hanya untuk PREVENTION yang dipilih pengguna. Kekurangan evidence tidak diubah menjadi pencegahan. recycling_access=YES/NO/UNKNOWN mencatat pemeriksaan penerima. Default AUTO/UNKNOWN. Tidak ada akses daur ulang tidak otomatis membolehkan TRASH tanpa evidence spesifik. Evidence ID harus berasal dari retrieval request tersebut; URL sumber disediakan server dari evidence, bukan URL baru buatan LLM. COMPOST tidak otomatis menjadi enum baru atau diam-diam dipetakan ke RECYCLE tanpa aturan editorial.
+The server calculates the allowed methods from the guide and context, then checks the single LLM result against that subset. Evidence may only support the chosen method. recommendation_goal=AUTO/PREVENTION/HANDLING sets the focus; AUTO and HANDLING pick the current handling, and REDUCE is only for PREVENTION when the user chooses it. Missing evidence is never turned into prevention. recycling_access=YES/NO/UNKNOWN records whether the user checked for a recycler. Defaults are AUTO and UNKNOWN. Having no recycling access doesn't automatically allow TRASH without specific evidence. Evidence IDs must come from that request's retrieval; source URLs are supplied by the server from the evidence, never new URLs made up by the LLM. COMPOST never automatically becomes a new enum or gets quietly mapped to RECYCLE without an editorial rule.
 
-Prioritas validasi policy-04: tentukan risiko → ketersediaan panduan → klarifikasi konteks yang kurang → evidence sesuai risiko/kondisi → allowed methods → schema/evidence → satu label dan peringatan. Risiko yang tercakup tidak menghilangkan klasifikasi. Jika special_handling benar, hanya evidence risk_compatible=true yang boleh dipilih; model tidak boleh menghapus flag tersebut. Contoh: kaca pecah → TRASH dengan pelindung, baterai/elektronik/pisau/gunting → RECYCLE melalui pengelola khusus. Kontaminasi kimia/biologis tidak mengikuti aturan cuci/residu umum. Instruksi dan sumber mengikuti metode terpilih. Kelas tidak terdeteksi bukan bukti benda aman. Lihat [mutu panduan dan kasus cangkir](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/GUIDE_QUALITY.md).
+Policy-04 validation order: determine risk → guide availability → clarify missing context → evidence that fits the risk and condition → allowed methods → schema and evidence → one label and warnings. A covered risk doesn't remove the classification. If special_handling is true, only evidence with risk_compatible=true can be chosen, and the model can't remove the flag. For example: broken glass → TRASH with protection; batteries, electronics, knives, and scissors → RECYCLE through a specialist handler. Chemical or biological contamination doesn't follow the general washing and residue rules. Instructions and sources follow the chosen method. An undetected class isn't proof an item is safe. See [guide quality and the cup case](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/GUIDE_QUALITY.md).
 
-Jika timeout, JSON invalid, evidence palsu, atau aturan tidak cocok, respons UNAVAILABLE dengan method null. Boleh tampilkan tautan panduan yang valid. Tidak ada auto-save atau fallback saran acak. Pilihan manual tetap melewati validasi domain biasa; tampilkan pengingat bahwa metode adalah tindakan yang dilakukan, bukan sertifikasi penanganan aman.
+On a timeout, invalid JSON, fake evidence, or a rule mismatch, the response is UNAVAILABLE with a null method. A valid guide link may still be shown. There's no auto-save and no random fallback advice. Manual choices still pass normal domain validation; remind the user that the method is the action they took, not a certification of safe handling.
 
-## 7. State dan konsistensi
+## 7. State and consistency
 
 `Idle → Permission → Preview → ReviewPhoto → Detecting → ReviewObject → Context → Recommending → ReviewRecommendation → LogDraft → Saving → Saved`.
 
-Exit melalui Batal/Manual tersedia di semua tahap sebelum Saving. Tidak ada retry otomatis upload/inference berulang. Tombol ulang mengirim aksi eksplisit; hasil request lama diabaikan dengan request ID/generation. Loading dapat dibatalkan dan tidak memiliki progres persentase palsu. Timeout tidak menghapus draf. Setelah rekomendasi expired, kategori/metode yang sudah dikonfirmasi tetap bisa disimpan sebagai manual setelah metadata AI dilepas secara eksplisit.
+Cancel and Manual exits are available at every stage before Saving. There are no repeated automatic upload or inference retries. A retry button sends an explicit action, and old request results are ignored by request ID or generation. Loading can be cancelled and has no fake percentage progress. A timeout never deletes the draft. After a recommendation expires, the confirmed category and method can still be saved as a manual entry once the AI metadata is explicitly dropped.
 
-AI session dan recommendation tidak menambah log/statistik/XP. Hanya POST waste-logs yang sukses menambah catatan; replay mengikuti client_request_id core. Retry model boleh menambah biaya inference, sehingga memakai dedup request ID dan pembatasan akun. Detail/edit log menunjukkan data final pengguna. Metadata awal AI adalah provenance, tidak ditulis ulang seolah model menyarankan hasil koreksi belakangan.
+AI sessions and recommendations never add logs, statistics, or XP. Only a successful waste-logs POST adds a log; replays follow the core client_request_id. Model retries can add inference cost, so they use request ID dedup and per-account limits. Log detail and edit show the user's final data. The original AI metadata is provenance and is never rewritten as if the model suggested a later correction.
 
-## 8. Privasi, retensi, dan operasi
+## 8. Privacy, retention, and operations
 
-Keputusan baseline usulan yang harus diwujudkan sebelum pilot:
+Proposed baseline decisions that must be in place before the pilot:
 
-| Data | Retensi / batas |
+| Data | Retention / limits |
 |---|---|
-| Foto lokal scan | Hapus saat keluar alur/logout atau paling lambat cleanup 1 jam; bukan galeri pengguna |
-| Foto inference server | Memori/tmp ephemeral tanpa backup; hapus saat selesai/gagal; scavenger batas 15 menit untuk crash |
-| Sesi deteksi/rekomendasi sementara | TTL 24 jam; user-scoped; hapus job berkala |
-| Metadata AI yang terhubung log | Umur log; hapus bersama data log sesuai kebijakan retensi core, akses langsung dicabut saat log dihapus |
-| Telemetri operasional | 7 hari untuk pilot, tanpa raw image/prompt/notes/token; agregat evaluasi dianonimkan |
-| Foto lampiran | Jalur opt-in terpisah /photos dan aturan core; scan tidak mengaktifkannya |
-| Dataset training | Tidak mengambil foto pengguna otomatis; dataset terkurasi berlisensi/persetujuan terpisah |
+| Local scan photos | Deleted on leaving the flow or logging out, or by cleanup within 1 hour at the latest; never in the user's gallery |
+| Server inference photos | Ephemeral memory or tmp with no backup; deleted on completion or failure; a 15-minute scavenger limit for crashes |
+| Temporary detection and recommendation sessions | 24-hour TTL; user-scoped; periodic delete job |
+| AI metadata linked to a log | The log's lifetime; deleted with the log data under the core retention policy, with direct access revoked when the log is deleted |
+| Operational telemetry | 7 days for the pilot, with no raw images, prompts, notes, or tokens; evaluation aggregates are anonymized |
+| Attachment photos | A separate opt-in /photos path and core rules; scanning never turns it on |
+| Training datasets | User photos are never collected automatically; a curated dataset with separate licenses or consent |
 
-Batasi file JPEG/PNG ≤5 MiB, decoded ≤12 megapiksel, sisi ≤4096 px; tolak malformed/decompression bomb. Angka ini batas rancangan API, bukan limit model. Resize input model dilakukan setelah validasi. Semua endpoint AI butuh sesi; internal service tidak diekspos publik. Akun lain menerima 404 untuk detection/recommendation milik pengguna lain.
+Limit files to JPEG or PNG ≤5 MiB, decoded ≤12 megapixels, sides ≤4096 px; reject malformed files and decompression bombs. These are API design limits, not model limits. Model input resizing happens after validation. Every AI endpoint needs a session; internal services are never exposed publicly. Other accounts get 404 for another user's detections and recommendations.
 
-Baseline timeout usulan: inference internal 10 detik, LLM 15 detik, deadline API 20 detik per request; timeout client 25 detik. Queue inference bounded; overload menghasilkan 429/503, bukan menumpuk gambar. Rate limit awal usulan 10 scan/menit/akun dan 30 rekomendasi/jam/akun; batas biaya harian per lingkungan wajib diisi tim. Jangan memanggil LLM setiap frame. Semua angka harus dituning dari pengukuran; tidak dipresentasikan sebagai latency aktual.
+Proposed baseline timeouts: 10 seconds for internal inference, 15 seconds for the LLM, a 20-second API deadline per request, and a 25-second client timeout. The inference queue is bounded; overload returns 429/503 rather than piling up images. Proposed starting rate limits are 10 scans per minute per account and 30 recommendations per hour per account; the team must fill in a daily cost limit per environment. Never call the LLM on every frame. Every number has to be tuned from measurements and never presented as actual latency.
 
-LLM provider harus mendukung kebijakan retensi yang disepakati tim; konfigurasi sebelum pilot. Simpan secret server-side. Pemilihan model YOLO juga memerlukan pencatatan lisensi kode, bobot dan dataset; [halaman lisensi Ultralytics](https://www.ultralytics.com/license) menyediakan opsi AGPL-3.0 dan Enterprise. Belum ada keputusan lisensi/deployment komersial dalam kit ini.
+The LLM provider must support the retention policy the team agrees on, configured before the pilot. Keep secrets server-side. Choosing a YOLO model also means recording the code, weight, and dataset licenses; [Ultralytics' license page](https://www.ultralytics.com/license) offers AGPL-3.0 and Enterprise options. This kit makes no licensing or commercial deployment decision.
 
-## 9. Dataset, evaluasi, dan release gate
+## 9. Datasets, evaluation, and the release gate
 
-Mulai dari pipeline pretrained dengan label asli; fine-tune hanya setelah taksonomi dan anotasi disepakati. Setiap artifact mempunyai model_version, checksum, daftar label, preprocessing, ukuran input, mapping_version dan provenance dataset. Pisahkan train/validation/test berdasarkan objek fisik/sesi pengambilan, bukan frame acak yang hampir sama. Audit duplikat, lisensi, ketimpangan kelas, dan background leakage. Data pengguna yang dikoreksi tidak otomatis menjadi label training benar.
+Start from a pretrained pipeline with its original labels; fine-tune only after the taxonomy and annotations are agreed. Every artifact has a model_version, checksum, label list, preprocessing, input size, mapping_version, and dataset provenance. Split train, validation, and test by physical object or capture session, not by near-identical random frames. Audit duplicates, licenses, class imbalance, and background leakage. Data users corrected doesn't automatically become correct training labels.
 
-Laporan harus memuat jumlah gambar/instance per split dan kelas, precision/recall per kelas, confusion matrix, mAP@0.5 dan mAP@0.5:0.95, false negative special waste, unknown rejection, confidence calibration, serta ukuran sampel. Uji cahaya rendah, objek kecil/tertutup, multi-object, background rumit, material mirip, perangkat/lokasi berbeda. Angka aggregate tidak cukup untuk menyetujui kelas berisiko.
+The report must include image and instance counts per split and class, per-class precision and recall, a confusion matrix, mAP@0.5 and mAP@0.5:0.95, false negatives for special waste, unknown rejection, confidence calibration, and sample sizes. Test low light, small or covered objects, multiple objects, busy backgrounds, similar materials, and different devices and locations. Aggregate numbers aren't enough to approve risky classes.
 
-Ukur upload/preprocess/inference/retrieval/LLM/end-to-end secara terpisah, p50/p95, hardware, versi runtime, ukuran foto dan koneksi. Catat acceptance/correction/fallback rate per versi serta waktu pengguna menyelesaikan log dibanding manual. Acceptance pengguna bukan ground truth akurasi. Target numerik kualitas/biaya/latency ditetapkan setelah baseline, sebelum pilot; tabel hasil tetap BELUM DIUKUR sampai ada bukti.
+Measure upload, preprocessing, inference, retrieval, LLM, and end-to-end time separately, at p50 and p95, with the hardware, runtime version, photo size, and connection. Record acceptance, correction, and fallback rates per version, and how long users take to finish a log compared with manual entry. User acceptance isn't ground truth for accuracy. Numeric quality, cost, and latency targets are set after the baseline and before the pilot; the results table stays NOT MEASURED until there's evidence.
 
-Release AI hanya jika taxonomy tersedia, mapping diuji, panduan PUBLISHED nyata, lisensi dicatat, privasi/cleanup dibuktikan, fallback manual berjalan, isolasi akun/idempotensi lulus, dan penanggung jawab menyetujui hasil holdout. Jika gagal, matikan capability AI tanpa mematikan tracking core. Model update memiliki evaluasi regresi dan rollback artifact+mapping; jangan mengganti bobot tanpa versi.
+Release AI only if the taxonomy exists, mapping is tested, real PUBLISHED guides exist, licenses are recorded, privacy and cleanup are proven, the manual fallback works, account isolation and idempotency pass, and the owner approves the holdout results. If anything fails, switch off the AI capability without switching off core tracking. Model updates get regression evaluation and an artifact + mapping rollback; never swap weights without a version.
 
-## 10. Referensi dan traceability
+## 10. References and traceability
 
-- Rencana tim §1–8 → pipeline, scope, confidence, validasi, special handling di §1–6 dokumen ini.
-- Rencana tim §9–13 → [ARCHITECTURE](ARCHITECTURE.md) dan [API](API.md), termasuk endpoint detection yang belum dirinci sumber.
-- Rencana tim §14–19 → dataset/evaluasi/privasi di §8–9 dan acceptance [IMPLEMENTATION_PLAN](IMPLEMENTATION_PLAN.md).
-- Rencana tim §20–23 → increment AI, optimasi ditunda, dan milestone setelah core.
-- [CameraX architecture](https://developer.android.com/media/camera/camerax/architecture) dan [Image capture](https://developer.android.com/media/camera/camerax/take-photo): lifecycle dan capture, diperiksa 28 September 2026.
-- [YOLO11](https://docs.ultralytics.com/models/yolo11/), [COCO](https://docs.ultralytics.com/datasets/detect/coco/), [lisensi](https://www.ultralytics.com/license): kandidat model, taksonomi pretrained, dan opsi lisensi; diperiksa 28 September 2026. Tidak mengunci versi runtime atau menjanjikan akurasi WasteNot.
+- Team plan §1 to §8 → the pipeline, scope, confidence, validation, and special handling in §1 to §6 of this document.
+- Team plan §9 to §13 → [ARCHITECTURE](ARCHITECTURE.md) and [API](API.md), including the detection endpoints the source didn't detail.
+- Team plan §14 to §19 → datasets, evaluation, and privacy in §8 to §9 and acceptance in the [IMPLEMENTATION_PLAN](IMPLEMENTATION_PLAN.md).
+- Team plan §20 to §23 → the AI increment, postponed optimizations, and milestones after the core.
+- [CameraX architecture](https://developer.android.com/media/camera/camerax/architecture) and [Image capture](https://developer.android.com/media/camera/camerax/take-photo): lifecycle and capture, checked 28 September 2026.
+- [YOLO11](https://docs.ultralytics.com/models/yolo11/), [COCO](https://docs.ultralytics.com/datasets/detect/coco/), [license](https://www.ultralytics.com/license): the model candidate, pretrained taxonomy, and license options; checked 28 September 2026. This doesn't pin a runtime version or promise accuracy for WasteNot.
 
-### Pembaruan kualitas pilot, 20 Oktober 2026
+### Pilot quality update, 20 October 2026
 
-Kontrak Python v1 menambahkan review_profile dan review_thresholds/review_reasons/ambiguous_with per kandidat, serta condition.former_contents=FOOD_DRINK/CHEMICAL/OTHER/UNKNOWN. Band server mengutamakan profil checkpoint; tabel threshold global adalah default COCO. Kandidat empat kelas SHA af1446f33338... memakai dw-val-01: can/HDPE OFFERED >=0,70; PET >=0,725; kaca selalu UNCERTAIN; beda kelas dengan overlap IoU>=0,65 tetap terlihat dan UNCERTAIN. Semua kandidat memerlukan konfirmasi pengguna.
+Python contract v1 adds review_profile and per-candidate review_thresholds, review_reasons, and ambiguous_with, plus condition.former_contents=FOOD_DRINK/CHEMICAL/OTHER/UNKNOWN. Server bands prefer the checkpoint profile; the global threshold table is the COCO default. The four-class candidate SHA af1446f33338... uses dw-val-01: cans and HDPE are OFFERED at >=0.70; PET at >=0.725; glass is always UNCERTAIN; different classes overlapping at IoU>=0.65 stay visible and UNCERTAIN. Every candidate needs user confirmation.
 
-Go mengirim model_sha256 dari snapshot privat pada selection agar aturan bisa diperiksa ulang; tidak menerima provenance tersebut dari frontend. Pilot RECYCLE memerlukan recycling_access=YES; HDPE memerlukan former_contents=FOOD_DRINK. UNKNOWN meminta konteks; tidak ditebak menjadi Trash/Reduce. Semua 69 panduan masih DRAFT. Rincian, metrik val beserta tradeoff, evaluasi Gemini dan perintah reproduksi: [mutu deteksi](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/DETECTION_QUALITY.md), [mutu rekomendasi](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/RECOMMENDATION_EVALUATION.md). OpenAPI pada ai/contracts/v1 merupakan acuan DTO yang diregenerasi.
+Go sends model_sha256 from the private snapshot on selection so the rules can be rechecked; it never accepts that provenance from the frontend. Pilot RECYCLE needs recycling_access=YES; HDPE needs former_contents=FOOD_DRINK. UNKNOWN asks for context and is never guessed as Trash or Reduce. All 69 guides are still DRAFT. Details, validation metrics and tradeoffs, the Gemini evaluation, and reproduction commands: [detection quality](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/DETECTION_QUALITY.md), [recommendation quality](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/RECOMMENDATION_EVALUATION.md). The OpenAPI in ai/contracts/v1 is the regenerated DTO reference.
 
-### Saran bersyarat saat kondisi kosong, policy-06
+### Conditional advice for blank conditions, policy-06
 
-Konteks biasa yang belum diisi tetap UNKNOWN/null. allow_conditional default true mengizinkan READY dengan recommendation_basis=CONDITIONAL dan conditions_to_verify; false mempertahankan mode ketat NEEDS_CONTEXT. UI menampilkan saran sementara dan syarat, tanpa mengisi data kosong atau menyimpan otomatis. Risiko ambigu, kontaminasi berbahaya dan riwayat isi HDPE tetap dibatasi. Lihat [perilaku terbaru, reproduksi dan hasil pengujian](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/CONDITIONAL_AND_BACKGROUND.md).
+Ordinary context the user hasn't filled in stays UNKNOWN or null. allow_conditional defaults to true, allowing READY with recommendation_basis=CONDITIONAL and conditions_to_verify; false keeps the strict NEEDS_CONTEXT mode. The UI shows provisional advice and its conditions, without filling in blank data or saving automatically. Ambiguous risks, hazardous contamination, and HDPE former contents stay restricted. See the [latest behavior, reproduction, and test results](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/CONDITIONAL_AND_BACKGROUND.md).

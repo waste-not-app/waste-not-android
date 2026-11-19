@@ -1,360 +1,360 @@
 # WasteNot: Product Requirements Document
 
-Versi 1.2 · 28 September 2026 · Core + AI extension · Rancangan implementasi
+Version 1.2 · 28 September 2026 · Core plus AI extension · Implementation design
 
-**Status:** spesifikasi rancangan untuk implementasi, bukan laporan fitur yang sudah tersedia. Dokumen ini memperluas seluruh 20 bagian `WasteNot_PRD.pdf` versi 1.0, 6 halaman. Detail baru diberi label **Keputusan rancangan** atau **Usulan**. Persetujuan produk dan hasil pengujian belum diasumsikan.
+**Status:** this is a design spec for implementation, not a report of shipped features. It expands all 20 sections of `WasteNot_PRD.pdf` version 1.0 (6 pages). New details are labeled **Design decision** or **Proposal**. Product approval and test results are not assumed.
 
-Tambahan v1.2: computer vision dan rekomendasi AI mengikuti [AI_SPEC](AI_SPEC.md), dengan tombol utama navbar dan camera bottom sheet. Core empat minggu dipertahankan sebagai baseline historis; estimasi increment AI dibahas terpisah.
+New in v1.2: computer vision and AI recommendations follow [AI_SPEC](AI_SPEC.md), with a main navbar button and a camera bottom sheet. The four-week core stays as the historical baseline; the AI increment is estimated separately.
 
-Dokumen pendamping: [desain](DESIGN.md), [spesifikasi layar](SCREEN_SPEC.md), [arsitektur](ARCHITECTURE.md), [kontrak API](API.md), [rencana implementasi dan QA](IMPLEMENTATION_PLAN.md), [design system interaktif](design-system.html).
+Companion documents: [design](DESIGN.md), [screen spec](SCREEN_SPEC.md), [architecture](ARCHITECTURE.md), [API contract](API.md), [implementation plan and QA](IMPLEMENTATION_PLAN.md), [interactive design system](design-system.html).
 
-## 1. Ringkasan produk
+## 1. Product summary
 
-WasteNot membantu pengguna mencatat aktivitas pengelolaan sampah pribadi, menemukan panduan penanganan, dan melihat kebiasaan Reduce, Reuse, Recycle (3R). Produk dipakai untuk refleksi pribadi; angka yang ditampilkan merupakan catatan pengguna, bukan pengukuran dampak lingkungan yang diverifikasi.
+WasteNot helps people log how they handle their own waste, find handling guides, and see their Reduce, Reuse, and Recycle habits. It's meant for personal reflection: the numbers it shows are the user's own records, not verified measurements of environmental impact.
 
-Platform yang ditetapkan pengguna adalah Android dengan Kotlin dan Jetpack Compose. Backend terpisah menyimpan akun, aktivitas, panduan, serta statistik. Jetpack Compose adalah toolkit UI Android, bukan infrastruktur server. Rancangan backend dari PDF adalah Go, PostgreSQL, autentikasi JWT, dan Docker Compose.
+The user chose Android with Kotlin and Jetpack Compose. A separate backend stores accounts, activities, guides, and statistics. Jetpack Compose is the Android UI toolkit, not server infrastructure. The backend design from the PDF is Go, PostgreSQL, JWT authentication, and Docker Compose.
 
-MVP harus menyelesaikan alur nyata: membuat akun → masuk → mencatat aktivitas → melihat riwayat → melihat ringkasan dan statistik berubah. UI HTML dalam paket ini adalah referensi visual dan simulasi interaksi; aplikasi Android akhirnya harus menggunakan data backend.
+The MVP has to complete a real flow: create an account → sign in → log an activity → see the history → watch the summary and statistics change. The HTML UI in this kit is a visual reference and interaction simulation; the final Android app must use backend data.
 
-## 2. Masalah dan konteks
+## 2. Problem and context
 
-Pengguna sering tidak mengetahui berapa banyak sampah yang mereka hasilkan, tidak yakin bagaimana menangani material tertentu, dan sulit menilai konsistensi kebiasaan. Catatan manual tidak menyatukan pencatatan, panduan, dan evaluasi. WasteNot menyediakan tempat yang ringkas untuk ketiganya.
+People often don't know how much waste they produce, aren't sure how to handle certain materials, and find it hard to judge how consistent their habits are. Manual notes don't bring logging, guidance, and evaluation together. WasteNot gives all three a compact home.
 
-Hipotesis produk: jika pencatatan singkat, panduan mudah dicari, dan perubahan kebiasaan terlihat, pengguna lebih bersedia mencatat secara rutin. Hipotesis ini belum dibuktikan dengan riset pengguna dan tidak dipresentasikan sebagai hasil penelitian.
+Product hypothesis: if logging is quick, guides are easy to find, and habit changes are visible, people are more willing to log regularly. This hasn't been proven with user research and isn't presented as a research finding.
 
-## 3. Tujuan dan ukuran keberhasilan
+## 3. Goals and success measures
 
-| ID | Tujuan | Bukti penerimaan |
+| ID | Goal | Acceptance evidence |
 |---|---|---|
-| G-01 | Pencatatan praktis | Pengguna yang memahami UI dapat menyimpan satu catatan dalam ≤30 detik; ukur saat uji kegunaan |
-| G-02 | Riwayat bisa dipercaya | Catatan yang sukses tersimpan muncul kembali setelah aplikasi ditutup dan dibuka |
-| G-03 | Evaluasi pribadi yang konsisten | Dashboard dan statistik memakai definisi metrik yang sama dan dapat dihitung ulang dari data |
-| G-04 | Panduan mudah ditemukan | Pencarian nama/kata kunci mengantar ke detail penanganan yang relevan |
-| G-05 | Dorongan kebiasaan ringan | XP dan level berubah setelah aktivitas valid; streak/achievement mengikuti cakupan iterasi |
-| G-06 | Demo end-to-end | Alur utama memakai akun, backend, dan database nyata; stabil pada perangkat demo |
+| G-01 | Practical logging | A user familiar with the UI can save one log in 30 seconds or less; measure during usability testing |
+| G-02 | Trustworthy history | Logs that saved successfully reappear after the app is closed and reopened |
+| G-03 | Consistent personal evaluation | The dashboard and statistics use the same metric definitions and can be recomputed from the data |
+| G-04 | Easy-to-find guides | Searching by name or keyword leads to the relevant handling details |
+| G-05 | Light habit nudges | XP and level change after a valid activity; streaks and achievements follow the iteration scope |
+| G-06 | End-to-end demo | The main flow uses a real account, backend, and database, and runs reliably on the demo device |
 
-Target ≤30 detik berasal dari PDF. Target respons p95, tingkat retensi, pertumbuhan pengguna, dan pengurangan emisi tidak ditetapkan tanpa baseline. Untuk tugas, laporkan jumlah skenario lulus, waktu pencatatan teramati, perangkat, kondisi jaringan, dan cacat tersisa.
+The 30-second target comes from the PDF. No targets are set for p95 response time, retention, user growth, or emission reduction without a baseline. For the assignment, report the number of passing scenarios, observed logging time, device, network conditions, and remaining defects.
 
-## 4. Pengguna dan kebutuhan
+## 4. Users and needs
 
-### Pengguna utama
+### Primary users
 
-Mahasiswa dan pengguna muda yang ingin memperbaiki kebiasaan sehari-hari. Mereka mungkin memiliki timbangan, tetapi tidak selalu. Karena itu pencatatan mendukung berat **atau** jumlah benda tanpa mengonversi jumlah ke kilogram secara spekulatif.
+Students and young people who want to improve their everyday habits. Some own a scale and some don't, so logging supports weight **or** item count, without speculatively converting counts to kilograms.
 
-### Skenario pengguna
+### User scenarios
 
-| Situasi | Kebutuhan | Hasil yang diharapkan |
+| Situation | Need | Expected outcome |
 |---|---|---|
-| Selesai minum dari botol kemasan | Mencatat kategori dan tindakan | Satu aktivitas tercatat tanpa terlalu banyak isian |
-| Menggunakan ulang wadah | Membedakan Reuse dari Recycle | Riwayat dan statistik menunjukkan metode yang benar |
-| Membawa wadah sendiri | Mencatat benda sekali pakai yang dihindari | Reduce tidak menambah total sampah yang ditangani |
-| Tidak yakin menangani barang | Mencari panduan berdasarkan nama | Membaca langkah, batasan, dan sumber yang ditinjau |
-| Mengevaluasi satu minggu | Melihat total dan komposisi | Memahami satuan, rentang tanggal, dan basis persentase |
-| Jaringan terputus saat menyimpan | Mempertahankan isian | Dapat mencoba kembali tanpa catatan ganda |
+| Just finished a bottled drink | Log the category and action | One activity is logged without too many fields |
+| Reusing a container | Tell Reuse apart from Recycle | History and statistics show the right method |
+| Brought their own container | Log a single-use item they avoided | Reduce doesn't add to the total waste handled |
+| Unsure how to handle an item | Search a guide by name | Read the steps, limits, and reviewed sources |
+| Reviewing a week | See totals and the breakdown | Understand the units, date range, and percentage basis |
+| Network drops while saving | Keep what they entered | Retry without creating a duplicate log |
 
-Tidak ada persona bernama, wawancara, atau kutipan pengguna yang direkayasa dalam spesifikasi ini.
+This spec contains no named personas, interviews, or invented user quotes.
 
-## 5. Cakupan dan prioritas
+## 5. Scope and priorities
 
-| Fitur | Prioritas PDF | Target rancangan ini | Batas |
+| Feature | PDF priority | Target in this design | Limits |
 |---|---|---|---|
-| Register, login, logout, sesi | Must | MVP inti | Email/password; tanpa social login |
-| Dashboard | Must | MVP inti | Hari ini, recycling rate, aktivitas terbaru, XP/level |
-| Tambah catatan | Must | MVP inti | Kategori, berat/jumlah, metode, tanggal, catatan |
-| Riwayat, detail, filter | Must | MVP inti | Hanya data pemilik |
-| Ubah dan hapus catatan | Tersirat dalam CRUD minggu 2 | Keputusan rancangan: MVP inti | Memperbaiki kesalahan input; bukan kolaborasi |
-| Waste Guide | Must | MVP inti | Knowledge base yang dikurasi; tanpa chatbot |
-| Statistik | Must | MVP inti | 7/30 hari, kategori, metode; tanpa skor lingkungan |
-| XP dan level | Should, tetapi ada dalam acceptance PDF | Baseline demo | 10 XP per catatan aktif; aturan di §10 |
-| Streak dan achievement | Should | Iterasi setelah inti | Bisa dipangkas jika alur inti belum stabil |
-| Pengingat | Should | Setelah inti | Opt-in, lokal, waktu perkiraan |
-| Foto lampiran | Opsional/Stretch | Opsi perluasan | Terpisah dari foto sementara scan |
-| AI scan + rekomendasi | Di luar PDF awal | Increment AI sesuai permintaan 28 Sep | Konfirmasi dan fallback manual; §21 |
-| Peta titik daur ulang | Could/Stretch | Opsi perluasan | Bergantung sumber lokasi terverifikasi |
+| Register, sign in, sign out, session | Must | Core MVP | Email and password; no social login |
+| Dashboard | Must | Core MVP | Today, recycling rate, recent activity, XP and level |
+| Add a log | Must | Core MVP | Category, weight or count, method, date, notes |
+| History, detail, filters | Must | Core MVP | Owner's data only |
+| Edit and delete logs | Implied by week 2 CRUD | Design decision: core MVP | For fixing input mistakes; not collaboration |
+| Waste Guide | Must | Core MVP | Curated knowledge base; no chatbot |
+| Statistics | Must | Core MVP | 7 and 30 days, category, method; no environmental score |
+| XP and level | Should, but in the PDF's acceptance | Demo baseline | 10 XP per active log; rules in §10 |
+| Streaks and achievements | Should | Iteration after core | Can be cut if the core flow isn't stable |
+| Reminders | Should | After core | Opt-in, local, approximate time |
+| Photo attachments | Optional or stretch | Expansion option | Separate from temporary scan photos |
+| AI scan and recommendations | Outside the original PDF | AI increment requested on 28 September | Confirmation and manual fallback; §21 |
+| Recycling point map | Could or stretch | Expansion option | Depends on a verified location source |
 
-**Penyelesaian konflik sumber:** PDF menempatkan gamifikasi sebagai Should tetapi meminta perubahan XP/level/achievement dalam acceptance. Baseline mencakup XP dan level sederhana. Jika seluruh gamifikasi dipangkas, catat penyimpangan acceptance dan konfirmasikan dengan penilai, jangan mengklaim memenuhi seluruh PDF.
+**Resolving a source conflict:** the PDF lists gamification as Should but asks for XP, level, and achievement changes in its acceptance criteria. The baseline includes simple XP and levels. If all gamification is cut, record the deviation from acceptance and confirm it with the assessor; don't claim the whole PDF is met.
 
-### Tidak termasuk core atau AI increment awal
+### Not in the core or the first AI increment
 
-IoT/smart bin, pickup, marketplace, pembayaran, jejaring sosial, leaderboard, QR recycling point, antrean sinkronisasi offline-first, export CSV/PDF, personalisasi reminder, klaim karbon atau sertifikasi lingkungan. Lupa password via email dan penghapusan akun mandiri belum masuk baseline demo; peluncuran publik memerlukan keputusan tambahan di §18.
+IoT or smart bins, pickup, marketplaces, payments, social networking, leaderboards, QR recycling points, an offline-first sync queue, CSV or PDF export, personalized reminders, and carbon claims or environmental certification. Password reset by email and self-service account deletion aren't in the demo baseline; a public launch needs the additional decisions in §18.
 
-## 6. Prinsip pengalaman
+## 6. Experience principles
 
-1. Satu tindakan utama per layar, dengan “Catat aktivitas” mudah ditemukan dari Beranda dan Riwayat.
-2. Tampilkan satuan bersama angka dan basis perhitungan bersama persentase.
-3. Gunakan bahasa yang membantu, tanpa menyalahkan pengguna yang memilih Trash.
-4. Keberhasilan baru ditampilkan setelah server mengonfirmasi transaksi.
-5. Isian yang gagal tidak hilang. Pengulangan request tidak membuat catatan ganda.
-6. UI selalu menjelaskan keadaan kosong, loading, error, dan data lama yang masih ditampilkan.
+1. One main action per screen, with "Log activity" easy to find from Home and History.
+2. Show units next to numbers and the calculation basis next to percentages.
+3. Use helpful language, and never blame a user for choosing Trash.
+4. Only show success after the server confirms the transaction.
+5. Failed input is never lost. Repeating a request never creates a duplicate log.
+6. The UI always explains empty, loading, error, and stale-data states.
 
-## 7. Information architecture dan perjalanan pengguna
+## 7. Information architecture and user journeys
 
-Navigasi utama mengikuti PDF: **Beranda · Riwayat · Panduan · Statistik · Profil**. Tambah catatan bukan tab keenam. Layar auth, form, dan detail menggunakan navigasi kembali; bar utama hanya muncul pada lima tujuan utama.
+The main navigation follows the PDF: **Home · History · Guide · Statistics · Profile**. Adding a log is not a sixth tab. Auth screens, forms, and details use back navigation; the main bar only appears on the five main destinations.
 
 ```mermaid
 flowchart TD
-  Launch[Buka aplikasi] --> Session{Sesi valid?}
-  Session -->|Tidak| Login[Masuk / Daftar]
-  Session -->|Ya| Home[Beranda]
+  Launch[Open the app] --> Session{Valid session?}
+  Session -->|No| Login[Sign in / Register]
+  Session -->|Yes| Home[Home]
   Login --> Home
-  Home --> Add[Catat aktivitas]
-  Add --> Validate{Valid dan tersimpan?}
-  Validate -->|Tidak| Retain[Isian dipertahankan + pesan]
+  Home --> Add[Log activity]
+  Add --> Validate{Valid and saved?}
+  Validate -->|No| Retain[Keep entries + message]
   Retain --> Add
-  Validate -->|Ya| Detail[Detail catatan]
-  Detail --> History[Riwayat]
-  Home --> Guide[Panduan]
-  Guide --> GuideDetail[Detail panduan]
+  Validate -->|Yes| Detail[Log detail]
+  Detail --> History[History]
+  Home --> Guide[Guide]
+  Guide --> GuideDetail[Guide detail]
   GuideDetail --> Add
-  Home --> Statistics[Statistik]
-  Home --> Profile[Profil / Progres]
+  Home --> Statistics[Statistics]
+  Home --> Profile[Profile / Progress]
 ```
 
-### Alur utama
+### Main flow
 
-Login → Beranda → Catat aktivitas → pilih metode dan kategori → isi berat atau jumlah → simpan → server menyimpan → detail catatan dengan feedback → riwayat/ringkasan/progres diperbarui.
+Sign in → Home → Log activity → choose method and category → enter weight or count → save → the server stores it → log detail with feedback → history, summary, and progress update.
 
-### Alur perbaikan
+### Correction flow
 
-Riwayat → detail milik sendiri → ubah → validasi → simpan dengan version check. Hapus memerlukan dialog yang menyebut catatan dan efek ke statistik/XP. Setelah sukses kembali ke riwayat. Konflik perubahan tidak boleh menimpa versi baru secara diam-diam.
+History → one of your logs → edit → validate → save with a version check. Deleting asks for confirmation in a dialog that names the log and its effect on statistics and XP. On success, go back to history. Edit conflicts must never silently overwrite a newer version.
 
-### Alur panduan
+### Guide flow
 
-Panduan → ketik nama/kata kunci → pilih item → baca langkah dan sumber → “Catat aktivitas ini”. Kategori/metode boleh diisi dari panduan; jumlah, tanggal, dan keputusan pengguna tetap harus dikonfirmasi.
+Guide → type a name or keyword → pick an item → read the steps and sources → "Log this activity". The guide may prefill the category and method; the user still confirms the amount, date, and their own decision.
 
-### Alur sesi kedaluwarsa
+### Expired session flow
 
-Request 401 → coba refresh sekali → jika gagal, hapus sesi dan cache pribadi → tampilkan Masuk dengan alasan. Draf nonrahasia boleh disimpan per identitas akun agar dapat ditawarkan kembali setelah login ke akun yang sama, tidak boleh terbuka ke akun lain.
+A 401 → try one refresh → if that fails, clear the session and private cache → show Sign in with the reason. Non-secret drafts may be kept per account so they can be offered again after signing in to the same account, and must never be visible to a different account.
 
-## 8. Functional requirements dan acceptance
+## 8. Functional requirements and acceptance
 
-ID FR-01 sampai FR-10 mempertahankan penomoran sumber; FR-11 dan seterusnya adalah perincian tambahan.
+IDs FR-01 to FR-10 keep the source numbering; FR-11 onward are added detail.
 
-| ID | Kebutuhan | Acceptance yang dapat diuji | Layar |
+| ID | Requirement | Testable acceptance | Screens |
 |---|---|---|---|
-| FR-01 | Register dan login | Email valid + password sesuai aturan menghasilkan sesi; email duplikat/credential salah memberi pesan; password tidak tersimpan di UI state persisten | S01–S03 |
-| FR-02 | Tambah waste log | Isian valid menghasilkan tepat satu catatan milik akun aktif; tombol disabled saat request berlangsung | S05 |
-| FR-03 | Simpan atribut lengkap | Kategori, quantity_kind, nilai kanonik, metode, tanggal aktivitas, catatan, dan waktu server dapat dibaca ulang | S05, S08 |
-| FR-04 | Riwayat dan detail sendiri | Catatan diurutkan tanggal aktivitas menurun dengan urutan ID stabil; objek akun lain mendapat 404 | S07, S08 |
-| FR-05 | Filter kategori/metode | Filter dapat digabung dengan AND; reset mengembalikan seluruh data; chip menunjukkan filter aktif | S07, S10 |
-| FR-06 | Pencarian panduan | Pencarian nama/kata kunci mengabaikan kapitalisasi; hasil kosong memiliki langkah pemulihan | S11, S12 |
-| FR-07 | Total dan recycling rate | Hasil mengikuti §9, termasuk denominator nol, Reduce, dan satuan campuran | S04, S13 |
-| FR-08 | XP | Satu catatan aktif menyumbang 10 XP; replay request tidak menambah XP kedua kali | S04, S14 |
-| FR-09 | Level/achievement | Level dihitung dari XP; bila achievement diaktifkan, threshold serta koreksi data mengikuti §10 | S14, S15 |
-| FR-10 | Statistik rentang waktu | 7/30 hari inklusif hari ini, tanggal lokal akun; hari tanpa aktivitas bernilai nol | S13 |
-| FR-11 | Edit | Hanya pemilik dapat mengubah; created_at tetap; updated_at/version berubah; agregat dihitung kembali | S09 |
-| FR-12 | Delete | Batal tidak mengubah data; konfirmasi menghapus catatan aktif dan memperbarui agregat | S08, D01 |
-| FR-13 | Logout | Sesi server dicabut, state/cache pribadi dibersihkan, Back tidak membuka layar akun sebelumnya | S14, D02 |
-| FR-14 | Error/retry | Offline/timeout/5xx mempertahankan isian dan menyediakan retry; timeout create memakai client_request_id yang sama | S05, S20 |
-| FR-15 | Reminder opsional | Default mati; permission hanya diminta saat diaktifkan; penolakan tidak menghalangi fitur lain | S17 |
-| FR-16 | Foto opsional | Satu gambar tervalidasi per log, akses privat, kegagalan upload dapat dipulihkan | S18 |
-| FR-17 | Peta opsional | Tanpa izin lokasi tetap bisa melihat daftar titik; tidak membuat titik fiktif | S19 |
-| FR-18 | Pengaturan tampilan | Terang, gelap, atau sistem; pilihan disimpan lokal dan tidak memengaruhi data statistik | S16 |
+| FR-01 | Register and sign in | A valid email and a password that meets the rules create a session; duplicate emails or wrong credentials show a message; the password isn't stored in persistent UI state | S01 to S03 |
+| FR-02 | Add a waste log | Valid input creates exactly one log owned by the active account; the button is disabled while the request runs | S05 |
+| FR-03 | Store all attributes | Category, quantity_kind, canonical value, method, activity date, notes, and server time can be read back | S05, S08 |
+| FR-04 | Own history and detail | Logs are sorted by activity date descending with a stable ID order; other accounts' objects return 404 | S07, S08 |
+| FR-05 | Category and method filters | Filters combine with AND; reset brings back all data; chips show active filters | S07, S10 |
+| FR-06 | Guide search | Name and keyword search ignores case; empty results offer a way out | S11, S12 |
+| FR-07 | Totals and recycling rate | Results follow §9, including a zero denominator, Reduce, and mixed units | S04, S13 |
+| FR-08 | XP | Each active log adds 10 XP; replaying a request doesn't add XP twice | S04, S14 |
+| FR-09 | Level and achievements | Level comes from XP; when achievements are on, thresholds and data corrections follow §10 | S14, S15 |
+| FR-10 | Statistics over time | 7 and 30 days including today, in the account's local dates; days with no activity count as zero | S13 |
+| FR-11 | Edit | Only the owner can edit; created_at stays; updated_at and version change; aggregates are recomputed | S09 |
+| FR-12 | Delete | Cancel changes nothing; confirming deletes the active log and updates aggregates | S08, D01 |
+| FR-13 | Sign out | The server session is revoked, private state and cache are cleared, and Back doesn't reopen the previous account's screens | S14, D02 |
+| FR-14 | Errors and retry | Offline, timeout, and 5xx keep the entries and offer a retry; a create that timed out retries with the same client_request_id | S05, S20 |
+| FR-15 | Optional reminders | Off by default; permission is only requested when turned on; denying it doesn't block other features | S17 |
+| FR-16 | Optional photo | One validated image per log, private access, recoverable upload failures | S18 |
+| FR-17 | Optional map | The list of points is visible without location permission; no made-up points | S19 |
+| FR-18 | Display settings | Light, dark, or system; the choice is stored locally and doesn't affect statistics | S16 |
 
-### Validasi form
+### Form validation
 
-| Field | Aturan rancangan | Pesan utama |
+| Field | Design rule | Main message |
 |---|---|---|
-| Nama akun | Setelah trim, 2–60 karakter | “Isi nama sepanjang 2–60 karakter.” |
-| Email | Trim luar, normalisasi untuk uniqueness, maksimal 254; validasi format di client dan server | “Periksa format email.” |
-| Password | 12–128 karakter; tidak trim; boleh paste dan password manager | “Gunakan minimal 12 karakter.” |
-| Konfirmasi password | Sama dengan password; hanya untuk UI registrasi | “Kata sandi belum sama.” |
-| Kategori | Salah satu enum server | “Pilih kategori.” |
-| Metode | REDUCE, REUSE, RECYCLE, TRASH | “Pilih cara pengelolaan.” |
-| Jenis jumlah | WEIGHT atau COUNT; tidak keduanya | “Pilih berat atau jumlah benda.” |
-| Berat | 1–100.000 gram; UI g bulat atau kg maksimal 3 desimal | “Masukkan berat antara 1 g dan 100 kg.” |
-| Jumlah | Bilangan bulat 1–10.000 benda | “Masukkan jumlah benda 1–10.000.” |
-| Tanggal aktivitas | Hari ini atau 30 hari sebelumnya, menurut zona akun | “Pilih tanggal dalam 30 hari terakhir.” |
-| Catatan | Opsional, trim luar, maksimal 500 karakter | “Catatan maksimal 500 karakter.” |
-| Foto (opsional) | Satu JPEG/PNG/WebP, ≤5 MiB, server memeriksa isi file | “Pilih gambar maksimal 5 MB.” |
+| Account name | 2 to 60 characters after trimming | "Enter a name of 2 to 60 characters." |
+| Email | Trim the ends, normalize for uniqueness, up to 254 characters; validate format on client and server | "Check the email format." |
+| Password | 12 to 128 characters; not trimmed; paste and password managers allowed | "Use at least 12 characters." |
+| Password confirmation | Matches the password; registration UI only | "The passwords don't match yet." |
+| Category | One of the server enums | "Choose a category." |
+| Method | REDUCE, REUSE, RECYCLE, TRASH | "Choose how you handled it." |
+| Quantity kind | WEIGHT or COUNT, never both | "Choose weight or item count." |
+| Weight | 1 to 100,000 grams; whole grams in the UI or kg with up to 3 decimals | "Enter a weight between 1 g and 100 kg." |
+| Count | Whole number, 1 to 10,000 items | "Enter 1 to 10,000 items." |
+| Activity date | Today or up to 30 days ago, in the account's time zone | "Choose a date within the last 30 days." |
+| Notes | Optional, ends trimmed, up to 500 characters | "Notes can be up to 500 characters." |
+| Photo (optional) | One JPEG, PNG, or WebP up to 5 MiB; the server checks the file contents | "Choose an image up to 5 MB." |
 
-Batas nilai adalah keputusan rancangan untuk input pribadi, bukan fakta dari PDF. Client memakai parser angka yang menerima koma atau titik desimal untuk kg, menolak separator ribuan yang ambigu, NaN, Infinity, nilai negatif, dan precision berlebih. Server menerima integer gram atau count saja. Tidak ada konversi plastik/botol → gram otomatis.
+These limits are design decisions for personal input, not facts from the PDF. The client's number parser accepts a decimal comma or point for kg and rejects ambiguous thousands separators, NaN, Infinity, negative values, and excess precision. The server only accepts integer grams or counts. There's no automatic plastic or bottle → gram conversion.
 
-Pada edit, activity_date lama boleh dipertahankan walaupun sudah di luar jendela 30 hari; ini memungkinkan koreksi berat/catatan lama. Jika tanggal diubah, tanggal baru harus mengikuti jendela validasi create. Validation yang bergantung hari memakai tanggal server menurut timezone akun.
+When editing, an old activity_date may stay even if it's outside the 30-day window, so old weights or notes can be corrected. If the date changes, the new date must follow the create window. Day-dependent validation uses the server's date in the account's time zone.
 
-## 9. Aturan data dan statistik
+## 9. Data and statistics rules
 
-### 9.1 Kategori dan metode
+### 9.1 Categories and methods
 
-Kategori baseline: ORGANIC (Organik), PLASTIC (Plastik), PAPER (Kertas), GLASS (Kaca), METAL (Logam), ELECTRONIC (Elektronik), OTHER (Lainnya). Kategori mendeskripsikan material; metode adalah tindakan. Kategori tidak memaksakan metode, karena penerimaan fasilitas dan kondisi barang berbeda.
+Baseline categories: ORGANIC, PLASTIC, PAPER, GLASS, METAL, ELECTRONIC, OTHER. The category describes the material; the method is the action. A category never forces a method, because facility acceptance and item condition vary.
 
-| Metode | Arti pada aplikasi | Dihitung sebagai |
+| Method | Meaning in the app | Counted as |
 |---|---|---|
-| Reduce | Benda/berat perkiraan yang dihindari, misalnya tidak mengambil kantong | Aktivitas pencegahan; terpisah dari sampah ditangani |
-| Reuse | Menggunakan ulang benda yang sudah dimiliki | Aktivitas penanganan tercatat |
-| Recycle | Menyerahkan/mengolah untuk daur ulang menurut catatan pengguna | Aktivitas penanganan tercatat; bukan bukti daur ulang aktual |
-| Trash | Membuang ke aliran residu | Aktivitas penanganan tercatat |
+| Reduce | Items or estimated weight avoided, such as declining a bag | A prevention activity; separate from waste handled |
+| Reuse | Using something you already own again | A logged handling activity |
+| Recycle | Handing over or processing for recycling, as the user records it | A logged handling activity; not proof that it was actually recycled |
+| Trash | Throwing it into the residual stream | A logged handling activity |
 
-**Keputusan rancangan penting:** Reduce bukan sampah yang dihasilkan. Header form berubah menjadi “Jumlah yang dihindari”; UI menunjukkan bantuan agar pengguna tidak mencatat satu tindakan dua kali. Nilai Reduce tidak masuk total berat sampah ditangani. Reuse adalah peristiwa penggunaan ulang, sehingga benda yang dipakai beberapa kali dapat muncul pada tanggal berbeda; total tidak boleh diklaim sebagai massa sampah unik yang dihasilkan.
+**Key design decision:** Reduce is not waste produced. The form heading changes to "Amount avoided", and the UI explains this so users don't log the same action twice. Reduce values don't count toward the total weight of waste handled. Reuse is a reuse event, so an item used several times can appear on different dates; the total must not be presented as the unique mass of waste produced.
 
-### 9.2 Rumus kanonik
+### 9.2 Canonical formulas
 
-Ambil himpunan catatan aktif milik pengguna dalam rentang tanggal `L`. Hapus catatan yang sudah dihapus. Definisikan `H` sebagai L dengan metode REUSE/RECYCLE/TRASH, dan `R` sebagai L dengan metode REDUCE.
+Take the set `L` of the user's active logs in the date range, excluding deleted logs. Let `H` be the logs in L with method REUSE, RECYCLE, or TRASH, and `R` the logs in L with method REDUCE.
 
 ```text
-total_handled_weight_g = sum(weight_g pada H yang quantity_kind = WEIGHT)
-total_handled_count    = sum(item_count pada H yang quantity_kind = COUNT)
-avoided_weight_g       = sum(weight_g pada R yang quantity_kind = WEIGHT)
-avoided_count          = sum(item_count pada R yang quantity_kind = COUNT)
+total_handled_weight_g = sum(weight_g in H where quantity_kind = WEIGHT)
+total_handled_count    = sum(item_count in H where quantity_kind = COUNT)
+avoided_weight_g       = sum(weight_g in R where quantity_kind = WEIGHT)
+avoided_count          = sum(item_count in R where quantity_kind = COUNT)
 activity_count        = count(L)
 handled_activity_count = count(H)
-recycled_activity_count = count(H dengan method = RECYCLE)
+recycled_activity_count = count(H where method = RECYCLE)
 recycling_rate        = recycled_activity_count / handled_activity_count * 100
-method_share[m]       = count(L dengan method m) / count(L) * 100
+method_share[m]       = count(L where method = m) / count(L) * 100
 ```
 
-Jika denominator nol, API mengirim `null` untuk persentase, UI menulis “Belum ada aktivitas penanganan”. Total numerik tetap 0. Nilai bukan 0% jika basis data belum ada. Label lengkap: **“Recycling rate · berdasarkan aktivitas penanganan”**. Jumlah benda tidak menjadi denominator recycling rate. Satu catatan 20 benda tetap satu aktivitas, sehingga metrik ini bukan persentase massa atau benda yang didaur ulang.
+If the denominator is zero, the API sends `null` for the percentage and the UI shows "No handling activities yet". Numeric totals stay 0. The value is not 0% when there's no data yet. The full label is **"Recycling rate · based on handling activities"**. Item counts never become the recycling rate's denominator. One log of 20 items is still one activity, so this metric is not a percentage of mass or items recycled.
 
-Pembulatan UI: persentase 1 desimal bila diperlukan; berat g untuk <1.000 g dan kg hingga 3 desimal di detail, ringkasan hingga 2 desimal. Hitung memakai nilai integer sebelum pembulatan. Daftar metode menampilkan keempat metode, termasuk Trash, supaya total dan denominator transparan. “Aktivitas 3R” adalah jumlah REDUCE+REUSE+RECYCLE dan harus dilabeli terpisah jika ditampilkan.
+UI rounding: percentages to 1 decimal when needed; weights in g under 1,000 g, otherwise kg with up to 3 decimals in details and 2 in summaries. Calculate with integers before rounding. The method list shows all four methods, Trash included, so the total and denominator stay transparent. "Activities" in the Reduce, Reuse, and Recycle sense means REDUCE+REUSE+RECYCLE and must be labeled separately if shown.
 
-### 9.3 Waktu dan rentang
+### 9.3 Time and ranges
 
-Simpan `activity_date` sebagai date dan `activity_timezone` sebagai IANA timezone akun. `created_at`/`updated_at` UTC berasal dari server, bukan jam perangkat. Zona awal mengikuti pilihan registrasi dari perangkat, dengan fallback Asia/Jakarta yang terlihat oleh pengguna. Baseline mengunci zona akun setelah registrasi untuk menghindari reinterpretasi data lama; perubahan zona adalah keputusan lanjutan.
+Store `activity_date` as a date and `activity_timezone` as the account's IANA time zone. `created_at` and `updated_at` are UTC from the server, not the device clock. The starting time zone comes from the device during registration, with a visible fallback to Asia/Jakarta. The baseline locks the account's time zone after registration to avoid reinterpreting old data; changing it is a later decision.
 
-“7 hari” berarti tanggal hari ini dan enam hari sebelumnya; “30 hari” berarti hari ini dan 29 hari sebelumnya. Rentang API `from`/`to` inklusif dan maksimum 366 hari. Tidak ada filter tanggal masa depan. Pergantian hari mengubah ringkasan sesuai zona akun, bukan waktu server UTC. Rekap kategori untuk berat dan jumlah benda harus memakai seri/label terpisah.
+"7 days" means today and the six days before; "30 days" means today and the 29 days before. The API's `from` and `to` are inclusive with a maximum of 366 days. There are no future-date filters. The day rolls over in the account's time zone, not server UTC. Category breakdowns for weight and item count must use separate series or labels.
 
-### 9.4 Contoh data untuk desain dan pengujian
+### 9.4 Sample data for design and testing
 
-Seluruh angka di mockup menggunakan **data simulasi**, dengan tanggal acuan 21 September 2026 di Asia/Jakarta.
+Every number in the mockup uses **simulated data**, with a reference date of 21 September 2026 in Asia/Jakarta.
 
-| ID | Tanggal | Kategori | Metode | Nilai |
+| ID | Date | Category | Method | Value |
 |---|---|---|---|---|
-| DEMO-01 | 21 Sep 2026 | Plastik | Recycle | 250 g |
-| DEMO-02 | 21 Sep 2026 | Kaca | Reuse | 400 g |
-| DEMO-03 | 21 Sep 2026 | Plastik | Reduce | 2 benda dihindari |
-| DEMO-04 | 20 Sep 2026 | Organik | Trash | 600 g |
-| DEMO-05 | 20 Sep 2026 | Kertas | Recycle | 150 g |
+| DEMO-01 | 21 Sep 2026 | Plastic | Recycle | 250 g |
+| DEMO-02 | 21 Sep 2026 | Glass | Reuse | 400 g |
+| DEMO-03 | 21 Sep 2026 | Plastic | Reduce | 2 items avoided |
+| DEMO-04 | 20 Sep 2026 | Organic | Trash | 600 g |
+| DEMO-05 | 20 Sep 2026 | Paper | Recycle | 150 g |
 
-Hasil hari ini: 650 g ditangani, 0 benda ditangani, 2 benda dihindari, 3 aktivitas, recycling rate 1/2 = 50%. Hasil 7 hari: 1.400 g, 5 aktivitas, 2 benda dihindari, recycling rate 2/4 = 50%. Proporsi aktivitas: Reduce 20%, Reuse 20%, Recycle 40%, Trash 20%. Tidak menjumlahkan 1.400 g dan 2 benda.
+Today: 650 g handled, 0 items handled, 2 items avoided, 3 activities, recycling rate 1/2 = 50%. Last 7 days: 1,400 g, 5 activities, 2 items avoided, recycling rate 2/4 = 50%. Activity shares: Reduce 20%, Reuse 20%, Recycle 40%, Trash 20%. Never add 1,400 g and 2 items together.
 
-## 10. Gamifikasi
+## 10. Gamification
 
-Aturan berikut adalah usulan sederhana untuk target satu bulan, bukan angka baku dari sumber.
+These rules are a simple proposal for a one-month target, not fixed values from the source.
 
 ```text
-xp = jumlah catatan aktif sepanjang waktu * 10
+xp = number of active logs ever * 10
 level = floor(xp / 100) + 1
 xp_into_level = xp mod 100
 xp_to_next_level = 100 - xp_into_level
 ```
 
-XP sama untuk semua metode agar UI tidak mendorong laporan palsu. Edit tidak memberi XP baru. Hapus mengurangi XP dan dapat menurunkan level. Server menghitung dari catatan aktif; client tidak mengirim XP/level. XP adalah progres pencatatan, bukan nilai kebaikan lingkungan. Contoh data §9.4 menghasilkan 50 XP, level 1, 50 XP menuju level 2.
+Every method earns the same XP so the UI doesn't encourage false reports. Editing never awards new XP. Deleting removes XP and can lower the level. The server calculates it from active logs; the client never sends XP or level. XP measures logging progress, not environmental virtue. The §9.4 sample data gives 50 XP, level 1, and 50 XP to level 2.
 
-Streak adalah jumlah hari aktivitas beruntun. Jika hari ini belum ada catatan tetapi kemarin ada, streak kemarin tetap tampil dengan teks “Belum mencatat hari ini”. Jika hari ini dan kemarin sama-sama kosong, streak 0. Beberapa catatan sehari tetap satu hari. Backdate dalam jendela input dihitung ulang; tidak ada leaderboard atau hadiah bernilai uang, sehingga tidak diperlukan sistem anti-cheat dalam MVP. Contoh data menghasilkan streak 2 hari.
+A streak is the number of consecutive days with activity. If nothing is logged today but something was logged yesterday, yesterday's streak still shows, with the text "You haven't logged today yet". If both today and yesterday are empty, the streak is 0. Several logs in one day still count as one day. Backdating within the input window is recalculated. There are no leaderboards or cash-value rewards, so the MVP doesn't need anti-cheat. The sample data gives a 2-day streak.
 
-| Achievement opsional | Syarat | Tampilan terkunci |
+| Optional achievement | Requirement | Locked display |
 |---|---|---|
-| Langkah pertama | ≥1 catatan aktif | 0/1 catatan |
-| Mulai terbiasa | ≥5 catatan aktif | min(count,5)/5 |
-| Pilah untuk daur ulang | ≥3 catatan Recycle aktif | min(count,3)/3 |
-| Satu minggu konsisten | Streak terbaik dari catatan aktif ≥7 hari | min(best_streak,7)/7 |
+| First step | At least 1 active log | 0/1 logs |
+| Getting into the habit | At least 5 active logs | min(count,5)/5 |
+| Sorted for recycling | At least 3 active Recycle logs | min(count,3)/3 |
+| A consistent week | Best streak from active logs of at least 7 days | min(best_streak,7)/7 |
 
-Status achievement dihitung ulang setelah koreksi data. Bila syarat tidak lagi terpenuhi, achievement kembali terkunci; jelaskan pada konfirmasi hapus. `unlocked_at` menyimpan saat status terakhir beralih menjadi terbuka. Satu pasangan user/achievement unik. Tidak ada popup berulang ketika kembali membuka layar.
+Achievement status is recalculated after data corrections. If the requirement is no longer met, the achievement locks again; explain this in the delete confirmation. `unlocked_at` stores when the status last switched to unlocked. Each user and achievement pair is unique. There's no repeated popup when the screen is reopened.
 
-## 11. Kebutuhan layar dan state
+## 11. Screen and state requirements
 
-Spesifikasi per field, aksi, dan state berada di [SCREEN_SPEC.md](SCREEN_SPEC.md). Inventaris mencakup 25 layar/panel (termasuk lima fase sheet AI) dan 4 dialog konfirmasi. Layar opsional tetap ditandai sebagai opsi desain.
+Field-level specs, actions, and states are in [SCREEN_SPEC.md](SCREEN_SPEC.md). The inventory covers 25 screens and panels (including five AI sheet phases) and 4 confirmation dialogs. Optional screens stay marked as design options.
 
-| Kelompok | Layar |
+| Group | Screens |
 |---|---|
-| Akses | S01 Pemulihan sesi; S02 Masuk; S03 Daftar |
-| Tracking | S04 Beranda; S05 Tambah; S06 Berhasil; S07 Riwayat; S08 Detail; S09 Ubah; S10 Filter |
-| Belajar/evaluasi | S11 Panduan; S12 Detail panduan; S13 Statistik |
-| Akun/kebiasaan | S14 Profil/progres; S15 Achievement; S16 Pengaturan; S17 Pengingat opsional |
-| Perluasan | S18 Foto opsional; S19 Titik daur ulang opsional |
-| Ketahanan | S20 Galeri state loading, kosong, tidak ditemukan, error, offline, sesi berakhir |
-| AI | S21 Kamera; S22 Konfirmasi objek; S23 Kondisi; S24 Rekomendasi; S25 Fallback |
-| Dialog | D01 Hapus; D02 Keluar; D03 Buang draf; D04 Konflik perubahan |
+| Access | S01 Session restore; S02 Sign in; S03 Register |
+| Tracking | S04 Home; S05 Add; S06 Success; S07 History; S08 Detail; S09 Edit; S10 Filters |
+| Learning and evaluation | S11 Guide; S12 Guide detail; S13 Statistics |
+| Account and habits | S14 Profile and progress; S15 Achievements; S16 Settings; S17 Optional reminders |
+| Expansion | S18 Optional photos; S19 Optional recycling points |
+| Resilience | S20 State gallery: loading, empty, not found, error, offline, session ended |
+| AI | S21 Camera; S22 Object confirmation; S23 Condition; S24 Recommendation; S25 Fallback |
+| Dialogs | D01 Delete; D02 Sign out; D03 Discard draft; D04 Edit conflict |
 
-Semua layar data memiliki loading, content, empty bila relevan, dan error. Refresh tidak harus mengosongkan data lama; tampilkan indikator data belum diperbarui. Tidak boleh menyajikan catatan milik akun sebelumnya ketika berganti akun.
+Every data screen has loading, content, empty where relevant, and error states. A refresh doesn't have to clear old data; show that the data hasn't updated yet. Never show the previous account's logs after switching accounts.
 
-## 12. Konten Waste Guide
+## 12. Waste Guide content
 
-Setiap artikel memiliki nama, kategori, kata kunci, rekomendasi metode, ringkasan, langkah, hal yang perlu dihindari, sumber URL, tanggal review, dan peninjau internal. Target isi awal diusulkan 12–20 item umum agar pencarian berguna; angka ini bukan konten yang sudah tersedia.
+Each article has a name, category, keywords, recommended method, summary, steps, things to avoid, source URL, review date, and internal reviewer. The proposed starting set is 12 to 20 common items so search is useful; this is a target, not existing content.
 
-Konten di HTML merupakan contoh editorial berlabel draf. Penanggung jawab konten wajib memeriksa sumber dan kesesuaian lokal sebelum seed produksi. Panduan tidak menjamin semua fasilitas menerima material tertentu. Baterai, limbah elektronik, benda tajam, atau limbah berbahaya tidak boleh diberi instruksi pembongkaran/pembakaran/penanganan berisiko. Untuk jenis tersebut arahkan ke petugas/fasilitas resmi dengan sumber yang sudah ditinjau.
+The content in the HTML is editorial sample content labeled as draft. The content owner must check the sources and local fit before the production seed. Guides don't guarantee that every facility accepts a given material. Batteries, electronic waste, sharp objects, and hazardous waste must never get instructions to take them apart, burn them, or handle them riskily. For those, point to official staff or facilities with reviewed sources.
 
-Konten draf tidak masuk endpoint publik panduan. Pencarian kosong bukan error dan menyediakan hapus kata kunci. Artikel yang tidak lagi dipublikasikan mengembalikan 404 dengan jalan kembali ke daftar.
+Draft content never reaches the public guide endpoint. An empty search isn't an error and offers a way to clear the keyword. Articles that are no longer published return 404 with a way back to the list.
 
-## 13. Kebutuhan nonfungsional
+## 13. Non-functional requirements
 
-| ID | Kebutuhan | Cara verifikasi |
+| ID | Requirement | How to verify |
 |---|---|---|
-| NFR-01 | Usability ≤30 detik setelah mengenal UI | Catat durasi pada 3–5 calon pengguna, sebagai usulan metode; laporkan data, jangan mengklaim sebelum diuji |
-| NFR-02 | Responsif pada dataset MVP | Uji daftar 1.000 catatan milik satu akun; pagination 20; catat load time dan jank perangkat demo |
-| NFR-03 | Tidak ada kehilangan input yang dapat dicegah | Rotasi, background, timeout, retry; password tidak dipersistenkan |
-| NFR-04 | Isolasi antar akun | Dua akun, request detail/update/delete ID silang, statistik silang, URL foto silang |
-| NFR-05 | Keamanan sesi | TLS di lingkungan bersama; hash password; token tidak muncul di log/URL; logout mencabut refresh session |
-| NFR-06 | Aksesibilitas | Target sentuh ≥48 dp, TalkBack, font scale 200%, kontras AA, status tidak hanya warna |
-| NFR-07 | Adaptasi ukuran | 360 dp, landscape, tablet; form tidak tertutup keyboard/system bars |
-| NFR-08 | Maintainability | UI, ViewModel/state, repository/network terpisah; token visual terpusat |
-| NFR-09 | Observability terbatas | Request ID, status, durasi; tanpa password, bearer token, catatan pribadi, atau gambar |
-| NFR-10 | Pemulihan data | Backup database terenkripsi dan satu uji restore sebelum demo final bila menggunakan server bersama |
+| NFR-01 | Usability: 30 seconds or less once familiar with the UI | Time 3 to 5 prospective users, as a proposed method; report the data, and don't claim it before testing |
+| NFR-02 | Responsive on the MVP dataset | Test a list of 1,000 logs for one account with pages of 20; record load time and jank on the demo device |
+| NFR-03 | No preventable input loss | Rotation, background, timeout, retry; passwords are never persisted |
+| NFR-04 | Isolation between accounts | Two accounts; cross-account detail, update, and delete requests, statistics, and photo URLs |
+| NFR-05 | Session security | TLS in shared environments; hashed passwords; tokens never in logs or URLs; sign-out revokes the refresh session |
+| NFR-06 | Accessibility | Touch targets of at least 48 dp, TalkBack, 200% font scale, AA contrast, status not shown by color alone |
+| NFR-07 | Adapting to screen size | 360 dp, landscape, tablet; forms never covered by the keyboard or system bars |
+| NFR-08 | Maintainability | UI, ViewModel and state, and repository and network kept separate; visual tokens centralized |
+| NFR-09 | Limited observability | Request ID, status, and duration; never passwords, bearer tokens, personal notes, or images |
+| NFR-10 | Data recovery | Encrypted database backups and one restore test before the final demo when using a shared server |
 
-Dataset 1.000, pagination 20, dan matriks perangkat adalah target rancangan pengujian. Bukan klaim performa yang sudah tercapai.
+The 1,000-log dataset, pages of 20, and device matrix are test design targets, not performance claims.
 
-## 14. Data, privasi, dan izin
+## 14. Data, privacy, and permissions
 
-Data minimum: nama, email, credential hash di backend, zona waktu, catatan aktivitas, progres turunan. Foto opsional disimpan privat dan hanya dikirim ketika pengguna memilihnya. Lokasi tidak diperlukan untuk fitur inti. Notifikasi tidak aktif secara default.
+Minimum data: name, email, a credential hash on the backend, time zone, activity logs, and derived progress. Optional photos are stored privately and only sent when the user chooses. Location isn't needed for core features. Notifications are off by default.
 
-Tidak ada password plaintext, password hash, refresh token, atau lokasi presisi dalam respons profil. Cache pribadi dihapus saat logout. Draf tidak dibagikan antar akun. Penyimpanan rahasia Android dibahas di ARCHITECTURE, terpisah dari preferences biasa.
+Profile responses never include a plaintext password, password hash, refresh token, or precise location. The private cache is cleared on sign-out. Drafts are never shared between accounts. ARCHITECTURE covers Android secret storage separately from regular preferences.
 
-Retensi akun, penghapusan akun, persetujuan privasi, kontak pengelola, dan durasi backup harus ditetapkan oleh tim sebelum distribusi publik. Dokumen ini tidak mengklaim kepatuhan regulasi. Demo memakai akun uji dan data yang memang diizinkan pemiliknya.
+Account retention, account deletion, privacy consent, the maintainer's contact, and backup duration must be decided by the team before public distribution. This document doesn't claim regulatory compliance. The demo uses test accounts and data its owners have agreed to share.
 
-## 15. Arsitektur dan dependensi produk
+## 15. Architecture and product dependencies
 
-Android Kotlin + Jetpack Compose/Material 3 + ViewModel + StateFlow + satu library navigasi + HTTP client. Backend Go modular monolith + PostgreSQL. Docker Compose mengorkestrasi backend/database; object storage hanya ditambahkan jika foto dikerjakan.
+Android Kotlin + Jetpack Compose and Material 3 + ViewModel + StateFlow + one navigation library + an HTTP client. A Go modular monolith with PostgreSQL on the backend. Docker Compose orchestrates the backend and database; object storage is only added if photos are built.
 
-Dependensi yang menghalangi core: API auth dan log, schema database, domain/TLS untuk penggunaan di luar lokal, data panduan terkurasi, perangkat demo. Maps SDK, provider geolokasi, dan object storage tidak menjadi prasyarat pencatatan.
+Core blockers: the auth and log API, the database schema, a domain and TLS for use beyond localhost, curated guide data, and a demo device. A Maps SDK, geolocation provider, and object storage are not prerequisites for logging.
 
-API draf pada PDF diperluas dengan logout/refresh, update/delete log, detail panduan, ringkasan dashboard, dan metadata kategori. Semua kontrak di [API.md](API.md) adalah proposal, belum endpoint terpasang.
+The PDF's draft API is expanded with sign-out and refresh, log update and delete, guide detail, dashboard summary, and category metadata. Every contract in [API.md](API.md) is a proposal, not a deployed endpoint.
 
-## 16. Rencana empat minggu
+## 16. Four-week plan
 
-| Minggu | Hasil utama | Gate selesai |
+| Week | Main outcome | Done when |
 |---|---|---|
-| 1 | Repo/aplikasi, theme, navigasi, schema, backend, auth | Akun bisa dibuat, login, logout, sesi pulih; UI ↔ API nyata |
-| 2 | Tambah, detail, ubah/hapus, riwayat, beranda | Satu catatan bertahan setelah restart, retry tidak duplikat, filter benar |
-| 3 | Panduan, statistik, XP/level; streak/achievement jika cukup | Rumus cocok dengan dataset acuan; pencarian menggunakan data terkurasi |
-| 4 | QA, aksesibilitas, polish, dokumentasi, build presentasi | Skenario penerimaan inti lulus, tidak ada bug kritis; opsi tambahan hanya jika aman |
+| 1 | Repo and app, theme, navigation, schema, backend, auth | Accounts can be created, signed in, and signed out, and sessions restore; UI ↔ real API |
+| 2 | Add, detail, edit and delete, history, home | A log survives a restart, retries don't duplicate, filters are correct |
+| 3 | Guides, statistics, XP and level; streaks and achievements if time allows | Formulas match the reference dataset; search uses curated data |
+| 4 | QA, accessibility, polish, documentation, presentation build | Core acceptance scenarios pass with no critical bugs; extras only if safe |
 
-Urutan pemangkasan: Maps → foto → reminder → achievement/streak → gamifikasi di luar baseline. Jangan mengorbankan auth, tracking, riwayat, dashboard, panduan, statistik, isolasi data, dan penanganan kegagalan demi opsi tambahan. Ini mempertahankan Waste Guide sebagai Must, meskipun ringkasan urutan scope PDF tidak menyebutnya.
+Order of cuts: Maps → photos → reminders → achievements and streaks → gamification beyond the baseline. Never sacrifice auth, tracking, history, the dashboard, guides, statistics, data isolation, or failure handling for extras. This keeps the Waste Guide a Must, even though the PDF's scope order summary doesn't mention it.
 
-## 17. Definition of done dan acceptance MVP
+## 17. MVP definition of done and acceptance
 
-- [ ] Register/login/logout dan pemulihan sesi berfungsi pada API nyata.
-- [ ] Tambah catatan valid, invalid, gagal jaringan, dan replay request lulus.
-- [ ] Riwayat/detail/filter memuat data sendiri, bertahan setelah restart.
-- [ ] Ubah/hapus memperbarui dashboard, statistik, dan progres secara konsisten.
-- [ ] Berat dan jumlah terpisah; Reduce tidak menambah total ditangani.
-- [ ] Kasus tanpa data menampilkan persentase “belum ada”, bukan NaN/Infinity.
-- [ ] Panduan dapat dicari, detail tersedia, konten produksi telah direview.
-- [ ] XP/level baseline berubah; pengurangan scope gamifikasi dicatat jika dilakukan.
-- [ ] Lima layar data utama memiliki loading, empty, content, error yang relevan.
-- [ ] Dua akun terbukti terisolasi, termasuk cache lokal dan objek foto jika ada.
-- [ ] TalkBack, target 48 dp, font scale, system insets, terang/gelap diperiksa.
-- [ ] Build Android dan backend diuji; hasil dan keterbatasan dicatat.
+- [ ] Register, sign in, sign out, and session restore work against the real API.
+- [ ] Adding a valid log, an invalid log, a network failure, and a replayed request all pass.
+- [ ] History, detail, and filters load the user's own data and survive a restart.
+- [ ] Editing and deleting update the dashboard, statistics, and progress consistently.
+- [ ] Weight and count stay separate; Reduce doesn't add to the total handled.
+- [ ] With no data, percentages show "none yet", never NaN or Infinity.
+- [ ] Guides are searchable, details are available, and production content has been reviewed.
+- [ ] Baseline XP and level change; any cut to gamification scope is recorded.
+- [ ] The five main data screens have the relevant loading, empty, content, and error states.
+- [ ] Two accounts are proven isolated, including the local cache and photo objects if present.
+- [ ] TalkBack, 48 dp targets, font scale, system insets, and light and dark themes are checked.
+- [ ] Android and backend builds are tested, with results and limitations recorded.
 
-Checklist ini masih target implementasi. Pemeriksaan paket dokumentasi tidak membuktikan acceptance aplikasi Android.
+This checklist is still an implementation target. Checking the documentation package doesn't prove Android acceptance.
 
-## 18. Risiko dan keputusan yang masih terbuka
+## 18. Risks and open decisions
 
-| Risiko / keputusan | Default rancangan | Yang harus dilakukan tim |
+| Risk or decision | Design default | What the team needs to do |
 |---|---|---|
-| Makna “total waste” ambigu | Label “Sampah ditangani”; Reduce terpisah | Setujui sebelum schema dan analytics ditulis |
-| Berat dan benda tercampur | Dua agregat, tidak ada konversi otomatis | Gunakan kasus uji bersama Android/backend |
-| CRUD disebut hanya di roadmap PDF | Ubah/hapus termasuk core untuk koreksi | Pastikan kapasitas minggu 2 |
-| Gamifikasi Should vs acceptance | XP/level baseline; lainnya fleksibel | Konfirmasi ekspektasi penilai bila dipangkas |
-| Jenis backend belum dipilih | Usulan Go + Gin + PostgreSQL | Pin versi yang kompatibel saat setup; Fiber tetap alternatif sumber |
-| Hosting dan anggaran | Docker Compose pada satu host pilihan tim | Tetapkan host, domain, biaya, backup owner; tidak ada klaim biaya gratis |
-| Jadwal satu bulan | Vertical slice mingguan | Bagi pemilik Android/backend/konten/QA |
-| Data panduan dan lokasi | Editorial review wajib | Sumber dan penanggung jawab belum tersedia |
-| Public release | Di luar baseline demo | Tambahkan password reset, kebijakan privasi, deletion/retention, rate-limit review |
-| API/library berubah | Pin stable saat kickoff | Catat versi aktual di version catalog dan lockfile |
+| "Total waste" is ambiguous | Label it "Waste handled"; Reduce kept separate | Agree before the schema and analytics are written |
+| Weights and counts get mixed | Two aggregates, no automatic conversion | Use shared test cases for Android and backend |
+| CRUD only appears in the PDF roadmap | Edit and delete are core, for corrections | Make sure week 2 has the capacity |
+| Gamification is Should vs. acceptance | Baseline XP and level; the rest is flexible | Confirm the assessor's expectations if it's cut |
+| Backend framework not chosen | Proposal: Go + Gin + PostgreSQL | Pin compatible versions at setup; Fiber stays an alternative from the source |
+| Hosting and budget | Docker Compose on one host the team picks | Decide the host, domain, costs, and backup owner; no claims of free hosting |
+| One-month schedule | Weekly vertical slices | Assign owners for Android, backend, content, and QA |
+| Guide and location data | Editorial review required | Sources and owners aren't available yet |
+| Public release | Outside the demo baseline | Add password reset, a privacy policy, deletion and retention, and a rate-limit review |
+| APIs and libraries change | Pin stable versions at kickoff | Record actual versions in the version catalog and lockfile |
 
-## 19. Traceability terhadap PDF
+## 19. Traceability to the PDF
 
-| Bagian PDF | Halaman | Bagian dokumen lengkap |
+| PDF section | Page | Section in the full document |
 |---|---|---|
 | 1 Product Overview | 1 | §1 |
 | 2 Problem Statement | 1 | §2 |
@@ -364,48 +364,48 @@ Checklist ini masih target implementasi. Pemeriksaan paket dokumentasi tidak mem
 | 6 Core User Journey | 2 | §7 |
 | 7 MVP Features | 2 | §5 |
 | 8 Screen Requirements | 2 | §11 + SCREEN_SPEC |
-| 9 Functional Requirements | 2–3 | §8; FR-01–FR-10 dipertahankan |
-| 10 Business Rules | 3 | §9–10 |
+| 9 Functional Requirements | 2 to 3 | §8; FR-01 to FR-10 kept |
+| 10 Business Rules | 3 | §9 to §10 |
 | 11 Information Architecture | 4 | §7 |
 | 12 Data Model | 4 | API §2 |
 | 13 Technical Architecture | 4 | §15 + ARCHITECTURE |
-| 14 API Endpoint Draft | 4 | API §3–8 |
-| 15 Non-Functional Requirements | 5 | §13–14 |
+| 14 API Endpoint Draft | 4 | API §3 to §8 |
+| 15 Non-Functional Requirements | 5 | §13 to §14 |
 | 16 4-Week Development Plan | 5 | §16 + IMPLEMENTATION_PLAN |
 | 17 MVP Acceptance Criteria | 5 | §17 |
-| 18 Stretch Goals | 5 | §5 dan SCREEN_SPEC opsi |
-| 19 Success Metrics | 5–6 | §3 dan §17 |
+| 18 Stretch Goals | 5 | §5 and the SCREEN_SPEC options |
+| 19 Success Metrics | 5 to 6 | §3 and §17 |
 | 20 Reference & Attribution | 6 | §20 |
 
-## 20. Sumber dan atribusi
+## 20. Sources and attribution
 
-Sumber kebutuhan: `docs/WasteNot_PRD.pdf`, versi 1.0, 6 halaman, dibaca pada 21 September 2026. Lokasi sumber yang diberikan: `/home/oktaavsm/Code/github.com/wastenot-android/docs/WasteNot_PRD.pdf`.
+Requirements source: `docs/WasteNot_PRD.pdf`, version 1.0, 6 pages, read on 21 September 2026. Source location provided: `/home/oktaavsm/Code/github.com/wastenot-android/docs/WasteNot_PRD.pdf`.
 
-PDF mengatribusikan inspirasi produk kepada WasteNot oleh tim Supernova, BINUS, pada PROXO National IT Competition 2024. Atribusi ini diteruskan sebagai pernyataan dokumen sumber; tautan akademik final dan rincian prestasi masih perlu diverifikasi sebelum dimasukkan ke laporan resmi. Paket ini merupakan adaptasi baru untuk tugas Android, bukan spesifikasi asli produk kompetisi.
+The PDF credits the product inspiration to WasteNot by team Supernova from BINUS at the PROXO National IT Competition 2024. This credit is passed on as a statement from the source document; the final academic link and award details still need verifying before they go into an official report. This kit is a new adaptation for an Android assignment, not the competition product's original spec.
 
-Referensi yang diberikan: `docs/example-project-overview/design-system-v2.html` adalah design system **Titip.in**. Sesuai arahan pengguna pada 22 September 2026, WasteNot memakai desain mandiri berdasarkan konteks waste tracking: Plus Jakarta Sans, hijau pinus, lime, dan layout pencatatan. Warna, font, fitur jastip/preloved/WhatsApp/transaksi Titip.in tidak diwariskan. Teks instruksi dalam dokumen sumber diperlakukan sebagai isi referensi, bukan instruksi untuk menjalankan tindakan pada lingkungan pengguna.
+Reference provided: `docs/example-project-overview/design-system-v2.html` is the **Titip.in** design system. As the user directed on 22 September 2026, WasteNot uses its own design based on waste tracking: Plus Jakarta Sans, pine green, lime, and a logging layout. Titip.in's colors, fonts, and its personal shopping, preloved, WhatsApp, and transaction features are not carried over. Instructions inside the source document are treated as reference content, not as instructions to act on the user's environment.
 
-## 21. Perluasan AI computer vision (v1.2)
+## 21. AI computer vision extension (v1.2)
 
-**Sumber kebutuhan baru:** permintaan pengguna 28 September 2026 dan [plan dari tim](sources/AI_PLAN_ORIGINAL.md). Fitur AI yang semula di luar baseline PDF kini menjadi increment yang direncanakan. Implementasi core tetap dapat beroperasi tanpa AI. Model, hosting inference, provider LLM dan target kualitas masih rancangan, belum bukti tersedia.
+**New requirements source:** the user's request on 28 September 2026 and the [team's plan](sources/AI_PLAN_ORIGINAL.md). AI features that were outside the PDF baseline are now a planned increment. The core still works without AI. The model, inference hosting, LLM provider, and quality targets are still designs, not proven availability.
 
-Tujuan tambahan: membantu mengenali objek dan mengurangi input awal tanpa mengurangi kendali pengguna. Ukur waktu penyelesaian dibanding manual, tingkat koreksi/fallback, keberhasilan save dan hasil evaluasi model per kelas. Jangan menganggap skor confidence atau acceptance pengguna sebagai akurasi model.
+Additional goal: help identify objects and reduce initial input without taking control away from the user. Measure completion time against manual entry, correction and fallback rates, save success, and per-class model evaluation results. Never treat confidence scores or user acceptance as model accuracy.
 
-| ID | Kebutuhan AI | Acceptance |
+| ID | AI requirement | Acceptance |
 |---|---|---|
-| FR-AI-01 | Tombol Catat/Scan utama pada tengah atas bottom navbar | Membuka satu bottom sheet kamera dari lima tab; Input manual selalu tersedia |
-| FR-AI-02 | Foto dengan izin dan preview | Capture → tinjau → scan; tidak upload sebelum aksi pengguna; retake/close berhenti kamera |
-| FR-AI-03 | YOLO + hasil deteksi | Bbox dan daftar objek dengan skor; pilih satu, koreksi material; kelas tak dikenal tidak dipaksakan |
-| FR-AI-04 | Konteks pengguna | Kebersihan, keutuhan, kelayakan independent; belum tahu valid |
-| FR-AI-05 | Waste Guide + LLM | Hanya knowledge ditinjau; output terstruktur dan validasi server; provider gagal tidak memblokir manual |
-| FR-AI-06 | Konfirmasi metode | Saran bisa ditolak/diubah; special handling tidak diberi metode otomatis |
-| FR-AI-07 | Integrasi tracking | Isi berat/benda sendiri; satu log setelah simpan; hasil AI sebelum save tidak mengubah statistik/XP |
-| FR-AI-08 | Ketahanan dan privasi | No raw image log/training otomatis; timeout/izin ditolak/low confidence punya fallback; isolasi akun dan cleanup diuji |
+| FR-AI-01 | Main Log/Scan button at the top center of the bottom navbar | Opens one camera bottom sheet from any of the five tabs; Log manually is always available |
+| FR-AI-02 | Photo with permission and preview | Capture → review → scan; nothing uploads before the user acts; retake or close stops the camera |
+| FR-AI-03 | YOLO and detection results | Boxes and an object list with scores; pick one and correct the material; unknown classes aren't forced |
+| FR-AI-04 | User context | Cleanliness, condition, and fitness are independent; "not sure" is valid |
+| FR-AI-05 | Waste Guide + LLM | Only reviewed knowledge; structured output with server validation; a failed provider never blocks manual entry |
+| FR-AI-06 | Method confirmation | Advice can be rejected or changed; special handling never gets an automatic method |
+| FR-AI-07 | Tracking integration | Users enter weight or count themselves; one log after saving; AI results before saving don't change statistics or XP |
+| FR-AI-08 | Resilience and privacy | No raw image logs or automatic training; timeouts, denied permission, and low confidence have fallbacks; account isolation and cleanup are tested |
 
-Alur: action dock → S21 kamera sheet → S22 hasil/koreksi → S23 kondisi → S24 saran/konfirmasi → S05 jumlah/tanggal/catatan → S06 berhasil. S25 adalah kelompok state gagal, bukan tab produk. Lima tujuan Beranda/Riwayat/Panduan/Statistik/Profil dipertahankan; action diletakkan menonjol di tengah atas dock agar tidak memadatkan enam kolom navigasi pada ponsel.
+Flow: dock action → S21 camera sheet → S22 results and correction → S23 condition → S24 advice and confirmation → S05 amount, date, and notes → S06 success. S25 is a group of failure states, not a product tab. The five destinations (Home, History, Guide, Statistics, Profile) stay; the action sits prominently at the top center of the dock so the phone navigation doesn't squeeze into six columns.
 
-AI tidak mengestimasi berat, material kimia, kontaminasi atau penerimaan fasilitas. Scan bukan bukti Reduce; saran otomatis disposal hanya REUSE/RECYCLE/TRASH yang sesuai panduan. REDUCE tetap untuk aktivitas pencegahan pada input manual. Metadata model bukan sumber metrik pengguna dan tidak memberi bonus XP.
+AI never estimates weight, chemical makeup, contamination, or facility acceptance. A scan is not proof of Reduce; automatic disposal advice is only REUSE, RECYCLE, or TRASH as the guides allow. REDUCE stays a prevention activity entered manually. Model metadata isn't a source for user metrics and never gives bonus XP.
 
-MVP AI mencakup capture foto, server inference, satu objek terpilih, mapping, retrieval, LLM tervalidasi, konfirmasi dan manual fallback. Realtime/batch/on-device/offline LLM/training from scratch ditunda. Foto scan bersifat sementara, lampiran foto tetap opt-in terpisah. Detail retensi, confidence kandidat 0,50/0,70, special handling, dataset dan gate tersedia di [AI_SPEC](AI_SPEC.md); kontrak di [API §10](API.md).
+The AI MVP covers photo capture, server inference, one selected object, mapping, retrieval, a validated LLM, confirmation, and manual fallback. Realtime, batch, on-device, offline LLMs, and training from scratch are postponed. Scan photos are temporary, and photo attachments stay a separate opt-in. Retention details, the 0.50 and 0.70 candidate confidence levels, special handling, datasets, and gates are in [AI_SPEC](AI_SPEC.md); the contract is in [API §10](API.md).
 
-Risiko utama: kelas pretrained tidak cocok, material mirip, model terlalu yakin, sumber panduan tidak lengkap, rekomendasi berbahaya, biaya/latency jaringan dan kebocoran gambar. Mitigasi: taxonomy aktual, konfirmasi material, evaluasi holdout, policy override, fallback manual, provider server-side, file ephemeral dan redaksi telemetri. Tidak ada target accuracy/latency yang diklaim telah tercapai. Release AI bergantung acceptance AT-AI dan evidence evaluasi; fitur dapat dimatikan terpisah dari core.
+Main risks: pretrained classes that don't fit, similar-looking materials, an overconfident model, incomplete guide sources, harmful advice, network cost and latency, and image leaks. Mitigations: the real taxonomy, material confirmation, holdout evaluation, policy overrides, manual fallback, a server-side provider, ephemeral files, and redacted telemetry. No accuracy or latency target is claimed as met. An AI release depends on AT-AI acceptance and evaluation evidence, and the feature can be turned off separately from the core.

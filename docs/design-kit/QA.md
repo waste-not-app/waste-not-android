@@ -1,171 +1,171 @@
-# WasteNot: Pemeriksaan Design Kit
+# WasteNot: Design Kit Checks
 
-Tanggal pemeriksaan terbaru: 13 November 2026 (penyempurnaan mockup v1.4 iOS Inset-Grouped + Liquid Glass). Bukti material v1.1–v1.3 di bawah tetap dicatat sebagai riwayat. Cakupan: HTML/CSS/JavaScript, dokumen, font, dan simulasi interaksi. **Bukan** hasil pengujian aplikasi Android atau backend.
+Latest check: 13 November 2026 (v1.4 mockup refinements, iOS inset-grouped + Liquid Glass). Evidence for materials v1.1 to v1.3 below is kept as history. Scope: HTML, CSS, JavaScript, documents, fonts, and interaction simulation. These are **not** test results for the Android app or the backend.
 
+## v1.4 results (iOS inset-grouped + Liquid Glass)
 
-## Hasil v1.4 (iOS Inset-Grouped + Liquid Glass)
+- PASS `verify.cjs`: all 22 checks passed (25 screens and panels, 39 components, 360/390/768/1024/1512 px in light and dark, 200% text stress, 4 dialogs, 8×5 states, forms, filters, guides, statistics, reminders, photos, locations, 0 JS errors).
+- PASS `verify-ai.cjs`: the whole AI bottom sheet flow passed (4 widths × 2 themes, Escape and focus restore, multiple, low, none, special, offline, and LLM fallbacks, virtual camera, 200% text stress, 0 JS errors).
+- Contrast for the new v1.4 tokens was calculated with the WCAG AA formula: 10 of 10 light and dark pairs are at least 5.96:1 (target 4.5:1).
 
-- PASS `verify.cjs`: seluruh 22 pemeriksaan lulus (25 layar/panel, 39 komponen, 360/390/768/1024/1512 px pada terang & gelap, stress teks 200%, 4 dialog, 8×5 state, form/filter/panduan/statistik/reminder/foto/lokasi, 0 JS error).
-- PASS `verify-ai.cjs`: seluruh flow AI bottom sheet (4 lebar × 2 tema, Escape/focus restore, multi/low/none/special/offline/LLM fallback, kamera virtual, 200% text stress, 0 JS error) lulus.
-- Kontras token baru v1.4 dihitung dengan formula WCAG AA: 10/10 pasangan terang/gelap ≥ 5,96:1 (target ≥ 4,5:1).
-## Hasil AI v1.2
+## AI v1.2 results
 
-- PASS `verify.cjs`: 25 layar/panel, 39 komponen, lima viewport pada dua tema; regresi create/edit/delete, state, unit, navigasi dan font 200% lulus, tanpa JavaScript error.
-- PASS `verify-ai.cjs`: sheet pada 360/390/768/1512 px × dua tema; Escape menutup dan mengembalikan fokus ke action utama.
-- PASS: kategori wajib dikonfirmasi, metode dapat dikoreksi, jumlah tetap kosong; scan tidak menambah record/XP, satu submit valid menambah satu log.
-- PASS: multi-object, skor rendah, unknown, special handling, jaringan gagal dan LLM gagal mempunyai manual fallback. Special handling tidak menyediakan tombol gunakan saran.
-- PASS: capture dan retake menggunakan kamera virtual Chromium; capture/close menghentikan track. Penolakan izin diuji dengan fake getUserMedia rejection. Kamera fisik/Android belum diuji.
-- PASS: hasil async yang dibatalkan diabaikan; manual dapat dicapai pada teks sheet 200%; tidak ada JavaScript error.
-- Review visual: Beranda dengan action dock, sheet kamera dan hasil scan, serta preview S21–S25 diperiksa. Foto tidak diunggah; bbox dan saran berlabel ilustrasi/simulasi.
-- Dokumen PRD, DESIGN, SCREEN_SPEC, API, ARCHITECTURE, IMPLEMENTATION_PLAN, README diperbarui; AI_SPEC dan salinan plan sumber ditambahkan. Kontrak API/infrastructure masih rancangan.
+- PASS `verify.cjs`: 25 screens and panels, 39 components, five viewports in two themes; regressions for create, edit, delete, states, units, navigation, and 200% font passed with no JavaScript errors.
+- PASS `verify-ai.cjs`: the sheet at 360/390/768/1512 px × two themes; Escape closes it and returns focus to the main action.
+- PASS: the category must be confirmed, the method can be corrected, and the amount stays empty; a scan adds no record or XP, and one valid submit adds one log.
+- PASS: multiple objects, low scores, unknown, special handling, network failure, and LLM failure all have a manual fallback. Special handling offers no use-advice button.
+- PASS: capture and retake use Chromium's virtual camera; capture and close stop the track. Permission denial was tested with a fake getUserMedia rejection. Physical and Android cameras haven't been tested.
+- PASS: cancelled async results are ignored; manual entry is reachable with 200% sheet text; no JavaScript errors.
+- Visual review: Home with the dock action, the camera sheet and scan results, and the S21 to S25 previews were checked. Photos aren't uploaded; boxes and advice are labeled as illustration or simulation.
+- The PRD, DESIGN, SCREEN_SPEC, API, ARCHITECTURE, IMPLEMENTATION_PLAN, and README were updated; AI_SPEC and a copy of the source plan were added. The API and infrastructure contracts are still designs.
 
-Belum diuji: YOLO nyata, model/dataset/accuracy/calibration, LLM provider/safety aktual, endpoint/backend/retensi file, latency/biaya, kamera Android dan izin perangkat fisik. Tidak ada klaim hasil AI berdasarkan simulasi browser.
+Not tested: real YOLO, the model, dataset, accuracy, and calibration, the actual LLM provider and its safety, endpoints, backend, and file retention, latency and cost, and the Android camera and physical device permissions. No AI result claims are based on the browser simulation.
 
-## Hasil yang diperiksa
+## What was checked
 
-| Pemeriksaan | Hasil / bukti |
+| Check | Result / evidence |
 |---|---|
-| Inventaris | PASS: 25 elemen galeri S01–S25, 39 komponen C01–C39, 4 dialog D01–D04 |
-| File offline | PASS: dibuka melalui file lokal dengan Chromium; font lokal dimuat; tidak memerlukan server data |
-| Desktop/mobile | PASS: semua 25 layar pada lebar 360, 390, 768, 1024, 1512 px; tidak ada horizontal overflow |
-| Tema | PASS: matriks ukuran diulang untuk terang dan gelap; kontrol tema dan alur pencatatan juga dicoba |
-| State | PASS: 8 layar data × loading/empty/error/offline/content; ditambah 6 contoh state pada S20 |
-| Angka contoh | PASS: 1.400 g, 2 benda dihindari, 50% recycling rate, streak 2; denominator kosong menghasilkan null |
-| Validasi unit | PASS: g, kg dengan koma/titik, integer benda, batas nilai, NaN/Infinity/eksponen ditolak |
-| Konversi unit | PASS: 250 g → 0,25 kg → 250 g; pindah ke benda mengosongkan nilai agar tidak membuat konversi palsu |
-| Kontras | PASS: 28 pasangan token teks minimal 4,5:1, nilai terendah terukur 5,40:1; 4 pasangan outline/background minimal 3:1 |
-| Font | PASS: Plus Jakarta Sans variable memuat axis wght 200–800; lisensi OFL disertakan |
-| Teks besar | PASS: stress font 200% pada Beranda, form, riwayat, dan statistik di viewport 390 px tanpa horizontal overflow |
-| Visual | PASS: screenshot semua 20 layar ditinjau; form/konten panjang dapat discroll; label dan CTA tetap berada dalam frame |
-| Runtime | PASS: tidak ada JavaScript page error pada pemeriksaan browser |
-| Dokumen | PASS: source kebutuhan dan keputusan baru dibedakan; referensi styling Titip.in diganti arah WasteNot |
+| Inventory | PASS: 25 gallery items S01 to S25, 39 components C01 to C39, 4 dialogs D01 to D04 |
+| Offline file | PASS: opened as a local file in Chromium; local fonts load; no data server needed |
+| Desktop and mobile | PASS: all 25 screens at 360, 390, 768, 1024, and 1512 px widths; no horizontal overflow |
+| Themes | PASS: the size matrix repeated in light and dark; the theme control and logging flow were also tried |
+| States | PASS: 8 data screens × loading/empty/error/offline/content; plus 6 sample states on S20 |
+| Sample numbers | PASS: 1,400 g, 2 items avoided, 50% recycling rate, streak 2; an empty denominator gives null |
+| Unit validation | PASS: g, kg with a comma or point, integer items, value limits; NaN, Infinity, and exponents rejected |
+| Unit conversion | PASS: 250 g → 0.25 kg → 250 g; switching to items clears the value so no fake conversion happens |
+| Contrast | PASS: 28 text token pairs at least 4.5:1, lowest measured 5.40:1; 4 outline/background pairs at least 3:1 |
+| Font | PASS: the Plus Jakarta Sans variable font loads the wght axis 200 to 800; the OFL license is included |
+| Large text | PASS: 200% font stress on Home, forms, history, and statistics at a 390 px viewport with no horizontal overflow |
+| Visual | PASS: screenshots of all 20 screens reviewed; long forms and content scroll; labels and CTAs stay inside the frame |
+| Runtime | PASS: no JavaScript page errors during browser checks |
+| Documents | PASS: source requirements and new decisions are kept apart; the Titip.in styling reference was replaced by WasteNot's direction |
 
-Stress CSS 200% adalah pemeriksaan web, bukan pengganti uji Android fontScale/TalkBack. Kontras yang diperiksa adalah pasangan warna yang ditetapkan sistem; laporan ini bukan sertifikasi WCAG seluruh produk.
+The 200% CSS stress test is a web check, not a substitute for Android fontScale or TalkBack testing. The contrast checked covers the color pairs the system defines; this report isn't a WCAG certification of the whole product.
 
-## Revisi material v1.1
+## Material revision v1.1
 
-- Gradasi, canvas, dan komposit tint glass: 1.212 sampel warna pada kedua tema, rasio teks minimum 5,24:1 (target 4,5:1). Sampel glass menguji latar hitam–putih pada opacity tint yang ditentukan; teks dock memakai onSurface. Ini pemeriksaan warna, bukan sertifikasi visual seluruh piksel.
-- Blur dock aktif pada Chromium di kedua tema; kelima target navigasi minimal 48×48 px pada viewport 360 px.
-- Reduced motion mempertahankan scroll tanpa animasi; forced colors mematikan backdrop blur. CSS juga menyediakan fallback surface opak ketika backdrop-filter tidak tersedia atau reduced-transparency aktif; dua kondisi terakhir diperiksa pada aturan CSS, bukan perangkat fisik.
-- Matriks dan click-through di bawah diulang dengan styling v1.1. Screenshot 20 layar per tema dibuat untuk pemeriksaan visual; preview desktop diperbarui.
-- Implementasi ini adalah interpretasi glass untuk web. Efek native Liquid Glass Apple dan performa backdrop Android tidak diklaim telah diimplementasikan atau diuji.
+- Gradients, canvas, and glass tint composites: 1,212 color samples across both themes, with a minimum text ratio of 5.24:1 (target 4.5:1). The glass samples test black-to-white backgrounds at the specified tint opacity; dock text uses onSurface. This is a color check, not a visual certification of every pixel.
+- The dock blur is active in Chromium in both themes; all five navigation targets are at least 48×48 px at a 360 px viewport.
+- Reduced motion keeps scrolling without animation; forced colors turn off the backdrop blur. The CSS also has an opaque surface fallback when backdrop-filter isn't available or reduced transparency is on; those last two conditions were checked in the CSS rules, not on physical devices.
+- The matrix and click-through below were repeated with v1.1 styling. Screenshots of 20 screens per theme were made for visual review, and the desktop preview was updated.
+- This implementation is a web interpretation of glass. Apple's native Liquid Glass effect and Android backdrop performance aren't claimed to be implemented or tested.
 
-## Bukti click-through
+## Click-through evidence
 
-| Elemen/alur | Tindakan dan hasil |
+| Element / flow | Action and result |
 |---|---|
-| Pilihan layar | S01–S25 masing-masing dibuka melalui selector dan tombol galeri; ID tujuan cocok |
-| Filter galeri | Akses/tracking/insight/profile/optional/semua mengubah kumpulan preview |
-| Theme selector | Terang/gelap memperbarui seluruh halaman dan prototype; sistem mengikuti preference browser |
-| Form catatan kosong | Simpan menampilkan permintaan memilih metode |
-| Berat invalid | Nilai 0 ditolak dengan pesan berat 1 g–100 kg |
-| Create | 100 g Recycle membuat satu catatan baru, jumlah log dari 5 menjadi 6 |
-| Detail | “Lihat catatan” membuka 100 g yang baru dibuat |
-| Edit | Nilai diubah ke 300 g; jumlah log tetap 6, sehingga tidak ada XP create tambahan |
-| Hapus | Batal mempertahankan log; konfirmasi mengembalikan jumlah log ke 5 |
-| Metode Reduce | Disimpan pada kedua tema; ditampilkan terpisah dari berat ditangani |
-| Filter riwayat | Plastik AND Recycle menghasilkan satu baris; reset kembali lima |
-| Reset pilihan sheet | Mengosongkan kategori/metode/tanggal draft filter, tidak kembali ke nilai filter awal |
-| Search panduan | Query tanpa hasil memunculkan empty state; hapus mengembalikan daftar |
-| Detail panduan | Artikel terbuka; “Catat aktivitas ini” mengisi kategori Plastik dan metode Recycle |
-| Statistik | Toggle 7/30 hari mengubah rentang; “Lihat angka harian” membuka data tekstual |
-| Draf form | Back membuka konfirmasi; Escape mempertahankan teks; Buang perubahan menghapus draf |
-| Selector saat dirty | Batal kembali menampilkan ID layar aktif, bukan tujuan yang dibatalkan |
-| Dialog | Keempat dialog dibuka; keyboard berpindah ke aksi dialog; Escape menutup; konflik memuat versi simulasi terbaru |
-| Reminder | Opt-in mengaktifkan isian waktu; 21:30 tersimpan sebagai preference simulasi; off menonaktifkan waktu |
-| Foto | File PNG lokal menampilkan preview; Hapus menghilangkan preview; text/plain ditolak |
-| Lokasi | Cari area menyatakan data belum ada; simulasi permission denied memberi fallback pencarian |
-| State gallery | Loading/kosong/error/offline/sesi/filter masing-masing mengubah pesan dan aksi |
-| Registrasi | Konfirmasi kata sandi berbeda ditolak; nilai cocok masuk ke akun simulasi |
-| Logout/login | Logout mengosongkan data sesi demo; login membuka Beranda kosong |
-| Bottom navigation | Kelima tab mengarahkan ke Beranda/Riwayat/Panduan/Statistik/Profil |
-| Password component | Tombol mata mengganti masked/visible |
-| Filter chip | Klik mengganti aria-pressed |
-| Segment component | Pilihan 30 hari menjadi satu-satunya pilihan aktif |
-| Filter sheet component | Membuka overlay; kategori Kaca menghasilkan satu baris setelah Apply |
-| Snackbar component | Tombol menampilkan feedback berstatus live region |
-| Switch component | Checkbox mengubah state dan feedback tanpa permission browser |
-| Search component | Teks masukan muncul di feedback pencarian contoh |
-| Native input/picker | Field teks, select, date, time, radio, checkbox memakai perilaku browser bawaan |
-| Reset demo | Memulihkan lima record awal dan membersihkan draft/filter/preview |
+| Screen selection | S01 to S25 each opened through the selector and gallery buttons; target IDs match |
+| Gallery filters | Access, tracking, insight, profile, optional, and all change the set of previews |
+| Theme selector | Light and dark update the whole page and prototype; system follows the browser preference |
+| Empty log form | Save asks the user to choose a method |
+| Invalid weight | 0 is rejected with the 1 g to 100 kg weight message |
+| Create | 100 g Recycle creates one new log, taking the count from 5 to 6 |
+| Detail | "View log" opens the newly created 100 g |
+| Edit | The value changed to 300 g; the count stays 6, so no extra create XP |
+| Delete | Cancel keeps the log; confirming brings the count back to 5 |
+| Reduce method | Saved in both themes; shown separately from handled weight |
+| History filters | Plastic AND Recycle gives one row; reset brings back five |
+| Sheet reset | Clears the draft category, method, and dates, rather than returning to the original filter values |
+| Guide search | A query with no results shows an empty state; clearing brings the list back |
+| Guide detail | The article opens; "Log this activity" fills in the Plastic category and Recycle method |
+| Statistics | The 7/30 day toggle changes the range; "See daily numbers" opens the text data |
+| Form draft | Back opens a confirmation; Escape keeps the text; Discard changes clears the draft |
+| Selector while dirty | Cancel shows the active screen ID again, not the cancelled target |
+| Dialogs | All four dialogs open; the keyboard moves to the dialog actions; Escape closes; the conflict loads the latest simulated version |
+| Reminders | Opting in enables the time field; 21:30 is saved as a simulated preference; off disables the time |
+| Photo | A local PNG shows a preview; Remove clears the preview; text/plain is rejected |
+| Location | Area search says there's no data yet; a simulated permission denial offers a search fallback |
+| State gallery | Loading, empty, error, offline, session, and filter each change the message and action |
+| Registration | A mismatched password confirmation is rejected; matching values go into the simulated account |
+| Logout and login | Logout clears the demo session data; login opens an empty Home |
+| Bottom navigation | All five tabs go to Home, History, Guide, Statistics, and Profile |
+| Password component | The eye button toggles masked and visible |
+| Filter chip | Clicking toggles aria-pressed |
+| Segment component | 30 days becomes the only active choice |
+| Filter sheet component | Opens an overlay; the Glass category gives one row after Apply |
+| Snackbar component | The button shows feedback in a live region |
+| Switch component | The checkbox changes state and feedback without browser permission |
+| Search component | Typed text appears in the sample search feedback |
+| Native inputs and pickers | Text, select, date, time, radio, and checkbox fields use built-in browser behavior |
+| Reset demo | Restores the five starting records and clears drafts, filters, and previews |
 
-Kontrol noninteraktif seperti badge, progress, ikon dekoratif, dan preview galeri tidak disajikan sebagai tombol palsu. Tautan dokumen/anchor diperiksa tujuannya pada paket lokal. Simulasi tidak melakukan authentication server, transaksi database, upload, geolocation, atau scheduling.
+Non-interactive elements such as badges, progress, decorative icons, and gallery previews aren't presented as fake buttons. Document links and anchors were checked against their targets in the local package. The simulation doesn't do server authentication, database transactions, uploads, geolocation, or scheduling.
 
-## Delivery gate Antislop
+## Antislop delivery gate
 
 ### Hard gate
 
-- R-02 PASS: tidak ada em dash dalam konten HTML/DESIGN yang diserahkan.
-- R-03 PASS: matriks 25 layar × 5 lebar × 2 tema tidak menghasilkan horizontal overflow.
-- R-17 PASS: angka produk berasal dari dataset simulasi yang diberi label; jumlah layar/komponen dihitung dari DOM.
-- R-18 PASS: tidak ada testimonial, foto orang, atau klaim pengguna fiktif.
-- R-23 PASS: pengguna meminta penentuan arah desain; wordmark teks, avatar inisial demo, dan placeholder editorial ditandai.
-- R-24 PASS: navigasi dokumentasi mengarah ke bagian/file yang tersedia; lima tab aplikasi memiliki tujuan nyata.
-- R-25 PASS: pasangan teks token terukur ≥5,40:1; pasangan batas kontrol diuji ≥3:1.
-- R-26 PASS: perilaku kontrol tercatat pada matriks click-through; kontrol disabled/preview memiliki peran jelas.
-- R-27 PASS: state loading, empty, error, offline, content tersedia pada layar data; success dan session state juga ditampilkan.
-- R-28 PASS: tidak ada FAQ pengisi ruang.
-- R-32 PASS: native button/input/dialog dapat digunakan dengan keyboard; focus-visible didefinisikan; Escape membatalkan dialog.
-- R-33 PASS: implementasi berada langsung pada HTML/CSS/JS; tidak ada helper patch UI yang disertakan.
-- R-34 PASS: tema terang dan gelap diuji pada seluruh lebar serta interaksi pencatatan.
-- R-35 PASS: Chromium menjalankan prototype, click-through dan screenshot tersedia selama QA; `verify.cjs` disertakan untuk mengulang pemeriksaan.
-- R-36 PASS: tidak ada klaim performa produksi, keamanan tersertifikasi, atau hasil pengurangan lingkungan.
-- R-37 PASS: DESIGN.md menetapkan arah terlebih dahulu; palet/font mandiri sesuai instruksi pengguna.
-- R-38 PASS: data demo, panduan editorial, Maps tanpa dataset, dan opsi fitur dinyatakan secara eksplisit.
+- R-02 PASS: no em dashes in the delivered HTML and DESIGN content.
+- R-03 PASS: the 25 screens × 5 widths × 2 themes matrix produces no horizontal overflow.
+- R-17 PASS: product numbers come from a labeled simulated dataset; screen and component counts are taken from the DOM.
+- R-18 PASS: no testimonials, photos of people, or made-up user claims.
+- R-23 PASS: the user asked for a design direction; the text wordmark, demo initial avatar, and editorial placeholders are labeled.
+- R-24 PASS: documentation navigation points to sections and files that exist; the five app tabs have real destinations.
+- R-25 PASS: measured token text pairs ≥5.40:1; control border pairs tested ≥3:1.
+- R-26 PASS: control behavior is recorded in the click-through matrix; disabled and preview controls have clear roles.
+- R-27 PASS: loading, empty, error, offline, and content states exist on data screens; success and session states are shown too.
+- R-28 PASS: no filler FAQ.
+- R-32 PASS: native buttons, inputs, and dialogs work with the keyboard; focus-visible is defined; Escape cancels dialogs.
+- R-33 PASS: the implementation lives directly in HTML, CSS, and JS; no UI patch helpers are included.
+- R-34 PASS: light and dark themes were tested at every width and with logging interactions.
+- R-35 PASS: Chromium ran the prototype, click-through and screenshots were available during QA; `verify.cjs` is included to rerun the checks.
+- R-36 PASS: no claims about production performance, certified security, or environmental reduction.
+- R-37 PASS: DESIGN.md sets the direction first; the palette and fonts are independent, as the user asked.
+- R-38 PASS: demo data, editorial guides, Maps without a dataset, and feature options are stated explicitly.
 
 ### Purpose gate
 
-- R-01 PASS: pinus untuk aksi, lime untuk progres; alasan tercatat di DESIGN §1–2.
-- R-04 PASS: simbol menunjukkan material/tindakan, dengan label; pemilihan dijelaskan di DESIGN §7.
-- R-06 PASS: Plus Jakarta Sans dipilih untuk UI dan angka; satu keluarga dan skala role terdokumentasi.
-- R-07 PASS: gradasi pinus/lime membedakan ringkasan dan progres; latar mint memberi dasar dock sesuai permintaan pengguna.
-- R-08 PASS: panah hanya Back/chevron navigasi, bukan dekorasi setiap CTA.
-- R-09 PASS: badge dipakai untuk metode/status; tanpa badge promosi.
-- R-10 PASS: glassmorphism diminta pengguna, dibatasi pada dock dan sampel materialnya; form/dialog opak.
-- R-12 PASS: bayangan membedakan dock/frame/overlay; highlight tipis pada summary dan CTA; daftar tetap tanpa bayangan.
-- R-13 PASS: tidak memakai glow.
-- R-14 PASS: layout aplikasi mengikuti form/list/statistik; grid komponen dan galeri dipakai untuk perbandingan katalog.
-- R-19 PASS: transisi kontrol pendek, reduced motion tersedia, tanpa gerak dekoratif berulang.
-- R-22 PASS: tidak memakai ilustrasi stok yang tidak terkait; ikon bersifat fungsional.
+- R-01 PASS: pine for actions, lime for progress; the reasoning is in DESIGN §1 to §2.
+- R-04 PASS: symbols show materials and actions, with labels; the choices are explained in DESIGN §7.
+- R-06 PASS: Plus Jakarta Sans was chosen for UI and numbers; one family and a documented role scale.
+- R-07 PASS: pine and lime gradients set apart the summary and progress; the mint background gives the dock a base, as the user asked.
+- R-08 PASS: arrows are only Back and navigation chevrons, not decoration on every CTA.
+- R-09 PASS: badges are used for methods and status; no promotional badges.
+- R-10 PASS: the user asked for glassmorphism, and it's limited to the dock and its material sample; forms and dialogs are opaque.
+- R-12 PASS: shadows set apart the dock, frame, and overlays; thin highlights on the summary and CTAs; lists have no shadows.
+- R-13 PASS: no glow.
+- R-14 PASS: the app layout follows forms, lists, and statistics; component and gallery grids are used to compare the catalog.
+- R-19 PASS: short control transitions, reduced motion available, no repeating decorative motion.
+- R-22 PASS: no unrelated stock illustrations; icons are functional.
 
-### Liveliness dan quality locks
+### Liveliness and quality locks
 
-- Dials PASS: ENERGY 2 / RHYTHM 2 / MOTION 1 tertulis sebelum mockup dibuat.
-- Focal point PASS: angka, form, daftar, atau tindakan utama dibedakan per layar dalam DESIGN §5.
-- Whitespace PASS: spacing 4–48 dan pembagian section/field diterapkan konsisten.
-- Accent PASS: lime menandai pencegahan/progres; primary menangani aksi.
-- Identity PASS: angka tebal, satuan, bidang pinus dan lime menjadi pola identitas yang berulang.
-- Design read PASS: konteks pengguna, bahasa visual, dan dials tercatat di DESIGN §1.
-- C-1 PASS: alasan warna, font, layout, spacing, ikon, bentuk tercatat.
-- C-2 PASS: perilaku kontrol diuji dan keterbatasan simulasi dinyatakan.
-- C-3 PASS: section berisi kebutuhan fondasi, komponen, layar, prototype, dan handoff.
-- C-4 PASS: ukuran, tema, state, dan keyboard diperiksa; validasi Android tetap pekerjaan implementasi.
-- C-5 PASS: tidak ada angka dampak atau pengguna yang disajikan sebagai fakta.
-- R-05 PASS: halaman dokumentasi memiliki tipe konten berbeda; aplikasi mengikuti pekerjaan tiap layar.
-- R-11 PASS: radius 8/12/16/24 berbeda sesuai fungsi; dock memakai radius 26; input tetap radius 12.
-- R-15 PASS: CTA menyebut aksi seperti Simpan catatan, Terapkan filter, dan Hapus foto.
-- R-16 PASS: tidak ada buzzword pemasaran yang menggantikan fungsi produk.
-- R-20 PASS: desain disusun untuk catatan 3R, tidak menyalin UI marketplace sumber.
-- R-21 PASS: tersedia pilihan terang/gelap/sistem.
-- R-29 PASS: pinus dan lime sebagai warna identitas; warna error/warning dipakai secara semantik.
-- R-30 PASS: tidak menyalin susunan produk populer atau contoh Titip.in.
-- R-31 PASS: alasan keputusan besar tersedia dalam DESIGN §1.
+- Dials PASS: ENERGY 2 / RHYTHM 2 / MOTION 1 were written down before the mockup was made.
+- Focal point PASS: the number, form, list, or main action is set apart on each screen in DESIGN §5.
+- Whitespace PASS: 4 to 48 spacing and the section and field divisions are applied consistently.
+- Accent PASS: lime marks prevention and progress; primary handles actions.
+- Identity PASS: bold numbers, units, and pine and lime areas form the recurring identity.
+- Design read PASS: user context, visual language, and dials are recorded in DESIGN §1.
+- C-1 PASS: the reasoning behind color, font, layout, spacing, icons, and shapes is recorded.
+- C-2 PASS: control behavior is tested and the simulation's limits are stated.
+- C-3 PASS: sections cover foundation needs, components, screens, the prototype, and handoff.
+- C-4 PASS: sizes, themes, states, and keyboard were checked; Android validation stays implementation work.
+- C-5 PASS: no impact or user numbers are presented as facts.
+- R-05 PASS: documentation pages have different content types; the app follows each screen's job.
+- R-11 PASS: radii of 8, 12, 16, and 24 differ by function; the dock uses 26; inputs stay at 12.
+- R-15 PASS: CTAs name the action, such as Save log, Apply filters, and Remove photo.
+- R-16 PASS: no marketing buzzwords standing in for product function.
+- R-20 PASS: the design is built for Reduce, Reuse, and Recycle logging and doesn't copy the source's marketplace UI.
+- R-21 PASS: light, dark, and system options are available.
+- R-29 PASS: pine and lime are the identity colors; error and warning colors are used semantically.
+- R-30 PASS: doesn't copy a popular product's layout or the Titip.in example.
+- R-31 PASS: the reasoning for big decisions is in DESIGN §1.
 
-## Belum dibuktikan oleh paket ini
+## Not proven by this package
 
-Build Android, TalkBack pada perangkat, fontScale Android, API ownership, session security, latency backend, query performance, proses upload privat, WorkManager, Maps provider, dan kebenaran editorial panduan. Semua itu harus diuji saat implementasi, mengikuti IMPLEMENTATION_PLAN.md.
+The Android build, TalkBack on a device, Android fontScale, API ownership, session security, backend latency, query performance, private uploads, WorkManager, a Maps provider, and the editorial accuracy of the guides. All of these have to be tested during implementation, following IMPLEMENTATION_PLAN.md.
 
-## Bukti mesin v1.2
+## v1.2 machine evidence
 
-Laporan yang disertakan: [regresi core](assets/qa-core-v1.2.json), [AI browser simulation](assets/qa-ai-v1.2.json), dan [preview alur AI](assets/preview-ai.png). `verify.cjs` dan `verify-ai.cjs` dapat dijalankan ulang sesuai README. Pemeriksaan struktur menemukan 60 tautan lokal valid; salinan plan cocok byte-per-byte dengan berkas sumber.
+Included reports: [core regression](assets/qa-core-v1.2.json), [AI browser simulation](assets/qa-ai-v1.2.json), and [AI flow preview](assets/preview-ai.png). `verify.cjs` and `verify-ai.cjs` can be rerun as the README describes. A structure check found 60 valid local links; the plan copy matches its source file byte for byte.
 
-## Verifikasi mockup v1.3
+## v1.3 mockup verification
 
-- PASS: 22 kelompok regresi core, 25 layar × 5 viewport × 2 tema; interaksi, font 200% dan JavaScript error checks.
-- PASS: alur sheet pada empat viewport × dua tema, skenario AI dan manual, capture kamera virtual, permission denied, dan fallback pada font 200%.
-- PASS: memilih contoh simulasi menghentikan kamera; stream dari izin yang datang terlambat langsung dihentikan; Escape menghentikan track sebelum dialog selesai ditutup.
-- PASS: draf dirty tidak ditimpa scan baru. Koreksi mempertahankan objek, kategori, kondisi dan reuse intention; penggantian material mereset kondisi sebelumnya.
-- Review visual: camera sheet dengan step indicator, footer manual, dan preview form kondisi memakai komponen yang sama dengan interaksi; teks dan target utama terbaca.
-- C07, susunan katalog, DESIGN, SCREEN_SPEC dan README diselaraskan dengan aksi manual sekunder serta Catat/Scan utama. Kontrak domain/API v1.2 tidak berubah.
+- PASS: 22 core regression groups, 25 screens × 5 viewports × 2 themes; interaction, 200% font, and JavaScript error checks.
+- PASS: the sheet flow at four viewports × two themes, AI and manual scenarios, virtual camera capture, permission denied, and the fallback at 200% font.
+- PASS: choosing the simulated example stops the camera; a stream from a late permission grant is stopped immediately; Escape stops the track before the dialog finishes closing.
+- PASS: a dirty draft isn't overwritten by a new scan. Corrections keep the object, category, condition, and reuse intention; changing the material resets the previous condition.
+- Visual review: the camera sheet with the step indicator, the manual footer, and the condition form preview use the same components as the interaction; text and main targets are readable.
+- C07, the catalog layout, DESIGN, SCREEN_SPEC, and README were aligned with the secondary manual action and the main Log/Scan. The v1.2 domain and API contract didn't change.
 
-Bukti terbaru: [core v1.3](assets/qa-core-v1.3.json), [AI browser v1.3](assets/qa-ai-v1.3.json), [preview](assets/preview-ai.png). Laporan v1.2 disimpan sebagai riwayat. Kamera fisik, Android, YOLO dan LLM produksi belum diuji.
+Latest evidence: [core v1.3](assets/qa-core-v1.3.json), [AI browser v1.3](assets/qa-ai-v1.3.json), [preview](assets/preview-ai.png). The v1.2 reports are kept as history. The physical camera, Android, YOLO, and production LLM haven't been tested.
