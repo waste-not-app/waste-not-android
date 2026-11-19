@@ -1,33 +1,33 @@
 <resources>
-    <string name="onboarding_skip">Lewati</string>
-    <string name="onboarding_next">Lanjut</string>
-    <string name="onboarding_start">Mulai sekarang</string>
-    <string name="onboarding_login">Sudah punya akun? Masuk</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_start">Get started</string>
+    <string name="onboarding_login">Already have an account? Sign in</string>
 
-    <string name="onboarding_slide1_tag">3R HARIAN</string>
-    <string name="onboarding_slide1_title">Catat kebiasaan tanpa ribet.</string>
-    <string name="onboarding_slide1_body">Simpan aktivitas Reduce, Reuse, dan Recycle harianmu dengan ringkasan cepat dan progres XP yang nyata.</string>
+    <string name="onboarding_slide1_tag">DAILY HABITS</string>
+    <string name="onboarding_slide1_title">Log your habits without the hassle.</string>
+    <string name="onboarding_slide1_body">Save what you reduce, reuse, and recycle each day, with a quick summary and real XP progress.</string>
 
     <string name="onboarding_slide2_tag">AI SCAN</string>
-    <string name="onboarding_slide2_title">Foto sampah, cek cara tangani.</string>
-    <string name="onboarding_slide2_body">Arahkan kamera ke satu benda untuk mengenali material, memeriksa kondisi, dan melihat panduan pengelolaan.</string>
+    <string name="onboarding_slide2_title">Snap your waste, see how to handle it.</string>
+    <string name="onboarding_slide2_body">Point the camera at one item to identify the material, check its condition, and read the handling guide.</string>
 
-    <string name="onboarding_slide3_tag">STATISTIK &amp; OFFLINE</string>
-    <string name="onboarding_slide3_title">Pantau tren dari waktu ke waktu.</string>
-    <string name="onboarding_slide3_body">Bandingkan pola 7 dan 30 hari, jaga streak harian, dan tetap bisa mencatat meski koneksi terputus.</string>
+    <string name="onboarding_slide3_tag">STATS &amp; OFFLINE</string>
+    <string name="onboarding_slide3_title">Watch your trends over time.</string>
+    <string name="onboarding_slide3_body">Compare 7- and 30-day patterns, keep your daily streak going, and keep logging even when you\'re offline.</string>
 
-    <string name="onboarding_preview_label">Contoh tampilan</string>
+    <string name="onboarding_preview_label">Preview</string>
     <string name="onboarding_preview_level_xp">Level 1 · +10 XP</string>
     <string name="onboarding_preview_weight">650 g</string>
-    <string name="onboarding_preview_activities">3 aktivitas tercatat</string>
-    <string name="onboarding_preview_item_subtitle">Recycle · Hari ini</string>
+    <string name="onboarding_preview_activities">3 activities logged</string>
+    <string name="onboarding_preview_item_subtitle">Recycle · Today</string>
     <string name="onboarding_preview_item_weight">250 g</string>
-    <string name="onboarding_preview_detected">Botol · 94% terdeteksi</string>
-    <string name="onboarding_preview_advice_title">Saran: Recycle</string>
-    <string name="onboarding_preview_advice_body">Kosongkan isi dan pisahkan tutup botol.</string>
-    <string name="onboarding_preview_trend">Tren 7 hari terakhir</string>
-    <string name="onboarding_preview_trend_weight">1,4 kg</string>
+    <string name="onboarding_preview_detected">Bottle · 94% detected</string>
+    <string name="onboarding_preview_advice_title">Advice: Recycle</string>
+    <string name="onboarding_preview_advice_body">Empty it and take the cap off.</string>
+    <string name="onboarding_preview_trend">Last 7 days</string>
+    <string name="onboarding_preview_trend_weight">1.4 kg</string>
     <string name="onboarding_preview_rate">50%</string>
-    <string name="onboarding_preview_avoided">2 benda</string>
-    <string name="onboarding_page_indicator">Halaman %1$d dari %2$d</string>
+    <string name="onboarding_preview_avoided">2 items</string>
+    <string name="onboarding_page_indicator">Page %1$d of %2$d</string>
 </resources>

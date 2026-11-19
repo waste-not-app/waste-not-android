@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="freshness_cached">Menampilkan snapshot server tersimpan. Perubahan lokal belum tentu masuk dalam ringkasan ini.</string>
+    <string name="freshness_cached_at">Snapshot server disimpan pada %1$s. Perubahan lokal belum tentu masuk dalam ringkasan ini.</string>
+    <string name="freshness_previous_period">Data ini berasal dari hari atau periode sebelumnya, bukan hasil untuk periode saat ini.</string>
+    <string name="freshness_handled_date">Ditangani pada %1$s</string>
+</resources>

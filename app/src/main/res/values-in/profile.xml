@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Pengaturan</string>
+    <string name="profile_progress">Progres pencatatan</string>
+    <string name="profile_streak_title">Hari berturut-turut</string>
+    <string name="profile_current_streak">%1$s hari beruntun</string>
+    <string name="profile_best_streak">Terbaik: %1$s hari</string>
+    <string name="profile_streak_basis">Dihitung dari hari pencatatan menurut zona akun.</string>
+    <string name="profile_streak_today_pending">Belum mencatat hari ini.</string>
+    <string name="profile_streak_today_logged">Kamu sudah mencatat hari ini.</string>
+    <string name="profile_xp_count">%1$s XP dari %2$s catatan aktif</string>
+    <string name="profile_empty">Mulai catat aktivitasmu untuk membangun progres.</string>
+    <string name="profile_xp_basis">XP menunjukkan kebiasaan mencatat, bukan skor lingkungan.</string>
+    <string name="profile_refresh_failed">Progres belum bisa diperbarui. Data yang sudah tampil tetap tersedia.</string>
+    <string name="profile_progress_unavailable">Progres belum tersedia.</string>
+    <string name="theme_application">Tema aplikasi</string>
+    <string name="personal_data">Data pribadi</string>
+    <string name="privacy_account">Catatan pribadi terhubung dengan akunmu. Keluar dari akun untuk menutup akses di aplikasi.</string>
+    <string name="privacy_optional_photo">Akses kamera atau foto hanya digunakan saat kamu memilih fitur tersebut. Lampiran foto bersifat opsional.</string>
+    <string name="timezone_read_only">Zona akun ditetapkan saat pendaftaran.</string>
+</resources>

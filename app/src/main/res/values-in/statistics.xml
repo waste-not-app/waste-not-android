@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="statistics_empty">Belum ada catatan pada periode ini</string>
+    <string name="statistics_empty_hint">Pilih periode lain atau mulai catat aktivitasmu.</string>
+    <string name="daily_weight_title">Berat ditangani per hari</string>
+    <string name="daily_count_title">Benda ditangani per hari</string>
+    <string name="daily_chart_description">%1$s dalam %2$s, %3$s hingga %4$s. Buka Lihat angka harian untuk rincian setiap tanggal.</string>
+    <string name="daily_scale">Nilai tertinggi: %1$s %2$s</string>
+    <string name="daily_axis">Tanggal · %1$s · hari tanpa aktivitas bernilai 0</string>
+    <string name="daily_scroll_hint">Geser grafik untuk melihat tanggal lainnya.</string>
+    <string name="daily_show">Lihat angka harian</string>
+    <string name="daily_hide">Tutup angka harian</string>
+    <string name="daily_values">Angka harian</string>
+    <string name="daily_expanded">Terbuka</string>
+    <string name="daily_collapsed">Tertutup</string>
+    <string name="daily_row">%1$s · %2$s g · %3$s benda</string>
+    <string name="methods_title">Metode pengelolaan</string>
+    <string name="method_fraction">%1$d dari %2$d aktivitas</string>
+    <string name="methods_basis">Proporsi berdasarkan seluruh aktivitas, termasuk Reduce dan Trash.</string>
+    <string name="categories_title">Menurut kategori</string>
+    <string name="category_totals_basis">Sampah ditangani; Reduce dicatat terpisah. Berat dan jumlah benda tidak digabungkan.</string>
+    <string name="category_totals">%1$s · %2$s benda</string>
+    <string name="record_activity">Catat aktivitas</string>
+    <string name="rate_no_handled">Belum ada aktivitas penanganan</string>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="draft_checking">Memeriksa draf perangkat…</string>
+    <string name="draft_read_failed">Draf belum bisa dibuka</string>
+    <string name="draft_read_help">Coba lagi untuk memulihkan isianmu. Jika draf tetap tidak bisa dibuka, kamu dapat membuang isian lokal tanpa menghapus catatan tersimpan.</string>
+    <string name="draft_discard_stored">Buang draf tersimpan</string>
+    <string name="draft_discard_title">Buang draf tersimpan?</string>
+    <string name="draft_discard_message">Hanya isian draf pada perangkat ini yang akan dihapus. Catatan yang sudah tersimpan tetap tersedia.</string>
+    <string name="draft_saving">Menyimpan draf di perangkat…</string>
+    <string name="draft_saved">Draf tersimpan di perangkat ini.</string>
+    <string name="draft_restored">Draf dipulihkan. Periksa isian sebelum menyimpan.</string>
+    <string name="draft_write_failed">Draf belum bisa disimpan di perangkat. Isian tetap terbuka. Coba lagi sebelum meninggalkan aplikasi.</string>
+    <string name="draft_cleanup_failed">Penyimpanan draf belum bisa diperbarui. Isian belum ditutup. Coba lagi.</string>
+    <string name="draft_record_saved">Catatan sudah tersimpan</string>
+    <string name="draft_completing">Catatan sudah tersimpan. Menyelesaikan draf perangkat…</string>
+    <string name="draft_saved_cleanup_failed">Catatan sudah tersimpan, tetapi draf perangkat belum bisa dibersihkan. Coba lagi untuk membuka konfirmasi.</string>
+    <string name="draft_pending_title">Masih ada draf sebelumnya</string>
+    <string name="draft_pending_message">Hasil simpan draf sebelumnya belum pasti. Lanjutkan draf untuk memeriksa atau mengirim ulang permintaan yang sama sebelum mulai catatan lain.</string>
+    <string name="draft_resume">Lanjutkan draf</string>
+    <string name="draft_finishing">Memperbarui draf…</string>
+    <string name="draft_logout_message">Kamu perlu masuk lagi untuk membuka catatanmu. Draf yang belum disimpan pada perangkat ini akan dihapus. Catatan tersimpan tetap tersedia.</string>
+</resources>

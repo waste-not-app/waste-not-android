@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="achievements_title">Pencapaian</string>
+    <string name="achievements_subtitle">Status dihitung dari catatan aktif dan diperbarui bila data diubah.</string>
+    <string name="achievements_loading">Memuat pencapaian…</string>
+    <string name="achievements_error">Pencapaian belum bisa dimuat.</string>
+    <string name="achievements_empty_title">Belum ada pencapaian tersedia</string>
+    <string name="achievements_empty_message">Pencapaian akan tampil setelah catatan dan definisi tersedia.</string>
+    <string name="achievement_unlocked">Tercapai</string>
+    <string name="achievement_locked">Belum tercapai</string>
+    <string name="achievement_progress">%1$s dari %2$s</string>
+    <string name="achievement_unlocked_at">Tercapai pada %1$s</string>
+    <string name="achievement_toggle_details">Lihat syarat</string>
+    <string name="achievement_hide_details">Tutup syarat</string>
+    <string name="reminder_title">Pengingat harian</string>
+    <string name="reminder_switch_label">Aktifkan pengingat harian</string>
+    <string name="reminder_time_label">Waktu perkiraan</string>
+    <string name="reminder_time_value">Sekitar %1$s</string>
+    <string name="reminder_choose_time">Pilih waktu pengingat</string>
+    <string name="reminder_helper">Jadwal dapat terlambat mengikuti kondisi perangkat. Pengingat hanya tampil jika hari ini belum ada catatan.</string>
+    <string name="reminder_save">Simpan pengingat</string>
+    <string name="reminder_saved">Pengingat harian disimpan untuk sekitar %1$s.</string>
+    <string name="reminder_disabled_saved">Pengingat harian dimatikan.</string>
+    <string name="reminder_permission_denied">Izin notifikasi ditolak. Aktifkan di pengaturan perangkat agar pengingat dapat tampil; pencatatan tetap berjalan normal.</string>
+    <string name="reminder_open_settings">Buka pengaturan notifikasi</string>
+    <string name="reminder_channel_name">Pengingat pencatatan harian</string>
+    <string name="reminder_notif_title">Belum mencatat aktivitas hari ini?</string>
+    <string name="reminder_notif_body">Luangkan sejenak untuk mencatat pengelolaan sampahmu hari ini.</string>
+    <string name="photo_section_title">Lampiran foto (opsional)</string>
+    <string name="photo_choose">Pilih foto</string>
+    <string name="photo_replace">Ganti</string>
+    <string name="photo_remove">Hapus foto</string>
+    <string name="photo_continue_without">Lanjut tanpa foto</string>
+    <string name="photo_uploading">Mengunggah foto…</string>
+    <string name="photo_attached_summary">Foto terlampir (%1$s)</string>
+    <string name="photo_saved_summary">Foto lampiran tersimpan di catatan ini.</string>
+    <string name="photo_error_too_large">Pilih gambar maksimal 5 MB.</string>
+    <string name="photo_error_format">Format gambar harus JPEG, PNG, atau WebP.</string>
+    <string name="photo_error_upload">Foto belum bisa diunggah. Kamu tetap bisa menyimpan catatan tanpa foto.</string>
+    <string name="photo_detail_title">Foto lampiran</string>
+    <string name="photo_detail_loading">Memuat foto lampiran…</string>
+    <string name="photo_detail_error">Foto lampiran belum bisa dimuat.</string>
+    <string name="photo_preview_description">Pratinjau foto lampiran aktivitas</string>
+</resources>

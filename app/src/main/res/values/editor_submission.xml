@@ -1,12 +1,12 @@
 <resources>
-    <string name="save_outcome_unknown">Hasil penyimpanan belum diketahui. Coba lagi dengan isian awal sebelum mengubah catatan.</string>
-    <string name="save_outcome_retry_error">%1$s\n\nPercobaan terakhir: %2$s</string>
-    <string name="save_request_conflict">Permintaan ini sudah dipakai untuk isian lain. Periksa riwayat sebelum membuat catatan baru.</string>
-    <string name="save_record_deleted">Catatan dari permintaan ini sudah dihapus. Catatan tidak dibuat ulang.</string>
-    <string name="save_rejected">Isian belum diterima. Periksa kembali metode, kategori, jumlah, tanggal, dan catatan sebelum menyimpan lagi.</string>
-    <string name="save_rate_limited">Terlalu banyak permintaan. Tunggu sebentar sebelum mencoba lagi. Isianmu tetap tersedia.</string>
-    <string name="save_storage_failed">Catatan belum bisa disimpan di perangkat. Isianmu tetap tersedia; coba lagi.</string>
-    <string name="discard_pending_message">Menutup formulir tidak membatalkan permintaan yang sudah dikirim. Hasilnya mungkin sudah tersimpan. Periksa riwayat sebelum membuat catatan yang sama lagi.</string>
-    <string name="close_editor">Tutup formulir</string>
-    <string name="close_editor_title">Tutup formulir?</string>
+    <string name="save_outcome_unknown">We don\'t know whether this was saved. Try again with the same entries before changing the log.</string>
+    <string name="save_outcome_retry_error">%1$s\n\nLast attempt: %2$s</string>
+    <string name="save_request_conflict">This request was already used for different entries. Check your history before creating a new log.</string>
+    <string name="save_record_deleted">The log from this request was deleted, so it won\'t be created again.</string>
+    <string name="save_rejected">Some entries weren\'t accepted. Check the method, category, amount, date, and notes before saving again.</string>
+    <string name="save_rate_limited">Too many requests. Wait a moment before trying again. Your entries are still here.</string>
+    <string name="save_storage_failed">Couldn\'t save the log on this device. Your entries are still here; try again.</string>
+    <string name="discard_pending_message">Closing the form doesn\'t cancel a request that was already sent, so it may already be saved. Check your history before logging the same thing again.</string>
+    <string name="close_editor">Close form</string>
+    <string name="close_editor_title">Close the form?</string>
 </resources>
