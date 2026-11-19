@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk-jammy AS sdk
+FROM eclipse-temurin:25-jdk-jammy AS sdk
 ARG CMDLINE_TOOLS_VERSION=11076708
 ENV ANDROID_HOME=/opt/android-sdk \
     ANDROID_SDK_ROOT=/opt/android-sdk \
