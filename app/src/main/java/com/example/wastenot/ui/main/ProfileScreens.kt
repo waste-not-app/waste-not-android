@@ -62,7 +62,7 @@ fun ProfileScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 val initials = user.name.split(' ').filter(String::isNotBlank).take(2)
-                    .joinToString("") { String(Character.toChars(it.codePointAt(0))).uppercase(Locale.forLanguageTag("id-ID")) }
+                    .joinToString("") { String(Character.toChars(it.codePointAt(0))).uppercase(Locale.getDefault()) }
                 Box(
                     Modifier
                         .sizeIn(minWidth = 54.dp, minHeight = 54.dp)

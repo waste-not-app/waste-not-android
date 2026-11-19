@@ -13,9 +13,9 @@ import java.util.Locale
 data class FormattedQuantity(val amount: String, val unit: QuantityUnit)
 
 object WasteFormat {
-    private val locale = Locale.forLanguageTag("id-ID")
-    private val date = DateTimeFormatter.ofPattern("d MMM uuuu", locale)
-    private val timestamp = DateTimeFormatter.ofPattern("d MMM uuuu, HH.mm", locale)
+    private val locale: Locale get() = Locale.getDefault()
+    private val date: DateTimeFormatter get() = DateTimeFormatter.ofPattern("d MMM uuuu", locale)
+    private val timestamp: DateTimeFormatter get() = DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm", locale)
 
     fun quantity(quantity: Quantity, summary: Boolean = false): FormattedQuantity = when (quantity) {
         is Quantity.Weight -> weight(quantity.grams.toLong(), summary)

@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -36,7 +37,6 @@ import com.example.wastenot.theme.*
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.*
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @Composable
 internal fun pagePadding(padding: PaddingValues): PaddingValues {
@@ -81,7 +81,7 @@ fun OverviewScreen(user: User, data: SnapshotState<DashboardSnapshot>, padding: 
     ScrollPage(padding, modifier) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(snapshot.date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.forLanguageTag("id-ID"))),
+                Text(snapshot.date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", LocalConfiguration.current.locales[0])),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(stringResource(R.string.greeting, user.name), style = MaterialTheme.typography.headlineMedium)
             }
@@ -155,7 +155,7 @@ internal fun SnapshotFreshnessBanner(freshness: SnapshotFreshness?, stale: Boole
         val confirmedAt = freshness.confirmedAt
         val label = if (confirmedAt == null) stringResource(R.string.freshness_cached) else stringResource(
             R.string.freshness_cached_at,
-            DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm 'UTC'", Locale.forLanguageTag("id-ID"))
+            DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm 'UTC'", LocalConfiguration.current.locales[0])
                 .withZone(java.time.ZoneOffset.UTC).format(confirmedAt),
         )
         MessageBanner(label)

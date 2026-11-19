@@ -147,7 +147,7 @@ fun ReminderSettingsScreen(
         }
     }
 
-    fun formatTime(h: Int, m: Int): String = String.format(Locale.forLanguageTag("id-ID"), "%02d.%02d", h, m)
+    fun formatTime(h: Int, m: Int): String = String.format(Locale.getDefault(), "%02d:%02d", h, m)
 
     if (pickingTime) {
         val pickerState = rememberTimePickerState(initialHour = hour, initialMinute = minute, is24Hour = true)
