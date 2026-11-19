@@ -1,5 +1,5 @@
 # =============================================================================
-# WasteNot Android — Makefile
+# WasteNot Android: Makefile
 # =============================================================================
 # Usage     : make <target>
 # Examples  : make build, make run, make branch TICKET=W1-03 NAME=theme-setup
@@ -51,7 +51,7 @@ $(if $(wildcard $(GRADLEW)),,$(error "gradlew not found. Run make from the Waste
 
 help: ## Show all available targets
 	@echo ""
-	@echo "  $(BOLD)$(CYAN)WasteNot Android — Makefile$(RESET)"
+	@echo "  $(BOLD)$(CYAN)WasteNot Android: Makefile$(RESET)"
 	@echo ""
 	@echo "  $(BOLD)BUILD$(RESET)"
 	@grep -E '^(build|run|install|uninstall|clean)[^:]*:.*##' $(MAKEFILE_LIST) \
@@ -154,7 +154,7 @@ lint: ## Run Android Lint
 	@echo "$(GREEN)✔ Lint report: app/build/reports/lint-results-debug.html$(RESET)"
 
 check: lint test-unit ## Lint and unit tests (run before committing)
-	@echo "$(GREEN)✔ check passed — safe to commit$(RESET)"
+	@echo "$(GREEN)✔ check passed, safe to commit$(RESET)"
 
 check-ci: ## Full CI gate: lint all variants, unit tests, build all APKs
 	$(GRADLEW) lintDebug lintStaging lintRelease testDebugUnitTest -Pwastenot.hotReload=false
@@ -272,7 +272,7 @@ merge-dev: ## Merge the current branch into develop (interactive)
 	echo "$(GREEN)✔ Merged into $(DEV_BRANCH)$(RESET)"
 
 merge-main: ## Merge develop into main (release or hotfix)
-	@echo "$(RED)⚠ Merging into $(MAIN_BRANCH) — make sure QA has passed!$(RESET)"
+	@echo "$(RED)⚠ Merging into $(MAIN_BRANCH). Make sure QA has passed!$(RESET)"
 	@read -p "Continue? [y/N] " ans; [ "$$ans" = "y" ] || exit 0
 	git checkout $(MAIN_BRANCH) && git pull origin $(MAIN_BRANCH)
 	git merge --no-ff $(DEV_BRANCH) -m "Release: merge $(DEV_BRANCH) → $(MAIN_BRANCH)"
@@ -303,7 +303,7 @@ week1: ## Week 1 gate: foundation and auth (debug build, unit tests)
 	@echo "  [ ] W1-04: Five-tab navigation and back work"
 	@echo "  [ ] W1-05: Backend health endpoint responds"
 	@echo "  [ ] W1-06: Real register, login, and logout"
-	@echo "  [ ] W1-07: S01–S03 with error validation"
+	@echo "  [ ] W1-07: S01 to S03 with error validation"
 	@echo ""
 	@$(MAKE) build
 	@$(MAKE) test-unit
@@ -315,7 +315,7 @@ week2: ## Week 2 gate: full tracking (build, test, nav-check)
 	@echo "Checklist:"
 	@echo "  [ ] W2-01: Create logs idempotently with client_request_id"
 	@echo "  [ ] W2-02: Editor with draft restore"
-	@echo "  [ ] W2-03: List, detail, filter, and pagination (S07–S10)"
+	@echo "  [ ] W2-03: List, detail, filter, and pagination (S07 to S10)"
 	@echo "  [ ] W2-04: Update and delete with 409 version conflicts"
 	@echo "  [ ] W2-05: Dashboard aggregates update automatically"
 	@echo "  [ ] W2-06: Data isolation between accounts"
@@ -327,7 +327,7 @@ week2: ## Week 2 gate: full tracking (build, test, nav-check)
 week3: ## Week 3 gate: guides and statistics (check, nav graph)
 	@echo "$(BOLD)$(CYAN)=== Week 3 gate: guides and evaluation ===$(RESET)"
 	@echo "Checklist:"
-	@echo "  [ ] W3-01: 12–20 guide articles reviewed"
+	@echo "  [ ] W3-01: 12 to 20 guide articles reviewed"
 	@echo "  [ ] W3-02: Guide search, list, detail, and empty results"
 	@echo "  [ ] W3-03: Statistics with daily series, categories, and methods"
 	@echo "  [ ] W3-04: Charts with text alternatives for 7 and 30 days"

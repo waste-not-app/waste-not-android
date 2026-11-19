@@ -179,7 +179,7 @@ internal fun SheetSystemBar() {
         val window = if (android.os.Build.VERSION.SDK_INT < 26) generateSequence(view) { it.parent as? android.view.View }
             .filterIsInstance<DialogWindowProvider>().firstOrNull()?.window else null
         val previous = window?.navigationBarColor
-        // API 24–25 cannot draw dark navigation icons over the sheet's light surface.
+        // API 24 and 25 cannot draw dark navigation icons over the sheet's light surface.
         if (window != null) window.navigationBarColor = Pine900.toArgb()
         onDispose { if (window != null && previous != null) window.navigationBarColor = previous }
     }
