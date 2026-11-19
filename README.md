@@ -21,7 +21,7 @@ WasteNot lets people log what they do with their waste and see their habits over
 
 An optional AI scan detects items in a photo and suggests one handling method. The user always confirms the object, its condition, and the method before anything is saved.
 
-The interface is in Indonesian. Every build talks to the real [WasteNot Backend](https://github.com/waste-not-app/waste-not-backend); there is no local mock mode.
+The interface is in English, with an Indonesian translation for phones set to Indonesian. Every build talks to the real [WasteNot Backend](https://github.com/waste-not-app/waste-not-backend); there is no local mock mode.
 
 ## Contents
 
