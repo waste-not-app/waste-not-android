@@ -1,10 +1,10 @@
 # Data Models
 
-References: [PRD §8–9](design-kit/PRD.md) and [API §2, §5–6](design-kit/API.md).
+References: [PRD §8 and §9](design-kit/PRD.md) and [API §2, §5 and §6](design-kit/API.md).
 
 `model/` holds pure Kotlin rules. It never stores Compose state, a `Context`, or credentials.
 
-- **Enums.** `WasteCategory`, `DisposalMethod`, and `QuantityKind` use the canonical API names. The UI maps them to Indonesian labels through string resources.
+- **Enums.** `WasteCategory`, `DisposalMethod`, and `QuantityKind` use the canonical API names. The UI maps them to localized labels through string resources.
 - **Quantities.** `Quantity.Weight` and `Quantity.Count` are mutually exclusive. The factories enforce limits, and `fromFields` returns `null` for payloads with:
   - both values or neither;
   - a value of the wrong kind;

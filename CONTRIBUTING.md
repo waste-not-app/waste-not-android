@@ -13,7 +13,7 @@ Thank you for helping improve WasteNot Android. This guide covers the workflow a
 
 - **Specifications.** Follow the [design kit](docs/design-kit/README.md) and [AGENTS.md](AGENTS.md).
   - Take design tokens from `DESIGN.md`; never hardcode colors.
-  - Put all user-facing text in `strings.xml`, in Indonesian.
+  - Put all user-facing text in string resources: English in `values/`, with the Indonesian translation in `values-in/`.
 - **Architecture.**
   - Keep a single `:app` module organized by feature, with ViewModel and StateFlow and unidirectional data flow.
   - Do not add generic base classes or one use case per endpoint.

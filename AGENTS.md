@@ -1,4 +1,4 @@
-# Agent Guide — WasteNot Android
+# Agent Guide: WasteNot Android
 
 Instructions for AI coding agents working in this repository. Read this file before writing or changing code.
 
@@ -18,18 +18,18 @@ The product and design specification is the design kit v1.4 in [`docs/design-kit
 | Task | Read first |
 |---|---|
 | UI, screens, components | [`DESIGN.md`](docs/design-kit/DESIGN.md), [`SCREEN_SPEC.md`](docs/design-kit/SCREEN_SPEC.md) |
-| Theme, color, typography, spacing | `DESIGN.md` §2–4 |
+| Theme, color, typography, spacing | `DESIGN.md` §2 to §4 |
 | Navigation, routes, back stack | [`ARCHITECTURE.md`](docs/design-kit/ARCHITECTURE.md) §6, `SCREEN_SPEC.md` §2 |
-| ViewModels, state, repositories | `ARCHITECTURE.md` §3–5 |
+| ViewModels, state, repositories | `ARCHITECTURE.md` §3 to §5 |
 | Networking, Retrofit, DTOs | [`API.md`](docs/design-kit/API.md), `ARCHITECTURE.md` §8, [`docs/ANDROID_NETWORK.md`](docs/ANDROID_NETWORK.md) |
-| Domain rules (XP, recycling rate, Reduce) | [`PRD.md`](docs/design-kit/PRD.md) §6–9, [`docs/ANDROID_MODELS.md`](docs/ANDROID_MODELS.md) |
+| Domain rules (XP, recycling rate, Reduce) | [`PRD.md`](docs/design-kit/PRD.md) §6 to §9, [`docs/ANDROID_MODELS.md`](docs/ANDROID_MODELS.md) |
 | Authentication, tokens, sessions | `ARCHITECTURE.md` §8, `API.md` §3 |
 | Offline reads, the mutation queue, conflicts | [`docs/OFFLINE_SYNC.md`](docs/OFFLINE_SYNC.md) |
 | Accessibility, font scale, insets | `DESIGN.md` §9, `ARCHITECTURE.md` §7 |
-| AI scan, camera, YOLO | [`AI_SPEC.md`](docs/design-kit/AI_SPEC.md), `SCREEN_SPEC.md` §3.21–3.25, `ARCHITECTURE.md` §13 |
+| AI scan, camera, YOLO | [`AI_SPEC.md`](docs/design-kit/AI_SPEC.md), `SCREEN_SPEC.md` §3.21 to §3.25, `ARCHITECTURE.md` §13 |
 | AI endpoints | `API.md` §10, `AI_SPEC.md` §6 |
 | Photo privacy and cleanup | `AI_SPEC.md` §8 |
-| Acceptance criteria | [`IMPLEMENTATION_PLAN.md`](docs/design-kit/IMPLEMENTATION_PLAN.md) §3–4 and §10, [`QA.md`](docs/design-kit/QA.md) |
+| Acceptance criteria | [`IMPLEMENTATION_PLAN.md`](docs/design-kit/IMPLEMENTATION_PLAN.md) §3, §4, and §10, [`QA.md`](docs/design-kit/QA.md) |
 | Dev plugins and the navigation graph | [`docs/DEV_PLUGINS.md`](docs/DEV_PLUGINS.md) |
 | CI/CD and releases | [`docs/CICD_SETUP.md`](docs/CICD_SETUP.md), `.github/workflows/` |
 
@@ -54,11 +54,11 @@ For an interactive visual reference, including the AI scan flow, open [`docs/des
 
 ### Design and UI
 
-- **Design tokens.** Take colors, typography, and spacing from `DESIGN.md` §2–4. Never hardcode hex colors in composables. The theme is `WasteNotTheme`.
+- **Design tokens.** Take colors, typography, and spacing from `DESIGN.md` §2 to §4. Never hardcode hex colors in composables. The theme is `WasteNotTheme`.
 - **Font.** Plus Jakarta Sans only.
 - **Layout.** Touch targets are at least 48 dp. Forms must never be covered by the keyboard. Layouts are edge-to-edge with correct insets.
 - **Navigation dock.** The dock uses the glass style from `DESIGN.md` §2, and the opaque fallback must still work.
-- **Text.** All user-facing text goes in `strings.xml`, in Indonesian.
+- **Text.** All user-facing text goes in string resources. English lives in `values/` and is the default; every string also needs its Indonesian translation in `values-in/`. Format dates and numbers with the device locale.
 - **Content descriptions.** Every action icon needs a `contentDescription`. Use `null` only for decorative icons that already have a text label.
 
 ### Domain
@@ -75,7 +75,7 @@ For an interactive visual reference, including the AI scan flow, open [`docs/des
 - **Decision support only.** The user must confirm before a log is saved. Never save a waste log automatically.
 - **No Reduce from scans.** Never recommend REDUCE from a photo scan. Reduce is available only through manual entry, without `ai_provenance`.
 - **Scan entry point.** The Log/Scan button sits at the top center of the dock; it is not a sixth tab. The five tabs stay Home, History, Guide, Statistics, and Profile.
-- **Scan sheet.** A scan opens a multi-step `ModalBottomSheet` (S21–S25), not a new route.
+- **Scan sheet.** A scan opens a multi-step `ModalBottomSheet` (S21 to S25), not a new route.
 - **Scan photos.** Delete temporary scan photos when the flow exits, on logout, and after one hour at the latest. Keep a photo only when the user opts in to an attachment.
 - **LLM data.** Never send photos, names, emails, locations, or tokens to the LLM. Only `object_key`, the category, the condition context, guide excerpts, and the allowed methods may be sent.
 - **Output validation.** The server validates every LLM output. An invalid `recommended_method` returns `UNAVAILABLE` with a `null` method, and the user picks one manually.
