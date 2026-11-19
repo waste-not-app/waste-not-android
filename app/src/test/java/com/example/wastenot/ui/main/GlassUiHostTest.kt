@@ -30,6 +30,8 @@ import com.example.wastenot.data.repository.ActivityInput
 import com.example.wastenot.model.*
 import com.example.wastenot.theme.LocalWasteNotScaffoldPadding
 import com.example.wastenot.theme.WasteNotTheme
+import com.example.wastenot.ui.auth.AccountDeletionScreen
+import com.example.wastenot.ui.auth.AccountDeletionState
 import com.example.wastenot.ui.components.*
 import java.io.File
 import java.time.LocalDate
@@ -147,6 +149,29 @@ class GlassUiHostTest {
             capture("header-font200")
         }
         compose.runOnIdle { assertEquals(2, backs) }
+    }
+
+    @Test fun accountDeletionContentStartsBelowGlassHeader() {
+        content {
+            AccountPage(DeleteAccount, MainTab.PROFILE, false, 0.dp, false, {}, {}, {}, {}) {
+                AccountDeletionScreen(
+                    state = AccountDeletionState(),
+                    padding = PaddingValues(),
+                    onPassword = {},
+                    onAcknowledge = {},
+                    onDelete = {},
+                    onPrivacy = {},
+                    onBack = {},
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
+        val headerTitle = compose.onAllNodesWithText(compose.activity.getString(R.string.delete_account_title))[0]
+            .fetchSemanticsNode().boundsInRoot
+        val warning = compose.onNodeWithText(compose.activity.getString(R.string.delete_account_warning))
+            .assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+        assertTrue("Warning overlaps top glass header: warning.top=${warning.top}, header.bottom=${headerTitle.bottom}",
+            warning.top >= headerTitle.bottom)
     }
 
     @Test fun editorSaveIsReachableAndSubmitsEnteredQuantityAtLargeText() {

@@ -23,10 +23,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -84,6 +89,72 @@ fun InsetGroupCard(
             verticalArrangement = if (contentPadding) Arrangement.spacedBy(12.dp) else Arrangement.Top,
             content = content,
         )
+    }
+}
+
+/**
+ * Lazy-list container that matches [InsetGroupCard] while allowing each row to be recycled
+ * individually inside a LazyColumn.
+ */
+@Composable
+fun InsetGroupItemContainer(
+    isFirst: Boolean,
+    isLast: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val tokens = LocalWasteNotSurfaceTokens.current
+    val top = if (isFirst) 22.dp else 0.dp
+    val bottom = if (isLast) 22.dp else 0.dp
+    val shape = RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom)
+    val edgeColor = tokens.cardEdge
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .drawBehind {
+                val stroke = 1.dp.toPx()
+                val half = stroke / 2f
+                if (isFirst && isLast) {
+                    val radius = 22.dp.toPx()
+                    drawRoundRect(
+                        color = edgeColor,
+                        topLeft = Offset(half, half),
+                        size = Size(size.width - stroke, size.height - stroke),
+                        cornerRadius = CornerRadius(radius, radius),
+                        style = Stroke(stroke),
+                    )
+                } else {
+                    val path = Path()
+                    val r = 22.dp.toPx()
+                    val right = size.width - half
+                    val bottomY = size.height - half
+                    if (isFirst) {
+                        path.moveTo(half, size.height)
+                        path.lineTo(half, r)
+                        path.quadraticTo(half, half, r, half)
+                        path.lineTo(right - r, half)
+                        path.quadraticTo(right, half, right, r)
+                        path.lineTo(right, size.height)
+                    } else if (isLast) {
+                        path.moveTo(half, 0f)
+                        path.lineTo(half, bottomY - r)
+                        path.quadraticTo(half, bottomY, r, bottomY)
+                        path.lineTo(right - r, bottomY)
+                        path.quadraticTo(right, bottomY, right, bottomY - r)
+                        path.lineTo(right, 0f)
+                    } else {
+                        path.moveTo(half, 0f)
+                        path.lineTo(half, size.height)
+                        path.moveTo(right, 0f)
+                        path.lineTo(right, size.height)
+                    }
+                    drawPath(path, color = edgeColor, style = Stroke(stroke))
+                }
+            },
+        shape = shape,
+        color = MaterialTheme.colorScheme.surface,
+    ) {
+        Column(modifier = Modifier.fillMaxWidth(), content = content)
     }
 }
 

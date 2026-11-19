@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,9 +47,11 @@ class MainActivity : ComponentActivity() {
             val dark = (mode ?: ThemeMode.SYSTEM).isDark(isSystemInDarkTheme())
             SideEffect {
                 appearanceReady = mode != null
+            }
+            LaunchedEffect(dark) {
                 enableEdgeToEdge(
                     statusBarStyle = SystemBarStyle.auto(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT) { dark },
-                    navigationBarStyle = SystemBarStyle.auto(android.graphics.Color.argb(230, 255, 255, 255), android.graphics.Color.argb(128, 0, 0, 0)) { dark },
+                    navigationBarStyle = SystemBarStyle.auto(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT) { dark },
                 )
                 window.isNavigationBarContrastEnforced = false
             }

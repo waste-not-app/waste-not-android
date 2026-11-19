@@ -97,8 +97,8 @@ private fun QuantityUnitPicker(unit: QuantityUnit, onChange: (QuantityUnit) -> U
                 border = BorderStroke(1.5.dp, if (enabled) tokens.fieldEdge else MaterialTheme.colorScheme.outlineVariant),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 14.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    containerColor = tokens.fieldWell,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
                     disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
                     disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),

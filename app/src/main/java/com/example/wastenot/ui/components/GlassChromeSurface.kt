@@ -7,10 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.innerShadow
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 import dev.chrisbanes.haze.HazeState
@@ -27,13 +30,22 @@ internal fun GlassChromeSurface(
 ) {
     val tokens = LocalWasteNotSurfaceTokens.current
     val rim = remember(tokens) {
-        Brush.linearGradient(listOf(tokens.glassEdge, tokens.glassEdge.copy(alpha = 0.08f), tokens.glassEdge))
+        val midAlpha = if (tokens.isDark) 0.14f else 0.18f
+        val bottomAlpha = if (tokens.isDark) 0.45f else 0.55f
+        Brush.verticalGradient(
+            listOf(
+                tokens.glassEdge,
+                tokens.glassEdge.copy(alpha = midAlpha),
+                tokens.glassEdge.copy(alpha = bottomAlpha),
+            ),
+        )
     }
     Surface(
         modifier = modifier
-            .shadow(6.dp, shape, clip = false)
+            .shadow(8.dp, shape, clip = false)
             .clip(shape)
-            .hazeEffect(state = hazeState, style = style),
+            .hazeEffect(state = hazeState, style = style)
+            .innerShadow(shape, Shadow(radius = 2.dp, color = tokens.glassHighlight, offset = DpOffset(0.dp, 1.dp))),
         shape = shape,
         color = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,

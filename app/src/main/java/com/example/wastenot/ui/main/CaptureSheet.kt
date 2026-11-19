@@ -30,7 +30,14 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Velocity
+import android.view.HapticFeedbackConstants
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.unit.DpOffset
+import com.example.wastenot.theme.ActionShadow
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.testTag
@@ -60,17 +67,22 @@ internal fun RecordAction(onClick: () -> Unit, modifier: Modifier = Modifier, ve
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
     val colors = MaterialTheme.colorScheme
+    val tokens = LocalWasteNotSurfaceTokens.current
+    val view = LocalView.current
     val shape = RoundedCornerShape(26.dp)
     Surface(
         modifier = modifier.widthIn(min = 136.dp).heightIn(min = 52.dp)
             .focusOutline(focused, shape, colors.primary, colors.surface)
+            .dropShadow(shape, Shadow(12.dp, ActionShadow, spread = (-6).dp, offset = DpOffset(0.dp, 4.dp)))
             .clip(shape)
-            .clickable(interactionSource = interactions, indication = ripple(), role = Role.Button, onClick = onClick)
+            .clickable(interactionSource = interactions, indication = ripple(), role = Role.Button) {
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                onClick()
+            }
             .clearAndSetSemantics { contentDescription = description },
         shape = shape,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(3.dp, MaterialTheme.colorScheme.surface),
-        shadowElevation = 2.dp,
+        color = Color.Transparent,
+        border = BorderStroke(1.5.dp, tokens.glassEdge),
     ) {
         if (vertical) {
             Column(

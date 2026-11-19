@@ -7,7 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import com.example.wastenot.ui.components.CategoryIconBadge
 import com.example.wastenot.ui.components.GroupSectionLabel
 import com.example.wastenot.ui.components.InsetGroupCard
+import com.example.wastenot.ui.components.InsetGroupItemContainer
 import com.example.wastenot.ui.components.wasteTextFieldColors
 import com.example.wastenot.ui.components.focusOutline
 import kotlinx.coroutines.launch
@@ -72,10 +73,10 @@ fun GuideListScreen(
     fun clear() { focus.clearFocus(); keyboard?.hide(); onQuery(""); onCategory(null); resetScroll() }
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         LazyColumn(Modifier.weight(1f).widthIn(max = 840.dp).fillMaxWidth(), state = list,
-            contentPadding = pagePadding(padding), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            contentPadding = pagePadding(padding)) {
             item(key = "search") {
                 val label = stringResource(R.string.guide_search)
-                InsetGroupCard(contentPadding = true) {
+                InsetGroupCard(Modifier.padding(bottom = 16.dp), contentPadding = true) {
                     Text(label, style = MaterialTheme.typography.titleSmall)
                     Text(stringResource(R.string.guide_intro), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     OutlinedTextField(
@@ -131,24 +132,26 @@ fun GuideListScreen(
                     }), if (data.error != null || !filtered) onSearch else ::clear, Modifier.fillMaxWidth())
                 }
             }
-            if (data.articles.isNotEmpty()) item(key = "articles-card") {
-                InsetGroupCard {
-                    data.articles.forEachIndexed { idx, article ->
-                        GuideRow(article, { keyboard?.hide(); onDetail(article.id) })
-                        if (idx < data.articles.lastIndex) {
-                            HorizontalDivider(Modifier.padding(start = 70.dp), color = MaterialTheme.colorScheme.outlineVariant)
-                        }
+            if (data.articles.isNotEmpty()) itemsIndexed(data.articles, key = { _, article -> article.id }) { idx, article ->
+                InsetGroupItemContainer(
+                    isFirst = idx == 0,
+                    isLast = idx == data.articles.lastIndex,
+                ) {
+                    GuideRow(article, { keyboard?.hide(); onDetail(article.id) })
+                    if (idx < data.articles.lastIndex) {
+                        HorizontalDivider(Modifier.padding(start = 70.dp), color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
             }
             if (data.articles.isNotEmpty() && data.error != null) item(key = "page-error") {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     MessageBanner(stringResource(guideErrorText(data.error)), isError = true)
                     if (data.nextCursor == null) ActionButton(stringResource(R.string.retry), onSearch)
                 }
             }
             if (data.nextCursor != null) item(key = "more") {
                 ActionButton(stringResource(if (data.error != null) R.string.retry else R.string.guide_more), onMore,
+                    Modifier.padding(top = 16.dp),
                     loading = data.loadingMore, loadingLabel = stringResource(R.string.guide_loading))
             }
         }

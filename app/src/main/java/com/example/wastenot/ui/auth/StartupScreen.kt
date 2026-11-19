@@ -1,6 +1,5 @@
 package com.example.wastenot.ui.auth
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,15 +18,15 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
-import com.example.wastenot.theme.LocalWasteNotGradients
 import com.example.wastenot.theme.WasteNotStateHeading
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.BrandWordmark
+import com.example.wastenot.ui.components.ambientCanvasBackground
 
 @Composable
 internal fun StartupScreen(error: Boolean, onRetry: () -> Unit, onLoginAgain: () -> Unit, modifier: Modifier = Modifier) {
-    Box(modifier.background(LocalWasteNotGradients.current.canvas).safeDrawingPadding(), contentAlignment = Alignment.TopCenter) {
+    Box(modifier.ambientCanvasBackground().safeDrawingPadding(), contentAlignment = Alignment.TopCenter) {
         Column(
             Modifier
                 .widthIn(max = 560.dp)
