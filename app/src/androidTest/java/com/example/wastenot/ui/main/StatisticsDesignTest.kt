@@ -46,23 +46,23 @@ class StatisticsDesignTest {
     @Test fun canonicalWeekHasAChartAndZeroFilledTextAlternative() = runTest {
         val records = store.load().value
         show({ WorkspaceUiState(records = records, loading = false) })
-        compose.onNodeWithText("1,4 kg").assertExists()
-        compose.onNodeWithText("2 benda dihindari").assertExists()
+        compose.onNodeWithText("1.4 kg").assertExists()
+        compose.onNodeWithText("2 items avoided").assertExists()
         compose.onNodeWithTag("daily-weight-chart").performScrollTo().assertIsDisplayed()
         compose.onNodeWithTag("daily-count-chart").assertDoesNotExist()
         capture("statistics-chart")
-        compose.onNodeWithText("Lihat angka harian").performScrollTo().performClick()
-        compose.onNodeWithText("15 Sep 2026 · 0 g · 0 benda").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("21 Sep 2026 · 650 g · 0 benda").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Show daily numbers").performScrollTo().performClick()
+        compose.onNodeWithText("15 Sep 2026 · 0 g · 0 items").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("21 Sep 2026 · 650 g · 0 items").performScrollTo().assertIsDisplayed()
         capture("statistics-daily")
-        compose.onNodeWithText("2 dari 4 aktivitas penanganan").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Metode pengelolaan").performScrollTo().assertIsDisplayed()
-        compose.onNode(hasText("Recycle") and SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "2 dari 5 aktivitas"))
+        compose.onNodeWithText("2 of 4 handling activities").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Handling methods").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasText("Recycle") and SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "2 of 5 activities"))
             .performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Trash").performScrollTo().assertIsDisplayed()
         capture("statistics-methods")
-        compose.onNodeWithText("Menurut kategori").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Lainnya").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("By category").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Other").performScrollTo().assertIsDisplayed()
         capture("statistics-categories")
     }
 
@@ -72,12 +72,12 @@ class StatisticsDesignTest {
         show({ WorkspaceUiState(records = records, loading = false) })
         compose.onNodeWithTag("daily-count-chart").performScrollTo().assertIsDisplayed()
         capture("statistics-count")
-        compose.onNodeWithText("Lihat angka harian").performScrollTo().performClick()
-        compose.onNodeWithText("21 Sep 2026 · 0 g · 20 benda").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Show daily numbers").performScrollTo().performClick()
+        compose.onNodeWithText("21 Sep 2026 · 0 g · 20 items").performScrollTo().assertIsDisplayed()
         compose.runOnIdle { records = listOf(record.copy(method = DisposalMethod.REDUCE, quantity = Quantity.Count.of(20))) }
         compose.onNodeWithTag("daily-count-chart").assertDoesNotExist()
-        compose.onNodeWithText("20 benda dihindari").assertExists()
-        compose.onNodeWithText("Belum ada aktivitas penanganan").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("20 items avoided").assertExists()
+        compose.onNodeWithText("No handling activities yet").performScrollTo().assertIsDisplayed()
         capture("statistics-reduce-only")
     }
 
@@ -85,16 +85,16 @@ class StatisticsDesignTest {
         val records = store.load().value.take(1).map { it.copy(activityDate = today.minusDays(10)) }
         var actions = 0
         show({ WorkspaceUiState(records = records, loading = false) }, onRecord = { actions++ })
-        compose.onNodeWithText("Belum ada catatan pada periode ini").assertIsDisplayed()
-        compose.onNodeWithText("Catat aktivitas").performScrollTo().performClick()
+        compose.onNodeWithText("No logs in this period").assertIsDisplayed()
+        compose.onNodeWithText("Log activity").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, actions) }
         capture("statistics-empty")
-        compose.onNodeWithText("30 hari").performScrollTo().performClick().assertIsSelected()
-        compose.onNodeWithText("${WasteFormat.activityDate(today.minusDays(29))} – ${WasteFormat.activityDate(today)}").assertExists()
-        compose.onNodeWithText("Belum ada catatan pada periode ini").assertDoesNotExist()
+        compose.onNodeWithText("30 days").performScrollTo().performClick().assertIsSelected()
+        compose.onNodeWithText("${WasteFormat.activityDate(today.minusDays(29))} to ${WasteFormat.activityDate(today)}").assertExists()
+        compose.onNodeWithText("No logs in this period").assertDoesNotExist()
         compose.onNodeWithTag("daily-weight-chart").performScrollTo().assertIsDisplayed()
         capture("statistics-month")
-        compose.onNodeWithText("Lihat angka harian").performScrollTo().performClick()
+        compose.onNodeWithText("Show daily numbers").performScrollTo().performClick()
         compose.onNodeWithTag("statistics-day-2026-08-23").assertExists()
         compose.onNodeWithTag("statistics-day-2026-09-21").assertExists()
     }
@@ -103,11 +103,11 @@ class StatisticsDesignTest {
         val records = store.load().value
         var retries = 0
         show({ WorkspaceUiState(records = records, loading = false, error = ApiFailureKind.NETWORK) }, onRetry = { retries++ })
-        compose.onNodeWithText("1,4 kg").assertExists()
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        compose.onNodeWithText("1.4 kg").assertExists()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, retries) }
-        compose.onNodeWithText("30 hari").performScrollTo().performClick()
-        compose.onNodeWithText("1,4 kg").assertExists()
+        compose.onNodeWithText("30 days").performScrollTo().performClick()
+        compose.onNodeWithText("1.4 kg").assertExists()
         capture("statistics-refresh-error")
     }
 
@@ -119,7 +119,7 @@ class StatisticsDesignTest {
         val plot = compose.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.HorizontalScrollAxisRange)
             and hasAnyAncestor(hasTestTag("daily-weight-chart")))
         plot.performScrollTo()
-        compose.onNodeWithText("Geser grafik untuk melihat tanggal lainnya.").assertExists()
+        compose.onNodeWithText("Scroll the chart to see other dates.").assertExists()
         val range = plot.fetchSemanticsNode().config[SemanticsProperties.HorizontalScrollAxisRange]
         assertTrue("The seven full-size values need a scrollable plot", range.maxValue() > 0)
         plot.performSemanticsAction(SemanticsActions.ScrollBy) { it(range.maxValue(), 0f) }
@@ -128,8 +128,8 @@ class StatisticsDesignTest {
         assertEquals(end.maxValue(), end.value(), 1f)
         compose.onNodeWithText("21").assertIsDisplayed()
         capture("statistics-large-values")
-        compose.onNodeWithText("Lihat angka harian").performScrollTo().performClick()
-        compose.onNodeWithText("21 Sep 2026 · 100.000 g · 0 benda").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Show daily numbers").performScrollTo().performClick()
+        compose.onNodeWithText("21 Sep 2026 · 100.000 g · 0 items").performScrollTo().assertIsDisplayed()
     }
 
     private fun capture(name: String) {

@@ -31,7 +31,7 @@ class DummyDataTest {
             val initial = (store.load() as ApiResult.Success).value
             assertEquals(5, initial.size)
             assertEquals(3, initial.count { it.activityDate == date })
-            val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE, Quantity.Count.of(3), date, "Catatan fixture")
+            val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE, Quantity.Count.of(3), date, "Fixture note")
             val receipt = (store.create(input, "fixture-request") as ApiResult.Success).value
             val created = receipt.log
             assertTrue(receipt.created)

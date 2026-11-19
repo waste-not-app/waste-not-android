@@ -46,11 +46,11 @@ class ActionButtonDesignTest {
             WasteNotTheme(dark) {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Column(Modifier.verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Text("Tindakan catatan", style = MaterialTheme.typography.headlineMedium)
-                        ActionButton("Simpan catatan", {}, Modifier.fillMaxWidth())
-                        ActionButton("Simpan perubahan", {}, Modifier.fillMaxWidth(), enabled = false)
-                        ActionButton("Simpan", {}, Modifier.fillMaxWidth(), loading = true, loadingLabel = "Menyimpan perubahan catatan…")
-                        ActionButton("Hapus catatan", {}, Modifier.fillMaxWidth(), destructive = true)
+                        Text("Log actions", style = MaterialTheme.typography.headlineMedium)
+                        ActionButton("Save log", {}, Modifier.fillMaxWidth())
+                        ActionButton("Save changes", {}, Modifier.fillMaxWidth(), enabled = false)
+                        ActionButton("Save", {}, Modifier.fillMaxWidth(), loading = true, loadingLabel = "Saving log changes…")
+                        ActionButton("Delete log", {}, Modifier.fillMaxWidth(), destructive = true)
                     }
                 }
             }
@@ -64,7 +64,7 @@ class ActionButtonDesignTest {
         }
         val metrics = JSONArray()
         val violations = mutableListOf<String>()
-        listOf("Simpan catatan", "Simpan perubahan", "Menyimpan perubahan catatan…", "Hapus catatan").forEachIndexed { index, label ->
+        listOf("Save log", "Save changes", "Saving log changes…", "Delete log").forEachIndexed { index, label ->
             val node = compose.onNodeWithText(label).performScrollTo().assertIsDisplayed()
             if (index in 1..2) node.assertIsNotEnabled() else node.assertIsEnabled()
             val bounds = node.fetchSemanticsNode().boundsInWindow
@@ -121,19 +121,19 @@ class ActionButtonDesignTest {
         var calls = 0
         compose.setContent { WasteNotTheme {
             Column {
-                ActionButton("Simpan catatan", { calls++; loading.value = true }, loading = loading.value, loadingLabel = "Menyimpan catatan…")
-                ActionButton("Hapus catatan", { calls++ }, enabled = false, destructive = true)
+                ActionButton("Save log", { calls++; loading.value = true }, loading = loading.value, loadingLabel = "Saving log…")
+                ActionButton("Delete log", { calls++ }, enabled = false, destructive = true)
             }
         } }
-        compose.onNodeWithText("Hapus catatan").assertIsNotEnabled().performTouchInput { click() }
+        compose.onNodeWithText("Delete log").assertIsNotEnabled().performTouchInput { click() }
         compose.runOnIdle { assertEquals(0, calls) }
         InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB)
         compose.waitForIdle()
-        compose.onNodeWithText("Simpan catatan").assertIsFocused().performKeyInput { pressKey(Key.Enter) }
-        compose.onNodeWithText("Menyimpan catatan…").assertIsNotEnabled().performTouchInput { click() }
+        compose.onNodeWithText("Save log").assertIsFocused().performKeyInput { pressKey(Key.Enter) }
+        compose.onNodeWithText("Saving log…").assertIsNotEnabled().performTouchInput { click() }
         compose.onRoot().performKeyInput { pressKey(Key.Enter) }
         compose.runOnIdle { assertEquals(1, calls); loading.value = false }
-        compose.onNodeWithText("Simpan catatan").performTouchInput { click() }
+        compose.onNodeWithText("Save log").performTouchInput { click() }
         compose.runOnIdle { assertEquals(2, calls) }
     }
 }

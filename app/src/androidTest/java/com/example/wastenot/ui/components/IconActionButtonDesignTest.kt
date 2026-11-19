@@ -37,7 +37,7 @@ class IconActionButtonDesignTest {
     private fun inspect(dark: Boolean) {
         val theme = if (dark) "dark" else "light"
         val scheme = if (dark) DarkColorScheme else LightColorScheme
-        val labels = listOf("Tampilan", "Filter tidak tersedia")
+        val labels = listOf("Display", "Filter unavailable")
         compose.setContent { WasteNotTheme(dark) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -85,9 +85,9 @@ class IconActionButtonDesignTest {
     @Test fun touchAndTabEnterRespectAvailabilityAndAccessibleLabels() {
         val enabled = mutableStateOf(true); var calls = 0
         compose.setContent { WasteNotTheme {
-            IconActionButton(R.drawable.ic_device, "Tampilan", { calls++; enabled.value = false }, enabled = enabled.value)
+            IconActionButton(R.drawable.ic_device, "Display", { calls++; enabled.value = false }, enabled = enabled.value)
         } }
-        val action = compose.onNodeWithContentDescription("Tampilan")
+        val action = compose.onNodeWithContentDescription("Display")
         InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB); compose.waitForIdle()
         action.assertIsFocused().performKeyInput { pressKey(Key.Enter) }
         action.assertIsNotEnabled().performTouchInput { click() }

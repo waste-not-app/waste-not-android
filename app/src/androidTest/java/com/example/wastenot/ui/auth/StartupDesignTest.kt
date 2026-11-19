@@ -35,7 +35,7 @@ class StartupDesignTest {
         val appName = compose.activity.getString(com.example.wastenot.R.string.app_name)
         for (theme in listOf(false, true)) for (failed in listOf(false, true)) {
             compose.runOnIdle { dark = theme; error = failed }
-            val heading = if (failed) "Belum bisa memeriksa sesi" else "Menyiapkan catatanmu…"
+            val heading = if (failed) "Can't check your session yet" else "Getting your logs ready…"
             assertReadable(appName)
             assertReadable(heading)
             compose.onNodeWithText(appName).performScrollTo()
@@ -43,12 +43,12 @@ class StartupDesignTest {
             compose.onNodeWithText("Simulasikan", substring = true).assertDoesNotExist()
             compose.onNodeWithText("Pratinjau", substring = true).assertDoesNotExist()
             if (failed) {
-                listOf("Coba lagi", "Masuk ulang").forEach { assertAction(it) }
+                listOf("Try again", "Sign in again").forEach { assertAction(it) }
                 capture("startup-${if (theme) "dark" else "light"}-actions")
                 compose.onNode(SemanticsMatcher.expectValue(SemanticsProperties.ProgressBarRangeInfo, ProgressBarRangeInfo.Indeterminate)).assertDoesNotExist()
             } else {
-                compose.onNodeWithText("Coba lagi").assertDoesNotExist()
-                compose.onNodeWithText("Masuk ulang").assertDoesNotExist()
+                compose.onNodeWithText("Try again").assertDoesNotExist()
+                compose.onNodeWithText("Sign in again").assertDoesNotExist()
                 compose.onNode(SemanticsMatcher.expectValue(SemanticsProperties.ProgressBarRangeInfo, ProgressBarRangeInfo.Indeterminate)).performScrollTo().assertIsDisplayed()
             }
         }
@@ -62,18 +62,18 @@ class StartupDesignTest {
         } }
         for (attempt in 0 until 3) {
             key(KeyEvent.KEYCODE_TAB)
-            if (compose.onAllNodes(hasText("Coba lagi") and isFocused()).fetchSemanticsNodes().isNotEmpty()) break
+            if (compose.onAllNodes(hasText("Try again") and isFocused()).fetchSemanticsNodes().isNotEmpty()) break
         }
-        compose.onNodeWithText("Coba lagi").assertIsFocused().assertIsDisplayed()
+        compose.onNodeWithText("Try again").assertIsFocused().assertIsDisplayed()
         capture("startup-keyboard-focus")
         key(KeyEvent.KEYCODE_ENTER)
         assertEquals(1, retries); assertEquals(0, logins)
         key(KeyEvent.KEYCODE_TAB)
-        compose.onNodeWithText("Masuk ulang").assertIsFocused().assertIsDisplayed()
+        compose.onNodeWithText("Sign in again").assertIsFocused().assertIsDisplayed()
         key(KeyEvent.KEYCODE_ENTER)
         assertEquals(1, retries); assertEquals(1, logins)
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
-        compose.onNodeWithText("Masuk ulang").performScrollTo().performClick()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
+        compose.onNodeWithText("Sign in again").performScrollTo().performClick()
         assertEquals(2, retries); assertEquals(2, logins)
     }
 

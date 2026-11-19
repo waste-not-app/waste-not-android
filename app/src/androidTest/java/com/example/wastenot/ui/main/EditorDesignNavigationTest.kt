@@ -39,34 +39,34 @@ class EditorDesignNavigationTest {
 
     @Test fun storageFailureKeepsTheDraftAcrossRecreationAndAllowsCorrection() {
         waitFor("650 g")
-        compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
+        compose.onNodeWithContentDescription("Log or scan waste").performClick()
+        compose.onNode(hasText("Log manually") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
         compose.onNodeWithText("Recycle").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
-        compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
-        compose.onNodeWithContentDescription("Berat").performScrollTo().performTextReplacement("250")
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Isian gagal tersimpan")
+        compose.onNodeWithContentDescription("Category").performScrollTo().performClick()
+        compose.onNode(hasText("Plastic") and hasAnyAncestor(isPopup())).performClick()
+        compose.onNodeWithContentDescription("Weight").performScrollTo().performTextReplacement("250")
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().performTextReplacement("Entry that failed to save")
         val preferences = InstrumentationRegistry.getInstrumentation().targetContext
             .getSharedPreferences("dummy_logs_dummy-owner", Context.MODE_PRIVATE)
         val original = checkNotNull(preferences.getString("records", null))
         try {
             compose.runOnIdle { check(preferences.edit().putString("records", "{").commit()) }
-            compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
-            val failure = "Catatan belum bisa disimpan di perangkat. Isianmu tetap tersedia; coba lagi."
+            compose.onNodeWithText("Save log").performScrollTo().performClick()
+            val failure = "Couldn't save the log on this device. Your entries are still here; try again."
             waitFor(failure)
-            compose.onNodeWithContentDescription("Catatan (opsional)").assertIsEnabled().assertTextContains("Isian gagal tersimpan")
+            compose.onNodeWithContentDescription("Notes (optional)").assertIsEnabled().assertTextContains("Entry that failed to save")
             compose.activityRule.scenario.recreate()
             compose.waitForIdle()
             compose.onNodeWithText(failure).assertExists()
-            compose.onNodeWithContentDescription("Berat").assertTextContains("250")
-            compose.onNodeWithContentDescription("Catatan (opsional)").assertIsEnabled().assertTextContains("Isian gagal tersimpan")
+            compose.onNodeWithContentDescription("Weight").assertTextContains("250")
+            compose.onNodeWithContentDescription("Notes (optional)").assertIsEnabled().assertTextContains("Entry that failed to save")
             compose.runOnIdle {
                 assertEquals("{", preferences.getString("records", null))
                 check(preferences.edit().putString("records", original).commit())
             }
-            compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Koreksi eksplisit")
-            compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
-            waitFor("+10 XP untuk aktivitas baru ini.")
+            compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().performTextReplacement("Koreksi eksplisit")
+            compose.onNodeWithText("Save log").performScrollTo().performClick()
+            waitFor("+10 XP for this new activity.")
             compose.runOnIdle { assertEquals(6, org.json.JSONArray(preferences.getString("records", null)).length()) }
         } finally {
             if (preferences.getString("records", null) == "{") check(preferences.edit().putString("records", original).commit())
@@ -75,26 +75,26 @@ class EditorDesignNavigationTest {
 
     private fun journey(dark: Boolean) {
         waitFor("650 g")
-        compose.onNode(tabs and hasText("Profil")).performClick()
-        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
-        compose.onNode(hasText(if (dark) "Gelap" else "Terang") and hasAnyAncestor(isDialog())).performClick()
-        compose.onNodeWithText("Tutup").performClick()
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        compose.onNode(tabs and hasText("Beranda")).performClick()
-        compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
+        compose.onNode(tabs and hasText("Profile")).performClick()
+        compose.onNodeWithText("Settings").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("App theme").performScrollTo().performClick()
+        compose.onNode(hasText(if (dark) "Dark" else "Light") and hasAnyAncestor(isDialog())).performClick()
+        compose.onNodeWithText("Close").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
+        compose.onNode(tabs and hasText("Home")).performClick()
+        compose.onNodeWithContentDescription("Log or scan waste").performClick()
+        compose.onNode(hasText("Log manually") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
         val mode = if (dark) "dark" else "light"
         capture("editor-create-$mode")
-        compose.onNodeWithText("Pilih satu metode.").assertDoesNotExist()
-        compose.onNodeWithText("Isi berat atau jumlah benda.").assertDoesNotExist()
-        val quantity = compose.onNodeWithContentDescription("Berat")
+        compose.onNodeWithText("Choose a method.").assertDoesNotExist()
+        compose.onNodeWithText("Enter a weight or an item count.").assertDoesNotExist()
+        val quantity = compose.onNodeWithContentDescription("Weight")
         quantity.performScrollTo().performTouchInput { click() }
         quantity.performTextReplacement("1.5")
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performClick()
-        compose.onNodeWithText("Gunakan angka sesuai satuan; benda dan gram tidak memakai desimal.").assertExists()
-        compose.onNodeWithText("Pilih kategori.").assertDoesNotExist()
-        compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().performClick()
+        compose.onNodeWithText("Use numbers that fit the unit; items and grams have no decimals.").assertExists()
+        compose.onNodeWithText("Choose a category.").assertDoesNotExist()
+        compose.onNodeWithText("Save log").performScrollTo().performClick()
         compose.waitUntil(5_000) {
             compose.onAllNodes(hasText("Reduce") and isFocused()).fetchSemanticsNodes().size == 1
         }
@@ -105,57 +105,57 @@ class EditorDesignNavigationTest {
         listOf("Reduce", "Reuse", "Recycle", "Trash").forEach { label ->
             compose.onNodeWithText(label).performScrollTo().assertHeightIsAtLeast(48.dp).performClick().assertIsSelected()
             if (label == "Reduce") {
-                compose.onNodeWithContentDescription("Jumlah yang dihindari").assertExists()
-                compose.onNodeWithText("Dicatat terpisah dari sampah yang ditangani.").assertExists()
+                compose.onNodeWithContentDescription("Amount avoided").assertExists()
+                compose.onNodeWithText("Tracked separately from waste you handled.").assertExists()
             }
         }
         compose.onNodeWithText("Recycle").performScrollTo().performClick()
-        compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
-        compose.waitUntil(5_000) { compose.onAllNodes(hasContentDescription("Kategori") and isFocused()).fetchSemanticsNodes().size == 1 }
-        compose.onNodeWithContentDescription("Kategori").assertIsFocused().assertIsDisplayed()
-        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
-        compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
-        compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
-        compose.waitUntil(5_000) { compose.onAllNodes(hasContentDescription("Berat") and isFocused()).fetchSemanticsNodes().size == 1 }
+        compose.onNodeWithText("Save log").performScrollTo().performClick()
+        compose.waitUntil(5_000) { compose.onAllNodes(hasContentDescription("Category") and isFocused()).fetchSemanticsNodes().size == 1 }
+        compose.onNodeWithContentDescription("Category").assertIsFocused().assertIsDisplayed()
+        compose.onNodeWithContentDescription("Category").performScrollTo().performClick()
+        compose.onNode(hasText("Plastic") and hasAnyAncestor(isPopup())).performClick()
+        compose.onNodeWithText("Save log").performScrollTo().performClick()
+        compose.waitUntil(5_000) { compose.onAllNodes(hasContentDescription("Weight") and isFocused()).fetchSemanticsNodes().size == 1 }
         quantity.assertIsFocused().assertIsDisplayed()
         quantity.performScrollTo().performTextReplacement("250")
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Catatan pribadi")
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().performTextReplacement("Private note")
         compose.activityRule.scenario.recreate()
         compose.waitForIdle()
         compose.onNodeWithText("Recycle").performScrollTo().assertIsSelected()
-        compose.onNodeWithContentDescription("Berat").performScrollTo().assertTextContains("250")
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().assertTextContains("Catatan pribadi")
-        compose.onNodeWithText("Asia/Jakarta · maksimum 30 hari sebelumnya.").assertExists()
-        compose.onNodeWithText("Simpan catatan").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithContentDescription("Weight").performScrollTo().assertTextContains("250")
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().assertTextContains("Private note")
+        compose.onNodeWithText("Asia/Jakarta · up to 30 days ago.").assertExists()
+        compose.onNodeWithText("Save log").performScrollTo().assertIsDisplayed()
         capture("editor-create-end-$mode")
-        compose.onNodeWithText("Simpan catatan").performClick()
-        waitFor("+10 XP untuk aktivitas baru ini.")
-        compose.onNodeWithText("Lihat catatan").performScrollTo().performClick()
-        compose.waitUntil(30_000) { compose.onAllNodes(hasText("Ubah catatan") and hasClickAction() and isEnabled()).fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Ubah catatan").performScrollTo().performClick()
+        compose.onNodeWithText("Save log").performClick()
+        waitFor("+10 XP for this new activity.")
+        compose.onNodeWithText("View log").performScrollTo().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodes(hasText("Edit log") and hasClickAction() and isEnabled()).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Edit log").performScrollTo().performClick()
         compose.waitUntil(10_000) {
-            compose.onAllNodes(hasText("Simpan perubahan") and hasClickAction()).fetchSemanticsNodes().size == 1
+            compose.onAllNodes(hasText("Save changes") and hasClickAction()).fetchSemanticsNodes().size == 1
         }
-        compose.onNodeWithText("Simpan perubahan").assertIsNotEnabled()
+        compose.onNodeWithText("Save changes").assertIsNotEnabled()
         capture("editor-edit-$mode")
-        compose.onNodeWithContentDescription("Satuan").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Unit").performScrollTo().performClick()
         capture("editor-unit-$mode")
-        compose.onNodeWithText("Benda").performClick()
-        val count = compose.onNodeWithContentDescription("Jumlah benda")
+        compose.onNodeWithText("Items").performClick()
+        val count = compose.onNodeWithContentDescription("Item count")
         assertEquals("", count.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
         count.performScrollTo().performTextReplacement("2")
         compose.runOnUiThread {
             compose.activity.getSystemService(InputMethodManager::class.java)
                 .hideSoftInputFromWindow(compose.activity.window.decorView.windowToken, 0)
         }
-        compose.onNodeWithText("Simpan perubahan").performScrollTo().assertIsDisplayed().assertHeightIsAtLeast(48.dp)
-        compose.onNodeWithText("Perubahan memperbarui statistik, tanpa XP tambahan.").assertExists()
+        compose.onNodeWithText("Save changes").performScrollTo().assertIsDisplayed().assertHeightIsAtLeast(48.dp)
+        compose.onNodeWithText("Edits update your statistics but don't add XP.").assertExists()
         capture("editor-edit-end-$mode")
-        compose.onNodeWithText("Simpan perubahan").performClick()
-        waitFor("Catatanmu sudah tersimpan. Tidak ada XP tambahan.")
+        compose.onNodeWithText("Save changes").performClick()
+        waitFor("Your log was already saved. No extra XP.")
         compose.onNodeWithText("+10 XP", substring = true).assertDoesNotExist()
-        compose.onNodeWithText("Lihat catatan").performScrollTo().performClick()
-        compose.onNodeWithText("2 benda").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("View log").performScrollTo().performClick()
+        compose.onNodeWithText("2 items").performScrollTo().assertIsDisplayed()
     }
 
     private fun capture(name: String) {

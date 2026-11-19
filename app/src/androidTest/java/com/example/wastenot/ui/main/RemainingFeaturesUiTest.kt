@@ -38,8 +38,8 @@ class RemainingFeaturesUiTest {
             Achievement(
                 id = "00000000-0000-4000-8000-000000000101",
                 code = "FIRST_STEP",
-                title = "Langkah pertama",
-                description = "Catat minimal 1 aktivitas aktif.",
+                title = "First step",
+                description = "Log at least 1 active activity.",
                 requirementType = AchievementRequirement.ACTIVE_LOG_COUNT,
                 currentValue = 1,
                 targetValue = 1,
@@ -49,8 +49,8 @@ class RemainingFeaturesUiTest {
             Achievement(
                 id = "00000000-0000-4000-8000-000000000102",
                 code = "STREAK_3",
-                title = "Konsisten 3 hari",
-                description = "Capai streak terbaik 3 hari.",
+                title = "Three days in a row",
+                description = "Reach a best streak of 3 days.",
                 requirementType = AchievementRequirement.BEST_STREAK,
                 currentValue = 2,
                 targetValue = 3,
@@ -71,14 +71,14 @@ class RemainingFeaturesUiTest {
             }
         }
 
-        compose.onNodeWithText("Langkah pertama").assertIsDisplayed()
-        compose.onNodeWithText("Tercapai").assertIsDisplayed()
-        compose.onNodeWithText("Konsisten 3 hari").assertIsDisplayed()
-        compose.onNodeWithText("Belum tercapai").assertIsDisplayed()
-        compose.onNodeWithText("2 dari 3").assertIsDisplayed()
-        compose.onNodeWithText("Capai streak terbaik 3 hari.").assertDoesNotExist()
-        compose.onNodeWithText("Konsisten 3 hari").performClick()
-        compose.onNodeWithText("Capai streak terbaik 3 hari.").assertIsDisplayed()
+        compose.onNodeWithText("First step").assertIsDisplayed()
+        compose.onNodeWithText("Unlocked").assertIsDisplayed()
+        compose.onNodeWithText("Three days in a row").assertIsDisplayed()
+        compose.onNodeWithText("Locked").assertIsDisplayed()
+        compose.onNodeWithText("2 of 3").assertIsDisplayed()
+        compose.onNodeWithText("Reach a best streak of 3 days.").assertDoesNotExist()
+        compose.onNodeWithText("Three days in a row").performClick()
+        compose.onNodeWithText("Reach a best streak of 3 days.").assertIsDisplayed()
     }
 
     @Test
@@ -95,8 +95,8 @@ class RemainingFeaturesUiTest {
                 )
             }
         }
-        compose.onNodeWithText("Pencapaian belum bisa dimuat.").assertIsDisplayed()
-        compose.onNodeWithText("Coba lagi").performClick()
+        compose.onNodeWithText("Couldn't load achievements.").assertIsDisplayed()
+        compose.onNodeWithText("Try again").performClick()
         assertTrue(retried)
     }
 
@@ -114,10 +114,10 @@ class RemainingFeaturesUiTest {
             }
         }
 
-        compose.onNodeWithText("Sekitar 19.30").assertIsDisplayed().assertIsEnabled()
-        compose.onNodeWithText("Simpan pengingat").performScrollTo().performClick()
+        compose.onNodeWithText("Around 19.30").assertIsDisplayed().assertIsEnabled()
+        compose.onNodeWithText("Save reminder").performScrollTo().performClick()
         assertEquals(ReminderSetting(enabled = true, hour = 19, minute = 30), saved)
-        compose.onNodeWithText("Pengingat harian disimpan untuk sekitar 19.30.").assertIsDisplayed()
+        compose.onNodeWithText("Daily reminder saved for around 19.30.").assertIsDisplayed()
     }
 
     @Test
@@ -132,7 +132,7 @@ class RemainingFeaturesUiTest {
                 )
             }
         }
-        compose.onNodeWithText("Sekitar 20.00").assertIsNotEnabled()
+        compose.onNodeWithText("Around 20.00").assertIsNotEnabled()
     }
 
     @Test
@@ -180,12 +180,12 @@ class RemainingFeaturesUiTest {
             }
         }
 
-        compose.onNodeWithText("Lampiran foto (opsional)").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Lanjut tanpa foto").performScrollTo().performClick()
+        compose.onNodeWithText("Photo attachment (optional)").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Continue without a photo").performScrollTo().performClick()
         assertTrue(dismissed)
-        compose.onNodeWithText("Hapus foto").performScrollTo().performClick()
+        compose.onNodeWithText("Remove photo").performScrollTo().performClick()
         assertTrue(removed)
-        compose.onNodeWithText("Pilih foto").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Choose photo").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -223,9 +223,9 @@ class RemainingFeaturesUiTest {
             }
         }
 
-        compose.onNodeWithText("Foto lampiran").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Foto lampiran belum bisa dimuat.").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        compose.onNodeWithText("Photo attachment").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Couldn't load the photo attachment.").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
         assertTrue(retried)
     }
 }

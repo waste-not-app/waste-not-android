@@ -61,29 +61,29 @@ class LocalBackendCoreTest {
         assertSignedOut()
         try {
             register(email, password)
-            waitFor("Input manual")
+            waitFor("Log manually")
             val original = (container.sessions.state.value as SessionState.Authenticated).user
             assertTrue(container.sessions.logout().serverRevoked)
             assertSignedOut()
 
             register(email, password)
-            waitFor("Email ini sudah digunakan.")
+            waitFor("This email is already in use.")
             assertNoSession()
-            tap("Sudah punya akun? Masuk")
+            tap("Already have an account? Sign in")
             fill("Email", email)
-            fill("Kata sandi", "pendek")
-            tap("Masuk")
-            waitFor("Kata sandi perlu 12–128 karakter, termasuk spasi.")
+            fill("Password", "pendek")
+            tap("Sign in")
+            waitFor("Passwords need 12 to 128 characters, including spaces.")
             assertNoSession()
 
-            fill("Kata sandi", UUID.randomUUID().toString())
-            tap("Masuk")
-            waitFor("Email atau kata sandi belum cocok.")
+            fill("Password", UUID.randomUUID().toString())
+            tap("Sign in")
+            waitFor("That email and password don't match.")
             assertNoSession()
 
-            fill("Kata sandi", password)
-            tap("Masuk")
-            waitFor("Input manual")
+            fill("Password", password)
+            tap("Sign in")
+            waitFor("Log manually")
             assertEquals(original, (container.sessions.state.value as SessionState.Authenticated).user)
             assertTrue(tokenStore.read() is TokenReadResult.Available)
         } finally {
@@ -94,11 +94,11 @@ class LocalBackendCoreTest {
     @Test fun savesRecycleRecordBeforeProcessRestart() = runTest(timeout = 3.minutes) {
         val runId = requireLocalProbe()
         createRecycleDraft(runId)
-        tap("Simpan catatan")
-        waitFor("+10 XP untuk aktivitas baru ini.")
+        tap("Save log")
+        waitFor("+10 XP for this new activity.")
         val logId = verifyOnlySavedRecord(runId)
-        tap("Kembali ke beranda")
-        waitFor("Input manual")
+        tap("Back to home")
+        waitFor("Log manually")
         assertTrue(tokenStore.read() is TokenReadResult.Available)
         instrumentation.targetContext.cacheDir.resolve("core-restart-$runId")
             .writeText("${Process.myPid()}\n$logId")
@@ -111,14 +111,14 @@ class LocalBackendCoreTest {
         val (priorPid, logId) = marker.readLines()
         assertNotEquals(priorPid.toInt(), Process.myPid())
         try {
-            waitFor("Input manual")
+            waitFor("Log manually")
             val restored = (container.sessions.state.value as SessionState.Authenticated).user
             assertEquals("record-$runId@example.test", restored.email)
-            compose.onNode(hasText("Riwayat") and isSelectable()).performClick()
+            compose.onNode(hasText("History") and isSelectable()).performClick()
             waitFor("250 g")
             compose.onNodeWithText("250 g").performClick()
-            waitFor("Detail catatan")
-            compose.onNodeWithText("Catatan QA $runId").performScrollTo().assertIsDisplayed()
+            waitFor("Log details")
+            compose.onNodeWithText("QA note $runId").performScrollTo().assertIsDisplayed()
             assertEquals(logId, verifyOnlySavedRecord(runId))
             println("CORE_RESTART_RESTORED pid=${Process.myPid()} log=$logId")
         } finally {
@@ -131,13 +131,13 @@ class LocalBackendCoreTest {
         val runId = requireLocalProbe(port = 18091)
         try {
             createRecycleDraft(runId)
-            tap("Simpan catatan")
-            waitFor("Hasil penyimpanan belum diketahui. Coba lagi dengan isian awal sebelum mengubah catatan.")
-            compose.onNodeWithContentDescription("Berat").performScrollTo().assertTextContains("250")
+            tap("Save log")
+            waitFor("We don't know whether this was saved. Try again with the same entries before changing the log.")
+            compose.onNodeWithContentDescription("Weight").performScrollTo().assertTextContains("250")
             captureUiPreview(compose, "unknown-outcome", "local-write-recovery", capturePanel = false)
 
-            tap("Coba lagi")
-            waitFor("Catatanmu sudah tersimpan. Tidak ada XP tambahan.")
+            tap("Try again")
+            waitFor("Your log was already saved. No extra XP.")
             val logId = verifyOnlySavedRecord(runId)
             println("CORE_WRITE_REPLAYED log=$logId")
             captureUiPreview(compose, "replayed-write", "local-write-recovery", capturePanel = false)
@@ -152,15 +152,15 @@ class LocalBackendCoreTest {
         try {
             success(container.sessions.register("Android QA 112", "history-$runId@example.test",
                 UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")))
-            waitFor("Input manual")
+            waitFor("Log manually")
             // The host seeds this disposable account in the isolated database.
             withContext(Dispatchers.IO) {
                 withTimeout(40_000) {
                     while (success(container.core.dashboard()).summary.activityCount != 1_000L) delay(500)
                 }
             }
-            compose.onNode(hasText("Riwayat") and isSelectable()).performClick()
-            waitFor("20 catatan dimuat.")
+            compose.onNode(hasText("History") and isSelectable()).performClick()
+            waitFor("20 logs loaded.")
             val list = compose.onNodeWithTag("history-list")
             val output = File(instrumentation.targetContext.getExternalFilesDir(null), "history-go-1000").apply { mkdirs() }
             fun graphics(suffix: String = "") = ParcelFileDescriptor.AutoCloseInputStream(
@@ -173,19 +173,19 @@ class LocalBackendCoreTest {
                 compose.waitUntil(15_000) {
                     runCatching {
                         list.performScrollToIndex(loaded + 2)
-                        compose.onNodeWithText("Muat catatan berikutnya").isDisplayed()
+                        compose.onNodeWithText("Load more logs").isDisplayed()
                     }.getOrDefault(false)
                 }
-                compose.onNodeWithText("Muat catatan berikutnya").performClick()
+                compose.onNodeWithText("Load more logs").performClick()
             }
             compose.waitUntil(15_000) {
                 runCatching {
                     list.performScrollToIndex(1_002)
-                    compose.onNodeWithText("Semua catatan sudah dimuat.").isDisplayed()
+                    compose.onNodeWithText("All logs loaded.").isDisplayed()
                 }.getOrDefault(false)
             }
             list.performScrollToIndex(0)
-            compose.onNodeWithText("1.000 catatan dimuat.").assertIsDisplayed()
+            compose.onNodeWithText("1.000 logs loaded.").assertIsDisplayed()
             repeat(4) { list.performTouchInput { swipeUp() } }
             repeat(4) { list.performTouchInput { swipeDown() } }
             list.performScrollToIndex(0)
@@ -206,7 +206,7 @@ class LocalBackendCoreTest {
         try {
             success(container.sessions.register("Android QA 112", "history-race-$runId@example.test",
                 UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")))
-            waitFor("Input manual")
+            waitFor("Log manually")
             val today = success(container.core.dashboard()).date
             for ((category, method, note) in listOf(
                 Triple(WasteCategory.PLASTIC, DisposalMethod.RECYCLE, "QA previous filter"),
@@ -217,32 +217,32 @@ class LocalBackendCoreTest {
                 success(container.core.createLog(ActivityInput(category, method, Quantity.Weight.of(250),
                     today, note), UUID.randomUUID().toString()))
             }
-            compose.onNode(hasText("Riwayat") and isSelectable()).performClick()
-            waitFor("4 catatan dimuat.")
+            compose.onNode(hasText("History") and isSelectable()).performClick()
+            waitFor("4 logs loaded.")
 
-            fun openFilter() = compose.onNodeWithContentDescription("Filter riwayat").performClick()
+            fun openFilter() = compose.onNodeWithContentDescription("Filter history").performClick()
             fun choose(label: String, option: String) {
                 compose.onNodeWithContentDescription(label).performScrollTo().performClick()
                 compose.onNode(hasText(option) and hasAnyAncestor(isPopup())).performClick()
             }
             openFilter()
-            choose("Kategori", "Plastik")
-            tap("Terapkan filter")
+            choose("Category", "Plastic")
+            tap("Apply filters")
             openFilter()
-            choose("Kategori", "Kertas")
-            choose("Metode", "Recycle")
-            tap("Terapkan filter")
-            waitFor("1 catatan sesuai filter dimuat.")
+            choose("Category", "Paper")
+            choose("Method", "Recycle")
+            tap("Apply filters")
+            waitFor("1 matching logs loaded.")
             withContext(Dispatchers.IO) { delay(7_500) }
             compose.onNodeWithText("QA combined filter").assertIsDisplayed()
             compose.onNodeWithText("QA previous filter").assertDoesNotExist()
             compose.onNodeWithText("QA excluded method").assertDoesNotExist()
             captureUiPreview(compose, "history-filter-race", "history-filter-race", capturePanel = false)
             openFilter()
-            choose("Kategori", "Plastik")
-            tap("Terapkan filter")
+            choose("Category", "Plastic")
+            tap("Apply filters")
             waitFor("QA previous filter")
-            compose.onNodeWithText("1 catatan sesuai filter dimuat.").assertExists()
+            compose.onNodeWithText("1 matching logs loaded.").assertExists()
             compose.onNodeWithText("QA excluded plastic").assertDoesNotExist()
         } finally {
             if (container.sessions.state.value is SessionState.Authenticated) container.sessions.logout()
@@ -315,7 +315,7 @@ class LocalBackendCoreTest {
         try {
             success(container.sessions.register("Android QA 112", "summary-$runId@example.test",
                 UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")))
-            waitFor("Input manual")
+            waitFor("Log manually")
             val today = success(container.core.dashboard()).date
             suspend fun save(method: DisposalMethod, quantity: Quantity, daysAgo: Long, note: String) =
                 success(container.core.createLog(ActivityInput(WasteCategory.PLASTIC, method, quantity,
@@ -323,7 +323,7 @@ class LocalBackendCoreTest {
             fun tab(label: String) = compose.onNode(hasText(label) and isSelectable()).performClick()
 
             save(DisposalMethod.REDUCE, Quantity.Count.of(2), 0, "QA avoid only")
-            tab("Statistik")
+            tab("Stats")
             val noHandling = instrumentation.targetContext.getString(R.string.rate_no_handled)
             waitFor(noHandling)
             compose.onNodeWithText(noHandling).performScrollTo().assertIsDisplayed()
@@ -336,29 +336,29 @@ class LocalBackendCoreTest {
             save(DisposalMethod.RECYCLE, Quantity.Weight.of(250), 0, "QA weight today")
             save(DisposalMethod.RECYCLE, Quantity.Count.of(3), 1, "QA remove middle day")
             save(DisposalMethod.REUSE, Quantity.Weight.of(250), 2, "QA older weight")
-            tap("30 hari")
-            compose.onNodeWithText("30 hari").assertIsSelected()
+            tap("30 days")
+            compose.onNodeWithText("30 days").assertIsSelected()
             waitFor("500 g")
-            compose.onNodeWithText("3 benda ditangani").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("3 items handled").performScrollTo().assertIsDisplayed()
             captureUiPreview(compose, "mixed-units", "local-core-summary", capturePanel = false)
             val before = success(container.core.dashboard()).progress
             assertEquals(3, before.currentStreak)
             assertEquals(40, before.xp)
 
-            tab("Riwayat")
-            waitFor("4 catatan dimuat.")
+            tab("History")
+            waitFor("4 logs loaded.")
             compose.onNodeWithTag("history-list").performScrollToNode(hasText("QA remove middle day"))
             compose.onNodeWithText("QA remove middle day").performClick()
-            waitFor("Hapus catatan")
-            tap("Hapus catatan")
-            compose.onNode(hasText("Hapus") and hasAnyAncestor(isDialog())).performClick()
-            waitFor("Catatan dihapus.")
+            waitFor("Delete log")
+            tap("Delete log")
+            compose.onNode(hasText("Clear") and hasAnyAncestor(isDialog())).performClick()
+            waitFor("Log deleted.")
             val after = success(container.core.dashboard()).progress
             assertEquals(1, after.currentStreak)
             assertEquals(30, after.xp)
-            tab("Profil")
-            waitFor("30 XP dari 3 catatan aktif")
-            compose.onNodeWithText("1 hari beruntun").performScrollTo().assertIsDisplayed()
+            tab("Profile")
+            waitFor("30 XP from 3 active logs")
+            compose.onNodeWithText("1-day streak").performScrollTo().assertIsDisplayed()
             captureUiPreview(compose, "streak-after-delete", "local-core-summary", capturePanel = false)
         } finally {
             if (container.sessions.state.value is SessionState.Authenticated) container.sessions.logout()
@@ -372,7 +372,7 @@ class LocalBackendCoreTest {
         try {
             val user = success(container.sessions.register("Android QA 112", "expiry-$runId@example.test",
                 UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")))
-            waitFor("Input manual")
+            waitFor("Log manually")
             val initial = success(container.sessions.authenticated { ApiResult.Success(it) })
             val claims = JSONObject(String(Base64.decode(initial.token.value.split('.')[1],
                 Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING), Charsets.UTF_8))
@@ -396,7 +396,7 @@ class LocalBackendCoreTest {
             assertEquals(initial.epoch, updated.epoch)
             assertEquals(initial.revision + 1, updated.revision)
             assertNotEquals(initial.token, updated.token)
-            waitFor("Input manual")
+            waitFor("Log manually")
             println("CORE_NATURAL_EXPIRY requests=401,200 rotations=1")
         } finally {
             if (container.sessions.state.value is SessionState.Authenticated) container.sessions.logout()
@@ -407,11 +407,11 @@ class LocalBackendCoreTest {
         val runId = requireLocalProbe()
         assertSignedOut()
         register("draft-$runId@example.test", UUID.randomUUID().toString())
-        waitFor("Input manual")
+        waitFor("Log manually")
         val user = (container.sessions.state.value as SessionState.Authenticated).user
-        tap("Input manual")
-        val note = "Draf QA $runId"
-        fill("Catatan (opsional)", note)
+        tap("Log manually")
+        val note = "QA draft $runId"
+        fill("Notes (optional)", note)
         val store = LocalEditorDraftStore.create(instrumentation.targetContext, user.id)
         compose.waitUntil(10_000) { runBlocking { success(store.read())?.fields?.get(12) == note } }
         val draft = checkNotNull(success(store.read()))
@@ -426,16 +426,16 @@ class LocalBackendCoreTest {
         val (priorPid, owner, requestId) = marker.readLines()
         assertNotEquals(priorPid.toInt(), Process.myPid())
         try {
-            waitFor("Draf dipulihkan. Periksa isian sebelum menyimpan.")
+            waitFor("Draft restored. Check your entries before saving.")
             val user = (container.sessions.state.value as SessionState.Authenticated).user
             assertEquals(owner, user.id)
-            compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().assertTextContains("Draf QA $runId")
+            compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().assertTextContains("QA draft $runId")
             val store = LocalEditorDraftStore.create(instrumentation.targetContext, user.id)
             assertEquals(requestId, checkNotNull(success(store.read())).requestId)
             assertTrue(success(container.core.wasteLogs()).isEmpty())
             assertTrue(container.sessions.logout().serverRevoked)
-            waitFor("Belum punya akun? Daftar")
-            val password = compose.onNodeWithContentDescription("Kata sandi").performScrollTo()
+            waitFor("New here? Create an account")
+            val password = compose.onNodeWithContentDescription("Password").performScrollTo()
                 .fetchSemanticsNode().config[SemanticsProperties.EditableText].text
             assertEquals("", password)
             println("CORE_DRAFT_RESTORED previous_pid=$priorPid current_pid=${Process.myPid()}")
@@ -455,35 +455,35 @@ class LocalBackendCoreTest {
     }
 
     private fun register(email: String, password: String) {
-        tap("Belum punya akun? Daftar")
-        fill("Nama", "Android QA 112")
+        tap("New here? Create an account")
+        fill("Name", "Android QA 112")
         fill("Email", email)
-        fill("Kata sandi", password)
-        fill("Konfirmasi kata sandi", password)
-        tap("Buat akun")
+        fill("Password", password)
+        fill("Confirm password", password)
+        tap("Create account")
     }
 
     private suspend fun createRecycleDraft(runId: UUID) {
         assertSignedOut()
         register("record-$runId@example.test", UUID.randomUUID().toString())
-        waitFor("Input manual")
-        tap("Input manual")
+        waitFor("Log manually")
+        tap("Log manually")
         tap("Recycle")
-        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
-        compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
-        fill("Berat", "250")
-        fill("Catatan (opsional)", "Catatan QA $runId")
+        compose.onNodeWithContentDescription("Category").performScrollTo().performClick()
+        compose.onNode(hasText("Plastic") and hasAnyAncestor(isPopup())).performClick()
+        fill("Weight", "250")
+        fill("Notes (optional)", "QA note $runId")
     }
 
     private suspend fun assertSignedOut() {
-        waitFor("Belum punya akun? Daftar")
+        waitFor("New here? Create an account")
         assertNoSession()
     }
 
     private suspend fun assertNoSession() {
         assertTrue(container.sessions.state.value is SessionState.SignedOut)
         assertEquals(TokenReadResult.Absent, tokenStore.read())
-        compose.onNodeWithText("Input manual").assertDoesNotExist()
+        compose.onNodeWithText("Log manually").assertDoesNotExist()
     }
 
     private suspend fun verifyOnlySavedRecord(runId: UUID): String {
@@ -491,7 +491,7 @@ class LocalBackendCoreTest {
         assertEquals(WasteCategory.PLASTIC, log.category)
         assertEquals(DisposalMethod.RECYCLE, log.method)
         assertEquals(Quantity.Weight.of(250), log.quantity)
-        assertEquals("Catatan QA $runId", log.notes)
+        assertEquals("QA note $runId", log.notes)
         assertEquals(10, success(container.core.dashboard()).progress.xp)
         return log.id
     }

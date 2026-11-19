@@ -40,33 +40,33 @@ class LocalScanRecoveryTest {
         assertEquals("http://10.0.2.2:18094/v1/", BuildConfig.API_BASE_URL)
         val runId = UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
         val container = (compose.activity.application as WasteNotApplication).container
-        waitFor("Belum punya akun? Daftar")
+        waitFor("New here? Create an account")
         assertTrue(container.sessions.state.value is SessionState.SignedOut)
         try {
             assertTrue(container.sessions.register("Android QA 112", "scan-recovery-$runId@example.test",
                 UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
             assertTrue((container.core.metadata() as ApiResult.Success).value.isEnabled("ai_scan"))
-            waitFor("Input manual")
+            waitFor("Log manually")
             capturePhoto()
-            tap("Scan foto")
-            waitFor("Scan belum tersedia")
+            tap("Scan photo")
+            waitFor("Scan isn't available")
             captureUiPreview(compose, "detection-network-error", "local-scan-recovery", capturePanel = false)
-            tap("Coba lagi")
-            waitFor("Tinjau foto")
-            tap("Scan foto")
-            waitFor("Periksa objek")
+            tap("Try again")
+            waitFor("Review photo")
+            tap("Scan photo")
+            waitFor("Check the object")
             captureUiPreview(compose, "detection-retry", "local-scan-recovery", capturePanel = false)
             dismissScan()
 
             capturePhoto()
-            tap("Scan foto")
-            waitFor("Mengenali objek…")
+            tap("Scan photo")
+            waitFor("Identifying the object…")
             dismissScan()
             withContext(Dispatchers.IO) { delay(9_000) }
-            compose.onNodeWithText("Periksa objek").assertDoesNotExist()
-            compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-            waitFor("Arahkan ke satu benda")
-            compose.onNodeWithText("Periksa objek").assertDoesNotExist()
+            compose.onNodeWithText("Check the object").assertDoesNotExist()
+            compose.onNodeWithContentDescription("Log or scan waste").performClick()
+            waitFor("Point at one item")
+            compose.onNodeWithText("Check the object").assertDoesNotExist()
             dismissScan()
 
             val dashboard = (container.core.dashboard() as ApiResult.Success).value
@@ -84,34 +84,34 @@ class LocalScanRecoveryTest {
         assertEquals("http://10.0.2.2:18094/v1/", BuildConfig.API_BASE_URL)
         val runId = UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
         val container = (compose.activity.application as WasteNotApplication).container
-        waitFor("Belum punya akun? Daftar")
+        waitFor("New here? Create an account")
         assertTrue(container.sessions.state.value is SessionState.SignedOut)
         try {
             assertTrue(container.sessions.register("Android QA 112", "confidence-$runId@example.test",
                 UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
-            waitFor("Input manual")
+            waitFor("Log manually")
             val scanCache = compose.activity.cacheDir.resolve("scan")
             val beforeCapture = scanCache.listFiles().orEmpty().toSet()
             capturePhoto()
             val originalPhoto = (scanCache.listFiles().orEmpty().toSet() - beforeCapture).single()
-            tap("Ambil ulang")
-            waitFor("Arahkan ke satu benda")
+            tap("Retake")
+            waitFor("Point at one item")
             assertTrue(!originalPhoto.exists())
             captureInOpenSheet()
             val retake = (scanCache.listFiles().orEmpty().toSet() - beforeCapture).single()
-            tap("Scan foto")
-            waitFor("Periksa objek")
+            tap("Scan photo")
+            waitFor("Check the object")
             val candidate = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton)
-            val uncertain = hasText("Belum yakin. Periksa atau ambil ulang foto.")
-            val atOfferedThreshold = candidate and hasText("Skor deteksi 70%") and !uncertain
-            val belowOfferedThreshold = candidate and hasText("Skor deteksi 70%") and uncertain
-            val atLowerThreshold = candidate and hasText("Skor deteksi 50%") and uncertain
+            val uncertain = hasText("Not sure yet. Check it or retake the photo.")
+            val atOfferedThreshold = candidate and hasText("Detection score 70%") and !uncertain
+            val belowOfferedThreshold = candidate and hasText("Detection score 70%") and uncertain
+            val atLowerThreshold = candidate and hasText("Detection score 50%") and uncertain
             compose.onAllNodes(candidate).assertCountEquals(3)
             compose.onNode(atOfferedThreshold).assertIsSelected()
             compose.onNode(belowOfferedThreshold).assertIsNotSelected()
             compose.onNode(atLowerThreshold).performScrollTo().performClick().assertIsSelected()
             compose.onNode(atOfferedThreshold).assertIsNotSelected()
-            compose.onNode(hasText("Konfirmasi objek") and hasClickAction()).assertIsNotEnabled()
+            compose.onNode(hasText("Confirm object") and hasClickAction()).assertIsNotEnabled()
             dismissScan()
             assertTrue(!retake.exists())
         } finally {
@@ -126,54 +126,54 @@ class LocalScanRecoveryTest {
         assertEquals("http://10.0.2.2:18094/v1/", BuildConfig.API_BASE_URL)
         val runId = UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
         val container = (compose.activity.application as WasteNotApplication).container
-        waitFor("Belum punya akun? Daftar")
+        waitFor("New here? Create an account")
         assertTrue(container.sessions.state.value is SessionState.SignedOut)
         try {
             assertTrue(container.sessions.register("Android QA 112", "recommendation-$runId@example.test",
                 UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
-            waitFor("Input manual")
+            waitFor("Log manually")
             capturePhoto()
-            tap("Scan foto")
-            waitFor("Periksa objek")
+            tap("Scan photo")
+            waitFor("Check the object")
             confirmGlassAndFillConditions()
-            tap("Lihat saran")
-            waitFor("Saran belum bisa dimuat. Kondisi yang sudah kamu isi tetap tersimpan.")
-            tap("Coba lagi")
-            waitFor("Kondisi objek")
-            assertChoice(R.string.scan_cleanliness, "Bersih")
-            assertChoice(R.string.scan_integrity, "Utuh")
-            tap("Lihat saran")
-            waitFor("Menyiapkan saran…")
-            tap("Koreksi objek")
-            waitFor("Periksa objek")
-            tap("Konfirmasi objek")
-            choose(R.string.scan_cleanliness, "Kotor")
+            tap("See advice")
+            waitFor("Couldn't load the advice. Your answers are still saved.")
+            tap("Try again")
+            waitFor("Item condition")
+            assertChoice(R.string.scan_cleanliness, "Clean")
+            assertChoice(R.string.scan_integrity, "Intact")
+            tap("See advice")
+            waitFor("Preparing advice…")
+            tap("Correct the object")
+            waitFor("Check the object")
+            tap("Confirm object")
+            choose(R.string.scan_cleanliness, "Dirty")
             withContext(Dispatchers.IO) { delay(6_000) }
-            compose.onNodeWithText("Periksa saran").assertDoesNotExist()
-            assertChoice(R.string.scan_cleanliness, "Kotor")
-            choose(R.string.scan_cleanliness, "Bersih")
-            tap("Lihat saran")
+            compose.onNodeWithText("Review the advice").assertDoesNotExist()
+            assertChoice(R.string.scan_cleanliness, "Dirty")
+            choose(R.string.scan_cleanliness, "Clean")
+            tap("See advice")
             try {
-                waitFor("Periksa saran")
+                waitFor("Review the advice")
             } catch (error: ComposeTimeoutException) {
                 compose.onAllNodes(isRoot()).printToLog("RecommendationTimeout")
                 throw error
             }
-            tap("Gunakan pilihan, isi jumlah")
+            tap("Use this, add amount")
             val attached = compose.activity.getString(R.string.ai_provenance_attached)
             waitFor(attached)
             tap("Reduce")
-            choose(R.string.quantity_unit, "Benda")
-            compose.onNodeWithContentDescription("Jumlah yang dihindari").performScrollTo().performTextReplacement("2")
-            tap("Simpan catatan")
+            choose(R.string.quantity_unit, "Items")
+            compose.onNodeWithContentDescription("Amount avoided").performScrollTo().performTextReplacement("2")
+            tap("Save log")
             waitFor(compose.activity.getString(R.string.ai_reduce_manual))
             val before = (container.core.dashboard() as ApiResult.Success).value
             assertEquals(0L, before.summary.activityCount)
             tap(compose.activity.getString(R.string.ai_use_manual))
             compose.onNodeWithText(attached).assertDoesNotExist()
-            tap("Simpan catatan")
+            tap("Save log")
             try {
-                waitFor("Catatan tersimpan")
+                waitFor("Log saved")
             } catch (error: ComposeTimeoutException) {
                 compose.onAllNodes(isRoot()).printToLog("ReduceSaveTimeout")
                 throw error
@@ -194,25 +194,25 @@ class LocalScanRecoveryTest {
         assertEquals("http://10.0.2.2:18094/v1/", BuildConfig.API_BASE_URL)
         val runId = UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
         val container = (compose.activity.application as WasteNotApplication).container
-        waitFor("Belum punya akun? Daftar")
+        waitFor("New here? Create an account")
         assertTrue(container.sessions.state.value is SessionState.SignedOut)
         try {
             assertTrue(container.sessions.register("Android QA 112", "double-save-$runId@example.test",
                 UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
-            waitFor("Input manual")
+            waitFor("Log manually")
             capturePhoto()
-            tap("Scan foto")
-            waitFor("Periksa objek")
+            tap("Scan photo")
+            waitFor("Check the object")
             confirmGlassAndFillConditions()
-            tap("Lihat saran")
-            waitFor("Periksa saran")
-            tap("Gunakan pilihan, isi jumlah")
+            tap("See advice")
+            waitFor("Review the advice")
+            tap("Use this, add amount")
             waitFor(compose.activity.getString(R.string.ai_provenance_attached))
-            compose.onNodeWithContentDescription("Berat").performScrollTo().performTextReplacement("250")
+            compose.onNodeWithContentDescription("Weight").performScrollTo().performTextReplacement("250")
             compose.runOnUiThread { compose.activity.window.insetsController?.hide(WindowInsets.Type.ime()) }
-            compose.onNode(hasText("Simpan catatan") and hasClickAction()).performScrollTo().assertIsEnabled()
+            compose.onNode(hasText("Save log") and hasClickAction()).performScrollTo().assertIsEnabled()
                 .performTouchInput { doubleClick() }
-            waitFor("Catatan tersimpan")
+            waitFor("Log saved")
             val dashboard = (container.core.dashboard() as ApiResult.Success).value
             assertEquals(1L, dashboard.summary.activityCount)
             assertEquals(10, dashboard.progress.xp)
@@ -225,13 +225,13 @@ class LocalScanRecoveryTest {
     }
 
     private fun confirmGlassAndFillConditions() {
-        choose(R.string.scan_material, "Kaca")
-        choose(R.string.scan_object_type, "Botol kaca")
-        tap("Konfirmasi objek")
-        waitFor("Kondisi objek")
-        choose(R.string.scan_cleanliness, "Bersih")
-        choose(R.string.scan_integrity, "Utuh")
-        choose(R.string.scan_recycling_access, "Ya")
+        choose(R.string.scan_material, "Glass")
+        choose(R.string.scan_object_type, "Glass bottle")
+        tap("Confirm object")
+        waitFor("Item condition")
+        choose(R.string.scan_cleanliness, "Clean")
+        choose(R.string.scan_integrity, "Intact")
+        choose(R.string.scan_recycling_access, "Yes")
     }
 
     @Test fun rejectsInvalidAdviceAndKeepsSpecialHandlingManual() = runTest(timeout = 3.minutes) {
@@ -241,33 +241,33 @@ class LocalScanRecoveryTest {
         assertEquals("http://10.0.2.2:18094/v1/", BuildConfig.API_BASE_URL)
         val runId = UUID.fromString(requireNotNull(arguments.getString("fixtureRunId")))
         val container = (compose.activity.application as WasteNotApplication).container
-        waitFor("Belum punya akun? Daftar")
+        waitFor("New here? Create an account")
         assertTrue(container.sessions.state.value is SessionState.SignedOut)
         try {
             assertTrue(container.sessions.register("Android QA 112", "scan-policy-$runId@example.test",
                 UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
-            waitFor("Input manual")
+            waitFor("Log manually")
             capturePhoto()
-            tap("Scan foto")
-            waitFor("Periksa objek")
+            tap("Scan photo")
+            waitFor("Check the object")
             confirmGlassAndFillConditions()
             repeat(4) {
-                tap("Lihat saran")
+                tap("See advice")
                 waitFor(compose.activity.getString(R.string.scan_recommendation_error))
-                compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
-                tap("Coba lagi")
-                waitFor("Kondisi objek")
-                assertChoice(R.string.scan_cleanliness, "Bersih")
+                compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
+                tap("Try again")
+                waitFor("Item condition")
+                assertChoice(R.string.scan_cleanliness, "Clean")
             }
             tap(compose.activity.getString(R.string.scan_risk_flag))
             choose(R.string.scan_risk_type, compose.activity.getString(R.string.scan_risk_sharp))
-            tap("Lihat saran")
-            waitFor("Panduan penanganan khusus")
+            tap("See advice")
+            waitFor("Specialist handling advice")
             compose.onNodeWithText("How Do I Recycle Common Recyclables").performScrollTo().assertIsDisplayed()
-            compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
+            compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
             compose.onNodeWithText(compose.activity.getString(R.string.scan_method_confirmation)).assertDoesNotExist()
-            compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).performClick()
-            waitFor("Cara pengelolaan")
+            compose.onNode(hasText("Log manually") and hasAnyAncestor(hasTestTag("capture-sheet"))).performClick()
+            waitFor("How you handled it")
             compose.onNodeWithText(compose.activity.getString(R.string.ai_provenance_attached)).assertDoesNotExist()
             val dashboard = (container.core.dashboard() as ApiResult.Success).value
             assertEquals(0L, dashboard.summary.activityCount)
@@ -287,27 +287,27 @@ class LocalScanRecoveryTest {
     }
 
     private fun capturePhoto() {
-        compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
+        compose.onNodeWithContentDescription("Log or scan waste").performClick()
         captureInOpenSheet()
     }
 
     private fun captureInOpenSheet() {
         compose.waitUntil(30_000) {
-            compose.onAllNodesWithText("Aktifkan kamera").fetchSemanticsNodes().isNotEmpty() ||
-                compose.onAllNodes(hasText("Ambil foto") and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodesWithText("Turn on camera").fetchSemanticsNodes().isNotEmpty() ||
+                compose.onAllNodes(hasText("Take photo") and isEnabled()).fetchSemanticsNodes().isNotEmpty()
         }
-        if (compose.onAllNodesWithText("Aktifkan kamera").fetchSemanticsNodes().isNotEmpty()) tap("Aktifkan kamera")
+        if (compose.onAllNodesWithText("Turn on camera").fetchSemanticsNodes().isNotEmpty()) tap("Turn on camera")
         compose.waitUntil(30_000) {
-            compose.onAllNodes(hasText("Ambil foto") and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodes(hasText("Take photo") and isEnabled()).fetchSemanticsNodes().isNotEmpty()
         }
-        tap("Ambil foto")
-        waitFor("Tinjau foto")
+        tap("Take photo")
+        waitFor("Review photo")
     }
 
     private fun dismissScan() {
-        compose.onNodeWithContentDescription("Tutup scan").performClick()
+        compose.onNodeWithContentDescription("Close scan").performClick()
         compose.waitUntil(15_000) {
-            compose.onAllNodesWithContentDescription("Tutup scan").fetchSemanticsNodes().isEmpty()
+            compose.onAllNodesWithContentDescription("Close scan").fetchSemanticsNodes().isEmpty()
         }
     }
 

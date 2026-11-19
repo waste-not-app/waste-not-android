@@ -30,12 +30,12 @@ class ProfileDesignTest {
         var records = 0; var settings = 0; var exits = 0
         show { ProfileScreen(user, dummyProgress(emptyList(), java.time.LocalDate.of(2026, 10, 22)), false, null, PaddingValues(), {}, { records++ }, { settings++ }, { exits++ }) }
         compose.onNodeWithText("0 XP total").assertExists()
-        compose.onNodeWithText("100 XP lagi ke level 2").assertExists()
+        compose.onNodeWithText("100 XP to level 2").assertExists()
         compose.onNodeWithText("WW").assertExists()
         capture("profile-empty")
-        compose.onNodeWithText("Catat aktivitas").performScrollTo().performClick()
-        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
-        compose.onNodeWithText("Keluar").performScrollTo().performClick()
+        compose.onNodeWithText("Log activity").performScrollTo().performClick()
+        compose.onNodeWithText("Settings").performScrollTo().performClick()
+        compose.onNodeWithText("Sign out").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, records); assertEquals(1, settings); assertEquals(1, exits) }
         compose.onNodeWithText("Achievement").assertDoesNotExist()
     }
@@ -61,40 +61,40 @@ class ProfileDesignTest {
         } }
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
-            compose.onNodeWithText("3 hari beruntun").performScrollTo().assertIsDisplayed()
-            compose.onNodeWithText("Kamu sudah mencatat hari ini.").performScrollTo().assertIsDisplayed()
-            compose.onNodeWithText("Terbaik: 7 hari").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("3-day streak").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("You've logged today.").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Best: 7 days").performScrollTo().assertIsDisplayed()
             captureUiPreview(compose, "S14-streak-${if (theme) "dark" else "light"}", "backend-contract-preview")
         }
         compose.runOnIdle { progress = progress!!.copy(currentStreak = null) }
-        compose.onNodeWithText("3 hari beruntun").assertDoesNotExist()
-        compose.onNodeWithText("Kamu sudah mencatat hari ini.").assertDoesNotExist()
-        compose.onNodeWithText("Terbaik: 7 hari").assertExists()
+        compose.onNodeWithText("3-day streak").assertDoesNotExist()
+        compose.onNodeWithText("You've logged today.").assertDoesNotExist()
+        compose.onNodeWithText("Best: 7 days").assertExists()
         compose.runOnIdle { progress = progress!!.copy(currentStreak = 3, bestStreak = null, hasLoggedToday = false) }
-        compose.onNodeWithText("3 hari beruntun").assertExists()
-        compose.onNodeWithText("Belum mencatat hari ini.").assertExists()
-        compose.onNodeWithText("Terbaik:", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("3-day streak").assertExists()
+        compose.onNodeWithText("You haven't logged today yet.").assertExists()
+        compose.onNodeWithText("Best:", substring = true).assertDoesNotExist()
         compose.runOnIdle { progress = UserProgress(0, 0, 1, 0, 100, 0, 0, false) }
-        compose.onNodeWithText("0 hari beruntun").assertExists()
-        compose.onNodeWithText("Terbaik: 0 hari").assertExists()
-        compose.onNodeWithText("Belum mencatat hari ini.").assertDoesNotExist()
+        compose.onNodeWithText("0-day streak").assertExists()
+        compose.onNodeWithText("Best: 0 days").assertExists()
+        compose.onNodeWithText("You haven't logged today yet.").assertDoesNotExist()
         captureUiPreview(compose, "S14-streak-zero", "backend-contract-preview")
         compose.runOnIdle { progress = progress!!.copy(currentStreak = null, bestStreak = null) }
-        compose.onNodeWithText("Hari berturut-turut").assertDoesNotExist()
-        compose.onAllNodesWithText("0 hari", substring = true).assertCountEquals(0)
+        compose.onNodeWithText("Days in a row").assertDoesNotExist()
+        compose.onAllNodesWithText("0 days", substring = true).assertCountEquals(0)
         captureUiPreview(compose, "S14-streak-unknown", "backend-contract-preview")
     }
 
     @Test fun settingsHasTheRealVersionReadOnlyZoneAndNoInactiveFeatureLinks() {
         var calls = 0
         show { SettingsScreen(user, ThemeMode.DARK, PaddingValues(), { calls++ }) }
-        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("App theme").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, calls) }
         capture("settings-theme")
         compose.onNodeWithText("Versi ${BuildConfig.VERSION_NAME}").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Zona akun ditetapkan saat pendaftaran.").assertExists()
-        compose.onNodeWithText("Ringkasan ini bukan kebijakan privasi resmi.", substring = true).assertExists()
-        compose.onNodeWithText("Pengingat harian").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Your account's time zone is set when you register.").assertExists()
+        compose.onNodeWithText("This summary isn't the official privacy policy.", substring = true).assertExists()
+        compose.onNodeWithText("Daily reminder").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Achievement").assertDoesNotExist()
         capture("settings-privacy")
     }

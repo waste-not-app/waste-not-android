@@ -31,13 +31,13 @@ class LogDetailNavigationTest {
     private fun open() {
         ready()
         compose.onNodeWithText("250 g").performScrollTo().performClick()
-        compose.onNodeWithText("Detail catatan").assertIsDisplayed()
+        compose.onNodeWithText("Log details").assertIsDisplayed()
         detailReady()
     }
     private fun detailReady() {
-        compose.waitUntil(30_000) { compose.onAllNodes(hasText("Ubah catatan") and hasClickAction() and isEnabled()).fetchSemanticsNodes().isNotEmpty() }
+        compose.waitUntil(30_000) { compose.onAllNodes(hasText("Edit log") and hasClickAction() and isEnabled()).fetchSemanticsNodes().isNotEmpty() }
     }
-    private fun delete() { compose.onNodeWithText("Hapus catatan", substring = false).performScrollTo().performClick() }
+    private fun delete() { compose.onNodeWithText("Delete log", substring = false).performScrollTo().performClick() }
 
     @Test fun cancelThenConfirmedDeleteRefreshesHistoryTotalsAndXpAcrossRecreation() {
         open()
@@ -45,45 +45,45 @@ class LogDetailNavigationTest {
         compose.onNodeWithText("Dibuat ", substring = true).performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Diperbarui ", substring = true).performScrollTo().assertIsDisplayed()
         delete()
-        compose.onNodeWithText("Statistik dan XP akan dihitung ulang.", substring = true).assertIsDisplayed()
+        compose.onNodeWithText("Your statistics and XP will be recalculated.", substring = true).assertIsDisplayed()
         capture("delete-light")
-        compose.onNodeWithText("Batal").performScrollTo().performClick()
-        compose.onNodeWithText("Detail catatan").assertIsDisplayed()
+        compose.onNodeWithText("Cancel").performScrollTo().performClick()
+        compose.onNodeWithText("Log details").assertIsDisplayed()
         delete()
         compose.activityRule.scenario.recreate()
-        compose.waitUntil(30_000) { compose.onAllNodesWithText("Hapus catatan?").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Hapus", substring = false).performScrollTo().performClick()
-        compose.waitUntil(30_000) { compose.onAllNodesWithText("Catatan dihapus.").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNode(tabs and hasText("Riwayat")).assertIsSelected()
+        compose.waitUntil(30_000) { compose.onAllNodesWithText("Delete this log?").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Clear", substring = false).performScrollTo().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodesWithText("Log deleted.").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNode(tabs and hasText("History")).assertIsSelected()
         capture("history-after-delete")
-        tab("Profil")
+        tab("Profile")
         compose.onNodeWithText("40 XP total").performScrollTo().assertIsDisplayed()
-        tab("Statistik")
+        tab("Stats")
         compose.onNodeWithText("1,15 kg").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("1 dari 3 aktivitas penanganan", substring = true).performScrollTo().assertIsDisplayed()
-        tab("Beranda")
+        compose.onNodeWithText("1 of 3 handling activities", substring = true).performScrollTo().assertIsDisplayed()
+        tab("Home")
         compose.onNode(hasText("400 g") and !hasClickAction()).performScrollTo().assertIsDisplayed()
         compose.activityRule.scenario.recreate()
         compose.waitUntil(30_000) { compose.onAllNodes(hasText("400 g") and !hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
-        tab("Profil")
+        tab("Profile")
         compose.onNodeWithText("40 XP total").performScrollTo().assertIsDisplayed()
     }
 
     @Test fun darkDetailAndDeleteCancelKeepTheRecordAvailable() {
-        ready(); tab("Profil")
-        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
-        compose.onNode(hasText("Gelap") and hasAnyAncestor(isDialog())).performClick()
-        compose.onNodeWithText("Tutup").performClick()
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        tab("Beranda"); open()
+        ready(); tab("Profile")
+        compose.onNodeWithText("Settings").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("App theme").performScrollTo().performClick()
+        compose.onNode(hasText("Dark") and hasAnyAncestor(isDialog())).performClick()
+        compose.onNodeWithText("Close").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
+        tab("Home"); open()
         capture("detail-dark")
         delete(); capture("delete-dark")
-        compose.onNodeWithText("Batal").performScrollTo().performClick()
+        compose.onNodeWithText("Cancel").performScrollTo().performClick()
         compose.onNodeWithText("250 g").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Ubah catatan").performScrollTo().assertIsEnabled()
-        if (compose.onAllNodes(tabs).fetchSemanticsNodes().isEmpty()) compose.onNodeWithContentDescription("Kembali").performClick()
-        tab("Profil")
+        compose.onNodeWithText("Edit log").performScrollTo().assertIsEnabled()
+        if (compose.onAllNodes(tabs).fetchSemanticsNodes().isEmpty()) compose.onNodeWithContentDescription("Back").performClick()
+        tab("Profile")
         compose.onNodeWithText("50 XP total").performScrollTo().assertIsDisplayed()
     }
 
@@ -91,21 +91,21 @@ class LogDetailNavigationTest {
         ready()
         compose.onNodeWithText("250 g").performScrollTo().performTouchInput { doubleClick() }
         detailReady()
-        compose.onNodeWithContentDescription("Kembali").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
         compose.onNodeWithText("650 g").performScrollTo().assertIsDisplayed()
         open()
         val retainedInHome = compose.onAllNodes(tabs).fetchSemanticsNodes().isNotEmpty()
-        if (!retainedInHome) compose.onNodeWithContentDescription("Kembali").performClick()
-        tab("Riwayat")
+        if (!retainedInHome) compose.onNodeWithContentDescription("Back").performClick()
+        tab("History")
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("250 g"))
         compose.onNodeWithText("250 g").performClick()
         detailReady()
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        compose.onNode(tabs and hasText("Riwayat")).assertIsSelected()
-        tab("Beranda")
+        compose.onNodeWithContentDescription("Back").performClick()
+        compose.onNode(tabs and hasText("History")).assertIsSelected()
+        tab("Home")
         if (retainedInHome) {
-            compose.onNodeWithText("Detail catatan").assertIsDisplayed()
-            compose.onNodeWithContentDescription("Kembali").performClick()
+            compose.onNodeWithText("Log details").assertIsDisplayed()
+            compose.onNodeWithContentDescription("Back").performClick()
         }
         compose.onNodeWithText("650 g").performScrollTo().assertIsDisplayed()
     }
@@ -113,18 +113,18 @@ class LogDetailNavigationTest {
     @Test fun wideDeleteReturnsToHistoryListWhenHistoryRetainsAnotherDetail() {
         assumeTrue(compose.activity.resources.configuration.screenWidthDp >= 600)
         ready()
-        tab("Riwayat")
+        tab("History")
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("400 g"))
         compose.onNodeWithText("400 g").performClick()
         detailReady()
-        tab("Beranda")
+        tab("Home")
         open()
         delete()
-        compose.onNodeWithText("Hapus", substring = false).performScrollTo().performClick()
-        compose.waitUntil(30_000) { compose.onAllNodesWithText("Catatan dihapus.").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNode(tabs and hasText("Riwayat")).assertIsSelected()
-        compose.onNodeWithText("Detail catatan").assertDoesNotExist()
-        compose.onNodeWithText("Catatan dihapus.").assertIsDisplayed()
+        compose.onNodeWithText("Clear", substring = false).performScrollTo().performClick()
+        compose.waitUntil(30_000) { compose.onAllNodesWithText("Log deleted.").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNode(tabs and hasText("History")).assertIsSelected()
+        compose.onNodeWithText("Log details").assertDoesNotExist()
+        compose.onNodeWithText("Log deleted.").assertIsDisplayed()
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("400 g"))
         compose.onNodeWithText("400 g").assertIsDisplayed()
     }

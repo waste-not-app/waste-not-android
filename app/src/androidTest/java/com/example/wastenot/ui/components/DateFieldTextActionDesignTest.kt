@@ -45,27 +45,27 @@ class DateFieldTextActionDesignTest {
             val before = updates
             compose.onNodeWithText(WasteFormat.activityDate(initial)).performClick()
             compose.onNodeWithText("Monday, September 14, 2026").performScrollTo().performClick()
-            compose.onNodeWithText("Batal").assertIsDisplayed().assertHeightIsAtLeast(48.dp).performTouchInput { click() }
+            compose.onNodeWithText("Cancel").assertIsDisplayed().assertHeightIsAtLeast(48.dp).performTouchInput { click() }
             compose.onNode(isDialog()).assertDoesNotExist()
             compose.runOnIdle { assertEquals(initial, selected); assertEquals(before, updates) }
 
             compose.onNodeWithText(WasteFormat.activityDate(initial)).performClick()
             compose.onNodeWithText("Monday, September 14, 2026").performScrollTo().performClick()
-            compose.onNodeWithText("Terapkan").assertIsEnabled().assertHeightIsAtLeast(48.dp).performTouchInput { click() }
+            compose.onNodeWithText("Apply").assertIsEnabled().assertHeightIsAtLeast(48.dp).performTouchInput { click() }
             compose.onNode(isDialog()).assertDoesNotExist()
             compose.runOnIdle { assertEquals(changed, selected); assertEquals(before + 1, updates); selected = null }
 
-            compose.onNodeWithText("Pilih tanggal").performClick()
-            val action = compose.onNodeWithText("Terapkan").assertIsDisplayed().assertIsNotEnabled().assertHeightIsAtLeast(48.dp)
+            compose.onNodeWithText("Choose a date").performClick()
+            val action = compose.onNodeWithText("Apply").assertIsDisplayed().assertIsNotEnabled().assertHeightIsAtLeast(48.dp)
             val layouts = mutableListOf<TextLayoutResult>()
-            compose.onNodeWithText("Terapkan", useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+            compose.onNodeWithText("Apply", useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
             assertEquals(if (theme) OnSurfaceVariantDark else OnSurfaceVariant, layouts.single().layoutInput.style.color)
             assertFalse(layouts.single().hasVisualOverflow)
             capture("date-text-${if (theme) "dark" else "light"}-unselected")
             action.performTouchInput { click() }
             compose.runOnIdle { assertNull(selected); assertEquals(before + 1, updates) }
             compose.onNode(isDialog()).assertExists()
-            compose.onNodeWithText("Batal").performTouchInput { click() }
+            compose.onNodeWithText("Cancel").performTouchInput { click() }
             compose.onNode(isDialog()).assertDoesNotExist()
         }
         compose.runOnIdle { assertEquals(2, updates) }

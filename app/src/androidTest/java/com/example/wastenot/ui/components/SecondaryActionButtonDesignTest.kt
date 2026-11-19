@@ -44,7 +44,7 @@ class SecondaryActionButtonDesignTest {
     private fun inspect(dark: Boolean) {
         val theme = if (dark) "dark" else "light"
         val scheme = if (dark) DarkColorScheme else LightColorScheme
-        val labels = listOf("Input manual", "Batal", "Gunakan isian versi terbaru", "Keluar dari akun perangkat ini")
+        val labels = listOf("Log manually", "Cancel", "Use the latest version", "Sign out of this device")
         compose.setContent { WasteNotTheme(dark) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                 Column(Modifier.verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -102,10 +102,10 @@ class SecondaryActionButtonDesignTest {
         var calls = 0
         compose.setContent { WasteNotTheme {
             Column(Modifier.fillMaxSize()) {
-                SecondaryActionButton("Batal", { calls++; enabled.value = false }, enabled = enabled.value)
+                SecondaryActionButton("Cancel", { calls++; enabled.value = false }, enabled = enabled.value)
             }
         } }
-        val action = compose.onNodeWithText("Batal")
+        val action = compose.onNodeWithText("Cancel")
         assertTrue("A compact caller must not be expanded to the window width",
             action.fetchSemanticsNode().boundsInRoot.width < compose.onRoot().fetchSemanticsNode().boundsInRoot.width)
         InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB)

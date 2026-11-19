@@ -27,17 +27,17 @@ class CorruptDraftRecoveryTest {
     private fun waitFor(text: String) { compose.waitUntil(30_000) { compose.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty() } }
 
     @Test fun corruptDraftShowsRecoveryBeforeAnyBlankEditorAndOnlyExplicitDiscardClearsIt() {
-        waitFor("Draf belum bisa dibuka")
-        compose.onNodeWithText("Cara pengelolaan").assertDoesNotExist()
-        compose.onNodeWithText("Beranda").assertDoesNotExist()
+        waitFor("Couldn't open your draft")
+        compose.onNodeWithText("How you handled it").assertDoesNotExist()
+        compose.onNodeWithText("Home").assertDoesNotExist()
         captureDraftFixture("draft-corrupt-recovery")
-        compose.onNodeWithText("Buang draf tersimpan").performScrollTo().performClick()
-        compose.onNodeWithText("Buang draf tersimpan?").assertIsDisplayed()
-        compose.onNode(hasText("Batal") and hasAnyAncestor(isDialog())).performScrollTo().performClick()
-        compose.onNodeWithText("Draf belum bisa dibuka").assertExists()
+        compose.onNodeWithText("Discard saved draft").performScrollTo().performClick()
+        compose.onNodeWithText("Discard saved draft?").assertIsDisplayed()
+        compose.onNode(hasText("Cancel") and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.onNodeWithText("Couldn't open your draft").assertExists()
         assertEquals("{", draftTestContext.getSharedPreferences(LocalEditorDraftStore.preferencesName("dummy-owner"), Context.MODE_PRIVATE).getString("draft", null))
-        compose.onNodeWithText("Buang draf tersimpan").performScrollTo().performClick()
-        compose.onNode(hasText("Buang draf tersimpan") and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.onNodeWithText("Discard saved draft").performScrollTo().performClick()
+        compose.onNode(hasText("Discard saved draft") and hasAnyAncestor(isDialog())).performScrollTo().performClick()
         waitFor("650 g")
         assertNull(readDraftFixture())
         runTest {

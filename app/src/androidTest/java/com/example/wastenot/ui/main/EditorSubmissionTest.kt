@@ -42,7 +42,7 @@ class EditorSubmissionTest {
 
     private fun draft() = EditorDraft.from(null, today).apply {
         change(EditorField.QUANTITY, values.copy(category = WasteCategory.PLASTIC, method = DisposalMethod.RECYCLE,
-            quantity = QuantityInput("0,25", QuantityUnit.KILOGRAM), notes = "  Isian awal  "))
+            quantity = QuantityInput("0,25", QuantityUnit.KILOGRAM), notes = "  Original entry  "))
     }
 
     @Test fun uncertainLightSubmissionRestoresAndRetriesTheSameInput() = uncertain(false)
@@ -55,19 +55,19 @@ class EditorSubmissionTest {
         compose.setContent { EditorHost(false) {
             LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(), {}, {}, {})
         } }
-        compose.onNodeWithText("Lanjutkan sebagai catatan manual").assertDoesNotExist()
+        compose.onNodeWithText("Continue as a manual log").assertDoesNotExist()
         compose.onNodeWithText(InstrumentationRegistry.getInstrumentation().targetContext.getString(
             com.example.wastenot.R.string.ai_provenance_attached)).assertIsDisplayed()
         compose.runOnIdle {
             assertNotNull(form.values.aiProvenance)
             form.change(EditorField.METHOD, form.values.copy(method = DisposalMethod.REDUCE))
         }
-        compose.onNodeWithText("Lanjutkan sebagai catatan manual").performScrollTo().assertIsDisplayed().performClick()
+        compose.onNodeWithText("Continue as a manual log").performScrollTo().assertIsDisplayed().performClick()
         compose.runOnIdle {
             assertNull(form.values.aiProvenance)
             assertEquals(DisposalMethod.REDUCE, form.values.method)
         }
-        compose.onNodeWithText("Lanjutkan sebagai catatan manual").assertDoesNotExist()
+        compose.onNodeWithText("Continue as a manual log").assertDoesNotExist()
     }
 
     @Test fun expiredAiEditorOffersExplicitManualRecoveryWithoutChangingFields() {
@@ -79,7 +79,7 @@ class EditorSubmissionTest {
         compose.setContent { EditorHost(true) {
             LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(), {}, {}, {})
         } }
-        compose.onNodeWithText("Lanjutkan sebagai catatan manual").performScrollTo().assertIsEnabled().performClick()
+        compose.onNodeWithText("Continue as a manual log").performScrollTo().assertIsEnabled().performClick()
         compose.runOnIdle {
             assertEquals(before.copy(aiProvenance = null), form.values)
             assertNull(form.prepareSubmission(today)!!.aiProvenance)
@@ -108,20 +108,20 @@ class EditorSubmissionTest {
                 }, { fail("An unresolved write must retain its original request") }, {}, Modifier.fillMaxSize())
             }
         }
-        compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
-        assertReadableBanner("Percobaan terakhir: Terlalu banyak permintaan.",
+        compose.onNodeWithText("Save log").performScrollTo().performClick()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
+        assertReadableBanner("Last attempt: Too many requests.",
             "submission-followup-banner-${if (dark) "dark" else "light"}")
         assertFrozen()
-        assertActionInViewport("Coba lagi")
+        assertActionInViewport("Try again")
         capture("submission-followup-action-${if (dark) "dark" else "light"}")
         restoration.emulateSavedInstanceStateRestore()
         assertFrozen()
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
-        assertReadableBanner("Percobaan terakhir: Isian belum diterima.",
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
+        assertReadableBanner("Last attempt: Some entries weren't accepted.",
             "submission-followup-validation-${if (dark) "dark" else "light"}")
         assertFrozen()
-        assertActionInViewport("Coba lagi")
+        assertActionInViewport("Try again")
         compose.runOnIdle {
             assertEquals(3, received.size)
             assertTrue(received.all { it == received.first() })
@@ -143,9 +143,9 @@ class EditorSubmissionTest {
                 Modifier.fillMaxSize(), persistence = EditorPersistenceState(loading = false, ready = true, failure = DraftFailure.FINISH),
                 saveConfirmed = true, onRetryPersistence = { cleanups++ })
         } }
-        compose.onNodeWithText("Hasil penyimpanan belum diketahui.", substring = true).assertDoesNotExist()
-        compose.onNodeWithText("Percobaan terakhir:", substring = true).assertDoesNotExist()
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        compose.onNodeWithText("We don't know whether this was saved.", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Last attempt:", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, cleanups); assertEquals(0, writes) }
     }
 
@@ -161,25 +161,25 @@ class EditorSubmissionTest {
                     { received.add(it); busy.value = true }, { error("Unknown result must offer an explicit retry") }, {}, Modifier.fillMaxSize())
             }
         }
-        compose.onNodeWithText("Simpan catatan").performScrollTo().performClick()
-        compose.onNodeWithText("Menyimpan…").assertIsNotEnabled()
+        compose.onNodeWithText("Save log").performScrollTo().performClick()
+        compose.onNodeWithText("Saving…").assertIsNotEnabled()
         assertFrozen()
         compose.runOnIdle {
             assertEquals(1, received.size)
             assertEquals(Quantity.Weight.of(250), received.single().quantity)
-            assertEquals("Isian awal", received.single().notes)
+            assertEquals("Original entry", received.single().notes)
             current.submissionFailed(ApiFailureKind.TIMEOUT)
             busy.value = false
         }
-        compose.onNodeWithText("Hasil penyimpanan belum diketahui.", substring = true).performScrollTo().assertIsDisplayed()
-        assertActionInViewport("Coba lagi")
+        compose.onNodeWithText("We don't know whether this was saved.", substring = true).performScrollTo().assertIsDisplayed()
+        assertActionInViewport("Try again")
         capture("submission-unknown-${if (dark) "dark" else "light"}")
         restoration.emulateSavedInstanceStateRestore()
         assertFrozen()
-        compose.onNodeWithContentDescription("Berat").assertTextContains("0,25")
-        compose.onNodeWithContentDescription("Catatan (opsional)").assertTextContains("  Isian awal  ")
+        compose.onNodeWithContentDescription("Weight").assertTextContains("0,25")
+        compose.onNodeWithContentDescription("Notes (optional)").assertTextContains("  Original entry  ")
         compose.runOnIdle { assertEquals(1, received.size) }
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
         compose.runOnIdle {
             assertEquals(2, received.size)
             assertEquals(received[0], received[1])
@@ -199,12 +199,12 @@ class EditorSubmissionTest {
                 { fail("A rejected request must not be retried") }, { history++ }, {}, Modifier.fillMaxSize())
         } }
         assertFrozen()
-        compose.onNodeWithText(if (error == ApiFailureKind.DELETED) "Catatan dari permintaan ini sudah dihapus." else "Permintaan ini sudah dipakai untuk isian lain.",
+        compose.onNodeWithText(if (error == ApiFailureKind.DELETED) "The log from this request was deleted" else "This request was already used for different entries.",
             substring = true).performScrollTo().assertIsDisplayed()
-        assertActionInViewport("Lihat riwayat")
+        assertActionInViewport("See history")
         capture("submission-${if (error == ApiFailureKind.DELETED) "deleted-light" else "conflict-dark"}")
-        compose.onNodeWithText("Coba lagi").assertDoesNotExist()
-        compose.onNodeWithText("Lihat riwayat").performClick()
+        compose.onNodeWithText("Try again").assertDoesNotExist()
+        compose.onNodeWithText("See history").performClick()
         compose.runOnIdle { assertEquals(1, history) }
     }
 
@@ -215,14 +215,14 @@ class EditorSubmissionTest {
         compose.setContent { EditorHost(false) {
             LogEditorScreen(draft, today, "Asia/Jakarta", false, PaddingValues(), {}, {}, {}, Modifier.fillMaxSize())
         } }
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().assertIsEnabled().performTextReplacement("Koreksi")
-        compose.onNodeWithText("Simpan catatan").performScrollTo().assertIsEnabled()
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().assertIsEnabled().performTextReplacement("Koreksi")
+        compose.onNodeWithText("Save log").performScrollTo().assertIsEnabled()
         compose.runOnIdle { assertEquals("Koreksi", draft.prepareSubmission(today)!!.notes) }
     }
 
     private fun assertFrozen() {
         listOf("Reduce", "Reuse", "Recycle", "Trash").forEach { compose.onNodeWithText(it).assertIsNotEnabled() }
-        listOf("Kategori", "Berat", "Satuan", "Catatan (opsional)").forEach {
+        listOf("Category", "Weight", "Unit", "Notes (optional)").forEach {
             compose.onNodeWithContentDescription(it).assertIsNotEnabled()
         }
     }

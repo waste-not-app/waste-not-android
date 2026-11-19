@@ -42,27 +42,27 @@ class ThemeFailureStartupTest {
         compose.waitUntil(15_000) { compose.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty() }
     }
     @Test fun preferenceFailuresKeepSignInUsableAndRetryRecoversTheRequestedChoice() {
-        val readFailure = "Pilihan tampilan belum bisa dibaca. Coba lagi."
-        val writeFailure = "Pilihan tampilan belum bisa dipastikan tersimpan. Coba lagi."
+        val readFailure = "Couldn't load your display settings. Try again."
+        val writeFailure = "Couldn't confirm your display settings were saved. Try again."
         waitFor(readFailure)
         compose.onNodeWithContentDescription("Email").performScrollTo().assertIsDisplayed()
         captureUiPreview(compose, "read-failure", "theme-datastore")
         compose.runOnIdle { failRead = false }
-        compose.onNodeWithText("Coba lagi").performClick()
+        compose.onNodeWithText("Try again").performClick()
         compose.waitUntil { compose.onAllNodesWithText(readFailure).fetchSemanticsNodes().isEmpty() }
-        val themeButton = compose.onNodeWithContentDescription("Tampilan")
+        val themeButton = compose.onNodeWithContentDescription("Display")
         if (!themeButton.isDisplayed()) themeButton.performScrollTo()
         themeButton.performClick()
-        compose.onNodeWithText("Gelap").assertIsSelected()
+        compose.onNodeWithText("Dark").assertIsSelected()
         captureUiPreview(compose, "read-recovered-dark", "theme-datastore")
         compose.runOnIdle { failWrite = true }
-        compose.onNodeWithText("Terang").performClick().assertIsSelected()
-        compose.onNodeWithText("Tutup").performClick()
+        compose.onNodeWithText("Light").performClick().assertIsSelected()
+        compose.onNodeWithText("Close").performClick()
         waitFor(writeFailure)
         assertEquals(ThemeMode.DARK, durable.value)
         captureUiPreview(compose, "write-failure", "theme-datastore")
         compose.runOnIdle { failWrite = false }
-        compose.onNodeWithText("Coba lagi").performClick()
+        compose.onNodeWithText("Try again").performClick()
         compose.waitUntil { compose.onAllNodesWithText(writeFailure).fetchSemanticsNodes().isEmpty() }
         assertEquals(ThemeMode.LIGHT, durable.value)
         captureUiPreview(compose, "write-recovered-light", "theme-datastore")

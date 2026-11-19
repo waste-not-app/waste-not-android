@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-@Preview(name = "Terang", widthDp = 360)
-@Preview(name = "Gelap", widthDp = 360, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Light", widthDp = 360)
+@Preview(name = "Dark", widthDp = 360, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Preview(name = "Teks 200%", widthDp = 360, fontScale = 2f)
 @Composable
 internal fun ThemePreview() {
@@ -37,17 +37,17 @@ internal fun ThemePreview() {
                         .background(LocalWasteNotGradients.current.summary, MaterialTheme.shapes.large)
                         .padding(24.dp),
                 ) {
-                    Text("Data contoh", color = SummarySecondaryText)
+                    Text("Sample data", color = SummarySecondaryText)
                     Text("650 g", style = MaterialTheme.typography.displayLarge, color = SummaryText)
                 }
-                Text("Sampah ditangani hari ini", style = MaterialTheme.typography.titleMedium)
+                Text("Waste handled today", style = MaterialTheme.typography.titleMedium)
                 Text("Reduce dicatat terpisah.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                OutlinedTextField("0,25", {}, label = { Text("Berat (kg)") })
-                Button(onClick = {}) { Text("Catat aktivitas") }
+                OutlinedTextField("0,25", {}, label = { Text("Weight (kg)") })
+                Button(onClick = {}) { Text("Log activity") }
                 listOf(
                     Typography.bodyLarge, Typography.titleMedium, Typography.titleLarge,
                     Typography.headlineLarge, Typography.displaySmall, Typography.displayMedium,
-                ).forEach { Text("250 g · 2 benda", style = it) }
+                ).forEach { Text("250 g · 2 items", style = it) }
             }
         }
     }

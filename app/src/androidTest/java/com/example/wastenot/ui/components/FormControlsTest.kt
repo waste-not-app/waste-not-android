@@ -41,21 +41,21 @@ class FormControlsTest {
     @Test fun unitChangesUseExactParserAndClearOtherQuantityKind() {
         val input = mutableStateOf(QuantityInput("250"))
         compose.setContent { WasteNotTheme { QuantityField(input.value, { input.value = it }) } }
-        val unitLabel = compose.onNodeWithText("Satuan").fetchSemanticsNode().boundsInWindow
-        val unitField = compose.onNodeWithContentDescription("Satuan").fetchSemanticsNode().boundsInWindow
+        val unitLabel = compose.onNodeWithText("Unit").fetchSemanticsNode().boundsInWindow
+        val unitField = compose.onNodeWithContentDescription("Unit").fetchSemanticsNode().boundsInWindow
         assertEquals("Unit label must align with its control", unitField.left, unitLabel.left, 1f)
-        compose.onNodeWithContentDescription("Satuan").performClick()
+        compose.onNodeWithContentDescription("Unit").performClick()
         compose.onNodeWithText("kg").performClick()
-        compose.onNodeWithContentDescription("Satuan").assertTextContains("kg")
+        compose.onNodeWithContentDescription("Unit").assertTextContains("kg")
         compose.onNode(hasSetTextAction()).assertTextContains("0.25")
         compose.runOnIdle {
             assertEquals(Quantity.Weight.of(250), (parseQuantity(input.value.rawText, input.value.unit) as QuantityParseResult.Valid).quantity)
         }
-        compose.onNodeWithContentDescription("Satuan").performClick()
-        compose.onNodeWithText("Benda").performClick()
+        compose.onNodeWithContentDescription("Unit").performClick()
+        compose.onNodeWithText("Items").performClick()
         compose.runOnIdle { assertEquals(QuantityInput(unit = QuantityUnit.ITEM), input.value) }
         val layouts = mutableListOf<TextLayoutResult>()
-        compose.onNodeWithContentDescription("Satuan").performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        compose.onNodeWithContentDescription("Unit").performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
         assertEquals(1, layouts.single().lineCount)
         assertFalse(layouts.single().hasVisualOverflow)
         compose.onNode(hasSetTextAction()).performTextReplacement("2,5")
@@ -66,18 +66,18 @@ class FormControlsTest {
         compose.setContent {
             WasteNotTheme {
                 Column {
-                    WasteTextField("contoh-aman-12", {}, "Kata sandi", password = true)
-                    ActionButton("Masuk", {}, loading = true, loadingLabel = "Sedang masuk…")
+                    WasteTextField("contoh-aman-12", {}, "Password", password = true)
+                    ActionButton("Sign in", {}, loading = true, loadingLabel = "Signing in…")
                 }
             }
         }
         compose.onNode(hasSetTextAction()).assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Password))
         assertEquals("•".repeat("contoh-aman-12".length), displayedInput())
-        compose.onNodeWithContentDescription("Tampilkan kata sandi").performClick()
+        compose.onNodeWithContentDescription("Show password").performClick()
         assertEquals("contoh-aman-12", displayedInput())
-        compose.onNodeWithContentDescription("Sembunyikan kata sandi").performClick()
+        compose.onNodeWithContentDescription("Hide password").performClick()
         assertEquals("•".repeat("contoh-aman-12".length), displayedInput())
-        compose.onNodeWithText("Sedang masuk…").assertIsNotEnabled()
+        compose.onNodeWithText("Signing in…").assertIsNotEnabled()
     }
 
     private fun displayedInput(): String {
@@ -116,17 +116,17 @@ class FormControlsTest {
         compose.onNodeWithText("Tuesday, September 22, 2026").assertIsNotEnabled()
         visibleCalendarDay("Sunday, September 20, 2026").performClick()
         compose.onNodeWithText("Sunday, September 20, 2026").assertIsSelected()
-        compose.onNodeWithText("Terapkan").performClick()
+        compose.onNodeWithText("Apply").performClick()
         compose.runOnIdle { assertEquals(LocalDate.of(2026, 9, 20), selected.value) }
         compose.onNodeWithText("20 Sep 2026").performClick()
         visibleCalendarDay("Saturday, September 19, 2026").performClick()
-        compose.onNodeWithText("Batal").performClick()
+        compose.onNodeWithText("Cancel").performClick()
         compose.runOnIdle { assertEquals(LocalDate.of(2026, 9, 20), selected.value) }
         compose.onNodeWithText("20 Sep 2026").performClick()
         compose.onNodeWithContentDescription("Change to previous month").performScrollTo().performClick()
         compose.onNodeWithText("Friday, August 21, 2026").assertIsNotEnabled()
         visibleCalendarDay("Monday, August 31, 2026").performClick()
-        compose.onNodeWithText("Terapkan").performClick()
+        compose.onNodeWithText("Apply").performClick()
         compose.runOnIdle { assertEquals(LocalDate.of(2026, 8, 31), selected.value) }
     }
 
@@ -140,7 +140,7 @@ class FormControlsTest {
         compose.onNodeWithText("23 Jun 2026").performClick()
         compose.onNodeWithText("Monday, June 22, 2026").assertIsNotEnabled()
         visibleCalendarDay("Tuesday, June 23, 2026").performClick()
-        compose.onNodeWithText("Terapkan").performClick()
+        compose.onNodeWithText("Apply").performClick()
         compose.runOnIdle { assertEquals(original, selected.value) }
     }
 
@@ -152,8 +152,8 @@ class FormControlsTest {
             DateField(stale, today.minusDays(30), today, { changes++ })
         } }
         compose.onNodeWithText("21 Sep 2024").performClick()
-        compose.onNodeWithText("Terapkan").assertIsNotEnabled()
-        compose.onNodeWithText("Batal").performClick()
+        compose.onNodeWithText("Apply").assertIsNotEnabled()
+        compose.onNodeWithText("Cancel").performClick()
         compose.runOnIdle { assertEquals(0, changes) }
     }
 }

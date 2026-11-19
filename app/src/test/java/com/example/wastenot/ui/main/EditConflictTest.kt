@@ -30,7 +30,7 @@ class EditConflictTest {
     }
     private suspend fun initial() = (source.load() as ApiResult.Success).value.first()
     private fun draft(log: WasteLog) = EditorDraft.from(log, source.referenceDate).apply {
-        change(EditorField.NOTES, values.copy(notes = "Draf pengguna"))
+        change(EditorField.NOTES, values.copy(notes = "User draft"))
         assertNotNull(prepareSubmission(source.referenceDate))
         submissionFailed(ApiFailureKind.VERSION_CONFLICT)
     }
@@ -38,12 +38,12 @@ class EditConflictTest {
     @Test fun changingFieldsAndRestoringStateCannotBypassTheConflict() = runTest {
         val original = initial(); val form = draft(original)
         assertFalse(form.locked); assertTrue(form.needsConflictResolution)
-        form.change(EditorField.NOTES, form.values.copy(notes = "Koreksi lagi"))
+        form.change(EditorField.NOTES, form.values.copy(notes = "Another correction"))
         assertNull(form.prepareSubmission(source.referenceDate))
         val scope = SaverScope { true }
         val saved = with(EditorDraft.Saver) { scope.save(form) }!!
         val restored = EditorDraft.Saver.restore(saved)!!
-        assertTrue(restored.needsConflictResolution); assertEquals("Koreksi lagi", restored.values.notes)
+        assertTrue(restored.needsConflictResolution); assertEquals("Another correction", restored.values.notes)
         assertEquals(original.version, restored.values.version)
         assertNull(restored.prepareSubmission(source.referenceDate))
     }
@@ -51,19 +51,19 @@ class EditConflictTest {
     @Test fun choosingDraftKeepsAllUserFieldsAndOnlyAdoptsTheNewBaselineVersion() = runTest {
         val original = initial(); val form = draft(original); val mine = form.values
         val latest = original.copy(version = 2, category = WasteCategory.ELECTRONIC, method = DisposalMethod.TRASH,
-            quantity = Quantity.Count.of(2), notes = "Versi perangkat lain")
+            quantity = Quantity.Count.of(2), notes = "Version from another device")
         assertTrue(form.resolveConflict(latest, keepDraft = true))
         assertEquals(mine.copy(version = 2), form.values)
         assertEquals(EditorDraft.from(latest, source.referenceDate).values, form.original)
         assertTrue(form.dirty); assertFalse(form.needsConflictResolution)
         assertNull(form.submittedValues)
-        assertEquals("Draf pengguna", form.prepareSubmission(source.referenceDate)!!.notes)
+        assertEquals("User draft", form.prepareSubmission(source.referenceDate)!!.notes)
     }
 
     @Test fun choosingLatestReplacesEveryFieldAndDoesNotPrepareASubmission() = runTest {
         val original = initial(); val form = draft(original)
         val latest = original.copy(version = 3, category = WasteCategory.GLASS, method = DisposalMethod.TRASH,
-            quantity = Quantity.Count.of(3), notes = "Isian terbaru")
+            quantity = Quantity.Count.of(3), notes = "Latest entry")
         assertTrue(form.resolveConflict(latest, keepDraft = false))
         assertEquals(EditorDraft.from(latest, source.referenceDate).values, form.values)
         assertFalse(form.dirty); assertNull(form.submittedValues)
@@ -137,21 +137,21 @@ class EditConflictTest {
     @Test fun concurrentEditRequiresExplicitSelectionAndAnotherSaveWithoutAddingARecord() = runTest {
         val vm = model(); vm.load(); advanceUntilIdle(); val log = vm.state.value.records.first()
         val form = EditorDraft.from(log, source.referenceDate)
-        form.change(EditorField.NOTES, form.values.copy(notes = "Draf saya"))
-        val other = ActivityInput(WasteCategory.GLASS, DisposalMethod.TRASH, Quantity.Count.of(2), log.activityDate, "Perangkat lain")
+        form.change(EditorField.NOTES, form.values.copy(notes = "My draft"))
+        val other = ActivityInput(WasteCategory.GLASS, DisposalMethod.TRASH, Quantity.Count.of(2), log.activityDate, "Another device")
         source.update(log.id, 1, other)
         vm.save(form.prepareSubmission(source.referenceDate)!!, log.id, 1, "editor"); advanceUntilIdle()
         form.submissionFailed(vm.state.value.save!!.error!!)
         assertTrue(form.needsConflictResolution)
         vm.loadConflict("editor", log.id, 1); advanceUntilIdle()
         val latest = vm.state.value.conflict!!.latest!!
-        assertEquals(2, latest.version); assertEquals("Perangkat lain", latest.notes)
+        assertEquals(2, latest.version); assertEquals("Another device", latest.notes)
         assertEquals(2, (source.get(log.id) as ApiResult.Success).value.version)
         assertTrue(form.resolveConflict(latest, true))
         assertEquals(2, (source.get(log.id) as ApiResult.Success).value.version)
         vm.save(form.prepareSubmission(source.referenceDate)!!, log.id, form.values.version, "editor"); advanceUntilIdle()
         val updated = (source.get(log.id) as ApiResult.Success).value
-        assertEquals(3, updated.version); assertEquals("Draf saya", updated.notes)
+        assertEquals(3, updated.version); assertEquals("My draft", updated.notes)
         assertEquals(log.quantity, updated.quantity); assertEquals(5, vm.state.value.records.size)
         assertFalse(vm.state.value.save!!.created)
     }

@@ -35,17 +35,17 @@ class DraftRecoveryUiTest {
         } }
         for (theme in listOf(false,true)) for (pending in listOf(true,false)) {
             compose.runOnIdle { dark = theme; loading = pending }
-            readable(if (pending) "Memeriksa draf perangkat…" else "Draf belum bisa dibuka")
+            readable(if (pending) "Checking for a draft on this device…" else "Couldn't open your draft")
             if (!pending) {
-                listOf("Coba lagi","Buang draf tersimpan").forEach {
+                listOf("Try again","Discard saved draft").forEach {
                     readable(it)
                     compose.onNodeWithText(it).assertHeightIsAtLeast(48.dp)
                 }
             }
             captureDraftFixture("draft-recovery-${if(theme) "dark" else "light"}-${if(pending) "loading" else "error"}")
         }
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
-        compose.onNodeWithText("Buang draf tersimpan").performScrollTo().performClick()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
+        compose.onNodeWithText("Discard saved draft").performScrollTo().performClick()
         assertEquals(1,retries); assertEquals(1,discards)
     }
 
@@ -63,8 +63,8 @@ class DraftRecoveryUiTest {
         } }
         for (theme in listOf(false,true)) {
             compose.runOnIdle { dark = theme }
-            compose.onNodeWithText("Catatan sudah tersimpan").performScrollTo().assertIsNotEnabled()
-            compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+            compose.onNodeWithText("Log saved").performScrollTo().assertIsNotEnabled()
+            compose.onNodeWithText("Try again").performScrollTo().performClick()
             captureDraftFixture("draft-saved-cleanup-${if(theme) "dark" else "light"}")
         }
         assertEquals(0,writes); assertEquals(2,retries)
@@ -76,15 +76,15 @@ class DraftRecoveryUiTest {
         compose.setContent { WasteNotTheme {
             DiscardChangesDialog(false, { dismisses++ }, { confirms++ }, busy = busy, error = !busy)
         } }
-        compose.onNodeWithText("Memperbarui draf…").performScrollTo().assertIsNotEnabled()
-        compose.onNodeWithText("Lanjut mengisi").assertIsNotEnabled()
+        compose.onNodeWithText("Updating draft…").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Keep editing").assertIsNotEnabled()
         InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
         InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_ESCAPE)
         compose.onNode(isDialog()).assertExists()
         assertEquals(0,dismisses); assertEquals(0,confirms)
         compose.runOnIdle { busy = false }
-        compose.onNodeWithText("Buang perubahan").performScrollTo().performClick()
-        compose.onNodeWithText("Lanjut mengisi").performScrollTo().performClick()
+        compose.onNodeWithText("Discard changes").performScrollTo().performClick()
+        compose.onNodeWithText("Keep editing").performScrollTo().performClick()
         assertEquals(1,dismisses); assertEquals(1,confirms)
         captureDraftFixture("draft-cleanup-failed")
     }

@@ -55,7 +55,7 @@ class EditorDraftTest {
             assertFalse(draft.locked)
             assertNotNull(draft.values.aiProvenance)
             assertEquals(com.example.wastenot.R.string.ai_reference_rejected, draft.manualConversionReason)
-            draft.change(EditorField.NOTES, draft.values.copy(notes = "Koreksi catatan"))
+            draft.change(EditorField.NOTES, draft.values.copy(notes = "Corrected notes"))
             val restored = EditorDraft.fromSnapshot(draft.snapshot())
             assertEquals(com.example.wastenot.R.string.ai_reference_rejected, restored.manualConversionReason)
             draft.useManualEntry()
@@ -132,7 +132,7 @@ class EditorDraftTest {
 
     @Test fun savedDraftRetainsOriginalVersionAndDirtyFieldsAcrossRecreation() {
         val draft = EditorDraft.from(log(), today)
-        draft.change(EditorField.NOTES, draft.values.copy(notes = "draf percobaan"))
+        draft.change(EditorField.NOTES, draft.values.copy(notes = "trial draft"))
         val scope = object : SaverScope { override fun canBeSaved(value: Any) = true }
         val saved = with(EditorDraft.Saver) { scope.save(draft) }
         val restored = EditorDraft.Saver.restore(checkNotNull(saved))!!
@@ -143,7 +143,7 @@ class EditorDraftTest {
 
     @Test fun oldDateMayStayButANewOutOfWindowDateFails() {
         val draft = EditorDraft.from(log().copy(activityDate = today.minusDays(90)), today)
-        draft.change(EditorField.NOTES, draft.values.copy(notes = "koreksi"))
+        draft.change(EditorField.NOTES, draft.values.copy(notes = "correction"))
         assertNotNull(draft.validate(today))
         draft.change(EditorField.DATE, draft.values.copy(date = today.plusDays(1)))
         assertNull(draft.validate(today))
@@ -169,13 +169,13 @@ class EditorDraftTest {
     @Test fun uncertainSubmissionFreezesRawValuesAndRetriesTheCanonicalSnapshotEvenAfterDateWindowMoves() {
         val draft = EditorDraft.from(null, today)
         draft.change(EditorField.QUANTITY, draft.values.copy(category = WasteCategory.PLASTIC, method = DisposalMethod.RECYCLE,
-            quantity = QuantityInput("0,25", QuantityUnit.KILOGRAM), notes = "  awal  "))
+            quantity = QuantityInput("0,25", QuantityUnit.KILOGRAM), notes = "  original  "))
         val submitted = draft.prepareSubmission(today)!!
         assertEquals(Quantity.Weight.of(250), submitted.quantity)
-        assertEquals("awal", submitted.notes)
+        assertEquals("original", submitted.notes)
         assertTrue(draft.locked)
         val raw = draft.values
-        draft.change(EditorField.NOTES, raw.copy(notes = "koreksi"))
+        draft.change(EditorField.NOTES, raw.copy(notes = "correction"))
         assertEquals(raw, draft.values)
         listOf(ApiFailureKind.TIMEOUT, ApiFailureKind.NETWORK, ApiFailureKind.SERVER,
             ApiFailureKind.HTTP, ApiFailureKind.MALFORMED_RESPONSE).forEach { error ->
@@ -189,7 +189,7 @@ class EditorDraftTest {
 
     @Test fun restoringAnUncertainSubmissionKeepsItsSnapshotAndError() {
         val draft = EditorDraft.from(log(), today)
-        draft.change(EditorField.NOTES, draft.values.copy(notes = "  awal  "))
+        draft.change(EditorField.NOTES, draft.values.copy(notes = "  original  "))
         val input = draft.prepareSubmission(today)!!
         draft.submissionFailed(ApiFailureKind.TIMEOUT)
         val scope = object : SaverScope { override fun canBeSaved(value: Any) = true }
@@ -222,9 +222,9 @@ class EditorDraftTest {
             draft.prepareSubmission(today)
             draft.submissionFailed(error)
             assertFalse(draft.locked)
-            draft.change(EditorField.NOTES, draft.values.copy(notes = "koreksi"))
+            draft.change(EditorField.NOTES, draft.values.copy(notes = "correction"))
             assertNull(draft.submissionError)
-            assertEquals("koreksi", draft.prepareSubmission(today)!!.notes)
+            assertEquals("correction", draft.prepareSubmission(today)!!.notes)
         }
         listOf(ApiFailureKind.IDEMPOTENCY_CONFLICT, ApiFailureKind.DELETED).forEach { error ->
             val draft = EditorDraft.from(log(), today)

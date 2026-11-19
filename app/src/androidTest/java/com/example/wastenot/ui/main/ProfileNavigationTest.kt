@@ -31,68 +31,68 @@ class ProfileNavigationTest {
 
     @Test fun registeredAccountStartsAtZeroAndTheOriginalAccountsLogsStayAvailable() {
         compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNode(tabs and hasText("Profil")).performClick()
+        compose.onNode(tabs and hasText("Profile")).performClick()
         logout()
-        chooseTheme("Terang")
+        chooseTheme("Light")
         capture("auth-login-light")
-        compose.onNodeWithText("Masuk").performScrollTo()
+        compose.onNodeWithText("Sign in").performScrollTo()
         capture("auth-login-form-light")
-        chooseTheme("Gelap")
+        chooseTheme("Dark")
         capture("auth-login-dark")
-        chooseTheme("Terang")
-        compose.onNodeWithText("Belum punya akun? Daftar").performScrollTo().performClick()
+        chooseTheme("Light")
+        compose.onNodeWithText("New here? Create an account").performScrollTo().performClick()
         capture("auth-register-light")
-        chooseTheme("Gelap")
+        chooseTheme("Dark")
         capture("auth-register-dark")
-        chooseTheme("Terang")
-        compose.onNodeWithText("Buat akun").performScrollTo()
+        chooseTheme("Light")
+        compose.onNodeWithText("Create account").performScrollTo()
         capture("auth-register-form-light")
-        compose.onNode(hasContentDescription("Nama") and hasSetTextAction()).performScrollTo().performTextReplacement("Wulan Wijaya")
+        compose.onNode(hasContentDescription("Name") and hasSetTextAction()).performScrollTo().performTextReplacement("Wulan Wijaya")
         compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("profile.zero@example.invalid")
-        compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
-        compose.onNode(hasContentDescription("Konfirmasi kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
-        compose.onNode(hasContentDescription("Nama") and hasSetTextAction()).assertTextContains("Wulan Wijaya")
+        compose.onNode(hasContentDescription("Password") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        compose.onNode(hasContentDescription("Confirm password") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        compose.onNode(hasContentDescription("Name") and hasSetTextAction()).assertTextContains("Wulan Wijaya")
         compose.onNode(hasContentDescription("Email") and hasSetTextAction()).assertTextContains("profile.zero@example.invalid")
-        listOf("Kata sandi", "Konfirmasi kata sandi").forEach { label ->
+        listOf("Password", "Confirm password").forEach { label ->
             val rendered = compose.onNode(hasContentDescription(label) and hasSetTextAction()).fetchSemanticsNode()
                 .config[SemanticsProperties.EditableText].text
             assertEquals("Masked password length for $label", 19, rendered.length)
         }
         dismissSystemOverlay()
-        compose.onNodeWithText("Buat akun").performScrollTo().performClick()
+        compose.onNodeWithText("Create account").performScrollTo().performClick()
         dismissSystemOverlay()
         capture("auth-register-submitted-light")
-        listOf("Nama perlu", "Masukkan alamat email", "Kata sandi perlu", "Konfirmasi kata sandi belum sama", "Email ini sudah digunakan", "Permintaan belum berhasil").forEach {
+        listOf("Names need", "Enter a valid email", "Passwords need", "The passwords don't match", "This email is already in use", "That didn't work").forEach {
             compose.onNodeWithText(it, substring = true).assertDoesNotExist()
         }
         compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
-        compose.onNode(tabs and hasText("Profil")).performClick()
+        compose.onNode(tabs and hasText("Profile")).performClick()
         compose.waitUntil(10_000) {
             compose.onAllNodesWithText("XP total", substring = true).fetchSemanticsNodes().isNotEmpty()
         }
         compose.onNodeWithText("0 XP total").performScrollTo().assertIsDisplayed()
         capture("profile-new-account")
-        compose.onNodeWithText("Catat aktivitas").performScrollTo().performClick()
-        compose.onNodeWithText("Cara pengelolaan").assertExists()
-        compose.onNodeWithContentDescription("Kembali").performClick()
+        compose.onNodeWithText("Log activity").performScrollTo().performClick()
+        compose.onNodeWithText("How you handled it").assertExists()
+        compose.onNodeWithContentDescription("Back").performClick()
         compose.onNodeWithText("0 XP total").assertExists()
         logout()
         compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("pengguna@example.invalid")
-        compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        compose.onNode(hasContentDescription("Password") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
         dismissSystemOverlay()
-        compose.onNodeWithText("Masuk").performScrollTo().performClick()
+        compose.onNodeWithText("Sign in").performScrollTo().performClick()
         dismissSystemOverlay()
         compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNode(tabs and hasText("Profil")).performClick()
-        compose.onNodeWithText("50 XP dari 5 catatan aktif").assertExists()
+        compose.onNode(tabs and hasText("Profile")).performClick()
+        compose.onNodeWithText("50 XP from 5 active logs").assertExists()
         logout()
         compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performScrollTo().performTextReplacement("profile.zero@example.invalid")
-        compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
+        compose.onNode(hasContentDescription("Password") and hasSetTextAction()).performScrollTo().performTextReplacement("fixture-password-12")
         dismissSystemOverlay()
-        compose.onNodeWithText("Masuk").performScrollTo().performClick()
+        compose.onNodeWithText("Sign in").performScrollTo().performClick()
         dismissSystemOverlay()
         compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
-        compose.onNode(tabs and hasText("Profil")).performClick()
+        compose.onNode(tabs and hasText("Profile")).performClick()
         compose.onNodeWithText("Wulan Wijaya").assertIsDisplayed()
         compose.onNodeWithText("Asia/Jakarta").assertExists()
         compose.onNodeWithText("0 XP total").assertExists()
@@ -101,31 +101,31 @@ class ProfileNavigationTest {
 
     @Test fun settingsBackThemePersistenceAndLogoutCancelKeepTheAccount() {
         compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNode(tabs and hasText("Profil")).performClick()
-        compose.onNodeWithText("50 XP dari 5 catatan aktif").assertExists()
-        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Kembali").assertExists()
-        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
-        compose.onNode(hasText("Terang") and hasAnyAncestor(isDialog())).performClick()
-        compose.onNodeWithText("Tutup").performClick()
-        compose.onNodeWithContentDescription("Kembali").performClick()
+        compose.onNode(tabs and hasText("Profile")).performClick()
+        compose.onNodeWithText("50 XP from 5 active logs").assertExists()
+        compose.onNodeWithText("Settings").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Back").assertExists()
+        compose.onNodeWithContentDescription("App theme").performScrollTo().performClick()
+        compose.onNode(hasText("Light") and hasAnyAncestor(isDialog())).performClick()
+        compose.onNodeWithText("Close").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
         capture("profile-app-light")
-        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
-        compose.onNode(hasText("Gelap") and hasAnyAncestor(isDialog())).performClick()
-        compose.onNodeWithText("Tutup").performClick()
+        compose.onNodeWithText("Settings").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("App theme").performScrollTo().performClick()
+        compose.onNode(hasText("Dark") and hasAnyAncestor(isDialog())).performClick()
+        compose.onNodeWithText("Close").performClick()
         capture("settings-app-dark")
         compose.activityRule.scenario.recreate()
-        compose.onNodeWithText("Gelap").assertExists()
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        compose.onNode(tabs and hasText("Profil")).assertIsSelected()
+        compose.onNodeWithText("Dark").assertExists()
+        compose.onNodeWithContentDescription("Back").performClick()
+        compose.onNode(tabs and hasText("Profile")).assertIsSelected()
         compose.onNodeWithText("50 XP total").performScrollTo().assertIsDisplayed()
         capture("profile-app-dark")
-        compose.onNodeWithText("Keluar").performScrollTo().performClick()
-        compose.onNodeWithText("Keluar dari akun?").assertIsDisplayed()
-        compose.onNodeWithText("Batal").performClick()
+        compose.onNodeWithText("Sign out").performScrollTo().performClick()
+        compose.onNodeWithText("Sign out?").assertIsDisplayed()
+        compose.onNodeWithText("Cancel").performClick()
         compose.onNodeWithText("50 XP total").assertExists()
-        compose.onNode(tabs and hasText("Beranda")).performClick()
+        compose.onNode(tabs and hasText("Home")).performClick()
         compose.onNodeWithText("650 g").assertExists()
     }
 
@@ -159,16 +159,16 @@ class ProfileNavigationTest {
     }
 
     private fun chooseTheme(label: String) {
-        compose.onNodeWithContentDescription("Tampilan").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Display").performScrollTo().performClick()
         compose.onNode(hasText(label) and hasAnyAncestor(isDialog())).performClick()
-        compose.onNodeWithText("Tutup").performClick()
+        compose.onNodeWithText("Close").performClick()
     }
 
     private fun logout() {
-        compose.onNodeWithText("Keluar").performScrollTo().performClick()
-        compose.onNode(hasText("Keluar") and hasAnyAncestor(isDialog())).performClick()
+        compose.onNodeWithText("Sign out").performScrollTo().performClick()
+        compose.onNode(hasText("Sign out") and hasAnyAncestor(isDialog())).performClick()
         compose.waitUntil(30_000) {
-            runCatching { compose.onAllNodesWithText("Belum punya akun? Daftar").fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
+            runCatching { compose.onAllNodesWithText("New here? Create an account").fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
         }
     }
 

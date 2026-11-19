@@ -36,10 +36,10 @@ class Iteration2DesignTest {
 
     @Test fun directDummyHomeDockAndManualFallbackRetainAllFiveStacks() {
         compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
-        compose.onNodeWithText("Lihat data contoh").assertDoesNotExist()
-        compose.onNodeWithText("Data contoh", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("See sample data").assertDoesNotExist()
+        compose.onNodeWithText("Sample data", substring = true).assertDoesNotExist()
         waitForHome()
-        val label = "Catat / Scan"
+        val label = "Log / Scan"
         val layouts = mutableListOf<TextLayoutResult>()
         compose.onNodeWithText(label, useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
         val layout = layouts.single()
@@ -49,19 +49,19 @@ class Iteration2DesignTest {
                 !label[end - 1].isLetter() || !label[end].isLetter())
         }
         capture("home-light")
-        compose.onNodeWithContentDescription("Buka profil").performClick()
-        compose.onNode(tabs and hasText("Profil")).assertIsSelected()
-        compose.onNode(tabs and hasText("Beranda")).performClick()
-        compose.onNodeWithText("Input manual").performScrollTo().performClick()
-        compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        compose.onNodeWithText("Lihat riwayat").performScrollTo().performClick()
-        compose.onNode(tabs and hasText("Riwayat")).assertIsSelected()
-        compose.onNode(tabs and hasText("Beranda")).performClick()
+        compose.onNodeWithContentDescription("Open profile").performClick()
+        compose.onNode(tabs and hasText("Profile")).assertIsSelected()
+        compose.onNode(tabs and hasText("Home")).performClick()
+        compose.onNodeWithText("Log manually").performScrollTo().performClick()
+        compose.onNodeWithText("Log activity").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Back").performClick()
+        compose.onNodeWithText("See history").performScrollTo().performClick()
+        compose.onNode(tabs and hasText("History")).assertIsSelected()
+        compose.onNode(tabs and hasText("Home")).performClick()
         compose.onNodeWithText("250 g").performScrollTo().performClick()
-        compose.onNodeWithText("Detail catatan").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        listOf("Beranda", "Riwayat", "Panduan", "Statistik", "Profil").forEach { label ->
+        compose.onNodeWithText("Log details").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Back").performClick()
+        listOf("Home", "History", "Guide", "Stats", "Profile").forEach { label ->
             compose.onNode(tabs and hasText(label)).performClick().assertIsSelected()
             compose.onAllNodes(tabs).fetchSemanticsNodes().forEach { node ->
                 val text = node.config[SemanticsProperties.Text].joinToString { it.text }
@@ -76,30 +76,30 @@ class Iteration2DesignTest {
                     "constraints=${labelLayout.layoutInput.constraints}",
                     labelLayout.lineCount == 1 && !labelLayout.hasVisualOverflow)
             }
-            compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-            compose.onNodeWithText("Scan sampah").assertIsDisplayed()
-            if (label == "Beranda") capture("capture-sheet")
-            compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
+            compose.onNodeWithContentDescription("Log or scan waste").performClick()
+            compose.onNodeWithText("Scan waste").assertIsDisplayed()
+            if (label == "Home") capture("capture-sheet")
+            compose.onNode(hasText("Log manually") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
             compose.onAllNodes(tabs).assertCountEquals(0)
-            compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
-            compose.onNodeWithText("Simpan contoh").assertDoesNotExist()
-            compose.onNodeWithText("Simpan catatan").performScrollTo().assertIsDisplayed()
-            compose.onNodeWithContentDescription("Kembali").performClick()
+            compose.onNodeWithText("Log activity").assertIsDisplayed()
+            compose.onNodeWithText("Save sample").assertDoesNotExist()
+            compose.onNodeWithText("Save log").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithContentDescription("Back").performClick()
             compose.onNode(tabs and hasText(label)).assertIsSelected()
         }
-        compose.onNode(tabs and hasText("Profil")).performClick()
-        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
-        compose.onNode(hasText("Gelap") and hasAnyAncestor(isDialog())).performClick()
-        compose.onNodeWithText("Tutup").performClick()
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        compose.onNode(tabs and hasText("Beranda")).performClick()
+        compose.onNode(tabs and hasText("Profile")).performClick()
+        compose.onNodeWithText("Settings").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("App theme").performScrollTo().performClick()
+        compose.onNode(hasText("Dark") and hasAnyAncestor(isDialog())).performClick()
+        compose.onNodeWithText("Close").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
+        compose.onNode(tabs and hasText("Home")).performClick()
         waitForHome()
         capture("home-dark")
         compose.activityRule.scenario.recreate()
         compose.waitForIdle()
         waitForHome()
-        compose.onNodeWithText("Lihat data contoh").assertDoesNotExist()
+        compose.onNodeWithText("See sample data").assertDoesNotExist()
     }
 
     private fun waitForHome() {
@@ -108,7 +108,7 @@ class Iteration2DesignTest {
     }
 
     private fun capture(name: String) {
-        if (name.startsWith("home-")) compose.onNodeWithText("Halo,", substring = true).performScrollTo()
+        if (name.startsWith("home-")) compose.onNodeWithText("Hi,", substring = true).performScrollTo()
         compose.mainClock.advanceTimeBy(64)
         compose.waitForIdle()
         val instrumentation = InstrumentationRegistry.getInstrumentation()

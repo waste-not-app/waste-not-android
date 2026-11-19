@@ -9,9 +9,9 @@ import java.util.UUID
 class DummyScanRepository : ScanRepository {
 
     override suspend fun catalog() = ApiResult.Success(AiCatalog("kit-v1.3", listOf(
-        AiCatalogItem("plastic_bottle", "Botol plastik (contoh)", WasteCategory.PLASTIC, false, AiGuideStatus.DRAFT),
-        AiCatalogItem("glass_bottle", "Botol kaca (contoh)", WasteCategory.GLASS, false, AiGuideStatus.DRAFT),
-    ), "demo", "demo", "demo", emptyMap(), emptySet(), mapOf("bottle" to "Botol")))
+        AiCatalogItem("plastic_bottle", "Plastic bottle (sample)", WasteCategory.PLASTIC, false, AiGuideStatus.DRAFT),
+        AiCatalogItem("glass_bottle", "Glass bottle (sample)", WasteCategory.GLASS, false, AiGuideStatus.DRAFT),
+    ), "demo", "demo", "demo", emptyMap(), emptySet(), mapOf("bottle" to "Bottle")))
 
     override suspend fun detect(photo: ScanPhoto, requestId: String) = ApiResult.Success(AiDetection(
         UUID.randomUUID().toString(), Instant.now().plusSeconds(3600), AiDetectionStatus.REVIEW_REQUIRED,
@@ -29,9 +29,9 @@ class DummyScanRepository : ScanRepository {
             if (method != null) AiRecommendationStatus.READY else AiRecommendationStatus.UNAVAILABLE,
             input.detectionId, input.objectId, input.contextRevision, input.objectKey, input.category, method,
             AiRecommendationScope.HANDLING.takeIf { method != null }, AiRecommendationBasis.CONFIRMED.takeIf { method != null },
-            emptyList(), emptyList(), if (guide != null && reuse) "Contoh: gunakan kembali bila kondisi benda dan rencana penggunaan ulangmu sudah sesuai."
-            else if (guide != null) "Contoh: periksa material dan penerimaan pengelola sebelum menyalurkan benda untuk daur ulang."
-            else "Belum ada contoh panduan yang cocok. Lanjutkan dengan pilihan manual.", null, false, "",
+            emptyList(), emptyList(), if (guide != null && reuse) "Example: reuse it if the item's condition and your plans for it allow."
+            else if (guide != null) "Example: check the material and what the collector accepts before sending it for recycling."
+            else "No matching sample guide yet. Continue with a manual choice.", null, false, "",
             "demo", true, "kit-v1.3", emptyList(), emptyList(), emptyList(), emptyList(), guide?.steps.orEmpty()))
     }
 

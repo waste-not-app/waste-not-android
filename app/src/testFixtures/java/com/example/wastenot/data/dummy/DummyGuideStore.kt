@@ -33,20 +33,20 @@ class DummyGuideStore(private val articles: List<WasteGuide> = fixtures) : Guide
     companion object {
         // Editorial fixtures from the kit retain their missing review metadata.
         val fixtures = listOf(
-            WasteGuide("1b681a96-36e1-42c5-95ab-803d951da101", "Botol plastik", WasteCategory.PLASTIC, DisposalMethod.RECYCLE,
-                listOf("botol", "plastik", "kemasan"), "Kenali material dan periksa penerimaan fasilitas.",
-                listOf("Periksa jenis material pada kemasan.", "Pisahkan dari material lain sesuai ketentuan fasilitas.",
-                    "Konfirmasikan kondisi dan penerimaan kepada pengelola."),
+            WasteGuide("1b681a96-36e1-42c5-95ab-803d951da101", "Plastic bottles", WasteCategory.PLASTIC, DisposalMethod.RECYCLE,
+                listOf("bottle", "plastic", "packaging"), "Identify the material and check what the facility accepts.",
+                listOf("Check the material type on the packaging.", "Keep it apart from other materials, as the facility asks.",
+                    "Confirm the condition and acceptance with the collector."),
                 emptyList()),
-            WasteGuide("1b681a96-36e1-42c5-95ab-803d951da102", "Wadah kaca", WasteCategory.GLASS, DisposalMethod.REUSE,
-                listOf("kaca", "wadah", "toples"), "Pertimbangkan penggunaan kembali sesuai kondisi wadah.",
-                listOf("Periksa kondisi wadah sebelum digunakan.", "Pastikan penggunaan berikutnya sesuai jenis wadah.",
-                    "Jika tidak layak dipakai, tanyakan penanganan ke fasilitas setempat."),
+            WasteGuide("1b681a96-36e1-42c5-95ab-803d951da102", "Glass containers", WasteCategory.GLASS, DisposalMethod.REUSE,
+                listOf("glass", "container", "jar"), "Consider reusing it, depending on the container's condition.",
+                listOf("Check the container's condition before using it.", "Make sure the next use suits this kind of container.",
+                    "If it can't be used, ask your local facility how to handle it."),
                 emptyList()),
-            WasteGuide("1b681a96-36e1-42c5-95ab-803d951da103", "Kertas dan kardus", WasteCategory.PAPER, DisposalMethod.RECYCLE,
-                listOf("kertas", "kardus", "karton"), "Cek kondisi material sebelum memilah.",
-                listOf("Pisahkan kertas dari bahan campuran.", "Periksa ketentuan kondisi material yang diterima.",
-                    "Konfirmasikan penerimaan ke fasilitas setempat."),
+            WasteGuide("1b681a96-36e1-42c5-95ab-803d951da103", "Paper and cardboard", WasteCategory.PAPER, DisposalMethod.RECYCLE,
+                listOf("paper", "cardboard", "carton"), "Check the material's condition before sorting.",
+                listOf("Separate paper from mixed materials.", "Check which material conditions are accepted.",
+                    "Confirm acceptance with your local facility."),
                 emptyList()),
         )
     }

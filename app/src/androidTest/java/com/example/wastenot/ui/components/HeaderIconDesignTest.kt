@@ -46,10 +46,10 @@ class HeaderIconDesignTest {
         } }
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
-            inspect("Tampilan", theme, "auth-theme")
-            inspect("Kembali", theme, "auth-back")
-            compose.onNodeWithContentDescription("Tampilan").performTouchInput { click() }
-            compose.onNodeWithContentDescription("Kembali").performTouchInput { click() }
+            inspect("Display", theme, "auth-theme")
+            inspect("Back", theme, "auth-back")
+            compose.onNodeWithContentDescription("Display").performTouchInput { click() }
+            compose.onNodeWithContentDescription("Back").performTouchInput { click() }
             compose.mainClock.advanceTimeBy(1_000)
             // API 24 draws the native ripple on the render-thread clock.
             android.os.SystemClock.sleep(500)
@@ -73,8 +73,8 @@ class HeaderIconDesignTest {
         } }
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
-            inspect("Buka profil", theme, "home-profile")
-            compose.onNodeWithContentDescription("Buka profil").performTouchInput { click() }
+            inspect("Open profile", theme, "home-profile")
+            compose.onNodeWithContentDescription("Open profile").performTouchInput { click() }
             compose.mainClock.advanceTimeBy(1_000)
             // API 24 draws the native ripple on the render-thread clock.
             android.os.SystemClock.sleep(500)

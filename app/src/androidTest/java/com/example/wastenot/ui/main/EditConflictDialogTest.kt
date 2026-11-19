@@ -19,8 +19,8 @@ import org.junit.Test
 class EditConflictDialogTest {
     @get:Rule val compose = createComposeRule()
     private val latest = WasteLog("log", WasteCategory.GLASS, DisposalMethod.TRASH, Quantity.Count.of(2),
-        LocalDate.of(2026, 10, 23), ZoneId.of("Asia/Jakarta"), "Perangkat lain", 2, Instant.EPOCH, Instant.EPOCH)
-    private val mine = EditorDraft.from(latest.copy(version = 1, quantity = Quantity.Weight.of(300), notes = "Isian draf saya"), latest.activityDate).values
+        LocalDate.of(2026, 10, 23), ZoneId.of("Asia/Jakarta"), "Another device", 2, Instant.EPOCH, Instant.EPOCH)
+    private val mine = EditorDraft.from(latest.copy(version = 1, quantity = Quantity.Weight.of(300), notes = "My draft entry"), latest.activityDate).values
 
     @Test fun loadingErrorsMissingAndComparisonRemainReadableInBothThemes() {
         var dark by mutableStateOf(false)
@@ -38,16 +38,16 @@ class EditConflictDialogTest {
             compose.runOnIdle { dark = theme }
             states.forEachIndexed { index, state ->
                 compose.runOnIdle { read = state }
-                compose.onNodeWithText("Tetap di draf").performScrollTo().assertIsDisplayed()
-                if (state?.loading == true) compose.onNodeWithText("Memuat versi terbaru…").assertIsNotEnabled()
-                if (state?.error == ApiFailureKind.NOT_FOUND) compose.onNodeWithText("Muat versi terbaru").assertDoesNotExist()
+                compose.onNodeWithText("Stay on my draft").performScrollTo().assertIsDisplayed()
+                if (state?.loading == true) compose.onNodeWithText("Loading the latest version…").assertIsNotEnabled()
+                if (state?.error == ApiFailureKind.NOT_FOUND) compose.onNodeWithText("Load the latest version").assertDoesNotExist()
                 if (state?.latest != null) {
-                    compose.onNodeWithText("Versi terbaru · v2").performScrollTo().assertIsDisplayed()
-                    compose.onNodeWithText("Drafmu").performScrollTo().assertIsDisplayed()
+                    compose.onNodeWithText("Latest version · v2").performScrollTo().assertIsDisplayed()
+                    compose.onNodeWithText("Your draft").performScrollTo().assertIsDisplayed()
                 }
                 capture("conflict-${if (theme) "dark" else "light"}-$index")
                 if (state?.latest != null) {
-                    compose.onNodeWithText("Tetap di draf").performScrollTo().assertIsDisplayed()
+                    compose.onNodeWithText("Stay on my draft").performScrollTo().assertIsDisplayed()
                     capture("conflict-${if (theme) "dark" else "light"}-choices")
                 }
             }
@@ -62,12 +62,12 @@ class EditConflictDialogTest {
         compose.setContent { WasteNotTheme {
             EditConflictDialog(mine, read, { dismisses++ }, { reloads++ }, { log, keep -> choices.add(log to keep) })
         } }
-        compose.onNodeWithText("Muat versi terbaru").performScrollTo().performClick()
+        compose.onNodeWithText("Load the latest version").performScrollTo().performClick()
         assertEquals(1, reloads); assertTrue(choices.isEmpty())
         compose.runOnIdle { read = ConflictReadState("entry", "log", latest = latest) }
-        compose.onNodeWithText("Gunakan seluruh isian drafku").performScrollTo().performClick()
-        compose.onNodeWithText("Gunakan isian versi terbaru").performScrollTo().performClick()
-        compose.onNodeWithText("Tetap di draf").performScrollTo().performClick()
+        compose.onNodeWithText("Use everything from my draft").performScrollTo().performClick()
+        compose.onNodeWithText("Use the latest version").performScrollTo().performClick()
+        compose.onNodeWithText("Stay on my draft").performScrollTo().performClick()
         assertEquals(listOf(latest to true, latest to false), choices); assertEquals(1, dismisses)
     }
 

@@ -83,7 +83,7 @@ class AccountInputTest {
     @Test
     fun passwordLengthCountsUnicodeCharactersWithoutTrimming() {
         listOf(12, 128).forEach { length ->
-            assertTrue(validateRegistrationInput("Nama", email, "😀".repeat(length), "😀".repeat(length)).isEmpty())
+            assertTrue(validateRegistrationInput("Name", email, "😀".repeat(length), "😀".repeat(length)).isEmpty())
         }
         listOf(11, 129).forEach { length ->
             assertEquals(AccountInputError.PASSWORD_LENGTH,
@@ -96,10 +96,10 @@ class AccountInputTest {
     @Test
     fun passwordConfirmationRequiresExactEqualityIncludingWhitespace() {
         val raw = " $password "
-        assertTrue(validateRegistrationInput("Nama", email, raw, raw).isEmpty())
+        assertTrue(validateRegistrationInput("Name", email, raw, raw).isEmpty())
         listOf(password, "$raw ", "", raw.uppercase()).forEach { confirmation ->
             assertEquals(mapOf(AccountField.PASSWORD_CONFIRMATION to AccountInputError.PASSWORD_MISMATCH),
-                validateRegistrationInput("Nama", email, raw, confirmation))
+                validateRegistrationInput("Name", email, raw, confirmation))
         }
     }
 

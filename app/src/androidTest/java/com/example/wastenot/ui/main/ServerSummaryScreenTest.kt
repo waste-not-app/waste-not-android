@@ -47,13 +47,13 @@ class ServerSummaryScreenTest {
             }
         } }
         compose.onNodeWithText("6,25 kg").assertExists()
-        compose.onNodeWithText("25 aktivitas tercatat").assertExists()
+        compose.onNodeWithText("25 activities logged").assertExists()
         compose.onNodeWithText("Level 11").performScrollTo().assertIsDisplayed()
         capture("server-home")
-        compose.onNodeWithText("Input manual").performScrollTo().performClick()
-        compose.onNodeWithText("Lihat riwayat").performScrollTo().performClick()
-        compose.onNode(hasText("Plastik") and hasClickAction()).performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Buka profil").performScrollTo().performClick()
+        compose.onNodeWithText("Log manually").performScrollTo().performClick()
+        compose.onNodeWithText("See history").performScrollTo().performClick()
+        compose.onNode(hasText("Plastic") and hasClickAction()).performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Open profile").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, manual); assertEquals(1, histories); assertEquals(1, profiles); assertEquals(log.id, detail) }
     }
 
@@ -69,24 +69,24 @@ class ServerSummaryScreenTest {
             }
         } }
         compose.onNode(hasText("250 g") and hasAnyAncestor(hasTestTag("statistics-summary"))).assertExists()
-        compose.onNodeWithText("30 hari").performClick()
-        compose.onNodeWithText("Memuat ringkasan…").assertIsDisplayed()
+        compose.onNodeWithText("30 days").performClick()
+        compose.onNodeWithText("Loading summary…").assertIsDisplayed()
         compose.onNodeWithText("250 g").assertDoesNotExist()
-        compose.onNodeWithText("30 hari").assertIsSelected()
+        compose.onNodeWithText("30 days").assertIsSelected()
         capture("server-statistics-loading")
         compose.runOnIdle { state = SnapshotState(week, loading = false, error = ApiFailureKind.NETWORK) }
-        compose.onNodeWithText("Coba lagi").performScrollTo().assertHeightIsAtLeast(androidx.compose.ui.unit.Dp(48f)).performClick()
+        compose.onNodeWithText("Try again").performScrollTo().assertHeightIsAtLeast(androidx.compose.ui.unit.Dp(48f)).performClick()
         compose.onNode(hasText("250 g") and hasAnyAncestor(hasTestTag("statistics-summary"))).assertExists()
-        compose.onNodeWithText("Data terakhir · 7 hari · 30 Okt 2026 – 5 Nov 2026").assertExists()
+        compose.onNodeWithText("Last data · 7 days · 30 Oct 2026 to 5 Nov 2026").assertExists()
         val layouts = mutableListOf<TextLayoutResult>()
-        compose.onNodeWithText("Ringkasan belum bisa diperbarui. Data dari pemuatan sebelumnya tetap ditampilkan.", useUnmergedTree = true)
+        compose.onNodeWithText("Couldn't refresh the summary. The previously loaded data is still shown.", useUnmergedTree = true)
             .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
         assertFalse(layouts.single().hasVisualOverflow)
         capture("server-statistics-error")
         compose.runOnIdle { state = SnapshotState(dummyStatistics(emptyList(), ActivityDateRange.lastDays(date, 30), zone), false) }
-        compose.onNodeWithText("7 Okt 2026 – 5 Nov 2026").assertExists()
-        compose.onNodeWithText("Belum ada catatan pada periode ini").assertExists()
-        compose.onNodeWithText("Catat aktivitas").performScrollTo().performClick()
+        compose.onNodeWithText("7 Okt 2026 to 5 Nov 2026").assertExists()
+        compose.onNodeWithText("No logs in this period").assertExists()
+        compose.onNodeWithText("Log activity").performScrollTo().performClick()
         capture("server-statistics-empty")
         compose.runOnIdle { assertEquals(1, retries); assertEquals(1, records); assertEquals(30, days) }
     }
@@ -102,8 +102,8 @@ class ServerSummaryScreenTest {
                 StatisticsScreen(SnapshotState(period, false, ApiFailureKind.TIMEOUT), 7, PaddingValues(), { retries++ }, {}, {})
             }
         } }
-        compose.onNodeWithText("30 Okt 2026 – 5 Nov 2026").assertExists()
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        compose.onNodeWithText("30 Okt 2026 to 5 Nov 2026").assertExists()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
         compose.onNode(hasText("250 g") and hasAnyAncestor(hasTestTag("statistics-summary"))).assertExists()
         compose.onAllNodesWithText("100%").onLast().performScrollTo().assertIsDisplayed()
         capture("server-statistics-long-method")

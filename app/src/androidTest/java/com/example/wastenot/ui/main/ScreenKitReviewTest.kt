@@ -44,7 +44,7 @@ class ScreenKitReviewTest {
     }
     @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
     private val tabs = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)
-    private val rootScreens = linkedMapOf("S04" to "Beranda", "S07" to "Riwayat", "S11" to "Panduan", "S13" to "Statistik", "S14" to "Profil")
+    private val rootScreens = linkedMapOf("S04" to "Home", "S07" to "History", "S11" to "Guide", "S13" to "Stats", "S14" to "Profile")
     private val rail get() = compose.activity.resources.configuration.screenWidthDp >= 600
 
     @Test fun screensAndChromeStayReadableAndEveryVisibleRailCaptureActionWorks() {
@@ -56,40 +56,40 @@ class ScreenKitReviewTest {
                 when (id) {
                     "S04" -> compose.waitUntil(10_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
                     "S07" -> compose.waitUntil(10_000) { compose.onAllNodesWithText("250 g").fetchSemanticsNodes().isNotEmpty() }
-                    "S11" -> compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Botol plastik"))
-                    "S13" -> compose.onNodeWithText("1,4 kg").assertExists()
+                    "S11" -> compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Plastic bottles"))
+                    "S13" -> compose.onNodeWithText("1.4 kg").assertExists()
                     "S14" -> compose.onNodeWithText("50 XP total").assertExists()
                 }
                 top()
                 capture(id, label, dark)
             }
-            tab("Beranda")
-            compose.onNodeWithText("Input manual").performScrollTo().performTouchInput { click() }
-            compose.waitUntil(10_000) { compose.onAllNodesWithText("Cara pengelolaan").fetchSemanticsNodes().isNotEmpty() }
-            capture("S05", "Catat aktivitas", dark)
-            back("Beranda")
-            compose.onNodeWithText("Aktivitas terbaru").performScrollTo()
+            tab("Home")
+            compose.onNodeWithText("Log manually").performScrollTo().performTouchInput { click() }
+            compose.waitUntil(10_000) { compose.onAllNodesWithText("How you handled it").fetchSemanticsNodes().isNotEmpty() }
+            capture("S05", "Log activity", dark)
+            back("Home")
+            compose.onNodeWithText("Recent activity").performScrollTo()
             val bodyScroll = compose.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange) and !hasAnyDescendant(tabs))
             val scrollMax = bodyScroll.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].maxValue()
             bodyScroll.performSemanticsAction(SemanticsActions.ScrollBy) { it(0f, scrollMax) }
             compose.waitForIdle()
             compose.onNodeWithText("250 g").performClick()
-            compose.waitUntil(10_000) { compose.onAllNodesWithText("Plastik").fetchSemanticsNodes().isNotEmpty() }
-            capture("S08", "Detail catatan", dark)
-            railCapture("S08", "Detail catatan", "Beranda")
-            back("Beranda")
-            tab("Panduan")
-            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Botol plastik"))
-            compose.onNodeWithText("Botol plastik").performScrollTo().performTouchInput { click() }
-            compose.waitUntil(10_000) { compose.onAllNodesWithText("Botol plastik").fetchSemanticsNodes().isNotEmpty() }
-            capture("S12", "Detail panduan", dark)
-            railCapture("S12", "Detail panduan", "Panduan")
-            back("Panduan")
-            tab("Profil")
-            compose.onNodeWithText("Pengaturan").performScrollTo().performTouchInput { click() }
-            capture("S16", "Pengaturan", dark)
-            railCapture("S16", "Pengaturan", "Profil")
-            back("Profil")
+            compose.waitUntil(10_000) { compose.onAllNodesWithText("Plastic").fetchSemanticsNodes().isNotEmpty() }
+            capture("S08", "Log details", dark)
+            railCapture("S08", "Log details", "Home")
+            back("Home")
+            tab("Guide")
+            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Plastic bottles"))
+            compose.onNodeWithText("Plastic bottles").performScrollTo().performTouchInput { click() }
+            compose.waitUntil(10_000) { compose.onAllNodesWithText("Plastic bottles").fetchSemanticsNodes().isNotEmpty() }
+            capture("S12", "Guide details", dark)
+            railCapture("S12", "Guide details", "Guide")
+            back("Guide")
+            tab("Profile")
+            compose.onNodeWithText("Settings").performScrollTo().performTouchInput { click() }
+            capture("S16", "Settings", dark)
+            railCapture("S16", "Settings", "Profile")
+            back("Profile")
         }
     }
 
@@ -98,39 +98,39 @@ class ScreenKitReviewTest {
         for (dark in listOf(false, true)) {
             theme(dark)
             val suffix = if (dark) "dark" else "light"
-            tab("Riwayat")
-            compose.onNodeWithContentDescription("Filter riwayat").performClick()
+            tab("History")
+            compose.onNodeWithContentDescription("Filter history").performClick()
             compose.onNodeWithTag("history-filter-sheet").assertIsDisplayed()
             captureUiPreview(compose, "S10-$suffix")
-            compose.onNodeWithText("Reset pilihan").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Reset").performScrollTo().assertIsDisplayed()
             captureUiPreview(compose, "S10-end-$suffix")
-            compose.onNodeWithText("Batal").performScrollTo().performClick()
+            compose.onNodeWithText("Cancel").performScrollTo().performClick()
             compose.onNodeWithText("250 g").performScrollTo().performClick()
-            compose.onNodeWithText("Hapus catatan").performScrollTo().performClick()
-            compose.onNode(hasText("Hapus catatan?") and hasAnyAncestor(isDialog())).assertIsDisplayed()
+            compose.onNodeWithText("Delete log").performScrollTo().performClick()
+            compose.onNode(hasText("Delete this log?") and hasAnyAncestor(isDialog())).assertIsDisplayed()
             captureUiPreview(compose, "D01-$suffix")
-            compose.onNodeWithText("Batal").performClick()
-            compose.onNodeWithText("Ubah catatan").performScrollTo().performClick()
-            compose.onNodeWithText("Cara pengelolaan").assertIsDisplayed()
+            compose.onNodeWithText("Cancel").performClick()
+            compose.onNodeWithText("Edit log").performScrollTo().performClick()
+            compose.onNodeWithText("How you handled it").assertIsDisplayed()
             captureUiPreview(compose, "S09-$suffix")
-            compose.onNodeWithText("Simpan perubahan").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Save changes").performScrollTo().assertIsDisplayed()
             captureUiPreview(compose, "S09-end-$suffix")
-            compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Preview perbaikan catatan $suffix")
-            compose.onNodeWithContentDescription("Kembali").performClick()
-            compose.onNodeWithText("Buang perubahan?").assertIsDisplayed()
+            compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().performTextReplacement("Preview note fix $suffix")
+            compose.onNodeWithContentDescription("Back").performClick()
+            compose.onNodeWithText("Discard changes?").assertIsDisplayed()
             captureUiPreview(compose, "D03-$suffix")
-            compose.onNodeWithText("Lanjut mengisi").performClick()
-            compose.onNodeWithText("Simpan perubahan").performScrollTo().performClick()
-            compose.waitUntil(10_000) { compose.onAllNodesWithText("Catatan tersimpan").fetchSemanticsNodes().isNotEmpty() }
+            compose.onNodeWithText("Keep editing").performClick()
+            compose.onNodeWithText("Save changes").performScrollTo().performClick()
+            compose.waitUntil(10_000) { compose.onAllNodesWithText("Log saved").fetchSemanticsNodes().isNotEmpty() }
             captureUiPreview(compose, "S06-$suffix")
-            compose.onNodeWithText("Kembali ke beranda").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Back to home").performScrollTo().assertIsDisplayed()
             captureUiPreview(compose, "S06-end-$suffix")
-            compose.onNodeWithText("Kembali ke beranda").performClick()
-            tab("Profil")
-            compose.onNodeWithText("Keluar").performScrollTo().performClick()
-            compose.onNodeWithText("Keluar dari akun?").assertIsDisplayed()
+            compose.onNodeWithText("Back to home").performClick()
+            tab("Profile")
+            compose.onNodeWithText("Sign out").performScrollTo().performClick()
+            compose.onNodeWithText("Sign out?").assertIsDisplayed()
             captureUiPreview(compose, "D02-$suffix")
-            compose.onNodeWithText("Batal").performClick()
+            compose.onNodeWithText("Cancel").performClick()
         }
     }
 
@@ -138,37 +138,37 @@ class ScreenKitReviewTest {
         compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
         for (dark in listOf(false, true)) {
             theme(dark)
-            tab("Beranda")
-            section("S04", "Aktivitas terbaru", "recent", dark)
+            tab("Home")
+            section("S04", "Recent activity", "recent", dark)
             compose.onNodeWithText("250 g").performScrollTo().performTouchInput { click() }
-            section("S08", "Hapus catatan", "actions", dark)
-            back("Beranda")
-            tab("Riwayat")
-            section("S07", "Kertas", "last-record", dark, lazy = true)
-            tab("Panduan")
-            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Botol plastik"))
-            compose.onNodeWithText("Botol plastik").performScrollTo().performTouchInput { click() }
-            section("S12", "Catat aktivitas ini", "article-end", dark)
-            back("Panduan")
-            section("S11", "Kertas dan kardus", "last-guide", dark, lazy = true)
-            tab("Statistik")
-            compose.onNodeWithText("7 hari").performScrollTo().performTouchInput { click() }
-            section("S13", "Berat ditangani per hari", "week", dark)
-            compose.onNodeWithText("Lihat angka harian").performScrollTo().performTouchInput { click() }
-            section("S13", "Angka harian", "daily-values", dark)
-            section("S13", "Metode pengelolaan", "methods", dark)
-            section("S13", "Lainnya", "categories-end", dark)
-            compose.onNodeWithText("30 hari").performScrollTo().performTouchInput { click() }
-            section("S13", "Berat ditangani per hari", "month", dark)
-            tab("Profil")
-            section("S14", "Keluar", "account-end", dark)
-            compose.onNodeWithText("Pengaturan").performScrollTo().performTouchInput { click() }
+            section("S08", "Delete log", "actions", dark)
+            back("Home")
+            tab("History")
+            section("S07", "Paper", "last-record", dark, lazy = true)
+            tab("Guide")
+            compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Plastic bottles"))
+            compose.onNodeWithText("Plastic bottles").performScrollTo().performTouchInput { click() }
+            section("S12", "Log this activity", "article-end", dark)
+            back("Guide")
+            section("S11", "Paper and cardboard", "last-guide", dark, lazy = true)
+            tab("Stats")
+            compose.onNodeWithText("7 days").performScrollTo().performTouchInput { click() }
+            section("S13", "Weight handled per day", "week", dark)
+            compose.onNodeWithText("Show daily numbers").performScrollTo().performTouchInput { click() }
+            section("S13", "Daily numbers", "daily-values", dark)
+            section("S13", "Handling methods", "methods", dark)
+            section("S13", "Other", "categories-end", dark)
+            compose.onNodeWithText("30 days").performScrollTo().performTouchInput { click() }
+            section("S13", "Weight handled per day", "month", dark)
+            tab("Profile")
+            section("S14", "Sign out", "account-end", dark)
+            compose.onNodeWithText("Settings").performScrollTo().performTouchInput { click() }
             section("S16", "Versi ${BuildConfig.VERSION_NAME}", "settings-end", dark)
-            back("Profil")
-            tab("Beranda")
-            compose.onNodeWithText("Input manual").performScrollTo().performTouchInput { click() }
-            section("S05", "Simpan catatan", "editor-end", dark)
-            back("Beranda")
+            back("Profile")
+            tab("Home")
+            compose.onNodeWithText("Log manually").performScrollTo().performTouchInput { click() }
+            section("S05", "Save log", "editor-end", dark)
+            back("Home")
         }
     }
 
@@ -185,12 +185,12 @@ class ScreenKitReviewTest {
     }
 
     private fun theme(dark: Boolean) {
-        tab("Profil")
-        compose.onNodeWithText("Pengaturan").performScrollTo().performTouchInput { click() }
-        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performTouchInput { click() }
-        compose.onNode(hasText(if (dark) "Gelap" else "Terang") and hasAnyAncestor(isDialog())).performTouchInput { click() }
-        compose.onNodeWithText("Tutup").performTouchInput { click() }
-        back("Profil")
+        tab("Profile")
+        compose.onNodeWithText("Settings").performScrollTo().performTouchInput { click() }
+        compose.onNodeWithContentDescription("App theme").performScrollTo().performTouchInput { click() }
+        compose.onNode(hasText(if (dark) "Dark" else "Light") and hasAnyAncestor(isDialog())).performTouchInput { click() }
+        compose.onNodeWithText("Close").performTouchInput { click() }
+        back("Profile")
     }
 
     private fun tab(label: String) {
@@ -209,7 +209,7 @@ class ScreenKitReviewTest {
     }
 
     private fun back(label: String) {
-        compose.onNodeWithContentDescription("Kembali").performTouchInput { click() }
+        compose.onNodeWithContentDescription("Back").performTouchInput { click() }
         compose.waitForIdle()
         compose.onNode(tabs and hasText(label)).assertIsSelected()
     }
@@ -228,23 +228,23 @@ class ScreenKitReviewTest {
 
     private fun railCapture(id: String, title: String, selected: String) {
         if (!rail) return
-        compose.onNodeWithContentDescription("Catat atau scan sampah").assertIsDisplayed().assertIsEnabled().performTouchInput { click() }
+        compose.onNodeWithContentDescription("Log or scan waste").assertIsDisplayed().assertIsEnabled().performTouchInput { click() }
         try {
             compose.waitUntil(5_000) { compose.onAllNodesWithTag("capture-sheet").fetchSemanticsNodes().isNotEmpty() }
         } catch (error: ComposeTimeoutException) {
-            throw AssertionError("$id: visible rail Catat/Scan must open the sheet", error)
+            throw AssertionError("$id: visible rail Log/Scan must open the sheet", error)
         }
-        compose.onNodeWithText("Scan sampah").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Tutup scan").performTouchInput { click() }
+        compose.onNodeWithText("Scan waste").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Close scan").performTouchInput { click() }
         compose.waitUntil(5_000) { compose.onAllNodesWithTag("capture-sheet").fetchSemanticsNodes().isEmpty() }
         compose.onNode(hasText(title) and !hasAnyAncestor(tabs), useUnmergedTree = true).assertIsDisplayed()
         compose.onNode(tabs and hasText(selected)).assertIsSelected()
-        compose.onNodeWithText("Simpan catatan").assertDoesNotExist()
+        compose.onNodeWithText("Save log").assertDoesNotExist()
     }
 
     private fun capture(id: String, title: String, dark: Boolean, section: String? = null) {
         compose.waitForIdle()
-        val caption = if (id == "S04" && section == null) compose.onNodeWithText("Halo,", substring = true, useUnmergedTree = true)
+        val caption = if (id == "S04" && section == null) compose.onNodeWithText("Hi,", substring = true, useUnmergedTree = true)
             else compose.onNode(hasText(title) and !hasAnyAncestor(tabs), useUnmergedTree = true)
         caption.assertIsDisplayed()
         val layouts = mutableListOf<TextLayoutResult>()
@@ -299,8 +299,8 @@ class ScreenKitReviewTest {
                 if (ink < 20) violations.add("$id/$label icon has $ink painted pixels")
                 paint.put(JSONObject().put("label", label).put("glyph_pixels", ink))
             }
-            val label = compose.onNodeWithText("Catat / Scan", useUnmergedTree = true).fetchSemanticsNode().boundsInWindow
-            val action = compose.onNodeWithContentDescription("Catat atau scan sampah").fetchSemanticsNode().boundsInWindow
+            val label = compose.onNodeWithText("Log / Scan", useUnmergedTree = true).fetchSemanticsNode().boundsInWindow
+            val action = compose.onNodeWithContentDescription("Log or scan waste").fetchSemanticsNode().boundsInWindow
             val camera = if (rail) Rect(action.center.x - px(12f), label.top - px(32f), action.center.x + px(12f), label.top - px(8f))
                 else Rect(label.left - px(32f), label.center.y - px(12f), label.left - px(8f), label.center.y + px(12f))
             val textInk = count(label, OnAccent.toArgb()); val cameraInk = count(camera, OnAccent.toArgb())

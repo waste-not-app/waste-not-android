@@ -43,7 +43,7 @@ class TextActionButtonDesignTest {
     private fun inspect(dark: Boolean) {
         val theme = if (dark) "dark" else "light"
         val scheme = if (dark) DarkColorScheme else LightColorScheme
-        val labels = listOf("Baca panduan", "Belum punya akun? Daftar", "Tampilkan rincian per hari", "Lihat riwayat")
+        val labels = listOf("Read the guide", "New here? Create an account", "Show the daily breakdown", "See history")
         compose.setContent { WasteNotTheme(dark) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                 Column(Modifier.verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -103,10 +103,10 @@ class TextActionButtonDesignTest {
         var calls = 0
         compose.setContent { WasteNotTheme {
             Column(Modifier.fillMaxSize()) {
-                TextActionButton("Lihat riwayat", { calls++; enabled.value = false }, enabled = enabled.value)
+                TextActionButton("See history", { calls++; enabled.value = false }, enabled = enabled.value)
             }
         } }
-        val action = compose.onNodeWithText("Lihat riwayat")
+        val action = compose.onNodeWithText("See history")
         assertTrue(action.fetchSemanticsNode().boundsInRoot.width < compose.onRoot().fetchSemanticsNode().boundsInRoot.width)
         InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB)
         compose.waitForIdle()

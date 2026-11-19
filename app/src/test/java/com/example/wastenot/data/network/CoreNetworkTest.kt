@@ -92,7 +92,7 @@ class CoreNetworkTest {
         val failure = (repository.metadata() as ApiResult.Failure).error
         assertEquals(ApiFailureKind.VALIDATION, failure.kind)
         assertEquals(422, failure.status)
-        assertEquals("Berat minimal 1 gram.", failure.fields["weight_g"])
+        assertEquals("Weight must be at least 1 gram.", failure.fields["weight_g"])
         assertEquals("fixture-request-id", failure.requestId)
     }
 

@@ -49,7 +49,7 @@ class AchievementsViewModelTest {
     } })[AchievementsViewModel::class]
 
     private fun achievementResponse(current: Int) = MockResponse().setResponseCode(200).setBody(
-        """{"data":[{"id":"00000000-0000-4000-8000-000000000101","code":"FIRST_STEP","title":"Langkah pertama","description":"Catat minimal 1 aktivitas.","requirement_type":"ACTIVE_LOG_COUNT","current_value":$current,"target_value":1,"is_unlocked":${current > 0},"unlocked_at":${if (current > 0) "\"2026-11-13T07:00:00Z\"" else "null"}}]}""",
+        """{"data":[{"id":"00000000-0000-4000-8000-000000000101","code":"FIRST_STEP","title":"First step","description":"Log at least 1 activity.","requirement_type":"ACTIVE_LOG_COUNT","current_value":$current,"target_value":1,"is_unlocked":${current > 0},"unlocked_at":${if (current > 0) "\"2026-11-13T07:00:00Z\"" else "null"}}]}""",
     )
 
     private suspend fun awaitState(predicate: (AchievementsUiState) -> Boolean): AchievementsUiState =
@@ -95,8 +95,8 @@ class AchievementsViewModelTest {
                 {"data":[{
                   "id":"00000000-0000-4000-8000-000000000101",
                   "code":"FIRST_STEP",
-                  "title":"Langkah pertama",
-                  "description":"Catat minimal 1 aktivitas.",
+                  "title":"First step",
+                  "description":"Log at least 1 activity.",
                   "requirement_type":"ACTIVE_LOG_COUNT",
                   "current_value":1,
                   "target_value":1,
@@ -150,7 +150,7 @@ class AchievementsViewModelTest {
         var calls = 0
         val latest = Achievement(
             id = "00000000-0000-4000-8000-000000000101",
-            code = "FIRST_STEP", title = "Langkah pertama", description = "Catat minimal 1 aktivitas.",
+            code = "FIRST_STEP", title = "First step", description = "Log at least 1 activity.",
             requirementType = AchievementRequirement.ACTIVE_LOG_COUNT,
             currentValue = 1, targetValue = 1, isUnlocked = true,
             unlockedAt = Instant.parse("2026-11-13T07:00:00Z"),

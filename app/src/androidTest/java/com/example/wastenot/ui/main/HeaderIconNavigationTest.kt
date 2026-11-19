@@ -28,28 +28,28 @@ class HeaderIconNavigationTest {
 
     @Test fun profileFilterBackAndScanCloseKeepTheirOriginalDestinations() {
         compose.waitUntil(30_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
-        compose.onNodeWithContentDescription("Buka profil").assertWidthIsAtLeast(48.dp).assertHeightIsAtLeast(48.dp)
+        compose.onNodeWithContentDescription("Open profile").assertWidthIsAtLeast(48.dp).assertHeightIsAtLeast(48.dp)
             .performTouchInput { click() }
-        compose.onNode(tabs and hasText("Profil")).assertIsSelected()
-        compose.onNodeWithText("Pengaturan").performScrollTo().performTouchInput { click() }
-        compose.onNodeWithContentDescription("Kembali").assertWidthIsAtLeast(48.dp).assertHeightIsAtLeast(48.dp)
+        compose.onNode(tabs and hasText("Profile")).assertIsSelected()
+        compose.onNodeWithText("Settings").performScrollTo().performTouchInput { click() }
+        compose.onNodeWithContentDescription("Back").assertWidthIsAtLeast(48.dp).assertHeightIsAtLeast(48.dp)
             .performTouchInput { click() }
-        compose.onNode(tabs and hasText("Profil")).assertIsSelected()
+        compose.onNode(tabs and hasText("Profile")).assertIsSelected()
 
-        compose.onNode(tabs and hasText("Riwayat")).performClick()
-        compose.onNodeWithContentDescription("Filter riwayat").assertWidthIsAtLeast(48.dp).assertHeightIsAtLeast(48.dp)
+        compose.onNode(tabs and hasText("History")).performClick()
+        compose.onNodeWithContentDescription("Filter history").assertWidthIsAtLeast(48.dp).assertHeightIsAtLeast(48.dp)
             .performTouchInput { click() }
         compose.onNodeWithTag("history-filter-sheet").assertExists()
-        compose.onNode(hasText("Batal") and hasAnyAncestor(hasTestTag("history-filter-sheet"))).performTouchInput { click() }
+        compose.onNode(hasText("Cancel") and hasAnyAncestor(hasTestTag("history-filter-sheet"))).performTouchInput { click() }
         compose.onNodeWithTag("history-filter-sheet").assertDoesNotExist()
-        compose.onNode(tabs and hasText("Riwayat")).assertIsSelected()
+        compose.onNode(tabs and hasText("History")).assertIsSelected()
 
-        compose.onNodeWithContentDescription("Catat atau scan sampah").performTouchInput { click() }
+        compose.onNodeWithContentDescription("Log or scan waste").performTouchInput { click() }
         compose.onNodeWithTag("capture-sheet").assertExists()
-        compose.onNodeWithContentDescription("Tutup scan").assertWidthIsAtLeast(48.dp).assertHeightIsAtLeast(48.dp)
+        compose.onNodeWithContentDescription("Close scan").assertWidthIsAtLeast(48.dp).assertHeightIsAtLeast(48.dp)
             .performTouchInput { click() }
         compose.waitUntil(10_000) { compose.onAllNodesWithTag("capture-sheet").fetchSemanticsNodes().isEmpty() }
-        compose.onNode(tabs and hasText("Riwayat")).assertIsSelected()
-        compose.onNodeWithText("Simpan catatan").assertDoesNotExist()
+        compose.onNode(tabs and hasText("History")).assertIsSelected()
+        compose.onNodeWithText("Save log").assertDoesNotExist()
     }
 }

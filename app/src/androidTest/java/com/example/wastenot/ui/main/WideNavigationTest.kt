@@ -56,17 +56,17 @@ class WideNavigationTest {
         assertTrue("All five tabs form a vertical starting rail", tabNodes.map { it.boundsInWindow.left }.distinct().size == 1)
         assertTrue("Rail leaves most of the window for content", tabNodes.all { it.boundsInWindow.right <= windowWidth * density / 3 })
         capture("wide-rail")
-        listOf("Beranda", "Riwayat", "Panduan", "Statistik", "Profil").forEach { label ->
+        listOf("Home", "History", "Guide", "Stats", "Profile").forEach { label ->
             compose.onNode(tabs and hasText(label)).reveal().performClick().assertIsSelected()
-            compose.onNodeWithContentDescription("Catat atau scan sampah").reveal().performClick()
-            compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
+            compose.onNodeWithContentDescription("Log or scan waste").reveal().performClick()
+            compose.onNode(hasText("Log manually") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
             compose.onAllNodes(tabs).assertCountEquals(0)
-            compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
-            compose.onNodeWithContentDescription("Berat").reveal().assertIsDisplayed()
-            val field = compose.onNodeWithContentDescription("Berat").fetchSemanticsNode().boundsInWindow
+            compose.onNodeWithText("Log activity").assertIsDisplayed()
+            compose.onNodeWithContentDescription("Weight").reveal().assertIsDisplayed()
+            val field = compose.onNodeWithContentDescription("Weight").fetchSemanticsNode().boundsInWindow
             assertTrue("Editor respects the 560 dp form cap", field.width <= 560 * density + 1)
-            if (label == "Profil") capture("wide-editor")
-            compose.onNodeWithContentDescription("Kembali").performClick()
+            if (label == "Profile") capture("wide-editor")
+            compose.onNodeWithContentDescription("Back").performClick()
             compose.onNode(tabs and hasText(label)).reveal().assertIsSelected()
         }
     }
