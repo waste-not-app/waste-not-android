@@ -1,40 +1,40 @@
-# WasteNot: Data Model dan Kontrak API
+# WasteNot: Data Model and API Contract
 
-Versi 1.2 · 28 September 2026 · Core + AI extension · Rancangan implementasi
+Version 1.2 · 28 September 2026 · Core plus AI extension · Implementation design
 
-Pembaruan AI 20 Oktober 2026: satu label REDUCE/REUSE/RECYCLE/TRASH, alasan dan sumber menggantikan rekomendasi dengan alternatif. Lihat [kontrak empat metode](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/RECOMMENDATION_CONTRACT.md) untuk perilaku prototipe dan perubahan integrasi yang belum diimplementasikan pada Go/Android.
+AI update on 20 October 2026: a single REDUCE/REUSE/RECYCLE/TRASH label with a reason and sources replaces recommendations with alternatives. See the [four-method contract](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/RECOMMENDATION_CONTRACT.md) for the prototype's behavior and the integration changes not yet implemented in Go or Android.
 
-Dokumen ini menetapkan kontrak usulan Android dan backend, melengkapi draft endpoint halaman 4 PDF. Aturan domain ada di [PRD.md](PRD.md). Prefix `/v1` merupakan keputusan rancangan. Contoh menggunakan data simulasi, bukan akun atau endpoint nyata.
+This document defines the proposed contract between Android and the backend, filling out the endpoint draft on page 4 of the PDF. Domain rules are in [PRD.md](PRD.md). The `/v1` prefix is a design decision. Examples use simulated data, not real accounts or endpoints.
 
-## 1. Konvensi
+## 1. Conventions
 
-- HTTPS untuk lingkungan bersama. Base URL disediakan konfigurasi build; jangan hardcode alamat produksi di composable.
-- JSON UTF-8, `snake_case`, UUID sebagai string, timestamp RFC 3339 UTC, tanggal aktivitas `YYYY-MM-DD`.
-- Autentikasi `Authorization: Bearer <access_token>`. Server mengambil user dari token, tidak dari body/query.
-- Semua endpoint selain register/login/refresh dan health memerlukan autentikasi pada baseline ini.
-- Respons sukses memakai `data`; daftar menambah `page`; error memakai `error` dan `request_id`.
-- Angka berat disimpan integer gram; jumlah benda integer. Persentase dihitung server dengan presisi penuh dan ditampilkan client sesuai PRD.
-- `created_at` dan `updated_at` milik server. `activity_date` milik pengguna dalam batas yang diizinkan.
-- Value enum API berbahasa Inggris kapital, label UI berbahasa Indonesia. Enum tidak mengambil nama tampilan sebagai kunci database.
-- `Cache-Control: no-store` untuk auth dan respons pribadi di intermediary HTTP. Cache aplikasi yang sengaja dibuat harus terisolasi per user.
+- HTTPS for shared environments. The base URL comes from build configuration; never hardcode the production address in composables.
+- UTF-8 JSON, `snake_case`, UUIDs as strings, RFC 3339 UTC timestamps, and `YYYY-MM-DD` activity dates.
+- Authentication uses `Authorization: Bearer <access_token>`. The server takes the user from the token, never from the body or query.
+- In this baseline, every endpoint except register, login, refresh, and health requires authentication.
+- Success responses use `data`; lists add `page`; errors use `error` and `request_id`.
+- Weights are stored as integer grams and item counts as integers. The server calculates percentages at full precision, and the client displays them as the PRD describes.
+- `created_at` and `updated_at` belong to the server. `activity_date` belongs to the user, within the allowed limits.
+- API enum values are uppercase English, while UI labels are localized. Enums never use display names as database keys.
+- `Cache-Control: no-store` for auth and private responses at HTTP intermediaries. Any deliberate app cache must be isolated per user.
 
 ## 2. Data model
 
-### 2.1 Entitas
+### 2.1 Entities
 
-| Entitas | Field dan constraint |
+| Entity | Fields and constraints |
 |---|---|
 | users | id UUID PK; name varchar(60); normalized_email varchar(254) UNIQUE; password_hash; timezone IANA; created_at, updated_at |
 | sessions | id UUID PK; user_id FK; refresh_token_hash UNIQUE; expires_at; revoked_at nullable; created_at |
 | waste_logs | id UUID PK; user_id FK; category enum; method enum; quantity_kind enum; weight_g nullable; item_count nullable; activity_date date; activity_timezone; notes varchar(500); photo_id nullable; client_request_id UUID; request_hash; version int; created_at, updated_at; deleted_at nullable |
 | waste_guides | id UUID PK; slug UNIQUE; name; category; keywords; recommended_method; summary; steps JSON; cautions JSON; source_url; reviewed_at; publication_status |
 | achievements | id UUID PK; code UNIQUE; name; description; requirement_type; requirement_value integer |
-| user_achievements | user_id FK + achievement_id FK composite PK; unlocked_at; derived dari catatan aktif |
-| photos (opsional) | id UUID PK; user_id FK; object_key UNIQUE; mime_type; size_bytes; status; created_at |
+| user_achievements | user_id FK + achievement_id FK composite PK; unlocked_at; derived from active logs |
+| photos (optional) | id UUID PK; user_id FK; object_key UNIQUE; mime_type; size_bytes; status; created_at |
 
-`xp`, `level`, dan `streak` pada entitas User di PDF menjadi field respons turunan pada rancangan ini. Untuk dataset MVP, hitung dari catatan aktif agar edit/hapus tidak membuat cache progres salah. Jangan menyimpan versi kedua tanpa strategi invalidasi. `user_achievements` hanya perlu disimpan jika fitur achievement diaktifkan dan timestamp unlock dibutuhkan.
+The PDF's `xp`, `level`, and `streak` fields on User become derived response fields in this design. For the MVP dataset, calculate them from active logs so edits and deletes never leave a wrong progress cache. Don't store a second copy without an invalidation strategy. `user_achievements` only needs storing if achievements are turned on and unlock timestamps are needed.
 
-### 2.2 Enum
+### 2.2 Enums
 
 ```text
 category: ORGANIC | PLASTIC | PAPER | GLASS | METAL | ELECTRONIC | OTHER
@@ -44,9 +44,9 @@ publication_status: DRAFT | PUBLISHED | ARCHIVED
 requirement_type: ACTIVE_LOG_COUNT | RECYCLE_LOG_COUNT | BEST_STREAK
 ```
 
-### 2.3 Constraint database
+### 2.3 Database constraints
 
-Contoh SQL berikut menunjukkan constraint yang harus ada; bukan migrasi produksi lengkap.
+The SQL below shows the constraints that must exist; it isn't a complete production migration.
 
 ```sql
 CHECK (
@@ -62,56 +62,56 @@ UNIQUE (user_id, client_request_id);
 CHECK (version >= 1);
 ```
 
-Gunakan NOT NULL untuk user_id, category, method, quantity_kind, activity_date, activity_timezone, client_request_id, request_hash, version, created_at, updated_at. Validasi enum di DB. Index aktif untuk `(user_id, activity_date DESC, id DESC) WHERE deleted_at IS NULL`, index filter kategori/metode ditambahkan bila query plan menunjukkan kebutuhan. Soft-delete mempertahankan identitas request agar replay create setelah delete tidak membuat aktivitas baru; hard-delete/retensi diputuskan terpisah.
+Use NOT NULL for user_id, category, method, quantity_kind, activity_date, activity_timezone, client_request_id, request_hash, version, created_at, and updated_at. Validate enums in the database. Add an active index on `(user_id, activity_date DESC, id DESC) WHERE deleted_at IS NULL`, and category or method filter indexes when the query plan shows a need. Soft delete keeps the request identity so a create replayed after a delete doesn't create a new activity; hard delete and retention are decided separately.
 
-Seluruh query objek pribadi mencantumkan `user_id = authenticated_user`. UUID yang sulit ditebak bukan kontrol akses. Object storage tidak boleh memakai public bucket.
+Every query for private objects includes `user_id = authenticated_user`. Hard-to-guess UUIDs are not access control. Object storage must never use a public bucket.
 
-### 2.4 Relasi
+### 2.4 Relationships
 
 ```mermaid
 erDiagram
-    USER ||--o{ SESSION : memiliki
-    USER ||--o{ WASTE_LOG : mencatat
-    USER ||--o{ USER_ACHIEVEMENT : memperoleh
-    ACHIEVEMENT ||--o{ USER_ACHIEVEMENT : mendefinisikan
-    USER ||--o{ PHOTO : mengunggah
-    WASTE_LOG o|--o| PHOTO : melampirkan
+    USER ||--o{ SESSION : has
+    USER ||--o{ WASTE_LOG : logs
+    USER ||--o{ USER_ACHIEVEMENT : earns
+    ACHIEVEMENT ||--o{ USER_ACHIEVEMENT : defines
+    USER ||--o{ PHOTO : uploads
+    WASTE_LOG o|--o| PHOTO : attaches
 ```
 
-Satu photo_id maksimal terkait satu log aktif dan harus milik user yang sama. WasteGuide tidak memiliki relasi kepemilikan pribadi; hanya record PUBLISHED yang dapat dibaca pengguna.
+A photo_id links to at most one active log and must belong to the same user. WasteGuide has no personal ownership; users can only read PUBLISHED records.
 
-## 3. Daftar endpoint
+## 3. Endpoint list
 
-| Method | Endpoint | Tujuan | Status |
+| Method | Endpoint | Purpose | Status |
 |---|---|---|---|
-| POST | /v1/auth/register | Buat akun + sesi | Dari PDF, diperinci |
-| POST | /v1/auth/login | Buat sesi | Dari PDF |
-| POST | /v1/auth/refresh | Rotasi refresh token | Tambahan rancangan |
-| POST | /v1/auth/logout | Cabut sesi sekarang | Tambahan rancangan |
-| GET | /v1/me | Profil dan progres | Dari PDF |
-| GET | /v1/dashboard | Ringkasan hari ini dan 3 aktivitas terbaru | Tambahan rancangan |
-| GET | /v1/metadata | Kategori, metode, batas validasi, capability | Tambahan rancangan |
-| GET | /v1/waste-logs | Riwayat, filter, pagination | Dari PDF |
-| POST | /v1/waste-logs | Tambah catatan | Dari PDF |
-| GET | /v1/waste-logs/{id} | Detail milik sendiri | Dari PDF |
-| PATCH | /v1/waste-logs/{id} | Koreksi catatan | Memperjelas CRUD PDF |
-| DELETE | /v1/waste-logs/{id} | Hapus catatan | Memperjelas CRUD PDF |
-| GET | /v1/waste-guide | Daftar/pencarian | Dari PDF |
-| GET | /v1/waste-guide/{id} | Detail artikel | Tambahan rancangan |
-| GET | /v1/statistics | Ringkasan, seri harian, kategori, metode | Dari PDF |
-| GET | /v1/achievements | Achievement dan progres | Dari PDF, fitur opsional |
-| POST | /v1/photos | Upload multipart gambar privat | Opsional |
-| DELETE | /v1/photos/{id} | Hapus lampiran belum terpakai | Opsional |
-| POST | /v1/ai/detections | Scan foto sementara | AI extension §10 |
-| GET | /v1/ai/objects | Katalog koreksi objek | AI extension §10 |
-| POST | /v1/ai/recommendations | Rekomendasi tervalidasi | AI extension §10 |
-| DELETE | /v1/ai/detections/{id} | Buang sesi scan | AI extension §10 |
-| GET | /health/live | Proses hidup | Operasional |
-| GET | /health/ready | Aplikasi dan DB siap | Operasional, jangan bocorkan detail |
+| POST | /v1/auth/register | Create an account + session | From the PDF, expanded |
+| POST | /v1/auth/login | Create a session | From the PDF |
+| POST | /v1/auth/refresh | Rotate the refresh token | Added in this design |
+| POST | /v1/auth/logout | Revoke the current session | Added in this design |
+| GET | /v1/me | Profile and progress | From the PDF |
+| GET | /v1/dashboard | Today's summary and the 3 latest activities | Added in this design |
+| GET | /v1/metadata | Categories, methods, validation limits, capabilities | Added in this design |
+| GET | /v1/waste-logs | History, filters, pagination | From the PDF |
+| POST | /v1/waste-logs | Add a log | From the PDF |
+| GET | /v1/waste-logs/{id} | Your own detail | From the PDF |
+| PATCH | /v1/waste-logs/{id} | Correct a log | Clarifies the PDF's CRUD |
+| DELETE | /v1/waste-logs/{id} | Delete a log | Clarifies the PDF's CRUD |
+| GET | /v1/waste-guide | List and search | From the PDF |
+| GET | /v1/waste-guide/{id} | Article detail | Added in this design |
+| GET | /v1/statistics | Summary, daily series, categories, methods | From the PDF |
+| GET | /v1/achievements | Achievements and progress | From the PDF, optional feature |
+| POST | /v1/photos | Multipart upload of a private image | Optional |
+| DELETE | /v1/photos/{id} | Delete an unused attachment | Optional |
+| POST | /v1/ai/detections | Scan a temporary photo | AI extension §10 |
+| GET | /v1/ai/objects | Object correction catalog | AI extension §10 |
+| POST | /v1/ai/recommendations | Validated recommendation | AI extension §10 |
+| DELETE | /v1/ai/detections/{id} | Discard a scan session | AI extension §10 |
+| GET | /health/live | Process is alive | Operations |
+| GET | /health/ready | App and DB are ready | Operations; never leak details |
 
-Tidak ada endpoint Maps dalam baseline. Saat opsi peta dipilih, tentukan provider/list lokasi terverifikasi dan kontraknya tersendiri. Tidak ada alamat dummy yang disajikan sebagai data fasilitas sungguhan.
+The baseline has no Maps endpoint. If the map option is chosen, decide the provider or verified location list and its contract separately. No dummy addresses are ever served as real facility data.
 
-## 4. Autentikasi dan profil
+## 4. Authentication and profile
 
 ### Register
 
@@ -122,18 +122,18 @@ Content-Type: application/json
 
 ```json
 {
-  "name": "Pengguna Demo",
+  "name": "Demo User",
   "email": "demo@example.com",
-  "password": "contoh-kata-sandi-panjang",
+  "password": "a-long-sample-password",
   "timezone": "Asia/Jakarta"
 }
 ```
 
-201 menghasilkan `user`, `access_token`, `access_expires_at`, `refresh_token`, `refresh_expires_at`, dan `session_id` di dalam `data`. Login memakai email/password dan menghasilkan payload sesi yang sama dengan 200. Contoh credential ini untuk format dokumentasi, jangan membuat akun seed dengan password tersebut.
+A 201 returns `user`, `access_token`, `access_expires_at`, `refresh_token`, `refresh_expires_at`, and `session_id` inside `data`. Login takes an email and password and returns the same session payload with a 200. These credentials only illustrate the format; never create a seed account with that password.
 
-Default usulan: access token 15 menit dan refresh session 7 hari. Nilai dipin di konfigurasi backend, bukan fakta dari PDF. JWT berisi `sub`, `sid`, `iat`, `exp`, issuer, audience. Verifikasi algoritma yang diizinkan, tanda tangan, issuer/audience, expiry, dan sesi yang belum dicabut. Refresh token opaque acak kriptografis; hanya hash token disimpan server.
+Proposed defaults: a 15-minute access token and a 7-day refresh session. The values are pinned in backend configuration and aren't facts from the PDF. The JWT holds `sub`, `sid`, `iat`, `exp`, issuer, and audience. Verify the allowed algorithm, signature, issuer and audience, expiry, and that the session isn't revoked. The refresh token is a cryptographically random opaque value; the server only stores its hash.
 
-Refresh menerima refresh_token, mencabut token lama, dan menerbitkan pasangan baru secara atomik. Aplikasi menserialisasi refresh agar beberapa request 401 tidak memicu rotasi bersamaan. Kegagalan rotasi yang hasilnya tidak diketahui meminta login ulang; jangan mengulangi refresh tanpa batas. Logout terautentikasi mencabut session_id yang ada pada JWT, menghasilkan 204 dan idempoten. Setelah logout gagal jaringan, client tetap menghapus rahasia lokal serta menyatakan sesi perangkat telah dihapus; sesi server belum boleh diklaim dicabut. Batas expiry tetap berlaku.
+Refresh takes a refresh_token, revokes the old token, and issues a new pair atomically. The app serializes refreshes so several 401s never trigger concurrent rotations. If a rotation's outcome is unknown, ask the user to sign in again; never retry the refresh without limit. An authenticated logout revokes the session_id in the JWT, returns 204, and is idempotent. If logout fails on the network, the client still deletes its local secrets and says the session was removed from the device; it can't claim the server session was revoked. The expiry limit still applies.
 
 ### GET /me
 
@@ -141,7 +141,7 @@ Refresh menerima refresh_token, mencabut token lama, dan menerbitkan pasangan ba
 {
   "data": {
     "id": "00000000-0000-4000-8000-000000000001",
-    "name": "Pengguna Demo",
+    "name": "Demo User",
     "email": "demo@example.com",
     "timezone": "Asia/Jakarta",
     "progress": {
@@ -158,9 +158,9 @@ Refresh menerima refresh_token, mencabut token lama, dan menerbitkan pasangan ba
 }
 ```
 
-Password hash tidak pernah dikirim. Bila streak belum diaktifkan, field streak boleh null dan UI menyembunyikan bagian tersebut, bukan menunjukkan nol seolah sudah dihitung. Metadata mengirim capability boolean seperti `achievements`, `reminders`, `photos`, `recycling_points` untuk menyelaraskan opsi yang sudah diimplementasikan; jangan menjadikan flag sebagai pengganti authorization.
+The password hash is never sent. If streaks aren't turned on, the streak fields may be null and the UI hides that section rather than showing zero as if it had been calculated. Metadata sends boolean capabilities such as `achievements`, `reminders`, `photos`, and `recycling_points` to match the options actually built; never use a flag in place of authorization.
 
-## 5. Catatan aktivitas
+## 5. Activity logs
 
 ### Create
 
@@ -173,34 +173,34 @@ Password hash tidak pernah dikirim. Bila streak belum diaktifkan, field streak b
   "weight_g": 250,
   "item_count": null,
   "activity_date": "2026-09-21",
-  "notes": "Contoh data simulasi.",
+  "notes": "Sample simulated data.",
   "photo_id": null
 }
 ```
 
-Server menetapkan timezone dari akun. 201 mengirim seluruh WasteLog termasuk id, activity_timezone, version=1, timestamp server, dan `progress` terbaru. Untuk COUNT kirim weight_g=null dan item_count integer. Field berlebih seperti user_id/xp/created_at ditolak, bukan dipakai.
+The server sets the time zone from the account. A 201 returns the whole WasteLog, including id, activity_timezone, version=1, server timestamps, and the latest `progress`. For COUNT, send weight_g=null and an integer item_count. Extra fields such as user_id, xp, or created_at are rejected, not used.
 
-### Idempotensi dan timeout
+### Idempotency and timeouts
 
-Android membuat `client_request_id` satu kali ketika draf baru disiapkan, menyimpannya bersama draf nonrahasia. Tombol simpan disabled ketika request aktif. Server melakukan insert dan pemeriksaan uniqueness dalam transaksi.
+Android creates the `client_request_id` once when a new draft is prepared and stores it with the non-secret draft. The save button is disabled while a request is active. The server does the insert and uniqueness check in one transaction.
 
-| Keadaan | Hasil |
+| Situation | Result |
 |---|---|
-| ID belum pernah diterima user ini | Simpan satu log, 201 |
-| ID sama + payload kanonik sama | Kembalikan log yang sama, 200; tidak menambah XP |
-| ID sama + payload berbeda | 409 IDEMPOTENCY_CONFLICT; jangan menimpa |
-| ID sama tetapi log sudah dihapus | 410 LOG_DELETED; jangan menghidupkan ulang |
-| Server commit tetapi respons hilang | Retry payload yang sama dengan ID yang sama |
+| This user has never sent the ID | Save one log, 201 |
+| Same ID + same canonical payload | Return the same log, 200; no extra XP |
+| Same ID + different payload | 409 IDEMPOTENCY_CONFLICT; never overwrite |
+| Same ID but the log was deleted | 410 LOG_DELETED; never bring it back |
+| The server committed but the response was lost | Retry the same payload with the same ID |
 
-Client tidak boleh mengedit lalu mengirim payload baru memakai ID request yang hasilnya belum diketahui. Resolve dulu dengan retry payload awal; setelah objek ditemukan, buka edit. Jika pengguna ingin aktivitas lain, mulai draf baru dengan ID baru. Uniqueness `(user_id, client_request_id)` tetap terjaga terhadap request paralel.
+The client must never edit and then send a new payload with a request ID whose outcome is unknown. Resolve it first by retrying the original payload; once the object is found, open the editor. If the user wants a different activity, start a new draft with a new ID. Uniqueness on `(user_id, client_request_id)` holds even for parallel requests.
 
-### List/filter
+### List and filters
 
 ```http
 GET /v1/waste-logs?category=PLASTIC&method=RECYCLE&from=2026-09-15&to=2026-09-21&limit=20
 ```
 
-Kategori dan metode masing-masing satu nilai atau tidak disertakan. Filter AND, tanggal inklusif. `limit` default 20, maksimum 100. Cursor opaque memuat posisi `(activity_date,id)` dan terikat pada filter serta user; cursor bukan offset. Urutan `activity_date DESC, id DESC`. Saat filter berubah, reset cursor dan daftar. Pull-to-refresh memulai halaman pertama; client deduplikasi berdasarkan id saat pagination karena data dapat berubah.
+Category and method each take one value or are left out. Filters combine with AND, and dates are inclusive. `limit` defaults to 20, with a maximum of 100. The opaque cursor holds the `(activity_date,id)` position and is bound to the filter and the user; it isn't an offset. Order is `activity_date DESC, id DESC`. When filters change, reset the cursor and the list. Pull-to-refresh starts from the first page; the client dedupes by id while paginating because data can change.
 
 ```json
 {
@@ -209,25 +209,25 @@ Kategori dan metode masing-masing satu nilai atau tidak disertakan. Filter AND, 
 }
 ```
 
-Daftar kosong adalah 200. Kegagalan halaman berikutnya mempertahankan halaman sebelumnya dengan retry di bagian bawah.
+An empty list is a 200. If a later page fails, earlier pages stay, with a retry at the bottom.
 
-### Read/update/delete
+### Read, update, delete
 
-GET id sukses 200; objek hilang, dihapus, atau milik akun lain sama-sama 404. PATCH menerima field mutable dan `version` saat dibaca. Field yang tidak disertakan tidak berubah; `notes: null` berarti kosong; immutable field ditolak. Setelah penggabungan, lakukan validasi XOR weight/count yang sama seperti create.
+GET by id returns 200; missing, deleted, or another account's objects all return 404. PATCH takes mutable fields plus the `version` that was read. Fields left out don't change; `notes: null` means empty; immutable fields are rejected. After merging, run the same weight/count XOR validation as create.
 
-activity_date lama yang tidak berubah boleh dipertahankan di luar jendela create. Tanggal baru pada PATCH harus berada antara hari ini dan 30 hari sebelumnya dalam timezone akun. Nilai notes null dinormalisasi ke string kosong sebelum disimpan.
+An unchanged old activity_date may stay outside the create window. A new date in a PATCH must fall between today and 30 days ago in the account's time zone. A null notes value is normalized to an empty string before saving.
 
 ```json
-{"version": 1, "weight_g": 300, "notes": "Berat diperbaiki."}
+{"version": 1, "weight_g": 300, "notes": "Corrected the weight."}
 ```
 
-Update memakai conditional query `WHERE id=? AND user_id=? AND version=? AND deleted_at IS NULL`, menaikkan version. 409 VERSION_CONFLICT mengharuskan UI memuat versi terbaru sebelum menerapkan ulang perubahan, dengan draf pengguna tetap tersedia. Jangan auto-merge berat/metode.
+Updates use the conditional query `WHERE id=? AND user_id=? AND version=? AND deleted_at IS NULL` and bump the version. A 409 VERSION_CONFLICT requires the UI to load the latest version before reapplying the change, with the user's draft kept. Never auto-merge weight or method.
 
-DELETE memakai header `If-Match: "<version>"`; missing header → 428 PRECONDITION_REQUIRED. Ketidakcocokan → 409 VERSION_CONFLICT. Delete berhasil → 204, `deleted_at` terisi, version bertambah. Replay delete atas objek milik sendiri yang sudah dihapus → 204; objek akun lain → 404. Semua agregat mengecualikan deleted_at.
+DELETE uses the header `If-Match: "<version>"`; a missing header → 428 PRECONDITION_REQUIRED. A mismatch → 409 VERSION_CONFLICT. A successful delete → 204, with `deleted_at` set and the version bumped. Replaying a delete on your own deleted object → 204; another account's object → 404. Every aggregate excludes deleted_at.
 
-## 6. Dashboard dan statistik
+## 6. Dashboard and statistics
 
-GET dashboard mengambil tanggal hari ini menurut timezone akun, bukan parameter client. Respons meliputi `date`, `timezone`, `summary`, `recent_logs` maksimal 3, dan `progress` sepanjang waktu. Summary memakai kontrak agregat yang sama dengan statistics.
+GET dashboard takes today's date from the account's time zone, not a client parameter. The response has `date`, `timezone`, `summary`, up to 3 `recent_logs`, and all-time `progress`. The summary uses the same aggregate contract as statistics.
 
 ```http
 GET /v1/statistics?from=2026-09-15&to=2026-09-21
@@ -273,19 +273,19 @@ GET /v1/statistics?from=2026-09-15&to=2026-09-21
 }
 ```
 
-Hari tanpa aktivitas tetap dikirim nol. Data kosong mengirim array kategori dan hari dengan nol, recycling_rate_percent=null. Filter tanggal invalid atau >366 hari → 422. API tidak mengirim CO2 saved, nilai uang, atau berat hasil perkiraan benda. UI memberi nama metrik dan basis; chart selalu memiliki ringkasan teks/tabel.
+Days with no activity are still sent as zero. Empty data sends category and day arrays full of zeros, with recycling_rate_percent=null. Invalid date filters or ranges over 366 days → 422. The API never sends CO2 saved, money values, or weights estimated from items. The UI names the metric and its basis, and every chart has a text summary or table.
 
-## 7. Panduan, achievement, dan foto
+## 7. Guides, achievements, and photos
 
-GET waste-guide menerima `q` maksimum 100 karakter, kategori opsional, limit/cursor. Query di-trim; string kosong berarti daftar. Cari nama dan keywords tanpa membedakan kapital. Backend memakai parameterized query, bukan merangkai SQL dari q.
+GET waste-guide takes a `q` of up to 100 characters, an optional category, and limit and cursor. The query is trimmed; an empty string means the full list. Search names and keywords case-insensitively. The backend uses parameterized queries and never builds SQL from q.
 
-Detail panduan mengirim id, name, category, recommended_method, summary, steps[], cautions[], source_url, reviewed_at. `reviewed_at` tidak boleh difabrikasi. Data PUBLISHED harus lolos pemeriksaan editorial; draft contoh di HTML tidak otomatis menjadi seed.
+Guide details send id, name, category, recommended_method, summary, steps[], cautions[], source_url, and reviewed_at. `reviewed_at` must never be fabricated. PUBLISHED data has to pass editorial review; sample drafts in the HTML never automatically become seeds.
 
-GET achievements mengirim id, title, description, current_value, target_value, is_unlocked, unlocked_at. Nilai progres dicap untuk tampilan, tetapi hitungan asli tidak dibuang. Semantik threshold dan koreksi mengikuti PRD §10.
+GET achievements sends id, title, description, current_value, target_value, is_unlocked, and unlocked_at. Progress values are capped for display, but the raw counts aren't thrown away. Threshold and correction semantics follow PRD §10.
 
-Foto opsional diunggah dengan multipart langsung ke backend untuk MVP, bukan membuat protokol upload kompleks. Backend memeriksa byte signature, MIME, ukuran ≤5 MiB, dimensi/decompression limit, kepemilikan, menghapus metadata EXIF sensitif, lalu menyimpan ke bucket privat. Respons photo_id dan preview URL berumur pendek. Log hanya menerima photo_id, bukan URL sewenang-wenang. URL bertanda tangan diperoleh hanya setelah otorisasi; log tidak mencatat URL utuh.
+For the MVP, optional photos are uploaded as multipart straight to the backend rather than through a complex upload protocol. The backend checks the byte signature, MIME type, size ≤5 MiB, dimension and decompression limits, and ownership, strips sensitive EXIF metadata, then stores the file in a private bucket. It responds with a photo_id and a short-lived preview URL. Logs only accept a photo_id, never an arbitrary URL. Signed URLs are only issued after authorization, and logs never record full URLs.
 
-Unggahan yang belum terhubung ke log dibersihkan setelah 24 jam (usulan retensi sementara). Jika penyimpanan log gagal, pengguna boleh mencoba kembali memakai photo_id yang sama selama masih valid. Foto yang terhubung ke log dihapus mengikuti kebijakan retensi log; akses pengguna langsung ditolak setelah log dihapus. Jangan menyatakan file telah terhapus permanen jika masih ada di backup.
+Uploads not linked to a log are cleaned up after 24 hours (a proposed temporary retention). If saving the log fails, the user can retry with the same photo_id while it's still valid. Photos linked to a log are deleted under the log retention policy, and user access is refused as soon as the log is deleted. Never say a file is permanently deleted if it still exists in a backup.
 
 ## 8. Error contract
 
@@ -293,59 +293,59 @@ Unggahan yang belum terhubung ke log dibersihkan setelah 24 jam (usulan retensi 
 {
   "error": {
     "code": "VALIDATION_ERROR",
-    "message": "Periksa kembali isianmu.",
-    "fields": {"weight_g": "Berat minimal 1 gram."}
+    "message": "Check the highlighted fields.",
+    "fields": {"weight_g": "Weight must be at least 1 gram."}
   },
   "request_id": "example-request-id"
 }
 ```
 
-| HTTP | Code | Perilaku Android |
+| HTTP | Code | Android behavior |
 |---|---|---|
-| 400 | INVALID_REQUEST | Pesan terarah, jangan retry otomatis |
-| 401 | UNAUTHENTICATED / SESSION_EXPIRED | Refresh sekali; login bila gagal |
-| 404 | NOT_FOUND | Kembali ke daftar; tidak membocorkan pemilik lain |
-| 409 | EMAIL_EXISTS | Sorot email registrasi |
-| 409 | VERSION_CONFLICT | D04, pertahankan draf, tawarkan muat versi baru |
-| 409 | IDEMPOTENCY_CONFLICT | Resolve catatan awal sebelum membuat draf baru |
-| 410 | LOG_DELETED | Informasikan catatan replay telah dihapus |
-| 413 | FILE_TOO_LARGE | Pilih foto lain atau lanjut tanpa foto |
-| 415 | UNSUPPORTED_MEDIA_TYPE | Pilih format yang diizinkan |
-| 422 | VALIDATION_ERROR | Error inline per field, fokus error pertama |
-| 428 | PRECONDITION_REQUIRED | Ambil versi objek sebelum hapus |
-| 429 | RATE_LIMITED | Hormati Retry-After; jangan retry loop |
-| 500/503 | INTERNAL_ERROR / UNAVAILABLE | Pesan generik + retry; request_id untuk diagnosis |
+| 400 | INVALID_REQUEST | A specific message; no automatic retry |
+| 401 | UNAUTHENTICATED / SESSION_EXPIRED | Refresh once; sign in if that fails |
+| 404 | NOT_FOUND | Back to the list; never reveal another owner |
+| 409 | EMAIL_EXISTS | Highlight the registration email |
+| 409 | VERSION_CONFLICT | D04, keep the draft, offer to load the new version |
+| 409 | IDEMPOTENCY_CONFLICT | Resolve the original log before starting a new draft |
+| 410 | LOG_DELETED | Explain that the replayed log was deleted |
+| 413 | FILE_TOO_LARGE | Pick another photo or continue without one |
+| 415 | UNSUPPORTED_MEDIA_TYPE | Pick an allowed format |
+| 422 | VALIDATION_ERROR | Inline errors per field, focus the first error |
+| 428 | PRECONDITION_REQUIRED | Fetch the object's version before deleting |
+| 429 | RATE_LIMITED | Respect Retry-After; no retry loops |
+| 500/503 | INTERNAL_ERROR / UNAVAILABLE | A generic message + retry; request_id for diagnosis |
 
-Tidak ada stack trace, SQL, token, email pemilik lain, atau path internal pada respons error. Network timeout bukan bukti transaksi gagal; create wajib menggunakan mekanisme idempotensi.
+Error responses never include stack traces, SQL, tokens, other owners' emails, or internal paths. A network timeout isn't proof a transaction failed; create must use the idempotency mechanism.
 
-## 9. Transaksi, keamanan, dan kontrak pengujian
+## 9. Transactions, security, and contract tests
 
-Create, uniqueness request, dan perubahan derived achievement dilakukan dalam transaksi yang menjaga satu hasil domain. Untuk MVP XP/statistik dihitung langsung dari log aktif. Endpoint summary menggunakan snapshot transaksi konsisten jika menggabungkan beberapa query. Validasi server tetap wajib meski client sudah memvalidasi.
+Create, request uniqueness, and derived achievement changes happen in one transaction that keeps a single domain outcome. For the MVP, XP and statistics are calculated directly from active logs. Summary endpoints use a consistent transaction snapshot when they combine several queries. Server validation is always required, even when the client has already validated.
 
-Password disimpan dengan Argon2id melalui library yang terpelihara; simpan parameter dan salt bersama hash, jangan membuat fungsi hashing sendiri. Pilihan ini mengacu pada [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html). Rate limit auth per IP dan identitas ternormalisasi, tanpa mengunci permanen pengguna lewat serangan pihak lain; nilai limit disepakati setelah pengujian.
+Passwords are stored with Argon2id through a maintained library; store the parameters and salt with the hash, and never write a homemade hash function. This follows the [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html). Rate limit auth per IP and normalized identity without letting someone else's attack lock a user out permanently; agree on the limit values after testing.
 
-Kasus wajib: user A tidak dapat membaca/mengubah/menghapus log user B; integer batas bawah/atas; XOR unit; semua enum invalid; hanya Reduce; tidak ada catatan; campuran unit; request create paralel dengan ID sama; version conflict; replay setelah delete; token expired/revoked; tanggal sekitar pergantian hari. Test penerimaan bersama Android/backend menggunakan dataset PRD §9.4.
+Required cases: user A can't read, change, or delete user B's logs; integer lower and upper bounds; the unit XOR; every invalid enum; Reduce only; no logs; mixed units; parallel creates with the same ID; version conflicts; replay after delete; expired and revoked tokens; dates around the day rollover. Shared Android and backend acceptance tests use the PRD §9.4 dataset.
 
 ## 10. AI extension v1.2
 
-Pembaruan integrasi 20 Oktober 2026: [kontrak HTTP v1](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/AI_HTTP_CONTRACT.md) dan [OpenAPI publik](https://github.com/waste-not-app/waste-not-ai/blob/main/contracts/v1/public.openapi.json) menjadi acuan mesin yang lebih lengkap dari contoh ringkas di bawah. Envelope menambah api_version=1.0.0; request rekomendasi menambah confirmed_object=true, input_source dan context_revision. Python adalah pemilik tunggal mapping/policy/Gemini; Go membungkus hasil dengan sesi/ownership/TTL/dedup dan penyimpanan. Mock publik tersedia; backend Go produksi tetap pekerjaan lanjutan.
+Integration update on 20 October 2026: the [HTTP contract v1](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/AI_HTTP_CONTRACT.md) and the [public OpenAPI](https://github.com/waste-not-app/waste-not-ai/blob/main/contracts/v1/public.openapi.json) are the machine-readable reference and are more complete than the short examples below. The envelope adds api_version=1.0.0; the recommendation request adds confirmed_object=true, input_source, and context_revision. Python is the single owner of mapping, policy, and Gemini; Go wraps the results with sessions, ownership, TTLs, dedup, and storage. A public mock is available; the production Go backend is still follow-up work.
 
-Kontrak ini memperluas core, menggunakan prefix `/v1` yang sama (contoh `/api/v1` pada plan dinormalisasi). Semua payload di bawah contoh rancangan. [AI_SPEC](AI_SPEC.md) menetapkan mapping, kebijakan rekomendasi, batas media, TTL dan retensi. Tidak ada endpoint AI yang membuat log atau XP.
+This contract extends the core with the same `/v1` prefix (the plan's `/api/v1` example is normalized). Every payload below is a design example. [AI_SPEC](AI_SPEC.md) defines the mapping, the recommendation policy, media limits, TTLs, and retention. No AI endpoint creates logs or XP.
 
-| Method | Endpoint | Fungsi |
+| Method | Endpoint | Function |
 |---|---|---|
-| GET | /v1/ai/objects | Katalog object_key/category yang didukung dan versi mapping |
-| POST | /v1/ai/detections | Upload foto ephemeral, jalankan YOLO, simpan sesi hasil user-scoped |
-| POST | /v1/ai/recommendations | Konfirmasi/koreksi objek, retrieval panduan, saran tervalidasi |
-| DELETE | /v1/ai/detections/{id} | Buang sesi sendiri dan rekomendasi sementara; idempotent 204 |
+| GET | /v1/ai/objects | Catalog of supported object_key/category values and the mapping version |
+| POST | /v1/ai/detections | Upload an ephemeral photo, run YOLO, store a user-scoped result session |
+| POST | /v1/ai/recommendations | Confirm or correct the object, retrieve guides, return validated advice |
+| DELETE | /v1/ai/detections/{id} | Discard your own session and temporary recommendations; idempotent 204 |
 
-GET /v1/ai/objects mengembalikan data.items berisi object_key, label, category, special_handling dan catalog_version; tidak memuat arbitrary prompt. Kategori OTHER dapat dipilih manual tanpa memaksa object_key palsu.
+GET /v1/ai/objects returns data.items with object_key, label, category, special_handling, and catalog_version; it never includes an arbitrary prompt. The OTHER category can be chosen manually without forcing a fake object_key.
 
-GET /v1/metadata menambah `capabilities.ai_scan` dan `capabilities.ai_recommendation` boolean serta `ai_object_catalog_version` nullable. Capability false tetap mempertahankan tombol Catat dengan input manual; bukan menyembunyikan seluruh pencatatan. Konfigurasi model mentah dan secret tidak masuk metadata publik.
+GET /v1/metadata adds the booleans `capabilities.ai_scan` and `capabilities.ai_recommendation` and a nullable `ai_object_catalog_version`. When a capability is false, the Log button stays with manual input; logging as a whole is never hidden. Raw model configuration and secrets never go into public metadata.
 
-### 10.1 Deteksi
+### 10.1 Detection
 
-Multipart fields: `image` JPEG/PNG, `client_request_id` UUID. Tidak menerima URL gambar eksternal/base64 JSON. File ≤5 MiB, decoded ≤12 MP dan sisi ≤4096, normalisasi orientasi/EXIF server-side. Autentikasi dan pembatasan akun dilakukan sebelum inference. Response 201 pertama, 200 replay identik selama TTL; ID sama dengan digest gambar berbeda → 409 IDEMPOTENCY_CONFLICT. Dedup scoped user dan digest tidak menjadi data training.
+Multipart fields: `image` as JPEG or PNG and `client_request_id` as a UUID. External image URLs and base64 JSON aren't accepted. Files are ≤5 MiB, decoded ≤12 MP with sides ≤4096, and orientation and EXIF are normalized server-side. Authentication and account limits are checked before inference. The first response is 201 and an identical replay within the TTL is 200; the same ID with a different image digest → 409 IDEMPOTENCY_CONFLICT. Dedup is scoped to the user, and the digest never becomes training data.
 
 ```json
 {
@@ -371,9 +371,9 @@ Multipart fields: `image` JPEG/PNG, `client_request_id` UUID. Tidak menerima URL
 }
 ```
 
-Tidak ada foto/URL permanen pada respons. `status`: REVIEW_REQUIRED bila ada kandidat ≥ambang lower; MANUAL_REQUIRED bila kosong/unknown/semua rendah. `objects` dapat kosong. Semua score finite 0..1; bbox tervalidasi sesuai AI_SPEC. `object_id` hanya unik di detection session. Raw class dan category berbeda. Skor rendah memakai UNCERTAIN; hasil <0,50 tidak dijadikan prefill. Nilai threshold adalah konfigurasi versioned, bukan magic constant UI.
+Responses never contain a photo or permanent URL. `status` is REVIEW_REQUIRED when there's a candidate at or above the lower threshold, and MANUAL_REQUIRED when the result is empty, unknown, or all low. `objects` can be empty. Every score is a finite value from 0 to 1, and bounding boxes are validated as AI_SPEC describes. `object_id` is only unique within the detection session. The raw class and the category are different things. Low scores use UNCERTAIN, and results below 0.50 never become a prefill. Thresholds are versioned configuration, not a magic constant in the UI.
 
-### 10.2 Rekomendasi
+### 10.2 Recommendations
 
 ```json
 {
@@ -391,7 +391,7 @@ Tidak ada foto/URL permanen pada respons. `status`: REVIEW_REQUIRED bila ada kan
 }
 ```
 
-Server mengambil confidence/model/mapping dari sesi sendiri, bukan percaya nilai kiriman client. `confirmed_object_key` berasal dari katalog server; kategori harus cocok atau 422. Untuk kelas unknown tanpa panduan, gunakan manual dan jangan membuat recommendation palsu. Tidak menerima user_id, arbitrary guide_key, URL/prompt bebas atau allowed_methods dari client. Ownership dicek sebelum lookup model/LLM.
+The server takes the confidence, model, and mapping from its own session rather than trusting values the client sends. `confirmed_object_key` comes from the server catalog; the category must match or the server returns 422. For unknown classes with no guide, fall back to manual entry and never make up a recommendation. The server doesn't accept user_id, an arbitrary guide_key, free-form URLs or prompts, or allowed_methods from the client. Ownership is checked before any model or LLM lookup.
 
 ```json
 {
@@ -401,12 +401,12 @@ Server mengambil confidence/model/mapping dari sesi sendiri, bukan percaya nilai
     "category": "PLASTIC",
     "recommended_method": "RECYCLE",
     "recommendation_scope": "HANDLING",
-    "reason": "Contoh respons: periksa ketentuan penerimaan dalam panduan fasilitas.",
+    "reason": "Sample response: check the acceptance rules in the facility guide.",
     "special_handling": false,
-    "caution": "Ini contoh kontrak, bukan rekomendasi yang sudah diverifikasi.",
+    "caution": "This is a contract example, not verified advice.",
     "guide_refs": [{"guide_id": "9fbd97ab-9450-4b6e-a43e-e0bda8a61011", "version": 1}],
     "source_urls": ["https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"],
-    "steps": ["Periksa ketentuan fasilitas penerima."],
+    "steps": ["Check the receiving facility's rules."],
     "recommendation_version": "pilot-policy-05",
     "expires_at": "2026-09-29T03:00:00Z"
   },
@@ -414,15 +414,15 @@ Server mengambil confidence/model/mapping dari sesi sendiri, bukan percaya nilai
 }
 ```
 
-`status` READY / NEEDS_CONTEXT / UNAVAILABLE. READY memiliki tepat satu recommended_method dari REDUCE/REUSE/RECYCLE/TRASH, reason, source_urls dan recommendation_scope=PREVENTION untuk REDUCE atau HANDLING untuk lainnya. source_details menambahkan judul/penerbit/wilayah/checked_at/scope_note dari registri. Tidak ada alternative_method atau status SPECIAL_HANDLING. special_handling=true adalah peringatan tambahan yang boleh menyertai READY. Contoh: kaca pecah READY/TRASH/true, baterai READY/RECYCLE/true melalui pengelola khusus. recommendation_goal=AUTO/PREVENTION/HANDLING dan recycling_access=YES/NO/UNKNOWN memiliki default AUTO/UNKNOWN; REDUCE hanya ditawarkan untuk PREVENTION yang dipilih pengguna.
+`status` is READY, NEEDS_CONTEXT, or UNAVAILABLE. READY has exactly one recommended_method from REDUCE/REUSE/RECYCLE/TRASH, a reason, source_urls, and recommendation_scope=PREVENTION for REDUCE or HANDLING for the others. source_details adds the title, publisher, region, checked_at, and scope_note from the registry. There's no alternative_method and no SPECIAL_HANDLING status. special_handling=true is an extra warning that can come with READY. For example, broken glass is READY/TRASH/true, and batteries are READY/RECYCLE/true through a specialist handler. recommendation_goal=AUTO/PREVENTION/HANDLING and recycling_access=YES/NO/UNKNOWN default to AUTO and UNKNOWN; REDUCE is only offered when the user chooses PREVENTION.
 
-Tambahan policy-04: condition.cleanable=YES/NO/UNKNOWN, condition.soiling=FOOD_DRINK/DUST/HAZARDOUS/UNKNOWN, risk_type=UNKNOWN/SHARP/CHEMICAL/BIOLOGICAL/ELECTRICAL/OTHER; default UNKNOWN. Peralatan kotor biasa yang dikonfirmasi bisa dibersihkan dapat REUSE setelah dicuci. NEEDS_CONTEXT memakai metode/scope null dan missing_context (misalnya ["risk_type"] atau ["condition.cleanable"]), tanpa memanggil Gemini. UNAVAILABLE memakai metode/scope null ketika panduan/layanan/output tidak siap atau risiko tidak tercakup; caution risiko dipertahankan. Tidak mengembalikan exception/provider raw text. Expiry recommendation tidak boleh melampaui sesi deteksi. Konfirmasi pengguna tidak disimpulkan dari tombol generate.
+Policy-04 additions: condition.cleanable=YES/NO/UNKNOWN, condition.soiling=FOOD_DRINK/DUST/HAZARDOUS/UNKNOWN, and risk_type=UNKNOWN/SHARP/CHEMICAL/BIOLOGICAL/ELECTRICAL/OTHER, all defaulting to UNKNOWN. Ordinarily dirty items confirmed as cleanable can get REUSE after washing. NEEDS_CONTEXT uses a null method and scope plus missing_context (for example ["risk_type"] or ["condition.cleanable"]) without calling Gemini. UNAVAILABLE uses a null method and scope when the guide, service, or output isn't ready or the risk isn't covered; risk cautions are kept. Raw exceptions or provider text are never returned. A recommendation's expiry never outlasts the detection session. User confirmation is never inferred from the generate button.
 
-Simpan rekomendasi identik/replay satu client_request_id tanpa memanggil provider lagi selama TTL. Payload berbeda dengan ID sama →409. Context berubah memakai request ID baru; respons lama dibuang di Android. Infrastruktur timeout memakai error 504 AI_TIMEOUT; provider unavailable 503 AI_UNAVAILABLE; output semantik invalid dapat kembali 200 status UNAVAILABLE sebagai hasil fallback yang terkontrol.
+Store identical recommendations and replays for one client_request_id without calling the provider again within the TTL. A different payload with the same ID → 409. Changed context uses a new request ID, and Android discards the old response. Infrastructure timeouts use 504 AI_TIMEOUT; an unavailable provider uses 503 AI_UNAVAILABLE; semantically invalid output may come back as a 200 with status UNAVAILABLE as a controlled fallback.
 
-### 10.3 Penyimpanan catatan dan metadata
+### 10.3 Saving logs and metadata
 
-POST /v1/waste-logs tetap satu-satunya create path. Tambahan opsional pada body existing:
+POST /v1/waste-logs stays the only create path. An optional addition to the existing body:
 
 ```json
 {
@@ -434,32 +434,32 @@ POST /v1/waste-logs tetap satu-satunya create path. Tambahan opsional pada body 
 }
 ```
 
-Ini fragmen tambahan, bukan request create lengkap; category/method/quantity/date/client_request_id tetap wajib seperti §5. Manual menghilangkan ai_provenance. Server memvalidasi ownership, TTL, kategori sama dengan konfirmasi, dan kedua confirmation=true. Metode akhir boleh berbeda dari saran; simpan final_category/final_method dari waste log dan flag accepted berdasarkan perbandingan server, bukan boolean client sebagai ukuran akurasi. REDUCE hanya lewat manual tanpa provenance rekomendasi disposal.
+This is an extra fragment, not a full create request; category, method, quantity, date, and client_request_id are still required as in §5. Manual entries leave ai_provenance out. The server validates ownership, TTL, a category matching the confirmation, and that both confirmations are true. The final method may differ from the advice; store final_category and final_method from the waste log and an accepted flag based on the server's comparison, never a client boolean as a measure of accuracy. REDUCE only comes through manual entry, without disposal recommendation provenance.
 
-Satu recommendation_id boleh terikat satu waste_log_id; constraint unik scoped user untuk mencegah double-save dengan request ID baru. Replay ID create core identik mengembalikan record yang sama. Reuse recommendation oleh log berbeda →409 AI_ALREADY_LINKED. Provenance invalid/expired →422 AI_REFERENCE_INVALID / 410 AI_SESSION_EXPIRED; pertahankan draf dan tawarkan simpan manual setelah pengguna melepas provenance. Jangan diam-diam mengubah hasil request idempotent.
+One recommendation_id can be linked to one waste_log_id; a user-scoped unique constraint prevents a double save with a new request ID. Replaying an identical core create ID returns the same record. Reusing a recommendation for a different log →409 AI_ALREADY_LINKED. Invalid or expired provenance →422 AI_REFERENCE_INVALID / 410 AI_SESSION_EXPIRED; keep the draft and offer a manual save once the user drops the provenance. Never quietly change the result of an idempotent request.
 
-Entitas tambahan:
+Extra entities:
 
-| Entitas | Field minimum |
+| Entity | Minimum fields |
 |---|---|
-| ai_detection_sessions | id, user_id, client_request_id, image_digest, model_version, mapping_version, detections JSON validated, created_at, expires_at; UNIQUE(user_id,client_request_id) |
-| ai_recommendations | id, detection_id, user_id, client_request_id, request_hash, confirmed_object_key/category, condition JSON, reuse_intention, status, methods nullable, guide_snapshot_refs, policy/provider/model version, created_at, expires_at |
-| ai_log_metadata | waste_log_id UNIQUE FK, recommendation_id UNIQUE, user_id, model/mapping/policy/guide versions, raw_class/confidence, confirmed object/category, original suggestion, final category/method at creation, confirmation flags; tidak menyimpan foto/prompt mentah |
+| ai_detection_sessions | id, user_id, client_request_id, image_digest, model_version, mapping_version, validated detections JSON, created_at, expires_at; UNIQUE(user_id,client_request_id) |
+| ai_recommendations | id, detection_id, user_id, client_request_id, request_hash, confirmed_object_key/category, condition JSON, reuse_intention, status, nullable methods, guide_snapshot_refs, policy/provider/model version, created_at, expires_at |
+| ai_log_metadata | waste_log_id UNIQUE FK, recommendation_id UNIQUE, user_id, model/mapping/policy/guide versions, raw_class/confidence, confirmed object/category, original suggestion, final category/method at creation, confirmation flags; never stores photos or raw prompts |
 
-Saat create, snapshot metadata dan waste log dibuat dalam transaksi yang sama. Snapshot tetap cukup untuk audit setelah sesi ephemeral dihapus (reference ID di metadata tidak menjadi FK yang memaksa sesi tetap hidup). Edit log tidak menghitung ulang model atau mengubah snapshot awal. Delete mengikuti retensi core dan menghapus metadata pada purge; statistik tidak membaca tabel AI. Migration tambahan nullable/terpisah sehingga log manual lama tetap valid.
+On create, the metadata snapshot and the waste log are written in the same transaction. The snapshot is enough for auditing after the ephemeral session is deleted (the reference ID in the metadata isn't an FK that forces the session to stay alive). Editing a log never reruns the model or changes the original snapshot. Delete follows core retention and removes the metadata on purge; statistics never read the AI tables. Extra migrations are nullable or separate so existing manual logs stay valid.
 
-### 10.4 Error dan pengujian kontrak
+### 10.4 Errors and contract tests
 
-413/415/422 untuk ukuran/tipe/decoder; 401 sesi; 404 session milik orang lain; 410 AI_SESSION_EXPIRED; 429 RATE_LIMITED + Retry-After; 503 AI_UNAVAILABLE/AI_DISABLED; 504 AI_TIMEOUT. Error envelope tetap §8. Retry upload/inference harus eksplisit dan dibatasi; retry simpan core mempertahankan ID yang sama.
+413/415/422 for size, type, and decoder problems; 401 for sessions; 404 for another person's session; 410 AI_SESSION_EXPIRED; 429 RATE_LIMITED + Retry-After; 503 AI_UNAVAILABLE/AI_DISABLED; 504 AI_TIMEOUT. The error envelope stays as in §8. Upload and inference retries must be explicit and limited; core save retries keep the same ID.
 
-Uji malformed bbox/NaN, spoof category/guide/confidence, AI lintas akun, replay identik/berbeda, expiry, special handling override, LLM schema/evidence invalid, unknown class, no guide, timeout, cancel, log transaction rollback, concurrent save, dan log manual tanpa metadata. Jangan mencatat body gambar/prompt/Authorization di access log.
+Test malformed boxes and NaN, spoofed category, guide, or confidence, cross-account AI, identical and different replays, expiry, special handling overrides, invalid LLM schema or evidence, unknown classes, no guide, timeouts, cancellation, log transaction rollback, concurrent saves, and manual logs without metadata. Never record image bodies, prompts, or Authorization in the access log.
 
-### Pembaruan kualitas pilot, 20 Oktober 2026
+### Pilot quality update, 20 October 2026
 
-Kontrak Python v1 menambahkan review_profile dan review_thresholds/review_reasons/ambiguous_with per kandidat, serta condition.former_contents=FOOD_DRINK/CHEMICAL/OTHER/UNKNOWN. Band server mengutamakan profil checkpoint; tabel threshold global adalah default COCO. Kandidat empat kelas SHA af1446f33338... memakai dw-val-01: can/HDPE OFFERED >=0,70; PET >=0,725; kaca selalu UNCERTAIN; beda kelas dengan overlap IoU>=0,65 tetap terlihat dan UNCERTAIN. Semua kandidat memerlukan konfirmasi pengguna.
+Python contract v1 adds review_profile and per-candidate review_thresholds, review_reasons, and ambiguous_with, plus condition.former_contents=FOOD_DRINK/CHEMICAL/OTHER/UNKNOWN. Server bands prefer the checkpoint profile; the global threshold table is the COCO default. The four-class candidate SHA af1446f33338... uses dw-val-01: cans and HDPE are OFFERED at >=0.70; PET at >=0.725; glass is always UNCERTAIN; different classes overlapping at IoU>=0.65 stay visible and UNCERTAIN. Every candidate needs user confirmation.
 
-Go mengirim model_sha256 dari snapshot privat pada selection agar aturan bisa diperiksa ulang; tidak menerima provenance tersebut dari frontend. Pilot RECYCLE memerlukan recycling_access=YES; HDPE memerlukan former_contents=FOOD_DRINK. UNKNOWN meminta konteks; tidak ditebak menjadi Trash/Reduce. Semua 69 panduan masih DRAFT. Rincian, metrik val beserta tradeoff, evaluasi Gemini dan perintah reproduksi: [mutu deteksi](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/DETECTION_QUALITY.md), [mutu rekomendasi](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/RECOMMENDATION_EVALUATION.md). OpenAPI pada ai/contracts/v1 merupakan acuan DTO yang diregenerasi.
+Go sends model_sha256 from the private snapshot on selection so the rules can be rechecked; it never accepts that provenance from the frontend. Pilot RECYCLE needs recycling_access=YES; HDPE needs former_contents=FOOD_DRINK. UNKNOWN asks for context and is never guessed as Trash or Reduce. All 69 guides are still DRAFT. Details, validation metrics and tradeoffs, the Gemini evaluation, and reproduction commands: [detection quality](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/DETECTION_QUALITY.md), [recommendation quality](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/RECOMMENDATION_EVALUATION.md). The OpenAPI in ai/contracts/v1 is the regenerated DTO reference.
 
-### Saran bersyarat saat kondisi kosong, policy-06
+### Conditional advice for blank conditions, policy-06
 
-Konteks biasa yang belum diisi tetap UNKNOWN/null. allow_conditional default true mengizinkan READY dengan recommendation_basis=CONDITIONAL dan conditions_to_verify; false mempertahankan mode ketat NEEDS_CONTEXT. UI menampilkan saran sementara dan syarat, tanpa mengisi data kosong atau menyimpan otomatis. Risiko ambigu, kontaminasi berbahaya dan riwayat isi HDPE tetap dibatasi. Lihat [perilaku terbaru, reproduksi dan hasil pengujian](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/CONDITIONAL_AND_BACKGROUND.md).
+Ordinary context the user hasn't filled in stays UNKNOWN or null. allow_conditional defaults to true, allowing READY with recommendation_basis=CONDITIONAL and conditions_to_verify; false keeps the strict NEEDS_CONTEXT mode. The UI shows provisional advice and its conditions, without filling in blank data or saving automatically. Ambiguous risks, hazardous contamination, and HDPE former contents stay restricted. See the [latest behavior, reproduction, and test results](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/CONDITIONAL_AND_BACKGROUND.md).
