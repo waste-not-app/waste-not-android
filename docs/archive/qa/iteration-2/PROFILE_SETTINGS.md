@@ -1,4 +1,4 @@
-# S14 Profil / S16 Pengaturan — checkpoint 22 Oktober 2026
+# S14 Profil / S16 Pengaturan: checkpoint 22 Oktober 2026
 
 Acuan: SCREEN_SPEC S14/S16, DESIGN typography/material serta PRD §10. Identitas berasal dari sesi akun aktif. Pada dummy, progres memakai seluruh catatan aktif namespace akun; remote memakai `User.progress`, bukan menghitung XP dari halaman Riwayat parsial.
 

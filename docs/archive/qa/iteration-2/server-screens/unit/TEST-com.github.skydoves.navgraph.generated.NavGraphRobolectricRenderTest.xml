@@ -2,7 +2,7 @@
 <testsuite name="com.github.skydoves.navgraph.generated.NavGraphRobolectricRenderTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-05T13:42:22.350Z" hostname="oktaavsm" time="19.06">
   <properties/>
   <testcase name="renderNavPreviews" classname="com.github.skydoves.navgraph.generated.NavGraphRobolectricRenderTest" time="19.06"/>
-  <system-out><![CDATA[compose-nav-graph-testing: render list is empty — nothing to render.
+  <system-out><![CDATA[compose-nav-graph-testing: render list is empty, nothing to render.
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

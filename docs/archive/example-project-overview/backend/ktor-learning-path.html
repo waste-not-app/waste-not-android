@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Titip.in — Ktor Learning Path</title>
+<title>Titip.in, Ktor Learning Path</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -142,7 +142,7 @@
 
 <!-- ANALOGY BANNER -->
 <div class="analogy-banner">
-  <div class="analogy-title">Tenang, konsepnya sama — tinggal ganti syntaxnya 🎯</div>
+  <div class="analogy-title">Tenang, konsepnya sama, tinggal ganti syntaxnya 🎯</div>
   <div class="analogy-col">
     <div class="analogy-label">Express.js → Ktor</div>
     <div class="analogy-item">
@@ -264,7 +264,7 @@
             <div class="topic-dot dot-terra"></div>
             <div>
               <div class="topic-text">Bikin 3 endpoint pertama</div>
-              <div class="topic-sub">GET /health, GET /jastip, POST /jastip — return dummy JSON dulu</div>
+              <div class="topic-sub">GET /health, GET /jastip, POST /jastip, return dummy JSON dulu</div>
             </div>
           </div>
           <div class="topic-item">
@@ -279,7 +279,7 @@
       <div class="phase-col">
         <div class="col-label">Kode yang kalian tulis</div>
         <div class="code-block">
-<span class="cc">// Application.kt — entry point</span>
+<span class="cc">// Application.kt, entry point</span>
 <span class="ck">fun</span> <span class="cf">main</span>() {
   <span class="cf">embeddedServer</span>(Netty, port = <span class="cn">8080</span>) {
     <span class="cf">install</span>(ContentNegotiation) {
@@ -329,7 +329,7 @@
     <div class="phase-header">
       <div class="phase-num num-2">2</div>
       <div class="phase-meta">
-        <div class="phase-title">Coroutines — Paham Dulu Ini</div>
+        <div class="phase-title">Coroutines, Paham Dulu Ini</div>
         <div class="phase-duration">⏱ 1 hari · Penting banget sebelum lanjut</div>
       </div>
       <div class="phase-goal">Ngerti suspend fun, cara kerja coroutines, kenapa Ktor butuh ini</div>
@@ -342,7 +342,7 @@
             <div class="topic-dot dot-sage"></div>
             <div>
               <div class="topic-text">suspend fun itu apa?</div>
-              <div class="topic-sub">Fungsi yang bisa di-pause tanpa block thread — kayak async/await tapi lebih ringan</div>
+              <div class="topic-sub">Fungsi yang bisa di-pause tanpa block thread, kayak async/await tapi lebih ringan</div>
             </div>
           </div>
           <div class="topic-item">
@@ -369,7 +369,7 @@
         </div>
       </div>
       <div class="phase-col">
-        <div class="col-label">Eksperimen kecil — jalanin ini</div>
+        <div class="col-label">Eksperimen kecil, jalanin ini</div>
         <div class="code-block">
 <span class="cc">// Coba ini dulu di main.kt biasa</span>
 <span class="ck">import</span> kotlinx.coroutines.*
@@ -424,7 +424,7 @@
     <div class="phase-header">
       <div class="phase-num num-3">3</div>
       <div class="phase-meta">
-        <div class="phase-title">Connect Database — Exposed ORM</div>
+        <div class="phase-title">Connect Database, Exposed ORM</div>
         <div class="phase-duration">⏱ 2–3 hari · Ini inti backend kalian</div>
       </div>
       <div class="phase-goal">Bisa CRUD data dari PostgreSQL, paham Exposed Table & transaction</div>
@@ -444,7 +444,7 @@
             <div class="topic-dot dot-blue"></div>
             <div>
               <div class="topic-text">Define tabel dengan Exposed DSL</div>
-              <div class="topic-sub">object JastipTable : Table() { ... } — mirip ORM lain tapi Kotlin-native</div>
+              <div class="topic-sub">object JastipTable : Table() { ... }, mirip ORM lain tapi Kotlin-native</div>
             </div>
           </div>
           <div class="topic-item">
@@ -465,7 +465,7 @@
             <div class="topic-dot dot-blue"></div>
             <div>
               <div class="topic-text">Flyway untuk migration</div>
-              <div class="topic-sub">File SQL di resources/db/migration/ — versioning schema</div>
+              <div class="topic-sub">File SQL di resources/db/migration/, versioning schema</div>
             </div>
           </div>
         </div>
@@ -523,7 +523,7 @@
             <div class="deliverable-icon">✅</div>
             <div>
               <div class="deliverable-text">Deliverable Phase 3</div>
-              <div class="deliverable-sub">GET /jastip baca dari DB, POST /jastip simpan ke DB — data persist setelah restart</div>
+              <div class="deliverable-sub">GET /jastip baca dari DB, POST /jastip simpan ke DB, data persist setelah restart</div>
             </div>
           </div>
         </div>
@@ -536,10 +536,10 @@
     <div class="phase-header">
       <div class="phase-num num-4">4</div>
       <div class="phase-meta">
-        <div class="phase-title">Auth — JWT Implementation</div>
+        <div class="phase-title">Auth, JWT Implementation</div>
         <div class="phase-duration">⏱ 1–2 hari</div>
       </div>
-      <div class="phase-goal">Register, login, protect endpoint dengan JWT — sama persis flow yang di API Contract</div>
+      <div class="phase-goal">Register, login, protect endpoint dengan JWT, sama persis flow yang di API Contract</div>
     </div>
     <div class="phase-body">
       <div class="phase-col">
@@ -556,7 +556,7 @@
             <div class="topic-dot dot-purple"></div>
             <div>
               <div class="topic-text">Generate & verify JWT token</div>
-              <div class="topic-sub">Pakai library JJWT — sign dengan secret key, extract claims</div>
+              <div class="topic-sub">Pakai library JJWT, sign dengan secret key, extract claims</div>
             </div>
           </div>
           <div class="topic-item">
@@ -705,7 +705,7 @@ titip-backend/
 
 <!-- DEPENDENCIES -->
 <div class="dep-section">
-  <div class="dep-title">build.gradle.kts — Dependencies Lengkap</div>
+  <div class="dep-title">build.gradle.kts, Dependencies Lengkap</div>
   <div class="dep-sub">Copy paste ini ke project kalian, semua yang dibutuhin sudah ada</div>
   <div class="code-block">
 <span class="ck">val</span> ktor_version = <span class="cs">"2.3.7"</span>
@@ -728,7 +728,7 @@ dependencies {
   implementation(<span class="cs">"io.ktor:ktor-server-auth-jvm:$ktor_version"</span>)
   implementation(<span class="cs">"io.ktor:ktor-server-auth-jwt-jvm:$ktor_version"</span>)
 
-  <span class="cc">// Database — Exposed ORM + HikariCP</span>
+  <span class="cc">// Database, Exposed ORM + HikariCP</span>
   implementation(<span class="cs">"org.jetbrains.exposed:exposed-core:$exposed_version"</span>)
   implementation(<span class="cs">"org.jetbrains.exposed:exposed-dao:$exposed_version"</span>)
   implementation(<span class="cs">"org.jetbrains.exposed:exposed-jdbc:$exposed_version"</span>)
@@ -770,7 +770,7 @@ dependencies {
   <div class="tip-card tip-3">
     <div class="tip-icon">🧪</div>
     <div class="tip-title">Test di Postman dulu, baru Android</div>
-    <div class="tip-desc">Tiap endpoint selesai, langsung test di Postman. Jangan tunggu Android selesai. Kalian berdua bisa parallel — backend test Postman, Android pakai mock data.</div>
+    <div class="tip-desc">Tiap endpoint selesai, langsung test di Postman. Jangan tunggu Android selesai. Kalian berdua bisa parallel, backend test Postman, Android pakai mock data.</div>
   </div>
 </div>
 

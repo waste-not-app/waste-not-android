@@ -1,4 +1,4 @@
-11 November 2026 — Android 17 / API 37.
+11 November 2026, Android 17 / API 37.
 ScanCameraLifecycleTest#deviceWithoutCamerasShowsErrorAndKeepsManualEntryAvailable
 
 Booted the QA emulator with -camera-back none -camera-front none.

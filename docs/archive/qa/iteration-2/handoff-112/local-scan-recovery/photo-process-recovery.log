@@ -1,4 +1,4 @@
-11 November 2026 — Android 17 / API 37, Go QA 8087405.
+11 November 2026, Android 17 / API 37, Go QA 8087405.
 
 Baseline 6ecb2b9: signed in through Masuk, captured a CameraX photo,
 removed the test JPEG, backgrounded the app, and killed the Android process.

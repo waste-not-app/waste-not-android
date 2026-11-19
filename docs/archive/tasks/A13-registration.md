@@ -1,4 +1,4 @@
-# A13 — Aturan registrasi dan timezone awal
+# A13: Aturan registrasi dan timezone awal
 
 Issue [#46](https://github.com/waste-not-app/waste-not-android/issues/46) · **Siap review client**. Validator awal ada pada branch `codex/android-auth-validation-a12-a13`; wiring UI pada `codex/android-auth-navigation`.
 

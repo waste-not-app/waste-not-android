@@ -1,4 +1,4 @@
-# A01 — Fondasi dan konfigurasi environment
+# A01: Fondasi dan konfigurasi environment
 
 Issue [#3](https://github.com/waste-not-app/waste-not-android/issues/3) · PR [#88](https://github.com/waste-not-app/waste-not-android/pull/88) · status In review.
 

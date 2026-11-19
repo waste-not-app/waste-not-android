@@ -33,4 +33,4 @@ class MainActivity : ComponentActivity() {
 }
 
 // Catatan: Greeting() dan GreetingPreview() yang default tadi
-// udah dihapus — itu cuma boilerplate dari Android Studio
+// udah dihapus, itu cuma boilerplate dari Android Studio

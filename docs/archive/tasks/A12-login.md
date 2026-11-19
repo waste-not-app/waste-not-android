@@ -1,4 +1,4 @@
-# A12 — Validasi akun untuk layar Masuk
+# A12: Validasi akun untuk layar Masuk
 
 Issue [#35](https://github.com/waste-not-app/waste-not-android/issues/35) · **Siap review client**. Validator awal ada pada branch `codex/android-auth-validation-a12-a13`; wiring UI pada `codex/android-auth-navigation`.
 

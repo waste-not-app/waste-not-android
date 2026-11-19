@@ -1,4 +1,4 @@
-# A29 — Logout dan pembersihan sesi
+# A29: Logout dan pembersihan sesi
 
 Issue [#40](https://github.com/waste-not-app/waste-not-android/issues/40) · **Siap review client**. Bagian repository disediakan oleh [PR #91](https://github.com/waste-not-app/waste-not-android/pull/91) dan [A04](A04-session.md).
 

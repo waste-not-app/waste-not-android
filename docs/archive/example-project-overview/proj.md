@@ -1,6 +1,6 @@
 ---
 
-## 📱 Project Summary — Jastip & Preloved Area Malang App
+## 📱 Project Summary: Jastip & Preloved Area Malang App
 
 ### 🎯 Latar Belakang / Problem
 

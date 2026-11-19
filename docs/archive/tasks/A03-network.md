@@ -1,4 +1,4 @@
-# A03 — HTTP, DTO, metadata, dan error API
+# A03: HTTP, DTO, metadata, dan error API
 
 Issue [#6](https://github.com/waste-not-app/waste-not-android/issues/6) · PR [#90](https://github.com/waste-not-app/waste-not-android/pull/90) · status In review.
 

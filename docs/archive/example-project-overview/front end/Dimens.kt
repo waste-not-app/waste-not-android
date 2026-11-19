@@ -3,7 +3,7 @@ package com.titipin.app.ui.theme
 import androidx.compose.ui.unit.dp
 
 // ── SPACING ───────────────────────────────────────────────────────
-// Gunakan ini konsisten di semua screen — jangan hardcode angka
+// Gunakan ini konsisten di semua screen, jangan hardcode angka
 object Spacing {
     val xs   = 4.dp
     val sm   = 8.dp
@@ -12,7 +12,7 @@ object Spacing {
     val xl   = 32.dp
     val xxl  = 48.dp
 
-    // Screen horizontal padding — pakai ini di semua screen
+    // Screen horizontal padding, pakai ini di semua screen
     val screenHorizontal = 20.dp
     val screenVertical   = 24.dp
 }

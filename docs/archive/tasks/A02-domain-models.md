@@ -1,4 +1,4 @@
-# A02 — Model, parser jumlah, dan tanggal
+# A02: Model, parser jumlah, dan tanggal
 
 Issue [#5](https://github.com/waste-not-app/waste-not-android/issues/5) · PR [#89](https://github.com/waste-not-app/waste-not-android/pull/89) · status In review.
 

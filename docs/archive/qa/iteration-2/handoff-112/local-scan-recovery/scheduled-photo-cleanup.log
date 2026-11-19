@@ -1,4 +1,4 @@
-11 November 2026 — Android 17 / API 37.
+11 November 2026, Android 17 / API 37.
 ScanPhotoCacheTest#schedulesCleanupForAnInterruptedCapture
 
 The production cache scheduled ScanPhotoCleanupWorker via WorkManager.

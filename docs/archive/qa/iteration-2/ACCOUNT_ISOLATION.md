@@ -4,7 +4,7 @@
 
 ## Bukti transport
 
-`RemoteAccountIsolationTest` membuat dua akun melalui API publik. Akun A memiliki satu catatan Plastik/Recycle 250 g; akun B memiliki dua benda Reduce. Replay request A mempertahankan satu record dan 10 XP. Enam operasi silang — GET/PATCH/DELETE A→B dan B→A — semuanya menerima 404/NOT_FOUND dengan request ID. Pembacaan pemilik sesudahnya memverifikasi record/version, daftar, jumlah dan XP tidak berubah.
+`RemoteAccountIsolationTest` membuat dua akun melalui API publik. Akun A memiliki satu catatan Plastik/Recycle 250 g; akun B memiliki dua benda Reduce. Replay request A mempertahankan satu record dan 10 XP. Enam operasi silang, GET/PATCH/DELETE A→B dan B→A, semuanya menerima 404/NOT_FOUND dengan request ID. Pembacaan pemilik sesudahnya memverifikasi record/version, daftar, jumlah dan XP tidak berubah.
 
 Edit milik A menjadi 300 g memperbarui total tanpa XP tambahan. Menghapusnya mengembalikan total/XP A ke nol sementara catatan/progres B tetap ada. Logout mencabut credential lama; `/me` dengan credential itu ditolak, lalu login ulang memulihkan identitas dan data A sendiri. Token pada pengujian transport ditahan dalam memori; ini bukan pengujian dua akun simultan dalam Keystore. [Log](account-isolation/phase1/transport.log), [lima langkah dan enam denial](account-isolation/phase1/transport-evidence.json).
 

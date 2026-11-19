@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
-// Placeholder sementara — nanti diganti dengan HomeScreen asli
+// Placeholder sementara, nanti diganti dengan HomeScreen asli
 // Konsep: di Compose, screen itu cuma @Composable function biasa
 // Ga perlu extends Fragment, ga perlu inflate layout
 @Composable

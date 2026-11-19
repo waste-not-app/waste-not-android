@@ -1,10 +1,10 @@
-# Titip.in — Backend Improvement Docs
+# Titip.in: Backend Improvement Docs
 *Dokumen ini dibuat untuk melanjutkan development BE di chat terpisah*
 *Prioritas diurutkan dari yang paling urgent untuk FE bisa jalan penuh*
 
 ---
 
-## 🔴 PRIORITAS TINGGI — FE Blocked
+## 🔴 PRIORITAS TINGGI: FE Blocked
 
 ### 1. Filter by `userId` di Jastip & Preloved
 
@@ -26,12 +26,12 @@ GET /preloved?userId={userId}   → return hanya preloved milik userId tsb
 
 ### 2. Stats di `/auth/me`
 
-**Problem:** Screen Profil menampilkan "—" untuk Jastip, Preloved, dan Review karena response `/auth/me` tidak include stats.
+**Problem:** Screen Profil menampilkan "," untuk Jastip, Preloved, dan Review karena response `/auth/me` tidak include stats.
 
 **Yang dibutuhkan:** Tambah field stats di response `UserDto`:
 
 ```json
-// Response GET /auth/me — tambah field berikut:
+// Response GET /auth/me, tambah field berikut:
 {
   "id": "...",
   "name": "...",
@@ -48,11 +48,11 @@ GET /preloved?userId={userId}   → return hanya preloved milik userId tsb
 }
 ```
 
-**Catatan:** `rating` bisa `null` kalau belum ada review. FE sudah handle null dengan tampil "—".
+**Catatan:** `rating` bisa `null` kalau belum ada review. FE sudah handle null dengan tampil ",".
 
 ---
 
-## 🟡 PRIORITAS SEDANG — Fitur Belum Complete
+## 🟡 PRIORITAS SEDANG: Fitur Belum Complete
 
 ### 3. Error Message yang Human-Readable untuk 403
 
@@ -80,7 +80,7 @@ GET /preloved?userId={userId}   → return hanya preloved milik userId tsb
 }
 ```
 
-FE sudah punya Snackbar yang langsung tampilkan `error.message` — tinggal pastikan BE kirim pesan yang proper.
+FE sudah punya Snackbar yang langsung tampilkan `error.message`, tinggal pastikan BE kirim pesan yang proper.
 
 ---
 
@@ -112,7 +112,7 @@ Error cases: `403` kalau bukan owner, `404` kalau tidak ditemukan.
 
 ---
 
-## 🔵 PRIORITAS RENDAH — Post-MVP / Fitur Besar
+## 🔵 PRIORITAS RENDAH: Post-MVP / Fitur Besar
 
 ### 6. Rating & Review System
 
@@ -172,7 +172,7 @@ GET  /users/{id}/reviews   🔐  → list review yang diterima user
 
 ---
 
-### 7. Redesign Flow Request & Wanted — Multi-Offer System
+### 7. Redesign Flow Request & Wanted: Multi-Offer System
 
 **Problem saat ini:** `PUT /requests/{id}/take` langsung set status TAKEN ke satu provider. Ini tidak ideal karena:
 - Requester tidak bisa memilih provider yang paling cocok
@@ -264,14 +264,14 @@ PUT /users/me/password 🔐  → ubah password (butuh old password untuk verifik
 
 | # | Fitur | Prioritas | Blocking FE? |
 |---|-------|-----------|-------------|
-| 1 | `GET /jastip?userId=` dan `GET /preloved?userId=` | 🔴 Tinggi | Ya — Jastip Saya & Preloved Saya |
-| 2 | Stats di `/auth/me` (`totalJastip`, `totalPreloved`, `totalReview`, `rating`) | 🔴 Tinggi | Ya — Stats di Profil |
-| 3 | Human-readable 403 error messages | 🟡 Sedang | Partial — Snackbar sudah ada |
+| 1 | `GET /jastip?userId=` dan `GET /preloved?userId=` | 🔴 Tinggi | Ya n/a Jastip Saya & Preloved Saya |
+| 2 | Stats di `/auth/me` (`totalJastip`, `totalPreloved`, `totalReview`, `rating`) | 🔴 Tinggi | Ya n/a Stats di Profil |
+| 3 | Human-readable 403 error messages | 🟡 Sedang | Partial n/a Snackbar sudah ada |
 | 4 | `DELETE /requests/{id}` dan `DELETE /wanted/{id}` | 🟡 Sedang | Tidak untuk MVP |
-| 5 | Fix trailing space pada `name` | 🟡 Sedang | Tidak — FE sudah workaround |
-| 6 | Rating & Review system | 🔵 Rendah | Ya — Review screen masih empty |
+| 5 | Fix trailing space pada `name` | 🟡 Sedang | Tidak n/a FE sudah workaround |
+| 6 | Rating & Review system | 🔵 Rendah | Ya n/a Review screen masih empty |
 | 7 | Redesign Request/Wanted flow (multi-offer) | 🔵 Rendah | Tidak untuk MVP |
-| 8 | Update profil endpoints | 🔵 Rendah | Tidak — FE sudah ada placeholder |
+| 8 | Update profil endpoints | 🔵 Rendah | Tidak n/a FE sudah ada placeholder |
 
 ---
 

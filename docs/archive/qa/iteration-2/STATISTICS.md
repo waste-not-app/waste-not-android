@@ -1,4 +1,4 @@
-# S13 Statistik — checkpoint 22 Oktober 2026
+# S13 Statistik: checkpoint 22 Oktober 2026
 
 Acuan: SCREEN_SPEC S13, DESIGN C15/C18/C22/C23 dan PRD §9. Sumber aplikasi adalah dummy persisten per akun sesuai permintaan pengguna. Tidak ada tombol demo atau data demo tambahan pada layar. Agregat di bawah berasal dari himpunan catatan dummy lengkap; adapter HTTP tidak menghitung statistik dari halaman Riwayat parsial.
 
