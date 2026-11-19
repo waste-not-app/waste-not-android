@@ -2,38 +2,36 @@
   "api_version": "1.0.0",
   "data": {
     "category": "GLASS",
-    "caution": "Broken glass needs special handling.",
+    "caution": "Broken glass needs special handling guidance.",
     "conditions_to_verify": [],
     "confirmed_object_key": "glass_bottle",
     "context_revision": 1,
     "detection_id": null,
-    "evidence_ids": [
-      "glass-intact-recycle-v1"
-    ],
+    "evidence_ids": [],
     "expires_at": "2026-10-21T08:00:00Z",
     "guide_refs": [
       {
         "guide_id": "pilot-glass-bottle",
-        "version": 7
+        "version": 6
       }
     ],
     "missing_context": [],
     "object_id": null,
     "prototype_only": true,
-    "provider": "rules",
-    "reason": "You confirmed that your collector accepts clean glass bottles in this condition, so this one can go to Recycle. Follow the collector's requirements. A YOLO score doesn't prove that a facility will accept it.",
+    "provider": "fixture",
+    "reason": "We can't settle on a method for glass bottles yet. Here's some starting guidance based on what we know.",
     "reason_code": "LLM_UNAVAILABLE",
-    "recommendation_basis": "CONFIRMED",
+    "recommendation_basis": null,
     "recommendation_id": "00000000-0000-0000-0000-000000000001",
-    "recommendation_scope": "HANDLING",
-    "recommendation_version": "pilot-policy-09",
-    "recommended_method": "RECYCLE",
+    "recommendation_scope": null,
+    "recommendation_version": "pilot-policy-08",
+    "recommended_method": null,
     "source_details": [
       {
         "checked_at": "2026-11-04",
         "publisher": "US EPA",
-        "region": "United States",
-        "scope_note": "General material guidance. The type and cleanliness of an item don't guarantee that a local facility accepts it.",
+        "region": "Amerika Serikat",
+        "scope_note": "General material guide; the type and cleanliness don't guarantee that a local facility accepts the item.",
         "title": "How Do I Recycle Common Recyclables",
         "url": "https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"
       }
@@ -42,11 +40,12 @@
       "https://www.epa.gov/recycle/how-do-i-recycle-common-recyclables"
     ],
     "special_handling": false,
-    "status": "READY",
+    "status": "UNAVAILABLE",
     "steps": [
-      "Make sure the bottle really is glass and that your collector accepts it in this condition.",
-      "Empty it and rinse out ordinary residue as the collector asks. Stop if you suspect hazardous contamination.",
-      "Sort it by type and hand it over the way the collector asks. Don't cut or crush it unless they ask you to."
+      "Check the type of glass, its condition, and what it held. If you don't know, don't guess from the photo alone.",
+      "Only consider reusing it once you're sure it works, it's clean, and it's safe.",
+      "Ask your local collector whether they accept this type and condition of item, then follow their sorting and drop-off instructions.",
+      "If you see signs of a battery or electrics, sharp edges, chemicals, or biological contamination, mark the risk type to get specific guidance."
     ]
   },
   "request_id": "00000000-0000-0000-0000-000000000063"

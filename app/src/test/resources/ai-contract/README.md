@@ -6,7 +6,10 @@ Transport fixtures copied verbatim from `contracts/v1/examples` in waste-not-ai 
 - detection-response.json: `c6535a14c5e53c0c26f48534b1c0c27e2d9056d20778e457b99a4e9ebd7316bb`
 - needs-context-response.json: `c772b3eea7f28915e9164755888b63eb94ec355014c4848a67f9196f4a7fd73e`
 - no-detections-response.json: `9e55aab8b6a9fed43d27b153e02c34c4b499c93e39d6c11be505c95c0356d82f`
-- provider-unavailable-response.json: `8b2e58772433dcdcc40a1f2fa3734179c5516b95193aace35923c4b4db3129f0`
+
+`provider-unavailable-response.json` is the older policy-08 UNAVAILABLE fixture, kept as negative-state coverage with its text translated to English. The androidTest `ai/policy08` asset is the same file.
+
+- provider-unavailable-response.json: `b71508675d9f746c74415dfbd4b6423a0deecf0e66c400a6f0eaf8028e857fca`
 
 `rules-ready-policy09-response.json` is a policy-09 compatibility fixture originally copied from the backend on 13 November 2026, with its advice text translated to English. It keeps its provider, failure reason, evidence, and prototype tracking restriction.
 
