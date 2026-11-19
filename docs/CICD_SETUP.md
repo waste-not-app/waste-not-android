@@ -1,66 +1,79 @@
-# CI/CD dan distribusi APK WasteNot
+# CI/CD and APK Distribution
 
-## Deployment aktif
+## Environments
 
-Android CI dan `Android Release & Deploy` berjalan pada runner self-hosted
-`alberd-staging-android`. Backend, AI dan landing memakai runner masing-masing
-di VM `alberd-staging`. Akses operator: `ssh alberd-staging`
-(`dev@proxy.bccdev.id`, port `11048`).
+Android CI and the `Android Release & Deploy` workflow run on the self-hosted `alberd-staging-android` runner. The backend, AI workers, and landing site use their own runners on the same staging host.
 
-- Landing: `https://waste-not.bccdev.id/`
-- Halaman rilis: `https://waste-not.bccdev.id/apk/`
-- Metadata: `https://waste-not.bccdev.id/apk/versions.json`
-- APK terbaru: `https://waste-not.bccdev.id/apk/latest.apk`
-- APK versi tertentu: `https://waste-not.bccdev.id/apk/wastenot-v<VERSION>.apk`
-- API Android: `https://waste-not-api.bccdev.id/v1/`
+| Resource | URL |
+|---|---|
+| Landing site | <https://waste-not.bccdev.id/> |
+| Release page | <https://waste-not.bccdev.id/apk/> |
+| Release metadata | <https://waste-not.bccdev.id/apk/versions.json> |
+| Latest APK | <https://waste-not.bccdev.id/apk/latest.apk> |
+| Specific version | `https://waste-not.bccdev.id/apk/wastenot-v<VERSION>.apk` |
+| Android API | <https://waste-not-api.bccdev.id/v1/> |
 
-Layanan WasteNot lama di `cp-bcc` dan runner lokal bukan target deploy aktif.
-Frontend lama di `pg-bcc` mengalihkan pengguna ke domain landing baru.
+## Workflows
 
-## Pemicu dan konfigurasi
+**Android CI** runs on pushes to `main`, feature branches, and pull requests. It performs these steps:
 
-Push branch utama menjalankan Android CI, bukan publikasi APK. Publikasi dipicu
-oleh tag `v*` atau `workflow_dispatch`. Workflow release menjalankan lint/unit
-test, membangun APK native, memeriksa adapter remote, lalu menyalin APK signed
-langsung ke filesystem VM runner. Tidak ada SSH/SCP dalam langkah publikasi.
+1. Lints all three build types.
+2. Runs the debug unit tests.
+3. Checks the URL configuration.
+4. Builds the debug, staging, and release APKs.
+5. Uploads the reports as artifacts.
 
-Repository variable `WASTENOT_RELEASE_API_BASE_URL` berisi
-`https://waste-not-api.bccdev.id/v1/`. URL kosong menghentikan publikasi.
-Signing memakai secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
-`ANDROID_KEY_ALIAS` dan `ANDROID_KEY_PASSWORD`. Deployment menolak APK tanpa
-release keystore.
+CI never uses signing or deployment credentials.
 
-Secret opsional `BACKEND_DIR` mengganti direktori publikasi, default
-`/var/www/wastenot-apk`. Nginx harus memakai direktori yang sama.
-Secrets SSH deployment lama tidak dipakai workflow release ini.
+**Android Release & Deploy** runs only on `v*` tags or a manual dispatch:
 
-## Filesystem dan routing Nginx
+1. Runs lint and the unit tests.
+2. Builds the native APK.
+3. Verifies that the APK uses the remote adapter.
+4. Copies the signed APK straight to the runner host's filesystem. There is no SSH or SCP step.
 
-`scripts/manage_releases.py <BACKEND_DIR>` membaca `<BACKEND_DIR>/apk/`,
-mempertahankan tiga APK versi terbaru, menyinkronkan `apk/latest.apk`, dan
-membuat `index.html` serta `versions.json` di direktori induk.
+A deployment is refused if the APK is not signed with the release keystore.
 
-Konfigurasi `/etc/nginx/sites-available/waste-not` memetakan:
+### Configuration
 
-| URL | File atau direktori |
+| Name | Type | Purpose |
+|---|---|---|
+| `WASTENOT_RELEASE_API_BASE_URL` | Repository variable | HTTPS API origin, `https://waste-not-api.bccdev.id/v1/`. An empty value stops the release |
+| `ANDROID_KEYSTORE_BASE64` | Secret | Release keystore |
+| `ANDROID_KEYSTORE_PASSWORD` | Secret | Keystore password |
+| `ANDROID_KEY_ALIAS` | Secret | Key alias |
+| `ANDROID_KEY_PASSWORD` | Secret | Key password |
+| `BACKEND_DIR` | Secret (optional) | Publication directory, `/var/www/wastenot-apk` by default. Nginx must serve the same directory |
+
+A manual version input is treated as an environment value and validated as a safe file name.
+
+## Filesystem and Nginx
+
+`scripts/manage_releases.py <BACKEND_DIR>` manages releases in `<BACKEND_DIR>`:
+
+- reads `<BACKEND_DIR>/apk/`;
+- keeps the three newest versions;
+- syncs `apk/latest.apk`;
+- generates `index.html` and `versions.json` in the parent directory.
+
+`/etc/nginx/sites-available/waste-not` maps:
+
+| URL | Path |
 |---|---|
 | `/` | `/var/www/wastenot-landing/` |
 | `/apk/` | `/var/www/wastenot-apk/index.html` |
 | `/apk/versions.json` | `/var/www/wastenot-apk/versions.json` |
 | `/apk/<file>.apk` | `/var/www/wastenot-apk/apk/<file>.apk` |
 
-Metadata memakai `Cache-Control: no-store`. APK memakai MIME
-`application/vnd.android.package-archive` dan `Content-Disposition: attachment`.
-Subfolder filesystem `apk/` tidak diulang dalam URL publik.
+- **Metadata.** Served with `Cache-Control: no-store`.
+- **APKs.** Served as `application/vnd.android.package-archive` with `Content-Disposition: attachment`.
+- **Public URLs.** The `apk/` subfolder on disk does not appear in the public URL.
 
-## Verifikasi
+## Verification
 
-`python3 scripts/verify_release_workflow.py` menjalankan langkah build,
-packaging, dan deploy workflow dalam direktori sementara. Pemeriksaan deploy
-memastikan metadata, tautan halaman rilis, serta file versi/latest cocok.
-Fixture pengujian tidak dipublikasikan.
+`python3 scripts/verify_release_workflow.py` runs the build, packaging, and deploy steps in a temporary directory. It checks that the metadata, the release page links, and the versioned and latest files all agree. Test fixtures are never published.
 
-Setelah publikasi, periksa metadata dan unduh file yang ditunjuk metadata:
+After a release:
 
 ```sh
 curl --fail https://waste-not.bccdev.id/apk/versions.json
@@ -68,7 +81,10 @@ curl --fail --head https://waste-not.bccdev.id/apk/latest.apk
 curl --fail https://waste-not-api.bccdev.id/health/ready
 ```
 
-Bandingkan ukuran dan SHA-256 APK hasil unduhan dengan file di VM. Buka landing
-di browser: informasi versi harus termuat dan tombol unduh harus mengambil APK,
-bukan HTML fallback SPA. Build/HTTP tidak membuktikan alur aplikasi di perangkat;
-pemeriksaan perangkat fisik dijalankan terpisah atas permintaan pemilik.
+Then confirm three things:
+
+1. The downloaded APK's size and SHA-256 match the file on the host.
+2. The landing page shows the version information.
+3. The download button fetches the APK rather than the SPA fallback page.
+
+HTTP checks do not prove that the app works on a device. Physical device checks run separately at the owner's request.
