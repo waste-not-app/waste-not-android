@@ -1,27 +1,43 @@
-# Model data Android
+# Data Models
 
-Acuan: [PRD §8–9](design-kit/PRD.md),
-[API §2,5–6](design-kit/API.md), issue [A02 #5](https://github.com/waste-not-app/waste-not-android/issues/5).
+References: [PRD §8–9](design-kit/PRD.md) and [API §2, §5–6](design-kit/API.md).
 
-`model/` berisi aturan murni Kotlin; tidak menyimpan state Compose, context, atau credential.
+`model/` holds pure Kotlin rules. It never stores Compose state, a `Context`, or credentials.
 
-- `WasteCategory`, `DisposalMethod`, dan `QuantityKind` memakai nama kanonik API. Label Indonesia dipetakan oleh UI melalui string resource, bukan nama enum terjemahan.
-- `Quantity.Weight` dan `Quantity.Count` saling eksklusif. Factory memeriksa batas; `fromFields` mengembalikan null untuk respons/payload dengan kedua nilai, tanpa nilai, nilai salah jenis, atau di luar batas.
-- `parseQuantity` menerima digit ASCII, trim luar, serta satu koma/titik desimal khusus kg. Tidak ada dukungan separator ribuan pada input. Dalam mode kg, `1.001` berarti 1,001 kg / 1001 g; grouping seperti `1.000,00` ditolak. Gram dan benda selalu bulat. Kg maksimal tiga desimal dan dikonversi tepat ke gram tanpa floating point.
-- `QuantityInput.changeUnit` mengonversi g ↔ kg secara tepat. Perpindahan berat ↔ benda mengosongkan nilai, begitu pula pergantian satuan berat bila nilai sebelumnya invalid.
-- Lapisan data menyediakan `Quantity.toRequestFields()` untuk quantity_kind/weight_g/item_count. Field jenis lain selalu JsonNull eksplisit agar PATCH pergantian jenis tidak mempertahankan jumlah lama. Kg hanya pilihan tampilan/parser; payload tetap integer gram. Repository write/editor belum terhubung.
-- `WasteSummary` menerima nilai server; tidak menghitung agregat ulang dari daftar lokal. `handled` dan `avoided` masing-masing mempertahankan gram dan jumlah benda. Rate null adalah keadaan tanpa aktivitas penanganan.
-- `WasteFormat` mengembalikan angka dan enum satuan terpisah agar UI memakai label resource. Detail berat memiliki maksimal tiga desimal kg; ringkasan dua; persentase satu desimal jika perlu. Null persentase tetap null untuk pesan tanpa denominator.
-- Tanggal aktivitas adalah `LocalDate`, bukan timestamp UTC. Timestamp server diformat dengan zona akun eksplisit. `ActivityDates` menerima tanggal/instant server, tidak memakai jam perangkat secara diam-diam. Rentang 7/30 hari inklusif; validasi create mengizinkan hari ini dan 30 hari sebelumnya, sedangkan edit boleh mempertahankan tanggal lama yang sama.
+- **Enums.** `WasteCategory`, `DisposalMethod`, and `QuantityKind` use the canonical API names. The UI maps them to Indonesian labels through string resources.
+- **Quantities.** `Quantity.Weight` and `Quantity.Count` are mutually exclusive. The factories enforce limits, and `fromFields` returns `null` for payloads with:
+  - both values or neither;
+  - a value of the wrong kind;
+  - a value out of range.
+- **Parsing.** `parseQuantity` accepts ASCII digits with surrounding whitespace trimmed, plus one decimal comma or point in kilogram mode only.
+  - Thousands separators are not supported, so `1.001` means 1.001 kg (1001 g) and `1.000,00` is rejected.
+  - Grams and item counts are always whole numbers.
+  - Kilograms allow up to three decimals and convert exactly to grams, without floating point.
+- **Unit switching.** `QuantityInput.changeUnit` converts between grams and kilograms exactly. Switching between weight and count clears the value, as does switching weight units while the current value is invalid.
+- **Request fields.** `Quantity.toRequestFields()` produces `quantity_kind`, `weight_g`, and `item_count`. The unused field is always an explicit JSON `null`, so a `PATCH` that changes the kind never keeps the old amount. Kilograms are a display and input choice only; payloads always carry integer grams.
+- **Summaries.** `WasteSummary` takes server values and never recomputes aggregates from a local list. `handled` and `avoided` each keep grams and item counts separately, and a `null` rate means there were no handling activities.
+- **Formatting.** `WasteFormat` returns numbers and unit enums separately so the UI can use resource labels.
+  - Detail weights show up to three kilogram decimals, and summaries show two.
+  - Percentages show one decimal when needed, and a `null` percentage stays `null`.
+- **Dates.** Activity dates are `LocalDate` values, not UTC timestamps. Server timestamps are formatted in the account's time zone.
+  - `ActivityDates` works from server dates and instants and never silently uses the device clock.
+  - 7- and 30-day ranges are inclusive.
+  - Creates allow today and the previous 30 days; edits may keep an older existing date.
 
-`java.time` didukung pada minSdk 24 melalui core library desugaring. Tidak ada perubahan minSdk atau upgrade toolchain.
+`java.time` is available through core library desugaring.
 
-## Verifikasi
+## Tests
 
-```bash
+```sh
 ./gradlew :app:testDebugUnitTest --tests 'com.example.wastenot.model.*'
 ```
 
-16 tes memeriksa batas, XOR unit, input invalid, round-trip g/kg, pembulatan tampilan, null rate, fixture server PRD §9.4, pergantian hari, zona akun, DST, dan rentang edit/create.
+The tests cover:
 
-Layar editor/ringkasan belum memakai model ini. Wiring UI, serialisasi DTO, persetujuan fixture backend B01, serta pengujian perangkat merupakan pekerjaan lanjutan; tes model bukan bukti integrasi backend atau penerimaan seluruh layar.
+- limits and the exclusive choice of weight or count;
+- invalid input;
+- gram and kilogram round trips;
+- display rounding and `null` rates;
+- the PRD §9.4 server fixture;
+- day rollover, account time zones, and DST;
+- create and edit date ranges.

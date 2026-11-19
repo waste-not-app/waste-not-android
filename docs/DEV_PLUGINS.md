@@ -1,249 +1,158 @@
-# Panduan Setup Plugin Development — WasteNot Android
+# Development Plugins
 
-Dokumen ini berisi panduan lengkap mengenai plugin development yang telah diintegrasikan ke dalam proyek **WasteNot Android**, termasuk cara kerja, instalasi plugin di Android Studio, cara penggunaan harian, serta perintah (commands/shortcuts) yang tersedia.
+The tooling that speeds up Compose development in this project: what each plugin does, how it is configured, and the commands it adds.
 
----
+## Contents
 
-## Daftar Isi
-1. [Ikhtisar Plugin](#1-ikhtisar-plugin)
-2. [Compose HotSwan v2 (Hot Reload)](#2-compose-hotswan-v2-hot-reload)
-3. [Compose Navigation Graph (Visualisasi Navigasi)](#3-compose-navigation-graph-visualisasi-navigasi)
-4. [Plugin Android Studio Rekomendasi (ADB Idea & JSON to Kotlin)](#4-plugin-android-studio-rekomendasi)
-5. [Tabel Cheatsheet Shortcut & Perintah](#5-tabel-cheatsheet-shortcut--perintah)
+1. [Overview](#overview)
+2. [Compose HotSwan (hot reload)](#compose-hotswan-hot-reload)
+3. [Compose Navigation Graph](#compose-navigation-graph)
+4. [Recommended IDE plugins](#recommended-ide-plugins)
+5. [Shortcuts and commands](#shortcuts-and-commands)
 
----
+## Overview
 
-## 1. Ikhtisar Plugin
-
-Untuk mempercepat siklus development aplikasi berbasis **Jetpack Compose + Navigation 3**, proyek ini telah dilengkapi dengan toolchain modern:
-
-| Komponen / Plugin | Tipe | Versi | Pembuat | Fungsi Utama |
-|---|---|---|---|---|
-| **Compose HotSwan v2** | Gradle Compiler Plugin + IDE Plugin | `2.0.1` | Jaewoong Eum (skydoves) | Hot-reload UI Compose secara instan (milidetik) tanpa re-run aplikasi & mempertahankan state input/navigasi. |
-| **Compose Navigation Graph** | Gradle Plugin + KSP Processor + IDE Plugin | `0.3.0` | Jaewoong Eum (skydoves) | Visualisasi arsitektur navigasi Compose sebagai graph interaktif dengan preview thumbnail layar. |
-| **KSP (Kotlin Symbol Processing)** | Gradle Plugin | `2.3.12` | Google | Engine annotation processing untuk NavGraph. |
-| **ADB Idea** | IDE Plugin | Latest | Philippe Breault | Akses cepat kontrol aplikasi di device (Clear data, Restart, Kill, Uninstall). |
-| **JSON To Kotlin Class** | IDE Plugin | Latest | Wu Xianlin | Generate otomatis `data class` Kotlin bertipe `@Serializable` dari JSON response backend. |
-
----
-
-## 2. Compose HotSwan v2 (Hot Reload)
-
-### 2.1 Apa itu HotSwan?
-Compose HotSwan v2 adalah solusi hot-reload berbasis interpreter compiler untuk Jetpack Compose di Android. Berbeda dengan Live Edit bawaan yang terbatas, HotSwan melakukan swap class secara langsung di ART (Android Runtime), sehingga:
-- State form input, remembered value, dan back-stack navigasi **tidak hilang/reset**.
-- Mendukung perubahan fungsi Composable, fungsi reguler, dan resources.
-
-### 2.2 Konfigurasi Gradle (Sudah Terpasang di Proyek)
-Jika Anda perlu mereferensikan kembali bagaimana plugin ini dikonfigurasi di file build:
-
-1. **`gradle/libs.versions.toml`**:
-   ```toml
-   [versions]
-   hotswan = "2.0.1"
-
-   [plugins]
-   hotswan-compiler = { id = "com.github.skydoves.compose.hotswan.compiler", version.ref = "hotswan" }
-   ```
-
-2. **Root `build.gradle.kts`**:
-   ```kotlin
-   plugins {
-       alias(libs.plugins.hotswan.compiler) apply false
-   }
-   ```
-
-3. **`app/build.gradle.kts`**:
-   ```kotlin
-   plugins {
-       alias(libs.plugins.hotswan.compiler) apply false
-   }
-   ```
-
-Plugin hanya diterapkan ketika properti `wastenot.hotReload=true`. Build biasa memakai native; aktifkan opsi tersebut melalui Gradle Run Configuration untuk sesi hot reload.
-
-> **Catatan Penting**: Versi Gradle plugin HotSwan **harus sama persis** dengan versi IDE Plugin di Android Studio (saat ini menggunakan `2.0.1`).
-
-### 2.3 Instalasi IDE Plugin di Android Studio
-1. Buka Android Studio.
-2. Masuk ke **Settings / Preferences** (`Ctrl + Alt + S` di Linux/Windows, `Cmd + ,` di macOS).
-3. Pilih menu **Plugins** > tab **Marketplace**.
-4. Ketik **"Compose HotSwan"** di kolom pencarian.
-5. Klik **Install**, lalu klik **Restart IDE** setelah instalasi selesai.
-
-### 2.4 Cara Penggunaan Harian
-1. Aktifkan `-Pwastenot.hotReload=true` untuk sesi pengembangan, lalu jalankan aplikasi ke emulator atau device fisik dengan tombol **Run** (`Shift + F10`).
-2. Buka tool window HotSwan: **View** > **Tool Windows** > **HotSwan** (biasanya ada di bilah kanan atau bawah IDE).
-3. Periksa status pada tool window:
-   - Jika status berwarna hijau dan bertuliskan **`WATCHING`**, koneksi hot-reload telah aktif.
-4. Lakukan modifikasi kode Composable (misalnya ubah warna, teks, padding, atau susunan layout).
-5. Tekan **Save** (`Ctrl + S` di Linux/Windows atau `Cmd + S` di macOS).
-6. Perubahan akan langsung terlihat di layar device dalam hitungan milidetik tanpa merestart aplikasi.
-
-### 2.5 Troubleshooting HotSwan
-
-Checkpoint DataStore 9 November menemukan bahwa reflection HotSwan 2.0.1 membungkus IOException dari pembacaan suspend sebelum catch ThemeViewModel. Pemulihan baca pada mode interpreter gagal di unit test; kombinasi dua pola pengecualian juga gagal pada parser opsi Kotlin. Build native kini default dan pemulihan I/O diterima melalui unit/native Android. Jalur hot reload eksplisit tetap untuk pengembangan tampilan; pakai native saat memeriksa perilaku data/pemulihan. [Bukti dan batasnya](archive/qa/iteration-2/THEME_DATASTORE.md#build-native-sebagai-default).
-
-`SessionTokens` dikecualikan secara spesifik melalui `hotSwanCompiler.exclude` di app Gradle. HotSwan 2.0.1 gagal membuat dispatch bridge `component2` untuk `RefreshToken` value class lintas file (`B3: ... has no primary constructor`). Dengan pengecualian DTO tersebut, build kembali lulus dan tipe credential tetap tervalidasi. Perubahan pada DTO ini memerlukan rebuild; hot reload UI tetap tersedia. Opsi pengecualian mengikuti [konfigurasi resmi HotSwan](https://hotswan.dev/docs/gradle-configuration#excluding-classes).
-
-- **Status tidak berubah ke WATCHING**: Pastikan path modul aplikasi diatur ke `:app` melalui **Settings** > **Tools** > **Compose HotSwan** > **App Module Path** (default: `:app`).
-- **Method yang di-skip**: Method lifecycle yang memanggil `super.<method>()` seperti `MainActivity.onCreate()` sengaja dilewati oleh interpreter dan tetap berjalan secara native. Modifikasi di luar itu (semua Composable functions) di-reload secara penuh.
-
----
-
-## 3. Compose Navigation Graph (Visualisasi Navigasi)
-
-### 3.1 Apa itu Compose Navigation Graph?
-Tool untuk memetakan dan memvisualisasikan seluruh alur navigasi Jetpack Compose (kompatibel penuh dengan **Navigation 3**) dalam bentuk diagram alur grafis interaktif langsung di dalam Android Studio.
-
-### 3.2 Konfigurasi Gradle (Sudah Terpasang di Proyek)
-1. **`gradle/libs.versions.toml`**:
-   ```toml
-   [versions]
-   ksp = "2.3.12"
-   skydovesNavgraph = "0.3.0"
-
-   [plugins]
-   ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-   skydoves-navgraph = { id = "com.github.skydoves.navgraph", version.ref = "skydovesNavgraph" }
-   ```
-
-2. **Root `build.gradle.kts`**:
-   ```kotlin
-   plugins {
-       alias(libs.plugins.ksp) apply false
-       alias(libs.plugins.skydoves.navgraph) apply false
-   }
-   ```
-
-3. **`app/build.gradle.kts`**:
-   ```kotlin
-   plugins {
-       alias(libs.plugins.ksp)
-       alias(libs.plugins.skydoves.navgraph)
-   }
-   ```
-
-### 3.3 Instalasi IDE Plugin di Android Studio
-1. Buka **Settings / Preferences** > **Plugins** > **Marketplace**.
-2. Cari **"Compose Navigation Graph"**.
-3. Klik **Install**, lalu restart Android Studio.
-4. Buka tool window melalui menu **View** > **Tool Windows** > **NavGraph Graph**.
-
-### 3.4 Cara Penggunaan di Kode (Anotasi)
-Tambahkan anotasi dari package `com.github.skydoves.navgraph.annotations.*`:
-
-1. **Anotasi Root Navigasi (`@NavGraphRoot`)**:
-   Diletakkan pada Composable yang membungkus `NavDisplay` / `rememberNavBackStack`:
-   ```kotlin
-   // File: app/src/main/java/com/example/wastenot/Navigation.kt
-   import com.github.skydoves.navgraph.annotations.NavGraphRoot
-
-   @NavGraphRoot
-   @Composable
-   fun MainNavigation() {
-       val backStack = rememberNavBackStack(Main)
-       NavDisplay(...)
-   }
-   ```
-
-2. **Anotasi Layar Tujuan (`@NavDestination`)**:
-   Diletakkan pada Composable layar dengan parameter route bertipe `KClass<*>`:
-   ```kotlin
-   // File: app/src/main/java/com/example/wastenot/ui/main/MainScreen.kt
-   import com.github.skydoves.navgraph.annotations.NavDestination
-
-   @NavDestination(route = Main::class)
-   @Composable
-   fun MainScreen(...) { ... }
-   ```
-
-3. **Anotasi Thumbnail Preview (`@NavPreview`)**:
-   Diletakkan pada Composable `@Preview` agar thumbnail tampilan layar dirender dan ditampilkan pada diagram grafis:
-   ```kotlin
-   // File: app/src/main/java/com/example/wastenot/ui/main/MainScreen.kt
-   import com.github.skydoves.navgraph.annotations.NavPreview
-
-   @NavPreview(route = Main::class)
-   @Preview(showBackground = true)
-   @Composable
-   fun MainScreenPreview() {
-       WasteNotTheme { MainScreen(...) }
-   }
-   ```
-
-### 3.5 Perintah & Ekspor Graph
-
-Anda dapat menjalankan perintah melalui terminal atau menggunakan target `Makefile`:
-
-| Aksi | Perintah Makefile | Perintah Gradle | Output File |
+| Plugin | Type | Version | Purpose |
 |---|---|---|---|
-| **Generate Data Graph** | `make nav-graph` | `./gradlew :app:generateNavGraph` | `app/build/navgraph/nav-graph.json` |
-| **Ekspor Web HTML Interaktif** | `make nav-html` | `./gradlew :app:exportNavGraphHtml` | `app/build/navgraph/nav-graph.html` |
-| **Ekspor Diagram Mermaid (Markdown)** | `make nav-mermaid` | `./gradlew :app:exportNavGraphMermaid` | `app/build/navgraph/nav-graph.mmd` |
-| **Linter Navigasi (Cek Route Rusak)** | `make nav-lint` | `./gradlew :app:navLint` | Laporan terminal |
-| **Simpan Baseline `.nav`** | `make nav-dump` | `./gradlew :app:navDump` | File baseline commit |
-| **Validasi CI vs Baseline** | `make nav-check` | `./gradlew :app:navCheck` | Exit code 0 jika valid |
+| Compose HotSwan | Gradle compiler plugin and IDE plugin | `2.0.1` | Hot reload of Compose UI that keeps input and navigation state |
+| Compose Navigation Graph | Gradle plugin, KSP processor, and IDE plugin | `0.3.0` | Interactive visualization of the Navigation 3 graph with screen thumbnails |
+| KSP | Gradle plugin | `2.3.12` | Annotation processing for the navigation graph |
+| ADB Idea | IDE plugin | Latest | Quick device actions: clear data, restart, kill, uninstall |
+| JSON To Kotlin Class | IDE plugin | Latest | Generates `@Serializable` Kotlin data classes from JSON |
 
-> **Tips Tim**: File HTML (`app/build/navgraph/nav-graph.html`) dapat langsung dibuka di browser web manapun tanpa perlu menjalankan server atau emulator.
+## Compose HotSwan (hot reload)
 
----
+HotSwan swaps classes directly in ART through a compiler-backed interpreter. Unlike Live Edit, it keeps form input, remembered values, and the navigation back stack. It reloads changes to composables, regular functions, and resources.
 
-## 4. Plugin Android Studio Rekomendasi
+### Configuration
 
-Untuk kenyamanan development harian, dua plugin berikut sangat disarankan di-install oleh setiap developer di tim:
+HotSwan is declared in `gradle/libs.versions.toml` and the root `build.gradle.kts`. It is applied only when the Gradle property `wastenot.hotReload=true` is set. Regular builds are native, so enable the property in a run configuration for hot reload sessions only.
 
-### 4.1 ADB Idea
-*   **Fungsi**: Melakukan operasi umum debugging Android tanpa harus mengetik perintah adb manual di terminal.
-*   **Cara Install**: Di Marketplace plugin Android Studio, cari **ADB Idea**.
-*   **Shortcut**:
-    - **Linux / Windows**: `Ctrl + Alt + Shift + A`
-    - **macOS**: `Cmd + Shift + A` (atau cari menu *Tools > ADB Idea*)
-*   **Aksi Cepat yang Sering Dipakai**:
-    - **ADB Clear App Data**: Reset database/DataStore tanpa uninstall (berguna saat test auth logout).
-    - **ADB Clear App Data and Restart**: Reset data lalu buka aplikasi kembali secara otomatis.
-    - **ADB Restart App**: Restart proses aplikasi secara instan.
-    - **ADB Uninstall App**: Hapus aplikasi dari emulator/device.
+```toml
+[versions]
+hotswan = "2.0.1"
 
-### 4.2 JSON To Kotlin Class (JsonToKotlinClass)
-*   **Fungsi**: Mengonversi JSON payload dari API dokumentasi ([API.md](file:///home/oktaavsm/Code/github.com/wastenot-android/docs/design-kit/API.md)) menjadi Kotlin `data class` lengkap dengan anotasi `@Serializable`.
-*   **Cara Install**: Di Marketplace plugin Android Studio, cari **JSON To Kotlin Class**.
-*   **Shortcut**:
-    - Di dalam folder source code Kotlin / package DTO, tekan `Alt + K`.
-    - Paste JSON response dari backend/dokumentasi, beri nama class, pilih parser *KotlinX Serialization*, lalu klik **Generate**.
+[plugins]
+hotswan-compiler = { id = "com.github.skydoves.compose.hotswan.compiler", version.ref = "hotswan" }
+```
 
----
+The Gradle plugin version must match the IDE plugin version exactly.
 
-## 5. Tabel Cheatsheet Shortcut & Perintah
+### Installation
 
-### Shortcut Keyboard IDE (Android Studio)
-| Fitur / Plugin | Linux / Windows | macOS | Fungsi |
+1. Open **Settings** (`Ctrl+Alt+S`, or `Cmd+,` on macOS), then **Plugins** → **Marketplace**.
+2. Search for **Compose HotSwan**, install it, and restart the IDE.
+
+### Daily use
+
+1. Run the app with `-Pwastenot.hotReload=true` on a connected device (`Shift+F10`).
+2. Open **View** → **Tool Windows** → **HotSwan** and wait for the `WATCHING` status.
+3. Edit a composable and save (`Ctrl+S` or `Cmd+S`). The change appears on the device within milliseconds.
+
+### Troubleshooting
+
+- **The status never reaches `WATCHING`.** Check that **Settings** → **Tools** → **Compose HotSwan** → **App Module Path** is set to `:app`.
+- **Lifecycle methods.** Methods that call `super`, such as `MainActivity.onCreate()`, are skipped by the interpreter and always run natively.
+- **Data and recovery logic.** HotSwan 2.0.1 reflection wraps `IOException`s thrown by suspend reads, which breaks the I/O recovery paths in the interpreter. Use native builds to check data or recovery behavior; hot reload is for visual work only.
+- **`SessionTokens`.** This class is excluded through `hotSwanCompiler.exclude`, because HotSwan 2.0.1 cannot build a dispatch bridge for the cross-file `RefreshToken` value class. Changes to that DTO need a full rebuild. See the [HotSwan exclusion docs](https://hotswan.dev/docs/gradle-configuration#excluding-classes).
+
+## Compose Navigation Graph
+
+Maps the Compose navigation flow, fully compatible with Navigation 3, as an interactive graph inside Android Studio.
+
+### Configuration
+
+```toml
+[versions]
+ksp = "2.3.12"
+skydovesNavgraph = "0.3.0"
+
+[plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+skydoves-navgraph = { id = "com.github.skydoves.navgraph", version.ref = "skydovesNavgraph" }
+```
+
+Both plugins are applied in `app/build.gradle.kts`. Install the **Compose Navigation Graph** IDE plugin from the Marketplace, then open **View** → **Tool Windows** → **NavGraph Graph**.
+
+### Annotations
+
+Annotations come from `com.github.skydoves.navgraph.annotations`:
+
+```kotlin
+@NavGraphRoot
+@Composable
+fun MainNavigation() {
+    val backStack = rememberNavBackStack(Main)
+    NavDisplay(...)
+}
+
+@NavDestination(route = Main::class)
+@Composable
+fun MainScreen(...) { ... }
+
+@NavPreview(route = Main::class)
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    WasteNotTheme { MainScreen(...) }
+}
+```
+
+- `@NavGraphRoot` marks the composable that owns `NavDisplay`.
+- `@NavDestination` marks each screen.
+- `@NavPreview` supplies the thumbnail shown in the graph.
+
+### Commands
+
+| Action | Make | Gradle | Output |
 |---|---|---|---|
-| **HotSwan Hot Reload** | `Ctrl + S` | `Cmd + S` | Memicu hot-reload instan pada file yang sedang diedit |
-| **ADB Idea Menu** | `Ctrl + Alt + Shift + A` | `Cmd + Shift + A` | Menu aksi cepat: Clear Data, Restart, Kill, Uninstall |
-| **JSON to Kotlin Data Class** | `Alt + K` | `Option + K` | Konversi payload JSON clipboard ke data class |
-| **Reformat Code** | `Ctrl + Alt + L` | `Cmd + Option + L` | Format kode sesuai panduan Kotlin |
-| **Run App** | `Shift + F10` | `Control + R` | Build dan jalankan aplikasi ke device/emulator |
+| Generate graph data | `make nav-graph` | `./gradlew :app:generateNavGraph` | `app/build/navgraph/nav-graph.json` |
+| Export interactive HTML | `make nav-html` | `./gradlew :app:exportNavGraphHtml` | `app/build/navgraph/nav-graph.html` |
+| Export Mermaid | `make nav-mermaid` | `./gradlew :app:exportNavGraphMermaid` | `app/build/navgraph/nav-graph.mmd` |
+| Lint navigation | `make nav-lint` | `./gradlew :app:navLint` | Terminal report |
+| Save the `.nav` baseline | `make nav-dump` | `./gradlew :app:navDump` | Baseline file to commit |
+| Check against the baseline | `make nav-check` | `./gradlew :app:navCheck` | Exit code 0 when valid |
 
-### Perintah Terminal / Makefile
-```bash
-# Build & Jalankan Aplikasi
-make build                  # Build APK debug
-make run                    # Build, install, dan launch aplikasi di device
-make clean                  # Bersihkan folder build
+The exported HTML opens in any browser without a server or device.
 
-# Validasi Kualitas Kode
-make check                  # Jalankan Android Lint + Unit Tests
-make pr-ready               # Cek menyeluruh (lint + test + nav-check) sebelum buat PR
+## Recommended IDE plugins
 
-# Navigasi & Graph Visualizer
-make nav-graph              # Ekstraksi graph navigasi ke JSON
-make nav-html               # Ekspor graph ke HTML interaktif dan otomatis buka di browser
-make nav-mermaid            # Ekspor representasi diagram Mermaid
-make nav-lint               # Cek apakah ada route yang tidak terjangkau (unreachable)
+### ADB Idea
 
-# Branching Otomatis Sesuai Tiket Sprint
-make branch-feature TICKET=W1-03 NAME=theme-setup   # Buat branch feature dari develop
-make branch-fix     TICKET=W2-04 NAME=conflict-409  # Buat branch fix dari develop
-make branch-hotfix  TICKET=WN-010 NAME=crash-auth   # Buat branch hotfix dari main
+Runs common adb actions from the IDE. Open it with `Ctrl+Alt+Shift+A` (`Cmd+Shift+A` on macOS) or **Tools** → **ADB Idea**.
+
+| Action | Effect |
+|---|---|
+| Clear App Data | Resets databases and DataStore without uninstalling |
+| Clear App Data and Restart | Resets the data, then relaunches the app |
+| Restart App | Restarts the app process |
+| Uninstall App | Removes the app from the device |
+
+### JSON To Kotlin Class
+
+Converts API JSON into Kotlin data classes:
+
+1. Press `Alt+K` in a DTO package.
+2. Paste the JSON and name the class.
+3. Choose **KotlinX Serialization**, then generate.
+
+Always check generated DTOs against the [API specification](design-kit/API.md).
+
+## Shortcuts and commands
+
+| Feature | Windows and Linux | macOS | Action |
+|---|---|---|---|
+| HotSwan reload | `Ctrl+S` | `Cmd+S` | Reload the edited file |
+| ADB Idea menu | `Ctrl+Alt+Shift+A` | `Cmd+Shift+A` | Device quick actions |
+| JSON to Kotlin | `Alt+K` | `Option+K` | Convert clipboard JSON to a data class |
+| Reformat code | `Ctrl+Alt+L` | `Cmd+Option+L` | Format Kotlin code |
+| Run app | `Shift+F10` | `Control+R` | Build and run on a device |
+
+```sh
+make build          # build the debug APK
+make run            # build, install, and launch on a device
+make check          # lint and unit tests
+make pr-ready       # lint, tests, and navigation check before a pull request
+make nav-html       # export the navigation graph to HTML and open it
+make help           # list every target
 ```

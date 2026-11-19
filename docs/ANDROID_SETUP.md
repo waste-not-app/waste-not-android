@@ -1,28 +1,16 @@
-# Setup dan fondasi Android WasteNot
+# Android Setup
 
-Pekerjaan awal untuk [A01 / issue #3](https://github.com/waste-not-app/waste-not-android/issues/3). Acuan produk yang digunakan adalah [kit terbaru](<design-kit/README.md>), bukan salinan `docs/design-kit/` yang lama.
+How to build WasteNot from a fresh checkout, configure backend environments, and sign releases.
 
-## Kondisi starter
+## Requirements
 
-Bagian ini mencatat baseline audit pada `e923f3c`. Perkembangan implementasi setelah audit dicatat per issue di [docs/tasks](archive/tasks/README.md).
+- JDK 17.
+- Android SDK Platform 36. Point `ANDROID_HOME` at the SDK, or set `sdk.dir` in a `local.properties` file. Git ignores that file.
+- An internet connection for the first build, to download dependencies.
 
-Satu module `:app`, Kotlin 2.3.20, AGP 9.0.1, Gradle 9.1.0, JDK 17, Compose BOM 2026.03.01, Navigation 3, min SDK 24, compile/target SDK 36. Versi dipertahankan dari starter dan dicatat di version catalog serta Gradle wrapper.
+The supported baseline is **Android 11 (API 30) and later**. Native, staging, release, and hot reload builds all use this minimum, and CI checks the minimum SDK in the APK manifest with `scripts/verify_minimum_sdk.py`. Compile and target SDK are 36. Primary testing uses the latest stable Android release.
 
-`HomeScreen` masih memakai data contoh dan callback pencatatan belum terhubung. Auth, repository HTTP, CRUD, statistik dan pipeline AI belum diimplementasikan. Pemeriksaan starter tidak membuktikan acceptance fitur tersebut.
-
-Package dan application ID dasar tetap `com.example.wastenot` agar identitas build awal tidak berubah. Tim perlu menetapkan identitas publik sebelum distribusi final. Staging memakai suffix `.staging` sehingga data instalasinya terpisah.
-
-Staging tidak debuggable dan memakai debug certificate untuk instalasi uji. HotSwan 2.0.1 pada starter tidak menyediakan task rewrite suspend-lambda staging, sehingga hot reload tetap terbatas pada debug; staging/release memakai jalur build biasa.
-
-## Build dari checkout baru
-
-Baseline dukungan diperbarui atas pilihan pengguna pada 5 November 2026: **Android 11 / API 30 ke atas**. Native, staging, release dan hot reload memakai minimum yang sama; CI memeriksa manifest APK native dengan `verify_minimum_sdk.py` dan menyimpan artifact `app-native-api30`. Angka SDK 24 pada audit starter dan bukti QA lama adalah riwayat pengujian, bukan batas instalasi saat ini. Pengujian utama menggunakan Android terbaru; compile/target SDK yang terpasang pada checkpoint ini masih 36.
-
-Pemeriksaan dokumentasi resmi pada tanggal tersebut mengidentifikasi Android 17 / API 37 sebagai versi stabil terbaru: [referensi API AOSP](https://source.android.com/docs/setup/reference/build-numbers) dan [panduan pengujian Android 17](https://developer.android.com/about/versions/17). Bukti runtime API 36 yang sudah ada adalah Android 16; jangan menyebutnya pengujian Android terbaru. Penerimaan API 30 dan API 37 masih perlu dijalankan.
-
-Build native menjadi default sejak checkpoint DataStore 9 November. Mode ini dipakai perintah biasa, unit test dan hook/CI. Hot reload dapat dipilih khusus pengembangan dengan `-Pwastenot.hotReload=true`; lihat batas interpreter di [panduan plugin](DEV_PLUGINS.md#25-troubleshooting-hotswan).
-
-Pasang JDK 17 dan Android SDK Platform 36. Arahkan `ANDROID_HOME` ke SDK, atau isi `sdk.dir` dalam `local.properties` yang diabaikan Git.
+## Build
 
 ```sh
 ./gradlew lintDebug lintStaging lintRelease testDebugUnitTest
@@ -30,54 +18,55 @@ Pasang JDK 17 dan Android SDK Platform 36. Arahkan `ANDROID_HOME` ke SDK, atau i
 python3 scripts/verify_build_environments.py
 ```
 
-Starter menyediakan task unit test debug (termasuk renderer Navigation Graph); task lint tersedia untuk debug/staging/release. Pemeriksaan APK menguji pemisahan konfigurasi ketiga varian. Build pertama membutuhkan koneksi untuk dependency. `assembleRelease` tanpa konfigurasi signing menghasilkan APK unsigned untuk pemeriksaan build, bukan artifact siap distribusi. Signing hanya membaca empat environment variable dari penyimpanan rahasia: `ANDROID_KEYSTORE_PATH`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`. Seluruh nilai harus tersedia bersama; konfigurasi parsial ditolak.
+`make check` and `make check-ci` wrap the same steps. Builds are native by default. Hot reload is an opt-in development mode (`-Pwastenot.hotReload=true`); see [DEV_PLUGINS.md](DEV_PLUGINS.md).
 
-## Konfigurasi lingkungan
+### Build types
 
-Semua build aplikasi menggunakan akun dan data backend nyata. Instalasi baru menampilkan Masuk/Daftar. Tidak ada akun otomatis, penyimpanan aktivitas lokal pengganti server atau pilihan sumber buatan. Sumber pengujian berada di `src/testFixtures`/`src/androidTest` dan tidak ikut APK aplikasi.
+| Build type | Application ID | Purpose |
+|---|---|---|
+| `debug` | `com.example.wastenot` | Development; the only type that supports hot reload and a cleartext localhost override |
+| `staging` | `com.example.wastenot.staging` | Non-debuggable test build, installed side by side with the others and signed with the debug certificate |
+| `release` | `com.example.wastenot` | Distribution build; requires release signing |
 
-| Build type | Property Gradle | Default | Kebijakan |
-|---|---|---|---|
-| debug | `wastenot.debugApiBaseUrl` | `https://waste-not-api.bccdev.id/v1/` | HTTPS; HTTP localhost/emulator hanya melalui override eksplisit |
-| staging | `wastenot.stagingApiBaseUrl` | alamat HTTPS yang sama | HTTPS; application ID `.staging` |
-| release | `wastenot.releaseApiBaseUrl` | alamat HTTPS yang sama | HTTPS; memerlukan signing untuk distribusi |
+The package and application ID remain `com.example.wastenot`. The public identity must be finalized before general distribution.
 
-Nilai kosong ditolak saat konfigurasi build. Base URL adalah konfigurasi publik dalam `BuildConfig.API_BASE_URL`, bukan tempat menyimpan credential atau API key.
+## Backend configuration
+
+Every build talks to the real backend with real accounts. A fresh install opens sign-in or registration; there are no automatic accounts or local substitute data. Test sources live in `src/testFixtures` and `src/androidTest` and never ship in an APK.
+
+| Build type | Gradle property | Default |
+|---|---|---|
+| `debug` | `wastenot.debugApiBaseUrl` | `https://waste-not-api.bccdev.id/v1/` |
+| `staging` | `wastenot.stagingApiBaseUrl` | Same HTTPS address |
+| `release` | `wastenot.releaseApiBaseUrl` | Same HTTPS address |
 
 ```sh
-# Build native yang langsung menggunakan backend HTTPS
+# Native builds against the HTTPS backend
 ./gradlew assembleDebug assembleStaging -Pwastenot.hotReload=false
 
-# Override backend lokal untuk pengembangan transport
+# Local backend for transport development
 ./gradlew assembleDebug -Pwastenot.debugApiBaseUrl=http://10.0.2.2:8080/v1/
 
-# Backend release yang ditetapkan lingkungan
+# Release backend supplied by the environment
 ./gradlew assembleRelease "-Pwastenot.releaseApiBaseUrl=$WASTENOT_RELEASE_API_BASE_URL"
 ```
 
-Base URL harus absolute, memiliki host/port yang valid, serta tidak memuat user info, query atau fragment. Trailing slash dinormalisasi. Cleartext debug dibatasi ke `10.0.2.2`, `localhost` dan `127.0.0.1`; staging/release menggunakan kebijakan jaringan HTTPS. Implementasi mengikuti [Network Security Configuration Android](https://developer.android.com/privacy-and-security/security-config) dan [build variants](https://developer.android.com/build/build-variants).
+- **URL format.** The base URL must be absolute with a valid host and port, and must not contain user info, a query, or a fragment. Empty values fail the build, and a trailing slash is added if missing.
+- **Cleartext.** Cleartext HTTP is allowed only in debug builds, and only for `10.0.2.2`, `localhost`, and `127.0.0.1`. Staging and release builds enforce HTTPS through the [network security configuration](https://developer.android.com/privacy-and-security/security-config).
+- **No secrets.** The URL is public configuration exposed as `BuildConfig.API_BASE_URL`. Never store credentials or keys there.
+- **Backups.** Cloud backup and device transfer of internal data are disabled. Passwords and refresh tokens must never reach a backup.
 
-Backup cloud/device-transfer data internal dinonaktifkan pada baseline. Aturan yang lebih selektif untuk preferences harus direview bersama penyimpanan token/draf A04–A05; password dan refresh token tidak boleh masuk backup.
+## Release signing
 
-## Branch dan CI/CD
+`assembleRelease` without signing produces an unsigned APK for build verification only. Signing reads four environment variables from a secret store:
 
-Repo yang diaudit baru memiliki branch remote `main`. Gunakan branch tugas dari commit dasar yang sudah diverifikasi; `develop` dapat menjadi keputusan workflow tim berikutnya.
+- `ANDROID_KEYSTORE_PATH`
+- `ANDROID_KEYSTORE_PASSWORD`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEY_PASSWORD`
 
-```sh
-git switch -c chore/3-android-foundation
-./gradlew lintDebug lintStaging lintRelease testDebugUnitTest assembleDebug assembleStaging assembleRelease
-git add <file-yang-terkait-tugas>
-git commit -m "chore(android): describe the completed change (#3)"
-git push -u origin HEAD
-```
+All four must be set together; a partial configuration is rejected. Never replace the signing certificate without considering update compatibility for installed APKs.
 
-`Android CI` mencakup `feat/**`, `fix/**` dan branch tugas standar lainnya, lint tiga build type serta unit test debug, pengujian konfigurasi URL, APK debug/staging/release, serta artifact laporan. CI tidak memakai credential signing atau deployment. `Android Release & Deploy` tetap mengikuti trigger main/tag/manual yang sudah ada, memeriksa lint release dan unit test debug dari source bersama, dan menolak deployment jika APK tidak ditandatangani. Push branch tugas tidak menjalankan workflow deploy.
+## Devices
 
-Input versi manual diperlakukan sebagai environment value lalu diperiksa agar aman sebagai nama file. Workflow rilis memakai adapter remote dan mewajibkan GitHub repository variable `WASTENOT_RELEASE_API_BASE_URL` berisi origin API HTTPS. Nilai kosong menghentikan build publikasi; seluruh varian aplikasi memakai sumber remote. Lihat [panduan CI/CD](CICD_SETUP.md) untuk nama secrets dan operasi rilis.
-
-## Bukti dan keputusan yang masih perlu
-
-- Catat hasil aktual lint, unit test dan build pada PR/issue terkait; hasil web mockup bukan hasil Android.
-- Install/launch dan pengujian UI memerlukan emulator atau perangkat Android. Tandai belum diuji bila tidak ada perangkat yang tersedia.
-- Identitas publik, URL backend nyata dan kontrak lintas tim tetap keputusan B01/tim.
-- Kredensial signing yang pernah dicatat di dokumentasi perlu dirotasi oleh pengelola. Menghapus nilainya dari file terbaru tidak menghapus riwayat Git; jangan mengganti certificate signing tanpa mempertimbangkan kompatibilitas update APK.
+Installing, launching, and UI testing need a physical device that the owner has connected and approved. Emulators are not used. When no device is available, record device checks as not run instead of inferring them from host tests.

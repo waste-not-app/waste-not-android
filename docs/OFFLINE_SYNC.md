@@ -1,53 +1,85 @@
-# Aktivitas offline dan sinkronisasi
+# Offline Activity and Synchronization
 
-Aktivitas dibaca dari Room, termasuk ketika jaringan tersedia. Create, update, dan delete menyimpan perubahan lokal dan operasi antrean dalam satu transaksi. WorkManager mengirim antrean ketika jaringan tersedia. Panduan dan AI tetap memakai layanan online.
+Activity is always read from Room, even when the network is available. Creates, updates, and deletes write the local change and a queued operation in one transaction, and WorkManager sends the queue when the network returns. Guides and AI features remain online only.
 
-## Penyimpanan dan akun
+## Storage and accounts
 
-`activities.db` menyimpan aktivitas, antrean operasi, receipt create, snapshot server dan identitas akun terakhir yang sudah diverifikasi. Setiap aktivitas, operasi, receipt dan snapshot memiliki pemilik. Refresh/access token serta password tidak masuk database atau input worker; refresh token tetap dienkripsi dengan Android Keystore.
+`activities.db` stores the following, each owned by a specific account:
 
-Akun yang pernah diverifikasi dapat membuka data lokal tanpa jaringan jika credential Keystore masih tersedia. Keadaan ini tidak menghasilkan access token dan tidak dapat memanggil API terautentikasi. Setelah tersambung, refresh dan `/me` harus memverifikasi akun sebelum sinkronisasi. Login pertama membutuhkan koneksi.
+- activities;
+- the operation queue;
+- create receipts;
+- server snapshots;
+- the last verified account identity.
 
-Keluar menghapus identitas aktif dan credential. Antrean milik akun tetap tersimpan agar dapat dilanjutkan setelah akun yang sama masuk lagi; dialog keluar menjelaskan hal tersebut. Worker akun A tidak boleh berjalan di bawah akun B. Database dan credential dikecualikan dari backup/cloud/transfer melalui aturan backup yang sudah ada.
+Access tokens, refresh tokens, and passwords never enter the database or worker input. The refresh token stays encrypted with the Android Keystore.
 
-Penghapusan akun berbeda dari keluar: setelah server mengonfirmasi DELETE akun dan sesi/work akun dihentikan, `ActivityDao.clearOwner` menghapus aktivitas, antrean, receipt, snapshot dan identitas pemilik tersebut dalam satu transaksi. Data pemilik lain tidak ikut dihapus. Operasi ini tidak dipakai saat logout biasa.
+- **Offline sign-in.** A previously verified account can open its local data offline while its Keystore credential exists. This never produces an access token or calls authenticated APIs. Once online, the app runs refresh and `/me` to verify the account before syncing. The first sign-in needs a connection.
+- **Sign-out.** Removes the active identity and credentials but keeps that account's queue, so it can resume when the same account signs in again. The sign-out dialog explains this. A worker for account A never runs as account B.
+- **Backups.** The database and credentials are excluded from backups and device transfers.
+- **Account deletion.** After the server confirms `DELETE /me` and the account's sessions and work are stopped, `ActivityDao.clearOwner` removes that owner's data in one transaction. Other owners' data is untouched. This never runs on a normal sign-out.
 
-## Alur perubahan
+## Change flow
 
-1. Create menyimpan UUID request, payload asli, identitas lokal dan operasi CREATE. Receipt menjaga UUID/payload tetap sama setelah respons hilang atau aplikasi dibuka ulang.
-2. Edit/delete mengantre setelah operasi sebelumnya pada aktivitas yang sama. Identitas lokal tetap dapat ditemukan ketika server sudah memberikan ID sendiri. Perubahan UI memakai revisi lokal; permintaan ke server memakai versi server tersimpan.
-3. Saat akan dikirim, versi permintaan dibekukan dalam antrean. Respons POST yang hilang diulang dengan UUID dan payload yang sama. Respons PATCH yang hilang hanya dianggap sudah diterima jika GET memperlihatkan tepat versi berikutnya dengan seluruh isian yang sama.
-4. Pengakuan operasi lama tidak mengganti isian lokal yang mempunyai operasi lebih baru. Penghapusan lokal disembunyikan dari riwayat sambil menunggu pengakuan server.
-5. Kesalahan jaringan, server dan rate limit menggunakan retry/backoff WorkManager. Kegagalan permanen dan konflik disimpan untuk ditinjau pengguna.
+1. **Create.** Stores the request UUID, the original payload, a local identity, and a `CREATE` operation. The receipt keeps the UUID and payload stable across lost responses and app restarts.
+2. **Edit and delete.** These queue behind earlier operations on the same activity. The local identity still resolves after the server assigns its own ID. The UI uses local revisions, while requests use the stored server version.
+3. **Sending.** The request version is frozen in the queue.
+   - A lost `POST` response is retried with the same UUID and payload.
+   - A lost `PATCH` response counts as accepted only if a `GET` shows exactly the next version with identical fields.
+4. **Acknowledgements.** Acknowledging an older operation never overwrites fields that a newer local operation changed. Local deletions are hidden from history until the server acknowledges them.
+5. **Failures.** Network, server, and rate-limit errors use WorkManager retry and backoff. Permanent failures and conflicts are stored for the user to review.
 
-Antrean work menggunakan nama unik per akun dan APPEND_OR_REPLACE agar perubahan yang datang ketika worker sebelumnya selesai tetap mendapat giliran. Satu worker menyinkronkan seluruh operasi yang tersedia saat ia mulai; pekerjaan berikutnya juga menarik keadaan server terbaru.
+Work uses a unique name per account with `APPEND_OR_REPLACE`, so changes made while a worker is finishing still get their turn. Each worker run syncs every operation available when it starts, then pulls the latest server state.
 
-## Konflik dan provenance AI
+## Conflicts and AI provenance
 
-409 tidak menimpa server atau menghapus isian lokal. Panel sinkronisasi menampilkan isian lokal dan versi server yang sudah dibaca. Pengguna dapat mengonfirmasi pengiriman ulang berdasarkan versi yang ditinjau, atau membuang perubahan lokal. Jika server berubah lagi, pengguna diminta meninjau lagi. Penghapusan yang berkonflik ikut tampil di panel meskipun sudah disembunyikan dari riwayat.
+- **Conflicts.** A `409` never overwrites the server or discards local fields. The sync panel shows the local fields next to the server version it last read. The user can confirm a resend based on that version or discard the local change, and is asked to review again if the server changes once more. Conflicting deletes appear in the panel even though they are hidden from history.
+- **Expired AI references.** If an AI reference has expired or become invalid, the activity fields are kept. The user may explicitly save the activity as a manual entry. That conversion uses a new UUID after a definitive server rejection, drops the AI provenance, and never claims the recommendation is still valid.
 
-Referensi AI yang sudah kedaluwarsa/tidak valid tetap menyimpan isian aktivitas. Pengguna dapat memilih secara eksplisit untuk menyimpannya sebagai catatan manual. Konversi membuat UUID baru setelah penolakan definitif dari server, menghapus provenance AI, dan tidak mengklaim rekomendasi masih berlaku.
+## Reads, summaries, and cache limits
 
-## Pembacaan, ringkasan dan batas cache
+- **History.** History pages 20 rows at a time from Room, with category, method, and date filters.
+  - Background sync pulls server pages of 20 rows at a time.
+  - History is complete only after the first pull finishes, and the UI says so until then.
+  - Data that was never downloaded is not available offline.
+- **Pull safety.** A pull never overwrites activities that have pending local changes. Server pagination is not a snapshot, so an activity missing from a pull is checked with a `GET` before it is removed from the cache. An interrupted pull never deletes unseen cache entries.
+- **Summaries.** Summaries, statistics, XP, and streaks use the last snapshot the server confirmed. Recent activity on the home screen comes from Room, and saving locally never announces new XP. The sync panel explains the difference between local changes and server summaries.
+- **Snapshot staleness.** Snapshots carry their server confirmation time and a cache marker.
+  - Home, profile, and statistics show that marker, and data from a previous day or period is flagged rather than presented as today's.
+  - Refresh failures are stored separately from the payload, so an old snapshot stays readable without hiding the error.
+- **Achievement refresh.** Each acknowledged create, update, or delete stores a random revision in the snapshot metadata within the same transaction.
+  - `ActivityStore.synchronizationAcknowledgements` replays the latest revision for the account, deduplicated.
+  - `AchievementsViewModel` reloads achievements when that revision changes. XP is never computed locally.
 
-Riwayat menggunakan pagination lokal 20 baris beserta filter kategori, metode dan tanggal. Sinkronisasi latar belakang mengambil halaman server secara bertahap, juga 20 baris. Riwayat baru lengkap setelah penarikan pertama selesai; label aplikasi menyatakan jika penarikan itu belum selesai. Data yang belum pernah diunduh belum tersedia offline.
+## Verification
 
-Penarikan tidak menimpa aktivitas yang masih mempunyai perubahan lokal. Pagination server bukan snapshot database, sehingga aktivitas yang tidak terlihat di hasil penarikan diverifikasi melalui GET sebelum dihapus dari cache. Penarikan terputus tidak menghapus cache yang belum terlihat.
+**Host tests.** Room host tests cover:
 
-Ringkasan, statistik, XP dan streak memakai snapshot terakhir yang dikonfirmasi server. Aktivitas terbaru di beranda dibaca dari Room. Simpan lokal tidak mengumumkan tambahan XP. Panel sinkronisasi menjelaskan perbedaan perubahan lokal dan ringkasan server, termasuk ketika koneksi tersedia tetapi belum ada pengakuan server.
+- reopening the database file;
+- retries after lost responses;
+- create, edit, and delete ordering;
+- protection of local changes;
+- filters and pagination;
+- receipts;
+- conflicts;
+- owner isolation.
 
-Snapshot yang dibaca dari Room membawa waktu konfirmasi server dan penanda cache. Beranda, profil dan statistik menampilkan penanda tersebut; data dari hari/periode sebelumnya diberi peringatan, bukan dianggap hasil hari ini. Kegagalan refresh disimpan terpisah dari payload sehingga snapshot lama tetap bisa dibaca tanpa menyembunyikan kesalahan. Pada pergantian hari, statistik dapat menampilkan periode tersimpan dengan panjang yang sama dan tanggal aslinya.
+Session tests check that an offline identity never yields API credentials and that sign-out clears the active identity.
 
-Pengakuan CREATE, UPDATE atau DELETE menyimpan revisi acak pada metadata snapshot dalam transaksi pengakuan yang sama. `ActivityStore.synchronizationAcknowledgements` memutar ulang revisi terakhir milik akun, dengan deduplikasi; simpan lokal, penarikan riwayat dan refresh ringkasan tidak mengubah revisi ini. `AchievementsViewModel` menerima flow tersebut dan memuat ulang pencapaian yang sudah diminta setelah pengakuan, termasuk jika worker berjalan lebih lambat daripada simpan lokal atau ViewModel baru mulai mengamati. Tidak ada tambahan XP yang dihitung lokal.
+**Device tests.** Device tests run only on a physical phone approved by the owner.
 
-## Verifikasi
+- `OfflineActivityDeviceTest` is opt-in through `verifyOfflineLive=true`. It creates a separate backend account, uses a test-only database and Keystore alias, and cleans up its records. Transport failures are simulated with a closed loopback socket so wireless ADB stays connected; this is not an airplane-mode test.
+- `ActivitySyncUiTest` checks the local-save message and the conflict decisions, and captures screenshots.
 
-Tes host Room mencakup pembukaan ulang file database, retry respons hilang, urutan create/edit/delete, perlindungan perubahan lokal, filter/pagination, receipt, konflik dan isolasi pemilik. Tes sesi memastikan identitas offline tidak memberikan credential API dan logout menghapus identitas aktif.
+**Schema changes.** The Room schema is exported to `app/schemas/`. Every schema change needs a migration that preserves the queue. Never add a destructive fallback migration.
 
-Pengujian perangkat hanya memakai HP fisik yang diizinkan pemilik. `OfflineActivityDeviceTest` bersifat opt-in melalui `verifyOfflineLive=true`, membuat akun backend terpisah, memakai database/alias Keystore khusus tes dan membersihkan catatan tes. Skenario kegagalan transport memakai socket loopback tertutup agar koneksi wireless ADB tetap hidup; ini bukan pengujian mode pesawat. `ActivitySyncUiTest` memeriksa pesan simpan lokal dan keputusan konflik serta menghasilkan screenshot. Tidak ada emulator yang digunakan.
+**Side-by-side QA build.** When the installed app uses the release key, build the debug APK and `debugAndroidTest` with `-Pwastenot.debugApplicationIdSuffix=.offlineqa`. They install alongside the main app as "WasteNot QA", so the main app and its data stay intact.
 
-Schema Room diekspor ke `app/schemas/`. Perubahan schema berikutnya wajib memiliki migrasi yang mempertahankan antrean; jangan menambahkan fallback destructive migration.
+**Process-death test.**
 
-Jika APK yang sudah terpasang memakai kunci rilis, gunakan `-Pwastenot.debugApplicationIdSuffix=.offlineqa` saat membuat APK debug dan debugAndroidTest. Keduanya dipasang berdampingan sebagai WasteNot QA sehingga aplikasi utama dan datanya tidak perlu dihapus. Konfigurasi debug standar, staging dan release tetap memakai ID biasanya.
+1. Run the persistent-offline test with `offlinePhase=prepare` and an `offlineRunId` UUID.
+2. Keep the report at `cache/qa/offline-sync/device.json`.
+3. Kill only the `.offlineqa` process.
+4. Rerun the test with `offlinePhase=recover`, the same `offlineRunId`, and `offlineRequestId` set to the report's `local_id`.
 
-Untuk pengujian proses mati, jalankan metode persistent-offline dengan `offlinePhase=prepare` dan UUID `offlineRunId`. Simpan laporan `cache/qa/offline-sync/device.json`, hentikan hanya proses paket `.offlineqa`, kemudian jalankan metode yang sama memakai `offlinePhase=recover`, `offlineRunId` yang sama dan `offlineRequestId` dari `local_id` laporan. Fase prepare sengaja mempertahankan database dan credential khusus tes; fase recover memulihkannya lalu membersihkannya. Jangan menjalankan tes WorkManager produksi terhadap paket aplikasi utama; tes tersebut mensyaratkan suffix `.offlineqa`.
+The prepare phase keeps the test database and credentials; the recover phase restores and then cleans them up. Never run production WorkManager tests against the main app package; they require the `.offlineqa` suffix.
