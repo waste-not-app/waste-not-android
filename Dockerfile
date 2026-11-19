@@ -13,7 +13,7 @@ RUN curl -fsSLo /tmp/cmdline-tools.zip "https://dl.google.com/android/repository
  && mv "${ANDROID_HOME}/cmdline-tools/cmdline-tools" "${ANDROID_HOME}/cmdline-tools/latest" \
  && rm /tmp/cmdline-tools.zip
 RUN yes | sdkmanager --licenses > /dev/null \
- && sdkmanager --install "platform-tools" "platforms;android-36" "build-tools;36.0.0" > /dev/null
+ && sdkmanager --install "platform-tools" "platforms;android-37.0" "build-tools;36.0.0" > /dev/null
 
 FROM sdk AS build
 WORKDIR /workspace
