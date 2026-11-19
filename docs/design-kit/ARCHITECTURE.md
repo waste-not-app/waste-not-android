@@ -222,8 +222,9 @@ flowchart LR
   Repo -->|HTTPS multipart| Go[Go API: auth / media validation]
   Go -->|private network| Python[Python YOLO inference worker]
   Python --> Go
-  Go --> DB[(PostgreSQL: sesi AI TTL dan panduan)]
-  Scan -->|konfirmasi objek dan kondisi| Rec[Go recommendation package]
+  Go --> DB[(PostgreSQL: sesi AI TTL dan provenance)]
+  Scan -->|konfirmasi objek dan kondisi| Go
+  Go --> Rec[Python AI decisions HTTP privat]
   Rec --> KB[PUBLISHED Waste Guide lookup]
   KB --> LLM[LLM provider: metadata tanpa foto]
   LLM --> Guard[Schema + aturan panduan + special handling]
@@ -236,10 +237,10 @@ Tambahkan package `feature/scan`, `data/ai`, `core/camera` di module Android yan
 
 Tombol Catat/Scan adalah action pada tengah atas dock lima tab, membuka satu ModalBottomSheet multi-step S21–S25. Sheet punya scroll, close/Back, manual fallback, camera preview, capture, hasil, kondisi, dan konfirmasi. Sheet ditutup saat masuk editor S05; bukan tab keenam. Untuk tablet action berada dekat NavigationRail dan sheet dibatasi lebar. Kembali/close menghentikan kamera; hasil request terlambat diabaikan. Setelah process death pulihkan draf nonfoto yang aman, minta capture lagi bila file tidak ada. Jangan menimpa log draft dirty dengan hasil scan baru tanpa dialog konfirmasi.
 
-Go tetap pemilik autentikasi, domain, mapping, knowledge retrieval, LLM validation dan penyimpanan. Python hanya menerima gambar tervalidasi dan mengembalikan deteksi; tidak memiliki DB credential atau LLM key. Private worker memakai timeout, request ID dan autentikasi service; port tidak dipublikasikan. Deploy satu worker bounded concurrency awal, CPU/GPU dipilih lewat benchmark. Tidak menambahkan queue broker/vector DB/Kubernetes untuk baseline.
+Keputusan 20 Oktober 2026: Go memiliki autentikasi, sesi/ownership, dedup/in-flight, budget dan penyimpanan domain. Python memiliki mapping, knowledge lookup, allowed methods dan validasi Gemini sebagai satu implementasi. Worker YOLO dan modul keputusan memakai proses/token terpisah; hanya modul keputusan memegang key Gemini. Go memanggil HTTP privat dan memvalidasi bentuk respons, tanpa mengimplementasikan ulang policy. [Kontrak HTTP v1](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/AI_HTTP_CONTRACT.md) menyediakan OpenAPI, contoh dan mock; backend Go/Android belum diimplementasikan oleh adapter ini. Tidak menambahkan broker/vector DB/Kubernetes.
 
 Model artifact dan mapping dipin dengan checksum/version; preprocessing/postprocessing teruji bbox terhadap orientasi gambar. Go menolak respons worker yang malformed. Worker readiness mengecek model termuat; kegagalan AI tidak membuat health core atau login/logs gagal. Circuit breaker sederhana/batas concurrency dan feature capability dapat mematikan AI sambil mempertahankan manual.
 
-Tambahan konfigurasi server: `AI_SCAN_ENABLED`, `AI_RECOMMENDATION_ENABLED`, `AI_INFERENCE_URL`, `AI_SERVICE_TOKEN`, `AI_MODEL_PATH`, `AI_MODEL_VERSION`, `AI_MAPPING_VERSION`, `AI_REQUEST_TIMEOUT`, `AI_SESSION_TTL`, `LLM_PROVIDER`, `LLM_MODEL`, `LLM_API_KEY`, `LLM_DAILY_BUDGET`. Model/runtime/license dipin saat eksperimen. Key tidak masuk APK. Batas waktu/retensi konkret mengikuti AI_SPEC §8, bukan duplikasi konfigurasi tak konsisten.
+Konfigurasi Go: feature flags, `AI_INFERENCE_URL`/`AI_SERVICE_TOKEN`, `AI_RECOMMENDATION_URL`/`AI_RECOMMENDATION_TOKEN`, deadline, TTL dan budget akun. Worker YOLO memakai `AI_MODEL_PATH`/`AI_DEVICE`; versi model/mapping dibaca dari hasil aktual. Modul keputusan memakai `GEMINI_MODEL`, `GEMINI_API_KEY[_1.._5]`, `GEMINI_TIMEOUT_SECONDS` dan bundle panduan yang ditinjau. Key tidak masuk Go/APK. Batas waktu/retensi mengikuti AI_SPEC §8 dan kontrak HTTP v1.
 
 CI tambahan: schema/model adapter fixture, mapping test, rekomendasi dengan fake provider, authorization/TTL/idempotensi, cleanup gambar, state machine/camera lifecycle dan E2E scanner. Pengujian model berkas asli terpisah dari unit test dan mengeluarkan evaluation report. Staging memakai dataset yang boleh digunakan, bukan foto pribadi otomatis. Rollback versi worker+mapping+policy dilakukan bersama; core schema tetap kompatibel log manual.

@@ -82,7 +82,7 @@ Plugin hanya diterapkan ketika properti `wastenot.hotReload=true`. Build biasa m
 
 ### 2.5 Troubleshooting HotSwan
 
-Checkpoint DataStore 9 November menemukan bahwa reflection HotSwan 2.0.1 membungkus IOException dari pembacaan suspend sebelum catch ThemeViewModel. Pemulihan baca pada mode interpreter gagal di unit test; kombinasi dua pola pengecualian juga gagal pada parser opsi Kotlin. Build native kini default dan pemulihan I/O diterima melalui unit/native Android. Jalur hot reload eksplisit tetap untuk pengembangan tampilan; pakai native saat memeriksa perilaku data/pemulihan. [Bukti dan batasnya](qa/iteration-2/THEME_DATASTORE.md#build-native-sebagai-default).
+Checkpoint DataStore 9 November menemukan bahwa reflection HotSwan 2.0.1 membungkus IOException dari pembacaan suspend sebelum catch ThemeViewModel. Pemulihan baca pada mode interpreter gagal di unit test; kombinasi dua pola pengecualian juga gagal pada parser opsi Kotlin. Build native kini default dan pemulihan I/O diterima melalui unit/native Android. Jalur hot reload eksplisit tetap untuk pengembangan tampilan; pakai native saat memeriksa perilaku data/pemulihan. [Bukti dan batasnya](archive/qa/iteration-2/THEME_DATASTORE.md#build-native-sebagai-default).
 
 `SessionTokens` dikecualikan secara spesifik melalui `hotSwanCompiler.exclude` di app Gradle. HotSwan 2.0.1 gagal membuat dispatch bridge `component2` untuk `RefreshToken` value class lintas file (`B3: ... has no primary constructor`). Dengan pengecualian DTO tersebut, build kembali lulus dan tipe credential tetap tervalidasi. Perubahan pada DTO ini memerlukan rebuild; hot reload UI tetap tersedia. Opsi pengecualian mengikuti [konfigurasi resmi HotSwan](https://hotswan.dev/docs/gradle-configuration#excluding-classes).
 

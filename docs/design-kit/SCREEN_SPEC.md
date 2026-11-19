@@ -268,8 +268,8 @@ Revisi 28 September menambahkan action Catat/Scan pada tengah atas dock, sambil 
 |---|---|---|---|
 | S21 | Kamera dan tinjau foto | Preview, aktifkan kamera, ambil foto, tinjau, scan, retake, manual | Permission denied, unavailable, capture belum siap; kirim hanya setelah konfirmasi |
 | S22 | Deteksi / konfirmasi satu objek | Bbox + daftar, skor, pemilihan objek, koreksi kategori, konfirmasi | Empty, low confidence, material unknown, multi-object; kategori tidak boleh kosong |
-| S23 | Kondisi objek | Cleanliness, integrity, reusable, reuse intention | UNKNOWN valid; field independent; perubahan membatalkan saran lama |
-| S24 | Rekomendasi | Metode, alasan, sumber/versi panduan, caution, ubah/gunakan | Tidak auto-save; special handling method null; lanjut S05 jumlah manual |
+| S23 | Kondisi objek | Cleanliness, integrity, reusable, reuse intention; cleanable/soiling saat kotor, former_contents untuk HDPE, dan risk_type saat ada risiko | UNKNOWN valid; NEEDS_CONTEXT meminta isian relevan; perubahan membatalkan saran lama |
+| S24 | Rekomendasi | Satu label Reduce/Reuse/Recycle/Trash, alasan, sumber/versi panduan, caution, ubah/gunakan | Tidak auto-save; special_handling menambahkan peringatan tanpa menghilangkan metode; lanjut S05 jumlah manual |
 | S25 | Gagal / tidak tersedia | Penyebab, ulang, manual, close | Kamera denied, unknown, offline, timeout, invalid LLM, no reviewed guide; tidak menambah XP |
 
 S21–S25 adalah fase satu alur sheet dalam produk; ditampilkan sebagai lima entry galeri untuk handoff. Preview HTML memakai ilustrasi bbox berlabel, bukan bbox terhadap foto kamera. Skor/objek/LLM adalah fixture. Kamera browser menggunakan getUserMedia jika didukung konteks aman; tidak mengunggah gambar. Pengujian kamera Android dan API tetap terpisah.
@@ -282,7 +282,7 @@ S05 sesudah AI: prefill hanya kategori dan metode yang dikonfirmasi; jumlah koso
 | C36 Camera sheet | ModalBottomSheet + camera preview | Height adaptif, scroll, izin, capture/retake, manual fallback |
 | C37 Detection review | Canvas overlay + selectable list | Bbox sesuai image transform; label accessible menyebut objek dan skor |
 | C38 Object context | Select/radio controls | Tiga dimensi terpisah dan unknown; tidak menyimpulkan kondisi dari gambar |
-| C39 Recommendation review | Surface + method selection | Sumber, reason, caution; konfirmasi; error dan special handling punya manual |
+| C39 Recommendation review | Surface + method selection | Satu label, sumber, reason, caution; special handling adalah peringatan tambahan; konfirmasi sebelum simpan |
 
 State prototipe bisa dipilih pada S21: satu objek, beberapa objek, skor rendah, tidak dikenali, penanganan khusus, jaringan gagal, rekomendasi gagal. Semua tersedia tanpa hardware kamera melalui “Gunakan contoh simulasi”. Tombol ini hanya untuk dokumentasi, tidak muncul sebagai fitur produksi. Refresh menghapus foto dan state sementara.
 
@@ -291,3 +291,7 @@ State prototipe bisa dipilih pada S21: satu objek, beberapa objek, skor rendah, 
 S21–S25 memakai isi komponen sheet yang sama, dengan field/aksi nyata sebagai preview inert. Buka “Coba bottom sheet” untuk interaksi. Tahap Foto → Objek → Kondisi → Saran mempunyai indikator current step. Pengaturan skenario simulasi berada pada disclosure agar jalur kamera lebih mudah dibaca. Input manual berada di footer opak yang menempel bagian bawah sheet.
 
 Kategori/objek/kondisi/niat penggunaan ulang tetap tersimpan ketika kembali untuk koreksi. Mengganti kategori mereset kondisi agar tidak memakai konteks benda lama. Memilih contoh simulasi menghentikan kamera aktif dan membuang hasil permission yang terlambat. Scan baru dari katalog ditolak dengan pesan saat editor mempunyai draf dirty; pengguna menyimpan atau kembali melalui D03 terlebih dahulu. Kamera/LLM tetap simulasi sebagaimana v1.2.
+
+### Saran bersyarat saat kondisi kosong, policy-06
+
+Konteks biasa yang belum diisi tetap UNKNOWN/null. allow_conditional default true mengizinkan READY dengan recommendation_basis=CONDITIONAL dan conditions_to_verify; false mempertahankan mode ketat NEEDS_CONTEXT. UI menampilkan saran sementara dan syarat, tanpa mengisi data kosong atau menyimpan otomatis. Risiko ambigu, kontaminasi berbahaya dan riwayat isi HDPE tetap dibatasi. Lihat [perilaku terbaru, reproduksi dan hasil pengujian](https://github.com/waste-not-app/waste-not-ai/blob/main/docs/archive/CONDITIONAL_AND_BACKGROUND.md).

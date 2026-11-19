@@ -1,7 +1,7 @@
 # Model data Android
 
-Acuan: [PRD §8–9](WasteNot-Product-Design-Kit%20update/WasteNot/PRD.md),
-[API §2,5–6](WasteNot-Product-Design-Kit%20update/WasteNot/API.md), issue [A02 #5](https://github.com/waste-not-app/waste-not-android/issues/5).
+Acuan: [PRD §8–9](design-kit/PRD.md),
+[API §2,5–6](design-kit/API.md), issue [A02 #5](https://github.com/waste-not-app/waste-not-android/issues/5).
 
 `model/` berisi aturan murni Kotlin; tidak menyimpan state Compose, context, atau credential.
 

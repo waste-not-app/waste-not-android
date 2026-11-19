@@ -4,13 +4,13 @@ Aplikasi Android untuk mencatat aktivitas Reduce, Reuse, Recycle dan Trash, memb
 
 ## Status implementasi
 
-Seluruh 20 screen wajib dan empat dialog sudah tersedia. Penyelarasan desain, navigasi dan pemeriksaan state masih berjalan; kelengkapan screen bukan penerimaan akhir rilis. Lihat [prioritas UI dan checkpoint](docs/UI_FIRST_PLAN.md).
+Seluruh 20 screen wajib dan empat dialog sudah tersedia. Penyelarasan desain, navigasi dan pemeriksaan state masih berjalan; kelengkapan screen bukan penerimaan akhir rilis. Lihat [prioritas UI dan checkpoint](docs/archive/UI_FIRST_PLAN.md).
 
 Semua varian aplikasi menggunakan akun dan layanan backend nyata. Instalasi baru membuka Masuk/Daftar; autentikasi tidak pernah dibuat lokal. Catatan, statistik, progres, panduan dan deteksi/rekomendasi diperoleh melalui API Go. Foto hanya dikirim setelah pengguna mengonfirmasi, dan saran tidak menyimpan aktivitas tanpa tinjauan serta input jumlah. Refresh token disimpan melalui Android Keystore.
 
 - [Kontrak integrasi Android](https://github.com/waste-not-app/waste-not-backend/blob/main/docs/ANDROID.md)
 - [Backend Go](https://github.com/waste-not-app/waste-not-backend) dan [worker AI](https://github.com/waste-not-app/waste-not-ai)
-- [Design system dan spesifikasi](<docs/WasteNot-Product-Design-Kit update/WasteNot/README.md>)
+- [Design system dan spesifikasi](<docs/design-kit/README.md>)
 - [Roadmap Android](https://github.com/waste-not-app/waste-not-android/issues/2)
 - [Kanban](https://github.com/orgs/waste-not-app/projects/1/views/1)
 
@@ -45,4 +45,4 @@ Alamat bawaan ketiga varian: `https://waste-not-api.bccdev.id/v1/`. Override lin
 
 Data terkontrol dan adapter lokal untuk pengujian berada di `app/src/testFixtures` dan `app/src/androidTest`, tidak masuk APK debug/staging/release. Pengujian perjalanan UI mengaktifkan sumber tersebut melalui runner pengujian saja; pengujian backend nyata tetap opt-in dan memakai adapter remote. Pemeriksaan `verify_live_data.py` menolak adapter lokal dalam source aplikasi maupun DEX APK.
 
-[Setup lingkungan](docs/ANDROID_SETUP.md), [CI/CD](docs/CICD_SETUP.md), dan [bukti QA](docs/qa/iteration-2/) memuat rincian serta batas pemeriksaan. Catatan checkpoint lama tetap menjadi bukti pada commit masing-masing.
+[Setup lingkungan](docs/ANDROID_SETUP.md), [CI/CD](docs/CICD_SETUP.md), dan [bukti QA](docs/archive/qa/iteration-2) memuat rincian serta batas pemeriksaan. Catatan checkpoint lama tetap menjadi bukti pada commit masing-masing.
