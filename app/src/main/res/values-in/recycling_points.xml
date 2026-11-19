@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="recycling_points_title">Titik pengumpulan</string>
+    <string name="recycling_points_intro">Cakupan awal: elektronik kecil di Jakarta. Daftar tersimpan di aplikasi, bukan peta langsung atau daftar lokasi terdekat. Tidak memerlukan izin lokasi.</string>
+    <string name="recycling_points_notice">Konfirmasikan ke pengelola sebelum berangkat. Sumber resmi menyebut titik ini, tetapi posisi dropbox, akses gedung, jam, dan bahan yang diterima bisa berubah. Belum ada pemeriksaan langsung di lokasi.</string>
+    <string name="recycling_points_empty">Belum ada titik pengumpulan dalam katalog aplikasi ini. Hubungi dinas lingkungan hidup setempat untuk penerima yang sesuai.</string>
+    <string name="recycling_point_detail">Lihat syarat dan sumber</string>
+    <string name="recycling_point_missing">Titik ini tidak ada dalam katalog aplikasi. Kembali untuk memilih titik yang tersedia.</string>
+    <string name="recycling_point_back">Kembali ke daftar titik</string>
+    <string name="recycling_point_materials_title">Bahan dan batas penerimaan</string>
+    <string name="recycling_point_materials_short">Dropbox elektronik kecil, konfirmasi penerimaan terlebih dahulu.</string>
+    <string name="recycling_point_materials">Sumber DLH menyebut elektronik kecil seperti ponsel, charger, kabel, dan powerbank. Artikel daftar titik menyebut bukaan dropbox 20 × 5 cm; jangan memaksa memasukkan barang. Baterai lepas, baterai rusak, lampu, bahan kimia, dan elektronik besar harus dikonfirmasikan melalui jalur khusus. Titik ini bukan penerima umum plastik, kertas, kaca, atau sampah organik.</string>
+    <string name="recycling_point_safety">Hapus data pribadi dari perangkat sesuai petunjuk produsen. Jangan membongkar baterai tanam. Untuk baterai menggembung, bocor, panas, atau rusak, hubungi produsen atau pengelola dahulu, jangan langsung ditaruh di dropbox.</string>
+    <string name="recycling_point_hours_title">Jam dan akses</string>
+    <string name="recycling_point_hours">Jam layanan dropbox dan posisi persisnya di dalam kompleks tidak dicantumkan pada sumber daftar titik. Jangan menganggap gedung atau dropbox buka 24 jam. Tanyakan kepada petugas gedung atau DLH DKI Jakarta sebelum membawa barang.</string>
+    <string name="recycling_point_contact">Kontak DLH DKI: (021) 8092744, dinaslh@jakarta.go.id. Kontak ini milik pengelola layanan kota, bukan WasteNot.</string>
+    <string name="recycling_point_maps">Cari alamat di Maps</string>
+    <string name="recycling_point_maps_notice">Membuka pencarian alamat di Google Maps atau browser, bukan pin dropbox yang telah diukur. Penyedia peta memproses permintaan sesuai kebijakannya sendiri.</string>
+    <string name="recycling_point_sources_title">Sumber resmi</string>
+    <string name="recycling_point_checked">Sumber web diperiksa %1$s. Bukan konfirmasi operasional hari ini.</string>
+    <string name="recycling_point_link_error">Tautan tidak dapat dibuka. Pastikan ada browser atau aplikasi peta, lalu coba lagi. Alamat dan sumber tetap tersedia di halaman ini.</string>
+    <string name="recycling_source_collection">Daftar titik, Pemprov DKI Jakarta</string>
+    <string name="recycling_source_service">Syarat layanan, DLH DKI Jakarta</string>
+    <string name="recycling_source_address">Alamat gedung, situs pemerintah</string>
+    <string name="recycling_source_contact">Kontak terbaru DLH DKI Jakarta</string>
+    <string name="recycling_balai_kota_name">Dropbox e-waste Balai Kota DKI Jakarta</string>
+    <string name="recycling_balai_kota_address">Kompleks Balai Kota DKI Jakarta, Jalan Medan Merdeka Selatan No. 9, Jakarta Pusat</string>
+    <string name="recycling_jakbar_name">Dropbox e-waste Kantor Wali Kota Jakarta Barat</string>
+    <string name="recycling_jakbar_address">Jalan Kembangan Raya No. 2, RT.5/RW.2, Kembangan Selatan, Kecamatan Kembangan, Jakarta Barat 11610</string>
+    <string name="recycling_jaktim_name">Dropbox e-waste Kantor Wali Kota Jakarta Timur</string>
+    <string name="recycling_jaktim_address">Jalan Dr. Sumarno, Pulogebang, Cakung, Jakarta Timur</string>
+</resources>

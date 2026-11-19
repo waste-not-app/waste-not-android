@@ -1,9 +1,9 @@
 <resources>
-    <string name="summary_info_toggle">Info metode perhitungan</string>
-    <string name="avoided_short_title">Dihindari</string>
+    <string name="summary_info_toggle">How this is calculated</string>
+    <string name="avoided_short_title">Avoided</string>
     <string name="level_label">Level</string>
-    <string name="streak_short_title">Streak aktif</string>
-    <string name="daily_trend_title">Tren harian</string>
-    <string name="guide_draft_badge">Draf</string>
-    <string name="editorial_details_toggle">Lihat catatan editorial</string>
+    <string name="streak_short_title">Current streak</string>
+    <string name="daily_trend_title">Daily trend</string>
+    <string name="guide_draft_badge">Draft</string>
+    <string name="editorial_details_toggle">See editorial notes</string>
 </resources>

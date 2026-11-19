@@ -1,4 +1,4 @@
 <resources>
-    <string name="theme_read_failed">Pilihan tampilan belum bisa dibaca. Coba lagi.</string>
-    <string name="theme_write_failed">Pilihan tampilan belum bisa dipastikan tersimpan. Coba lagi.</string>
+    <string name="theme_read_failed">Couldn\'t load your display settings. Try again.</string>
+    <string name="theme_write_failed">Couldn\'t confirm your display settings were saved. Try again.</string>
 </resources>

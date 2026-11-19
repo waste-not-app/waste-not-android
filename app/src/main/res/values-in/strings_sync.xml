@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_confirmed">Tersinkron</string>
+    <string name="sync_pending">Menunggu sinkronisasi</string>
+    <string name="sync_conflict">Perubahan di server perlu ditinjau</string>
+    <string name="sync_failed">Belum dapat disinkronkan</string>
+    <string name="sync_status">Data terakhir dari server · %1$d perubahan lokal · Lihat sinkronisasi</string>
+    <string name="sync_initial">Riwayat server belum selesai dimuat · %1$d perubahan lokal · Lihat sinkronisasi</string>
+    <string name="sync_title">Sinkronisasi aktivitas</string>
+    <string name="sync_explanation">Perubahan disimpan di HP ini dan dikirim saat terhubung. Ringkasan dan XP menampilkan hasil terakhir yang dikonfirmasi server. Panduan dan pemindaian AI memerlukan koneksi.</string>
+    <string name="sync_queue_empty">Tidak ada perubahan lokal yang menunggu. Tarik data terbaru dengan tombol di bawah.</string>
+    <string name="sync_saved_local">Tersimpan di HP ini. Aktivitas menunggu sinkronisasi; XP diperbarui setelah server menerimanya.</string>
+    <string name="sync_saved_confirmed">Catatan sudah tersinkron. Ringkasan dan XP mengikuti data server.</string>
+    <string name="sync_retry">Sinkronkan saat terhubung</string>
+    <string name="sync_in_progress">Menyinkronkan aktivitas…</string>
+    <string name="sync_save_manual">Simpan sebagai catatan manual</string>
+    <string name="sync_confirm_decision">Konfirmasi</string>
+    <string name="sync_manual_confirmation">Simpan isian ini sebagai catatan manual? Saran AI sebelumnya tidak dipakai.</string>
+    <string name="sync_already_linked">Saran ini sudah digunakan untuk catatan lain. Periksa Riwayat agar aktivitas yang sama tidak dicatat dua kali.</string>
+    <string name="sync_local">Isian di HP ini</string>
+    <string name="sync_local_delete">Penghapusan di HP ini</string>
+    <string name="sync_remote">Versi terakhir dari server</string>
+    <string name="sync_remote_unavailable">Versi server tidak tersedia. Isian lokal tetap tersimpan sampai kamu memutuskan untuk membuangnya.</string>
+    <string name="sync_keep_local">Kirim isian lokal setelah ditinjau</string>
+    <string name="sync_retry_delete">Hapus versi server setelah ditinjau</string>
+    <string name="sync_use_remote">Buang perubahan lokal</string>
+    <string name="sync_decision_title">Konfirmasi keputusan sinkronisasi</string>
+    <string name="sync_keep_confirmation">Kirim ulang perubahan yang ditampilkan menggunakan versi server yang sudah ditinjau? Jika server berubah lagi, aplikasi akan meminta tinjauan baru.</string>
+    <string name="sync_discard_confirmation">Buang antrean dan isian lokal ini? Versi server yang tersedia akan dipertahankan.</string>
+    <string name="sync_resolution_failed">Keputusan belum tersimpan. Coba lagi; isian lokal tetap dipertahankan.</string>
+    <string name="sync_logout_message">Masih ada perubahan yang belum tersinkron. Perubahan tetap tersimpan di HP ini untuk akun yang sama. Keluar sekarang menghentikan akses akun; masuk lagi agar sinkronisasi dapat dilanjutkan. Draf editor yang masih terbuka akan dihapus.</string>
+</resources>

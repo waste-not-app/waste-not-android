@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="scan_action">Catat / Scan</string>
+    <string name="scan_action_description">Catat atau scan sampah</string>
+    <string name="open_profile">Buka profil</string>
+    <string name="summary_activity_count">%1$d aktivitas tercatat</string>
+    <string name="summary_footer">Catatan pribadi, bukan dampak terverifikasi.</string>
+    <string name="rate_title">Recycling rate</string>
+    <string name="rate_basis">Berdasarkan aktivitas penanganan</string>
+    <string name="rate_fraction">%1$d dari %2$d aktivitas penanganan</string>
+    <string name="rate_empty">Belum ada</string>
+    <string name="rate_value">%1$s%%</string>
+    <string name="level_title">Level %1$d</string>
+    <string name="xp_total">%1$d XP total</string>
+    <string name="xp_next">%1$d XP lagi ke level %2$d</string>
+    <string name="scan_title">Scan sampah</string>
+    <string name="scan_camera_title">Kenali lewat foto</string>
+    <string name="scan_camera_description">Foto satu benda untuk meninjau kategori dan cara penanganannya.</string>
+    <string name="scan_camera_pending">Alur foto sedang disiapkan</string>
+    <string name="scan_manual_description">Sudah tahu kategori dan metodenya? Langsung isi catatan.</string>
+    <string name="home_empty_today">Belum ada catatan hari ini.</string>
+    <string name="date_method">%1$s · %2$s</string>
+</resources>

@@ -242,8 +242,8 @@ private fun AchievementsScreenPreview() {
                     Achievement(
                         id = "00000000-0000-4000-8000-000000000101",
                         code = "FIRST_STEP",
-                        title = "Langkah pertama",
-                        description = "Catat minimal 1 aktivitas pengelolaan sampah aktif.",
+                        title = "First step",
+                        description = "Log at least 1 active waste activity.",
                         requirementType = AchievementRequirement.ACTIVE_LOG_COUNT,
                         currentValue = 1,
                         targetValue = 1,
@@ -253,8 +253,8 @@ private fun AchievementsScreenPreview() {
                     Achievement(
                         id = "00000000-0000-4000-8000-000000000102",
                         code = "GETTING_USED",
-                        title = "Mulai terbiasa",
-                        description = "Catat minimal 5 aktivitas pengelolaan sampah aktif.",
+                        title = "Getting into the habit",
+                        description = "Log at least 5 active waste activities.",
                         requirementType = AchievementRequirement.ACTIVE_LOG_COUNT,
                         currentValue = 3,
                         targetValue = 5,

@@ -1,10 +1,10 @@
 <resources>
-    <string name="save_confirm_title">Catatan tersimpan</string>
-    <string name="save_confirm_heading">Satu langkah tercatat.</string>
-    <string name="save_confirm_created">+10 XP untuk aktivitas baru ini.</string>
-    <string name="save_confirm_existing">Catatanmu sudah tersimpan. Tidak ada XP tambahan.</string>
+    <string name="save_confirm_title">Log saved</string>
+    <string name="save_confirm_heading">One more step logged.</string>
+    <string name="save_confirm_created">+10 XP for this new activity.</string>
+    <string name="save_confirm_existing">Your log was already saved. No extra XP.</string>
     <string name="save_confirm_category_method">%1$s · %2$s</string>
     <string name="save_confirm_quantity_date">%1$s %2$s · %3$s</string>
-    <string name="save_confirm_view">Lihat catatan</string>
-    <string name="save_confirm_home">Kembali ke beranda</string>
+    <string name="save_confirm_view">View log</string>
+    <string name="save_confirm_home">Back to home</string>
 </resources>

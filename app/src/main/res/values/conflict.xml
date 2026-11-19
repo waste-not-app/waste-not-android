@@ -1,15 +1,15 @@
 <resources>
-    <string name="conflict_preserve_message">Catatan telah berubah. Muat versi terbaru sebelum mencoba lagi. Isian drafmu tetap tersimpan di form.</string>
-    <string name="conflict_compare_message">Bandingkan versi terbaru dengan drafmu. Pilih seluruh isian yang ingin dipakai, lalu periksa kembali di form. Pilihan ini belum menyimpan perubahan.</string>
-    <string name="conflict_missing_draft">Catatan ini sudah tidak tersedia. Isian drafmu tetap ada, tetapi perubahan tidak dapat disimpan ke catatan yang sudah dihapus.</string>
-    <string name="conflict_loading">Memuat versi terbaru…</string>
-    <string name="conflict_latest_stale">Versi yang lebih baru belum bisa dipastikan. Coba muat lagi; drafmu tetap ada.</string>
-    <string name="conflict_reload_failed">Versi terbaru belum bisa dimuat. Coba lagi; drafmu tetap ada.</string>
-    <string name="conflict_latest">Versi terbaru · v%1$d</string>
-    <string name="conflict_my_draft">Drafmu</string>
-    <string name="conflict_use_draft">Gunakan seluruh isian drafku</string>
-    <string name="conflict_use_latest">Gunakan isian versi terbaru</string>
-    <string name="conflict_keep_draft">Tetap di draf</string>
-    <string name="conflict_no_notes">Tanpa catatan</string>
-    <string name="conflict_form_message">Catatan berubah. Muat dan periksa versi terbaru sebelum menyimpan. Isianmu tetap ada.</string>
+    <string name="conflict_preserve_message">This log has changed. Load the latest version before you try again. Your draft stays in the form.</string>
+    <string name="conflict_compare_message">Compare the latest version with your draft. Choose which set of entries to keep, then check them in the form. Nothing is saved yet.</string>
+    <string name="conflict_missing_draft">This log is no longer available. Your draft is still here, but changes can\'t be saved to a deleted log.</string>
+    <string name="conflict_loading">Loading the latest version…</string>
+    <string name="conflict_latest_stale">We couldn\'t confirm the newer version. Try loading it again; your draft is still here.</string>
+    <string name="conflict_reload_failed">Couldn\'t load the latest version. Try again; your draft is still here.</string>
+    <string name="conflict_latest">Latest version · v%1$d</string>
+    <string name="conflict_my_draft">Your draft</string>
+    <string name="conflict_use_draft">Use everything from my draft</string>
+    <string name="conflict_use_latest">Use the latest version</string>
+    <string name="conflict_keep_draft">Stay on my draft</string>
+    <string name="conflict_no_notes">No notes</string>
+    <string name="conflict_form_message">This log has changed. Load and check the latest version before saving. Your entries are still here.</string>
 </resources>
