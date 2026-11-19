@@ -44,7 +44,7 @@ fun apiBaseUrl(property: String, defaultValue: String = "", allowLocalHttp: Bool
 
 android {
     namespace = "com.example.wastenot"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         applicationId = "com.example.wastenot"
         minSdk = 30
@@ -113,8 +113,8 @@ android {
         }
     }
     sourceSets {
-        getByName("test").kotlin.srcDir("src/testFixtures/java")
-        getByName("androidTest").kotlin.srcDir("src/testFixtures/java")
+        getByName("test").kotlin.directories.add("src/testFixtures/java")
+        getByName("androidTest").kotlin.directories.add("src/testFixtures/java")
     }
 
     compileOptions {
@@ -146,8 +146,8 @@ kotlin {
 }
 
 // Resolve SDK jars through Gradle's repository/cache handling before the test JVM starts.
-val robolectricSdks by configurations.creating { isTransitive = false }
-val prepareRobolectricSdks by tasks.registering(Sync::class) {
+val robolectricSdks = configurations.create("robolectricSdks") { isTransitive = false }
+val prepareRobolectricSdks = tasks.register<Sync>("prepareRobolectricSdks") {
     from(robolectricSdks)
     into(layout.buildDirectory.dir("robolectric-sdks"))
 }
