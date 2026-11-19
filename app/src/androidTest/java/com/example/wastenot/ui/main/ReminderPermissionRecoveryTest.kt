@@ -53,7 +53,7 @@ class ReminderPermissionRecoveryTest {
             }
             repeat(2) {
                 compose.onNode(isToggleable()).assertIsOff()
-                compose.onNodeWithText("Buka pengaturan", substring = true).assertIsDisplayed()
+                compose.onNodeWithText("Open notification settings", substring = true).assertIsDisplayed()
                 compose.onNode(isToggleable()).performClick()
                 compose.runOnIdle {
                     assertEquals(it + 1, opened.size)

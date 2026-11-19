@@ -35,9 +35,9 @@ class GuideViewModelTest {
 
     @Test fun dummySearchTrimsMatchesKeywordsAndCombinesCategory() = runTest {
         val source = DummyGuideStore()
-        val found = source.search(" KARTON ") as ApiResult.Success
+        val found = source.search(" CARTON ") as ApiResult.Success
         assertEquals(listOf(WasteCategory.PAPER), found.value.map { it.category })
-        assertEquals(emptyList<WasteGuide>(), (source.search("karton", WasteCategory.GLASS) as ApiResult.Success).value)
+        assertEquals(emptyList<WasteGuide>(), (source.search("carton", WasteCategory.GLASS) as ApiResult.Success).value)
         assertFalse(found.page!!.hasMore)
         assertEquals(ApiFailureKind.VALIDATION, (source.search("x".repeat(101)) as ApiResult.Failure).error.kind)
         assertEquals(ApiFailureKind.NOT_FOUND, (source.get("removed") as ApiResult.Failure).error.kind)
@@ -66,11 +66,11 @@ class GuideViewModelTest {
             }
         })
         vm.load(); advanceUntilIdle(); calls.clear()
-        vm.query("ka"); advanceTimeBy(200); vm.query(" KARTON "); advanceTimeBy(299); runCurrent()
+        vm.query("ca"); advanceTimeBy(200); vm.query(" CARTON "); advanceTimeBy(299); runCurrent()
         assertTrue(calls.isEmpty())
         advanceTimeBy(1); runCurrent()
-        assertEquals(listOf("KARTON"), calls)
-        assertEquals("Kertas dan kardus", vm.state.value.articles.single().name)
+        assertEquals(listOf("CARTON"), calls)
+        assertEquals("Paper and cardboard", vm.state.value.articles.single().name)
         vm.query("x".repeat(101)); advanceUntilIdle()
         assertEquals(100, vm.state.value.query.length)
         assertEquals(100, calls.last().length)
@@ -110,7 +110,7 @@ class GuideViewModelTest {
         assertNotNull(vm.state.value.nextCursor)
         vm.search(more = true); advanceUntilIdle()
         assertEquals(20, vm.state.value.articles.size)
-        vm.query("karton"); vm.search(); vm.detail(entries.first().id); advanceUntilIdle()
+        vm.query("carton"); vm.search(); vm.detail(entries.first().id); advanceUntilIdle()
         assertEquals(2, reads)
         assertNull(vm.state.value.nextCursor)
         assertEquals(0, details)
@@ -134,14 +134,14 @@ class GuideViewModelTest {
         val source = DummyGuideStore()
         val vm = model(object : GuideStore by source {
             override suspend fun search(query: String, category: WasteCategory?, cursor: String?) =
-                if (query == "botol") withContext(NonCancellable) { old.await() } else source.search(query, category, cursor)
+                if (query == "bottle") withContext(NonCancellable) { old.await() } else source.search(query, category, cursor)
         })
-        vm.query("botol"); advanceTimeBy(300); runCurrent()
-        vm.query("karton"); advanceTimeBy(300); runCurrent()
-        assertEquals("Kertas dan kardus", vm.state.value.articles.single().name)
-        old.complete(source.search("botol")); advanceUntilIdle()
-        assertEquals("karton", vm.state.value.query)
-        assertEquals("Kertas dan kardus", vm.state.value.articles.single().name)
+        vm.query("bottle"); advanceTimeBy(300); runCurrent()
+        vm.query("carton"); advanceTimeBy(300); runCurrent()
+        assertEquals("Paper and cardboard", vm.state.value.articles.single().name)
+        old.complete(source.search("bottle")); advanceUntilIdle()
+        assertEquals("carton", vm.state.value.query)
+        assertEquals("Paper and cardboard", vm.state.value.articles.single().name)
     }
 
     @Test fun laterPageFailureKeepsTheFirstPageAndExplicitRetryUsesItsCursor() = runTest {
@@ -179,20 +179,20 @@ class GuideViewModelTest {
         fail = false; vm.search(); advanceUntilIdle()
         assertEquals(articles, vm.state.value.articles)
         assertNull(vm.state.value.error)
-        vm.query("karton")
+        vm.query("carton")
         assertTrue(vm.state.value.articles.isEmpty())
         advanceUntilIdle()
-        assertEquals("Kertas dan kardus", vm.state.value.articles.single().name)
+        assertEquals("Paper and cardboard", vm.state.value.articles.single().name)
     }
 
     @Test fun savedSearchRestoresAndMissingDetailDoesNotExposeThePreviousArticle() = runTest {
         val saved = SavedStateHandle()
         val source = DummyGuideStore()
         val first = model(source, saved)
-        first.query("toples"); first.category(WasteCategory.GLASS); advanceUntilIdle()
+        first.query("jar"); first.category(WasteCategory.GLASS); advanceUntilIdle()
         val restored = model(source, saved)
         restored.load(); advanceUntilIdle()
-        assertEquals("toples", restored.state.value.query)
+        assertEquals("jar", restored.state.value.query)
         assertEquals(WasteCategory.GLASS, restored.state.value.category)
         val id = restored.state.value.articles.single().id
         restored.detail(id); advanceUntilIdle(); assertNotNull(restored.state.value.detail!!.article)

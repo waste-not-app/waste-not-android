@@ -78,8 +78,8 @@ class CoreControlDesignTest {
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
             val name = if (theme) "dark" else "light"
-            val label = if (theme) "Gelap" else "Terang"
-            val control = compose.onNodeWithContentDescription("Tema aplikasi").assertIsDisplayed()
+            val label = if (theme) "Dark" else "Light"
+            val control = compose.onNodeWithContentDescription("App theme").assertIsDisplayed()
             val image = capture(control, "theme-$name")
             if (image.height + 1 < 56 * density) errors.add("$name: theme height ${image.height}px, expected >= ${56 * density}px")
             image.recycle()

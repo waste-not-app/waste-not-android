@@ -38,7 +38,7 @@ class RemoteGuideStoreTest {
 
     @Test fun listUsesAuthenticatedGuideRouteFiltersAndOpaqueCursor() = runTest {
         server.enqueue(reply(list(listOf(article()), "next+/=")))
-        val result = success(store.search("  botol & plastik  ", WasteCategory.PLASTIC, "previous+/="))
+        val result = success(store.search("  bottle & plastic  ", WasteCategory.PLASTIC, "previous+/="))
         val guide = result.value.single()
         assertEquals(DisposalMethod.RECYCLE, guide.method)
         assertEquals(listOf("plastik"), guide.keywords)
@@ -51,7 +51,7 @@ class RemoteGuideStoreTest {
         assertEquals("Bearer guide-test-credential", request.getHeader("Authorization"))
         val url = request.requestUrl!!
         assertEquals("/v1/waste-guide", url.encodedPath)
-        assertEquals("botol & plastik", url.queryParameter("q"))
+        assertEquals("bottle & plastic", url.queryParameter("q"))
         assertEquals("PLASTIC", url.queryParameter("category"))
         assertEquals("20", url.queryParameter("limit"))
         assertEquals("previous+/=", url.queryParameter("cursor"))

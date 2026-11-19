@@ -44,20 +44,20 @@ class PausedDraftReplayTest {
     private fun waitFor(text: String) { compose.waitUntil(30_000) { compose.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty() } }
 
     @Test fun closedUnknownDraftResumesAndAnAlreadyCommittedRequestDoesNotCreateADuplicate() {
-        waitFor("Lanjutkan draf")
-        compose.onNodeWithText("Cara pengelolaan").assertDoesNotExist()
-        compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNodeWithText("Masih ada draf sebelumnya").assertIsDisplayed()
+        waitFor("Continue draft")
+        compose.onNodeWithText("How you handled it").assertDoesNotExist()
+        compose.onNodeWithContentDescription("Log or scan waste").performClick()
+        compose.onNodeWithText("You have an unfinished draft").assertIsDisplayed()
         compose.onNodeWithTag("capture-sheet").assertDoesNotExist()
-        compose.onNode(hasText("Batal") and hasAnyAncestor(isDialog())).performScrollTo().performClick()
-        compose.onNodeWithText("Lanjutkan draf").performScrollTo().performClick()
-        waitFor("Draf dipulihkan. Periksa isian sebelum menyimpan.")
-        compose.onNodeWithContentDescription("Berat").performScrollTo().assertIsNotEnabled().assertTextContains("250")
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().assertIsNotEnabled().assertTextContains("Permintaan sebelum restart")
+        compose.onNode(hasText("Cancel") and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.onNodeWithText("Continue draft").performScrollTo().performClick()
+        waitFor("Draft restored. Check your entries before saving.")
+        compose.onNodeWithContentDescription("Weight").performScrollTo().assertIsNotEnabled().assertTextContains("250")
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().assertIsNotEnabled().assertTextContains("Permintaan sebelum restart")
         assertEquals(requestId, readDraftFixture()!!.requestId)
         captureDraftFixture("draft-paused-resumed")
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
-        waitFor("Catatanmu sudah tersimpan. Tidak ada XP tambahan.")
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
+        waitFor("Your log was already saved. No extra XP.")
         assertNull(readDraftFixture())
         runTest {
             val source = DummyActivityStore(draftTestContext.getSharedPreferences("dummy_logs_dummy-owner", Context.MODE_PRIVATE), ZoneId.of("Asia/Jakarta"))
@@ -67,12 +67,12 @@ class PausedDraftReplayTest {
     }
 
     @Test fun logoutWarnsThenClearsTheDraftWithoutDeletingStoredRecords() {
-        waitFor("Lanjutkan draf")
-        compose.onNode(hasText("Profil") and hasClickAction()).performClick()
-        compose.onNodeWithText("Keluar").performScrollTo().performClick()
-        compose.onNodeWithText("Draf yang belum disimpan", substring = true).assertExists()
-        compose.onNode(hasText("Keluar") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
-        waitFor("Masuk")
+        waitFor("Continue draft")
+        compose.onNode(hasText("Profile") and hasClickAction()).performClick()
+        compose.onNodeWithText("Sign out").performScrollTo().performClick()
+        compose.onNodeWithText("Unsaved drafts on this device", substring = true).assertExists()
+        compose.onNode(hasText("Sign out") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        waitFor("Sign in")
         assertNull(readDraftFixture())
         runTest {
             val source = DummyActivityStore(draftTestContext.getSharedPreferences("dummy_logs_dummy-owner", Context.MODE_PRIVATE), ZoneId.of("Asia/Jakarta"))
@@ -82,24 +82,24 @@ class PausedDraftReplayTest {
     }
 
     @Test fun closingAResumedFollowupFailureKeepsTheDraftForReviewAgain() {
-        waitFor("Lanjutkan draf")
-        compose.onNodeWithText("Lanjutkan draf").performScrollTo().performClick()
-        waitFor("Draf dipulihkan. Periksa isian sebelum menyimpan.")
-        compose.onNodeWithText("Percobaan terakhir: Terlalu banyak permintaan.", substring = true).performScrollTo().assertIsDisplayed()
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        compose.onNodeWithText("Tutup formulir?").assertIsDisplayed()
-        compose.onNodeWithText("Menutup formulir tidak membatalkan permintaan", substring = true).assertExists()
-        compose.onNodeWithText("Buang perubahan").assertDoesNotExist()
+        waitFor("Continue draft")
+        compose.onNodeWithText("Continue draft").performScrollTo().performClick()
+        waitFor("Draft restored. Check your entries before saving.")
+        compose.onNodeWithText("Last attempt: Too many requests.", substring = true).performScrollTo().assertIsDisplayed()
+        compose.onNodeWithContentDescription("Back").performClick()
+        compose.onNodeWithText("Close the form?").assertIsDisplayed()
+        compose.onNodeWithText("Closing the form doesn't cancel a request", substring = true).assertExists()
+        compose.onNodeWithText("Discard changes").assertDoesNotExist()
         captureDraftFixture("draft-followup-close-dialog")
-        compose.onNode(hasText("Tutup formulir") and hasClickAction()).performScrollTo().performClick()
+        compose.onNode(hasText("Close form") and hasClickAction()).performScrollTo().performClick()
         compose.waitUntil(10_000) { readDraftFixture()?.paused == true }
-        compose.onNode(hasText("Panduan") and hasClickAction()).assertIsSelected()
+        compose.onNode(hasText("Guide") and hasClickAction()).assertIsSelected()
         val saved = checkNotNull(readDraftFixture())
         assertEquals(requestId, saved.requestId)
         assertTrue(saved.paused)
         assertTrue(saved.restoreForm().outcomeUnknown)
         assertEquals(ApiFailureKind.RATE_LIMITED, saved.restoreForm().submissionError)
-        compose.onNode(hasText("Beranda") and hasClickAction()).performClick()
-        waitFor("Lanjutkan draf")
+        compose.onNode(hasText("Home") and hasClickAction()).performClick()
+        waitFor("Continue draft")
     }
 }

@@ -21,11 +21,11 @@ class ScanChoiceOrderTest {
     private val lower = high.copy(id = "second", classId = 41, rawClass = "cup", confidence = .6, band = AiConfidenceBand.UNCERTAIN,
         suggestedObjectKeys = listOf("plastic_01", "other_specific"))
     private fun items() = (0 until 81).map {
-        AiCatalogItem("plastic_%02d".format(it), "Pilihan plastik %02d".format(it), WasteCategory.PLASTIC, false, AiGuideStatus.UNAVAILABLE)
-    } + listOf(AiCatalogItem("pet_bottle", "Botol PET", WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED),
-        AiCatalogItem("hdpe_bottle", "Botol HDPE", WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED),
-        AiCatalogItem("other_fallback", "Sampah campuran", WasteCategory.OTHER, false, AiGuideStatus.UNAVAILABLE),
-        AiCatalogItem("other_specific", "Peralatan lain", WasteCategory.OTHER, false, AiGuideStatus.UNAVAILABLE))
+        AiCatalogItem("plastic_%02d".format(it), "Plastic option %02d".format(it), WasteCategory.PLASTIC, false, AiGuideStatus.UNAVAILABLE)
+    } + listOf(AiCatalogItem("pet_bottle", "PET bottle", WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED),
+        AiCatalogItem("hdpe_bottle", "HDPE bottle", WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED),
+        AiCatalogItem("other_fallback", "Mixed waste", WasteCategory.OTHER, false, AiGuideStatus.UNAVAILABLE),
+        AiCatalogItem("other_specific", "Other utensils", WasteCategory.OTHER, false, AiGuideStatus.UNAVAILABLE))
 
     @Test fun matchingChoicesStayFirstAndCorrectionWorksInLight() = verify(false)
     @Test fun matchingChoicesStayFirstAndCorrectionWorksInDark() = verify(true)
@@ -33,7 +33,7 @@ class ScanChoiceOrderTest {
     private fun verify(dark: Boolean) {
         val mode = if (dark) "dark" else "light"
         val catalog = AiCatalog("ordering-fixture", items(), "fixture", "fixture", "fixture", emptyMap(), emptySet(),
-            mapOf("bottle" to "Botol", "cup" to "Gelas"))
+            mapOf("bottle" to "Bottle", "cup" to "Cup"))
         assertEquals(85, catalog.items.size)
         val state = mutableStateOf(ScanState(session = "order-$mode", phase = ScanPhase.OBJECT,
             objects = listOf(high, lower), selectedId = high.id, catalog = catalog))
@@ -46,42 +46,42 @@ class ScanChoiceOrderTest {
                     onObjectKey = { key -> state.value = state.value.copy(objectKey = key) }, camera = {})
             }
         }
-        val first = compose.onNode(hasText("Botol") and isSelectable())
-        val second = compose.onNode(hasText("Gelas") and isSelectable())
+        val first = compose.onNode(hasText("Bottle") and isSelectable())
+        val second = compose.onNode(hasText("Cup") and isSelectable())
         first.assertIsSelected(); second.assertIsNotSelected()
         assertTrue(first.fetchSemanticsNode().boundsInRoot.top < second.fetchSemanticsNode().boundsInRoot.top)
         compose.onNodeWithText(context.getString(R.string.scan_uncertain)).assertExists()
         capture("candidates-$mode")
-        chooseMaterial("Plastik")
+        chooseMaterial("Plastic")
         openTypes()
-        menu("Botol HDPE").assertIsDisplayed()
-        menu("Botol PET").assertIsDisplayed()
+        menu("HDPE bottle").assertIsDisplayed()
+        menu("PET bottle").assertIsDisplayed()
         capture("suggested-types-$mode")
-        assertTrue("Server hint order must put HDPE before PET", menu("Botol HDPE").fetchSemanticsNode().boundsInRoot.top < menu("Botol PET").fetchSemanticsNode().boundsInRoot.top)
-        assertTrue(menu("Botol PET").fetchSemanticsNode().boundsInRoot.top < menu("Pilihan plastik 00").fetchSemanticsNode().boundsInRoot.top)
+        assertTrue("Server hint order must put HDPE before PET", menu("HDPE bottle").fetchSemanticsNode().boundsInRoot.top < menu("PET bottle").fetchSemanticsNode().boundsInRoot.top)
+        assertTrue(menu("PET bottle").fetchSemanticsNode().boundsInRoot.top < menu("Plastic option 00").fetchSemanticsNode().boundsInRoot.top)
         assertNull(state.value.objectKey); assertEquals(0, confirmations)
-        menu("Pilihan plastik 80").performScrollTo().performClick()
+        menu("Plastic option 80").performScrollTo().performClick()
         assertEquals("plastic_80", state.value.objectKey)
         capture("manual-correction-$mode")
 
-        chooseMaterial("Lainnya")
-        chooseMaterial("Plastik")
+        chooseMaterial("Other")
+        chooseMaterial("Plastic")
         assertNull(state.value.objectKey)
         openTypes()
-        menu("Botol HDPE").assertIsDisplayed()
-        menu("Botol PET").assertIsDisplayed()
-        assertTrue(menu("Botol HDPE").fetchSemanticsNode().boundsInRoot.top < menu("Botol PET").fetchSemanticsNode().boundsInRoot.top)
+        menu("HDPE bottle").assertIsDisplayed()
+        menu("PET bottle").assertIsDisplayed()
+        assertTrue(menu("HDPE bottle").fetchSemanticsNode().boundsInRoot.top < menu("PET bottle").fetchSemanticsNode().boundsInRoot.top)
         capture("material-reset-top-$mode")
-        menu("Pilihan plastik 00").performClick()
+        menu("Plastic option 00").performClick()
         second.performScrollTo().performClick()
         assertEquals(lower.id, state.value.selectedId)
         assertNull(state.value.category); assertNull(state.value.objectKey)
-        chooseMaterial("Plastik")
+        chooseMaterial("Plastic")
         openTypes()
-        menu("Pilihan plastik 01").assertIsDisplayed()
-        assertTrue(menu("Pilihan plastik 01").fetchSemanticsNode().boundsInRoot.top < menu("Pilihan plastik 00").fetchSemanticsNode().boundsInRoot.top)
+        menu("Plastic option 01").assertIsDisplayed()
+        assertTrue(menu("Plastic option 01").fetchSemanticsNode().boundsInRoot.top < menu("Plastic option 00").fetchSemanticsNode().boundsInRoot.top)
         capture("changed-candidate-$mode")
-        menu("Pilihan plastik 01").performClick()
+        menu("Plastic option 01").performClick()
         assertEquals("plastic_01", state.value.objectKey)
         compose.onNodeWithText(context.getString(R.string.scan_confirm_object)).performScrollTo().assertIsEnabled().performClick()
         assertEquals(1, confirmations)

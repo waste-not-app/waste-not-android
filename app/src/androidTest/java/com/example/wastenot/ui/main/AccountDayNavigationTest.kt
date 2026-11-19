@@ -77,7 +77,7 @@ class AccountDayNavigationTest {
                 return fixture.statistics(range)
             }
         }
-        val user = User(owner, "Pengguna Uji", "day@example.test", zone, null)
+        val user = User(owner, "Test User", "day@example.test", zone, null)
         compose.setContent {
             WasteNotTheme(dark) {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -95,9 +95,9 @@ class AccountDayNavigationTest {
 
     @Test fun foregroundMidnightAndResumeRefreshTheSameSelectedPeriod() {
         showNavigation()
-        tab("Statistik")
-        compose.onNodeWithText("30 hari").performClick()
-        waitFor("11 Okt 2026 – 9 Nov 2026")
+        tab("Stats")
+        compose.onNodeWithText("30 days").performClick()
+        waitFor("11 Okt 2026 to 9 Nov 2026")
         capture("statistics-before-midnight")
         clock.set(Instant.parse("2026-11-09T17:00:00Z"))
         try {
@@ -108,14 +108,14 @@ class AccountDayNavigationTest {
         } finally {
             capture("statistics-at-day-boundary")
         }
-        compose.onNodeWithText("30 hari").assertIsSelected()
-        waitFor("12 Okt 2026 – 10 Nov 2026")
-        tab("Beranda")
+        compose.onNodeWithText("30 days").assertIsSelected()
+        waitFor("12 Okt 2026 to 10 Nov 2026")
+        tab("Home")
         waitFor("Selasa, 10 November")
-        compose.onNodeWithText("Belum ada catatan hari ini.").assertExists()
+        compose.onNodeWithText("Nothing logged today yet.").assertExists()
         capture("home-after-midnight")
-        tab("Profil")
-        compose.onNodeWithText("Belum mencatat hari ini.").performScrollTo().assertIsDisplayed()
+        tab("Profile")
+        compose.onNodeWithText("You haven't logged today yet.").performScrollTo().assertIsDisplayed()
         capture("profile-yesterday-streak")
 
         compose.activityRule.scenario.moveToState(Lifecycle.State.CREATED)
@@ -125,9 +125,9 @@ class AccountDayNavigationTest {
             dashboardDates.lastOrNull() == LocalDate.of(2026, 11, 12) &&
                 ranges.lastOrNull()?.to == LocalDate.of(2026, 11, 12)
         }
-        tab("Statistik")
-        compose.onNodeWithText("30 hari").assertIsSelected()
-        waitFor("14 Okt 2026 – 12 Nov 2026")
+        tab("Stats")
+        compose.onNodeWithText("30 days").assertIsSelected()
+        waitFor("14 Okt 2026 to 12 Nov 2026")
         capture("statistics-after-resume")
         val dashboardCalls = dashboardDates.size
         val statisticsCalls = ranges.size
@@ -144,31 +144,31 @@ class AccountDayNavigationTest {
             WasteNotTheme(dark) {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Box(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas)) {
-                        ProfileScreen(User(owner, "Pengguna Uji", "day@example.test", zone, null), progress,
+                        ProfileScreen(User(owner, "Test User", "day@example.test", zone, null), progress,
                             false, null, PaddingValues(), {}, {}, {}, {})
                     }
                 }
             }
         }
-        compose.onNodeWithText("Keluar").performScrollTo()
+        compose.onNodeWithText("Sign out").performScrollTo()
         capture("streak-today-pending")
-        compose.onNodeWithText("Belum mencatat hari ini.").assertIsDisplayed()
+        compose.onNodeWithText("You haven't logged today yet.").assertIsDisplayed()
         compose.runOnIdle { progress = progress.copy(hasLoggedToday = true) }
-        compose.onNodeWithText("Belum mencatat hari ini.").assertDoesNotExist()
+        compose.onNodeWithText("You haven't logged today yet.").assertDoesNotExist()
         capture("streak-logged-today")
         compose.runOnIdle { progress = progress.copy(hasLoggedToday = false, currentStreak = 0) }
-        compose.onNodeWithText("Belum mencatat hari ini.").assertDoesNotExist()
+        compose.onNodeWithText("You haven't logged today yet.").assertDoesNotExist()
         compose.runOnIdle { progress = progress.copy(currentStreak = null) }
-        compose.onNodeWithText("Belum mencatat hari ini.").assertDoesNotExist()
+        compose.onNodeWithText("You haven't logged today yet.").assertDoesNotExist()
     }
 
     @Test fun anOpenDraftKeepsItsDateAndValuesAndANewDraftUsesTheNewDay() {
         showNavigation()
-        compose.onNodeWithText("Input manual").performScrollTo().performClick()
+        compose.onNodeWithText("Log manually").performScrollTo().performClick()
         compose.onNodeWithText("Recycle").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Berat").performScrollTo().performTextReplacement("250")
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo()
-            .performTextReplacement("Catatan melewati tengah malam")
+        compose.onNodeWithContentDescription("Weight").performScrollTo().performTextReplacement("250")
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo()
+            .performTextReplacement("Note past midnight")
         compose.runOnUiThread { compose.activity.window.insetsController?.hide(android.view.WindowInsets.Type.ime()) }
         compose.onNodeWithText("9 Nov 2026").performScrollTo().assertIsDisplayed()
         capture("draft-before-midnight")
@@ -177,16 +177,16 @@ class AccountDayNavigationTest {
             dashboardDates.lastOrNull() == LocalDate.of(2026, 11, 10)
         }
         compose.onNodeWithText("9 Nov 2026").assertExists()
-        assertEquals("250", editable("Berat"))
-        assertEquals("Catatan melewati tengah malam", editable("Catatan (opsional)"))
+        assertEquals("250", editable("Weight"))
+        assertEquals("Note past midnight", editable("Notes (optional)"))
         capture("draft-preserved-after-midnight")
         compose.runOnUiThread { compose.activity.onBackPressedDispatcher.onBackPressed() }
-        compose.onNode(hasText("Buang perubahan") and hasAnyAncestor(isDialog())).performClick()
+        compose.onNode(hasText("Discard changes") and hasAnyAncestor(isDialog())).performClick()
         waitFor("Selasa, 10 November")
-        compose.onNodeWithText("Input manual").performScrollTo().performClick()
+        compose.onNodeWithText("Log manually").performScrollTo().performClick()
         compose.onNodeWithText("10 Nov 2026").performScrollTo().assertIsDisplayed()
-        assertEquals("", editable("Berat"))
-        assertEquals("", editable("Catatan (opsional)"))
+        assertEquals("", editable("Weight"))
+        assertEquals("", editable("Notes (optional)"))
         capture("new-draft-current-day")
     }
 

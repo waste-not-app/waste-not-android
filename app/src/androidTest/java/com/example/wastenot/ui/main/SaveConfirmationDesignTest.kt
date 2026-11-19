@@ -30,12 +30,12 @@ class SaveConfirmationDesignTest {
             SaveConfirmationScreen(log, false, PaddingValues(), { views++ }, { homes++ }, Modifier.fillMaxSize())
         } }
         compose.onNodeWithText("+10 XP", substring = true).assertDoesNotExist()
-        compose.onNodeWithText("Catatanmu sudah tersimpan. Tidak ada XP tambahan.").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Satu langkah tercatat.")
+        compose.onNodeWithText("Your log was already saved. No extra XP.").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("One more step logged.")
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite))
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Catatan tersimpan"))
-        compose.onNodeWithText("Lihat catatan").performScrollTo().assertHeightIsAtLeast(48.dp).performClick()
-        compose.onNodeWithText("Kembali ke beranda").performScrollTo().assertHeightIsAtLeast(48.dp).performClick()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Log saved"))
+        compose.onNodeWithText("View log").performScrollTo().assertHeightIsAtLeast(48.dp).performClick()
+        compose.onNodeWithText("Back to home").performScrollTo().assertHeightIsAtLeast(48.dp).performClick()
         assertEquals(1, views)
         assertEquals(1, homes)
     }

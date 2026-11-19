@@ -42,15 +42,15 @@ class ScanCameraNavigationTest {
 
     @Test fun aDeniedPermissionExplainsTheResultAndKeepsManualReachable() {
         openScan()
-        compose.onNodeWithText("Aktifkan kamera").performScrollTo().performClick()
+        compose.onNodeWithText("Turn on camera").performScrollTo().performClick()
         permission("permission_deny_button")
-        val message = "Izin kamera belum diberikan. Kamu tetap bisa menggunakan input manual."
+        val message = "Camera permission wasn't granted. You can still log manually."
         waitFor(message)
         compose.onNodeWithText(message).performScrollTo().assertIsDisplayed()
         manual().assertIsDisplayed()
         capture("camera-permission-denied")
         manual().performClick()
-        compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
+        compose.onNodeWithText("Log activity").assertIsDisplayed()
     }
 
     @Test fun bRealCaptureThenPrototypeReviewKeepsManualAvailableAndDeletesItsPrivatePhoto() {
@@ -61,61 +61,61 @@ class ScanCameraNavigationTest {
         val directory = File(context.cacheDir, "scan")
         val originalFiles = directory.listFiles()?.map { it.name }?.toSet().orEmpty()
         capture("camera-before-permission")
-        compose.onNodeWithText("Aktifkan kamera").performScrollTo().performClick()
+        compose.onNodeWithText("Turn on camera").performScrollTo().performClick()
         permission("permission_allow_button")
-        compose.waitUntil(60_000) { compose.onAllNodes(hasText("Ambil foto") and isEnabled()).fetchSemanticsNodes().size == 1 }
+        compose.waitUntil(60_000) { compose.onAllNodes(hasText("Take photo") and isEnabled()).fetchSemanticsNodes().size == 1 }
         capture("camera-preview")
-        compose.onNodeWithText("Ambil foto").performScrollTo().performClick()
-        waitFor("Tinjau foto")
+        compose.onNodeWithText("Take photo").performScrollTo().performClick()
+        waitFor("Review photo")
         compose.waitUntil(30_000) {
-            compose.onAllNodesWithContentDescription("Foto sampah yang akan diperiksa").fetchSemanticsNodes().size == 1
+            compose.onAllNodesWithContentDescription("Photo of the waste to check").fetchSemanticsNodes().size == 1
         }
-        compose.onNodeWithText("Tinjau foto").assertIsDisplayed()
+        compose.onNodeWithText("Review photo").assertIsDisplayed()
         val created = directory.listFiles().orEmpty().filter { it.name !in originalFiles }
         assertEquals("Capture creates one private JPEG", 1, created.size)
         assertTrue(created.single().length() in 1..5 * 1024 * 1024)
         capture("camera-photo-review")
-        compose.onNodeWithText("Scan foto").performScrollTo().performClick()
-        waitFor("Periksa objek")
-        compose.onNodeWithText("Konfirmasi objek").performScrollTo().assertIsNotEnabled()
-        compose.onNodeWithText("Pilih material").performScrollTo().performClick()
-        compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
-        compose.onNodeWithText("Pilih jenis benda").performScrollTo().performClick()
-        compose.onNode(hasText("Botol plastik (contoh)") and hasAnyAncestor(isPopup())).performClick()
+        compose.onNodeWithText("Scan photo").performScrollTo().performClick()
+        waitFor("Check the object")
+        compose.onNodeWithText("Confirm object").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Choose a material").performScrollTo().performClick()
+        compose.onNode(hasText("Plastic") and hasAnyAncestor(isPopup())).performClick()
+        compose.onNodeWithText("Choose an item type").performScrollTo().performClick()
+        compose.onNode(hasText("Plastic bottle (sample)") and hasAnyAncestor(isPopup())).performClick()
         capture("camera-object-review")
-        compose.onNodeWithText("Konfirmasi objek").performScrollTo().performClick()
-        compose.onNodeWithText("Kondisi objek").assertIsDisplayed()
+        compose.onNodeWithText("Confirm object").performScrollTo().performClick()
+        compose.onNodeWithText("Item condition").assertIsDisplayed()
         capture("camera-context")
-        compose.onNodeWithText("Lihat saran").performScrollTo().performClick()
-        waitFor("Periksa saran")
+        compose.onNodeWithText("See advice").performScrollTo().performClick()
+        waitFor("Review the advice")
         capture("camera-recommendation")
-        compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
+        compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
         manual().performClick()
-        compose.onNodeWithText("Catat aktivitas").assertIsDisplayed()
+        compose.onNodeWithText("Log activity").assertIsDisplayed()
         compose.onNodeWithText("Recycle").performScrollTo().assertIsNotSelected()
-        compose.onNodeWithContentDescription("Kategori").performScrollTo().assertTextContains("Plastik")
-        compose.onNodeWithContentDescription("Berat").performScrollTo()
+        compose.onNodeWithContentDescription("Category").performScrollTo().assertTextContains("Plastic")
+        compose.onNodeWithContentDescription("Weight").performScrollTo()
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("")))
         assertEquals(records, preferences.getString("records", null))
         assertTrue("Leaving scan deletes the captured photo", created.none { it.exists() })
         capture("camera-editor-prefill")
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        compose.onNodeWithText("Buang perubahan?").assertIsDisplayed()
-        compose.onNodeWithText("Buang perubahan").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
+        compose.onNodeWithText("Discard changes?").assertIsDisplayed()
+        compose.onNodeWithText("Discard changes").performClick()
         waitFor("650 g")
-        compose.onNodeWithText("Profil").performClick()
+        compose.onNodeWithText("Profile").performClick()
         compose.onNodeWithText("50 XP total").performScrollTo().assertIsDisplayed()
         assertEquals(records, preferences.getString("records", null))
     }
 
     private fun openScan() {
         waitFor("650 g")
-        compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNodeWithText("Scan sampah").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Log or scan waste").performClick()
+        compose.onNodeWithText("Scan waste").assertIsDisplayed()
         manual().assertIsDisplayed()
         instrumentation.uiAutomation.waitForIdle(500, 5_000)
     }
-    private fun manual() = compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet")))
+    private fun manual() = compose.onNode(hasText("Log manually") and hasAnyAncestor(hasTestTag("capture-sheet")))
     private fun waitFor(text: String) {
         compose.waitUntil(30_000) { compose.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty() }
     }

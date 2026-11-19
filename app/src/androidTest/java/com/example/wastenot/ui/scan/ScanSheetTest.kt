@@ -50,19 +50,19 @@ class ScanSheetTest {
     @get:Rule(order = 1) val compose = createComposeRule()
     private val candidate = AiDetectionObject("bottle", 0, "bottle", .94, ScanBounds(.2f, .1f, .8f, .9f),
         AiConfidenceBand.OFFERED, true, true, listOf("plastic_bottle"), emptyList(), emptyList(), null)
-    private val catalog = AiCatalog("native-fixture", listOf(AiCatalogItem("plastic_bottle", "Botol plastik",
+    private val catalog = AiCatalog("native-fixture", listOf(AiCatalogItem("plastic_bottle", "Plastic bottles",
         WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED)), "fixture", "fixture", "fixture",
-        emptyMap(), emptySet(), mapOf("bottle" to "Botol"))
+        emptyMap(), emptySet(), mapOf("bottle" to "Bottle"))
     private val objects = ScanState(session = "native-test", phase = ScanPhase.OBJECT, objects = listOf(candidate),
         selectedId = candidate.id, catalog = catalog)
     private val recommendation = AiRecommendation("00000000-0000-4000-8000-000000000002", Instant.now().plusSeconds(3600),
         AiRecommendationStatus.READY, "00000000-0000-4000-8000-000000000001", candidate.id, 1,
         "plastic_bottle", WasteCategory.PLASTIC, DisposalMethod.RECYCLE, AiRecommendationScope.HANDLING,
         AiRecommendationBasis.CONFIRMED, emptyList(), emptyList(), "Periksa penerimaan fasilitas setempat.", null,
-        false, "Pisahkan dari sampah lain.", "native-fixture", false, "fixture", listOf("fixture-evidence"),
+        false, "Keep it apart from other waste.", "native-fixture", false, "fixture", listOf("fixture-evidence"),
         listOf(URI("https://example.org/fixture")), listOf(AiSourceReference(URI("https://example.org/fixture"),
-            "Sumber fixture", "Penerbit fixture", "Wilayah fixture", "2026-10-20", "Cakupan fixture, bukan panduan produksi.")),
-        listOf(AiGuideReference("fixture-pet", 6)), listOf("Periksa material kemasan."))
+            "Fixture source", "Fixture publisher", "Fixture region", "2026-10-20", "Fixture scope, not a production guide.")),
+        listOf(AiGuideReference("fixture-pet", 6)), listOf("Check the packaging material."))
 
     @Test fun scanDesignViewportsLightAndDark() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -88,18 +88,18 @@ class ScanSheetTest {
         } }
         try {
             val phases = listOf(
-                Triple("S21-camera", ScanPhase.CAMERA, "Aktifkan kamera"),
-                Triple("S21-photo", ScanPhase.PHOTO, "Ambil ulang"),
-                Triple("S22", ScanPhase.OBJECT, "Konfirmasi objek"),
-                Triple("S23", ScanPhase.CONTEXT, "Lihat saran"),
-                Triple("S24", ScanPhase.RECOMMENDATION, "Gunakan pilihan, isi jumlah"),
+                Triple("S21-camera", ScanPhase.CAMERA, "Turn on camera"),
+                Triple("S21-photo", ScanPhase.PHOTO, "Retake"),
+                Triple("S22", ScanPhase.OBJECT, "Confirm object"),
+                Triple("S23", ScanPhase.CONTEXT, "See advice"),
+                Triple("S24", ScanPhase.RECOMMENDATION, "Use this, add amount"),
             )
             for (theme in listOf(false, true)) {
                 for ((id, phase, action) in phases) {
                     compose.runOnIdle {
                         dark = theme
                         state = fixture.copy(phase = phase, recommendation = recommendation.copy(
-                            prototypeOnly = false, reason = "Contoh: periksa material dan penerimaan pengelola sebelum mendaur ulang.",
+                            prototypeOnly = false, reason = "Example: check the material and what the collector accepts before recycling.",
                             caution = "", sourceDetails = emptyList(), sources = emptyList()), method = DisposalMethod.RECYCLE)
                     }
                     if (phase == ScanPhase.PHOTO || phase == ScanPhase.OBJECT) {
@@ -111,13 +111,13 @@ class ScanSheetTest {
                     val name = "$id-${if (theme) "dark" else "light"}"
                     captureUiPreview(compose, name, "scan-design-preview")
                     if (phase == ScanPhase.CONTEXT) {
-                        compose.onNodeWithContentDescription("Kebersihan").assertHeightIsAtLeast(56.dp)
+                        compose.onNodeWithContentDescription("Cleanliness").assertHeightIsAtLeast(56.dp)
                     }
                     compose.onNodeWithText(action).performScrollTo().assertIsDisplayed()
                     val tail = when (phase) {
-                        ScanPhase.OBJECT -> "Ambil ulang"
-                        ScanPhase.CONTEXT -> "Koreksi objek"
-                        ScanPhase.RECOMMENDATION -> "Periksa kondisi benda"
+                        ScanPhase.OBJECT -> "Retake"
+                        ScanPhase.CONTEXT -> "Correct the object"
+                        ScanPhase.RECOMMENDATION -> "Check the item's condition"
                         else -> action
                     }
                     compose.onNodeWithText(tail).performScrollTo().assertIsDisplayed()
@@ -149,11 +149,11 @@ class ScanSheetTest {
             states.forEachIndexed { index, next ->
                 compose.runOnIdle { state = next }
                 if (next.phase in listOf(ScanPhase.CAMERA, ScanPhase.PHOTO, ScanPhase.FAILURE)) {
-                    compose.onNodeWithText("Input manual").assertIsDisplayed().performClick()
+                    compose.onNodeWithText("Log manually").assertIsDisplayed().performClick()
                 } else {
-                    compose.onNodeWithText("Input manual").assertDoesNotExist()
+                    compose.onNodeWithText("Log manually").assertDoesNotExist()
                 }
-                compose.onNodeWithText("Gunakan contoh simulasi").assertDoesNotExist()
+                compose.onNodeWithText("Use simulated example").assertDoesNotExist()
                 compose.onNodeWithText("Pengaturan simulasi").assertDoesNotExist()
                 val markers = (0..3).map { compose.onNodeWithTag("scan-step-$it", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot }
                 markers.forEach { marker ->
@@ -174,13 +174,13 @@ class ScanSheetTest {
             Sheet(state, onCategory = { state = state.copy(category = it) }, onConfirm = { confirmed++ },
                 onObjectKey = { state = state.copy(objectKey = it) })
         } }
-        compose.onNodeWithText("Konfirmasi objek").performScrollTo().assertIsNotEnabled()
-        compose.onNodeWithText("Pilih material").performScrollTo().performClick()
-        compose.onNodeWithText("Plastik").performClick()
-        compose.onNodeWithText("Konfirmasi objek").performScrollTo().assertIsNotEnabled()
-        compose.onNodeWithText("Pilih jenis benda").performScrollTo().performClick()
-        compose.onNodeWithText("Botol plastik").performClick()
-        compose.onNodeWithText("Konfirmasi objek").performScrollTo().assertIsEnabled().performClick()
+        compose.onNodeWithText("Confirm object").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Choose a material").performScrollTo().performClick()
+        compose.onNodeWithText("Plastic").performClick()
+        compose.onNodeWithText("Confirm object").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Choose an item type").performScrollTo().performClick()
+        compose.onNodeWithText("Plastic bottles").performClick()
+        compose.onNodeWithText("Confirm object").performScrollTo().assertIsEnabled().performClick()
         assertEquals(WasteCategory.PLASTIC, state.category); assertEquals(1, confirmed)
     }
 
@@ -189,11 +189,11 @@ class ScanSheetTest {
             Sheet(objects.copy(catalog = catalog.copy(supportedObjectLabels = emptyMap())))
         } }
         compose.waitUntil(5_000) {
-            runCatching { compose.onAllNodesWithText("Objek 1 · bottle").fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
+            runCatching { compose.onAllNodesWithText("Object 1 · bottle").fetchSemanticsNodes().isNotEmpty() }.getOrDefault(false)
         }
-        compose.onNodeWithText("Objek 1 · bottle").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Pilih material").assertExists()
-        compose.onNodeWithText("Konfirmasi objek").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Object 1 · bottle").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Choose a material").assertExists()
+        compose.onNodeWithText("Confirm object").performScrollTo().assertIsNotEnabled()
         captureUiPreview(compose, "S22-raw-label", "backend-contract-preview")
     }
 
@@ -202,17 +202,17 @@ class ScanSheetTest {
         compose.setContent { WasteNotTheme {
             Sheet(state, onContext = { state = state.copy(context = it) })
         } }
-        compose.onNodeWithContentDescription("Kebersihan")
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Belum tahu"))
-        compose.onAllNodesWithText("Belum tahu")[0].performScrollTo().performClick()
-        compose.onNodeWithText("Bersih").performClick()
-        compose.onNodeWithContentDescription("Kebersihan")
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Bersih"))
+        compose.onNodeWithContentDescription("Cleanliness")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Not sure"))
+        compose.onAllNodesWithText("Not sure")[0].performScrollTo().performClick()
+        compose.onNodeWithText("Clean").performClick()
+        compose.onNodeWithContentDescription("Cleanliness")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Clean"))
         assertEquals(Cleanliness.CLEAN, state.context.cleanliness)
         assertEquals(Integrity.UNKNOWN, state.context.integrity)
         assertEquals(Reusability.UNKNOWN, state.context.reusable); assertNull(state.context.reuseIntention)
-        compose.onNodeWithText("Belum memutuskan").performScrollTo().performClick()
-        compose.onNodeWithText("Akan dipakai ulang").performClick()
+        compose.onNodeWithText("Haven't decided").performScrollTo().performClick()
+        compose.onNodeWithText("I'll reuse it").performClick()
         assertEquals(true, state.context.reuseIntention)
         assertEquals(Integrity.UNKNOWN, state.context.integrity)
     }
@@ -225,19 +225,19 @@ class ScanSheetTest {
         compose.setContent { WasteNotTheme(dark) {
             Sheet(state, onMethod = { state = state.copy(method = it) }, onUse = { used++ })
         } }
-        compose.onNodeWithText("Pisahkan dari sampah lain.").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Lihat dasar saran").performScrollTo().performClick()
-        compose.onNodeWithText("Botol plastik").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Referensi panduan: fixture-pet · versi 6").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Keep it apart from other waste.").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Why this advice").performScrollTo().performClick()
+        compose.onNodeWithText("Plastic bottles").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Guide reference: fixture-pet · version 6").performScrollTo().assertIsDisplayed()
         captureUiPreview(compose, "guide-revision-light", "scan-review-fixes")
         compose.runOnIdle { dark = true }
-        compose.onNodeWithText("Referensi panduan: fixture-pet · versi 6").assertIsDisplayed()
+        compose.onNodeWithText("Guide reference: fixture-pet · version 6").assertIsDisplayed()
         captureUiPreview(compose, "guide-revision-dark", "scan-review-fixes")
         compose.onNode(hasText("Recycle") and hasClickAction()).performScrollTo().performClick()
         compose.onNodeWithText("Reduce").assertDoesNotExist()
         compose.onNodeWithText("Trash").performClick()
         assertEquals(DisposalMethod.TRASH, state.method); assertEquals(0, used)
-        compose.onNodeWithText("Gunakan pilihan, isi jumlah").performScrollTo().performClick()
+        compose.onNodeWithText("Use this, add amount").performScrollTo().performClick()
         assertEquals(1, used)
     }
 
@@ -249,11 +249,11 @@ class ScanSheetTest {
         compose.setContent { WasteNotTheme(dark) { Sheet(state, onManual = { manual++ }) } }
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
-            compose.onNodeWithText("Kategori dan metode yang sudah kamu pilih tetap dibawa ke input manual tanpa referensi AI.")
+            compose.onNodeWithText("The category and method you chose carry over to manual entry, without the AI reference.")
                 .performScrollTo().assertIsDisplayed()
-            compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
+            compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
             captureUiPreview(compose, "expired-choice-${if (theme) "dark" else "light"}", "scan-review-fixes")
-            compose.onNodeWithText("Input manual").assertIsDisplayed().performClick()
+            compose.onNodeWithText("Log manually").assertIsDisplayed().performClick()
         }
         assertEquals(2, manual)
     }
@@ -266,12 +266,12 @@ class ScanSheetTest {
         compose.setContent { WasteNotTheme {
             Sheet(state, onConfirmConditions = { state = state.copy(conditionsConfirmed = it) })
         } }
-        compose.onNodeWithText("Gunakan pilihan, isi jumlah").performScrollTo().assertIsNotEnabled()
-        compose.onNodeWithText("Aku sudah memeriksa syarat saran ini").performScrollTo().performClick()
-        compose.onNodeWithText("Gunakan pilihan, isi jumlah").performScrollTo().assertIsEnabled()
-        compose.onNodeWithText("Sumber fixture").performScrollTo().performClick()
+        compose.onNodeWithText("Use this, add amount").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("I've checked the conditions for this advice").performScrollTo().performClick()
+        compose.onNodeWithText("Use this, add amount").performScrollTo().assertIsEnabled()
+        compose.onNodeWithText("Fixture source").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(listOf("https://example.org/fixture"), openedSources) }
-        compose.onNodeWithText("Referensi diperiksa: 2026-10-20").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Reference checked: 2026-10-20").performScrollTo().assertIsDisplayed()
         capture("scan-conditional-source")
     }
 
@@ -282,15 +282,15 @@ class ScanSheetTest {
                 scope = null, basis = null, missingContext = listOf(AiContextField.RISK_TYPE))))
         var reviews = 0
         compose.setContent { WasteNotTheme { Sheet(state, onReviewContext = { reviews++ }) } }
-        compose.onNodeWithText("Lengkapi informasi benda").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Jenis risiko").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
-        compose.onNodeWithText("Periksa kondisi benda").performScrollTo().performClick()
+        compose.onNodeWithText("Tell us more about the item").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Risk type").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
+        compose.onNodeWithText("Check the item's condition").performScrollTo().performClick()
         assertEquals(1, reviews)
         capture("scan-needs-context")
         compose.runOnIdle { state = state.copy(recommendation = recommendation.copy(prototypeOnly = true)) }
-        compose.onNodeWithText("Hasil prototipe. Saran ini belum dapat digunakan untuk catatan AI.").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
+        compose.onNodeWithText("Prototype result. This advice can't be used for an AI log yet.").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
         capture("scan-prototype-unusable")
     }
 
@@ -323,23 +323,23 @@ class ScanSheetTest {
         for (item in cases) for (theme in listOf(false, true)) {
             compose.runOnIdle { current = item; dark = theme }
             val name = "${item.status.name.lowercase()}-${if (theme) "dark" else "light"}"
-            compose.onNodeWithText("Gunakan pilihan, isi jumlah").assertDoesNotExist()
-            compose.onNodeWithText("Konfirmasi / ubah metode").assertDoesNotExist()
-            compose.onNodeWithText(if (item.specialHandling) "Panduan penanganan khusus" else "Panduan penanganan awal")
+            compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
+            compose.onNodeWithText("Confirm or change the method").assertDoesNotExist()
+            compose.onNodeWithText(if (item.specialHandling) "Specialist handling advice" else "Starter handling advice")
                 .performScrollTo().assertIsDisplayed()
             compose.onNodeWithText("1. ${item.steps.first()}").performScrollTo().assertIsDisplayed()
             captureUiPreview(compose, "$name-guidance", "policy08-ui")
             for ((index, step) in item.steps.withIndex())
                 compose.onNodeWithText("${index + 1}. $step").performScrollTo().assertIsDisplayed()
-            compose.onNodeWithText("Hasil prototipe. Saran ini belum dapat digunakan untuk catatan AI.")
+            compose.onNodeWithText("Prototype result. This advice can't be used for an AI log yet.")
                 .assertExists()
             val source = item.sourceDetails.first()
             compose.onNodeWithText(source.title).performScrollTo().assertIsDisplayed().performClick()
             compose.runOnIdle { assertEquals(source.url.toString(), openedSources.lastOrNull()) }
-            compose.onNodeWithText("Periksa kondisi benda").performScrollTo().assertIsDisplayed()
+            compose.onNodeWithText("Check the item's condition").performScrollTo().assertIsDisplayed()
             captureUiPreview(compose, "$name-sources", "policy08-ui")
-            compose.onNodeWithText("Periksa kondisi benda").performClick()
-            compose.onNodeWithText("Input manual").assertIsDisplayed().performClick()
+            compose.onNodeWithText("Check the item's condition").performClick()
+            compose.onNodeWithText("Log manually").assertIsDisplayed().performClick()
         }
         compose.runOnIdle { assertEquals(4, manual); assertEquals(4, reviews); assertEquals(4, openedSources.size) }
     }
@@ -348,7 +348,7 @@ class ScanSheetTest {
     private fun Sheet(state: ScanState, onManual: () -> Unit = {}, onCategory: (WasteCategory) -> Unit = {},
         onConfirm: () -> Unit = {}, onContext: (ScanContext) -> Unit = {}, onMethod: (DisposalMethod) -> Unit = {}, onUse: () -> Unit = {},
         onObjectKey: (String) -> Unit = {}, onReviewContext: () -> Unit = {}, onConfirmConditions: (Boolean) -> Unit = {},
-        camera: @Composable () -> Unit = { Text("Arahkan ke satu benda") }) {
+        camera: @Composable () -> Unit = { Text("Point at one item") }) {
         ScanSheet(state, {}, onManual, {}, {}, {}, onCategory, onConfirm, {}, onContext, {}, onMethod, onUse, {},
             onObjectKey = onObjectKey, onReviewContext = onReviewContext, onConfirmConditions = onConfirmConditions, camera = camera)
     }

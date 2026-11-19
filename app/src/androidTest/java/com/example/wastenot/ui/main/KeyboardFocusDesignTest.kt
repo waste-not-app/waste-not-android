@@ -38,10 +38,10 @@ class KeyboardFocusDesignTest {
             WasteNotTheme(dark) {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                        ActionButton("Simpan catatan", {}, Modifier.fillMaxWidth().testTag("primary"))
-                        SecondaryActionButton("Batal", {}, Modifier.fillMaxWidth().testTag("secondary"))
-                        TextActionButton("Lihat riwayat", {}, Modifier.testTag("text"))
-                        IconActionButton(R.drawable.ic_close, "Tutup", {}, Modifier.testTag("icon"))
+                        ActionButton("Save log", {}, Modifier.fillMaxWidth().testTag("primary"))
+                        SecondaryActionButton("Cancel", {}, Modifier.fillMaxWidth().testTag("secondary"))
+                        TextActionButton("See history", {}, Modifier.testTag("text"))
+                        IconActionButton(R.drawable.ic_close, "Close", {}, Modifier.testTag("icon"))
                         RecordAction({}, Modifier.testTag("record"))
                     }
                 }
@@ -60,7 +60,7 @@ class KeyboardFocusDesignTest {
     }
 
     @Test fun keyboardTabsDoNotSelectUntilEnterAndScanReturnsFocusToItsTrigger() {
-        val user = User("keyboard-focus-review", "Pengguna Uji", "focus@example.test", ZoneId.of("Asia/Jakarta"), null)
+        val user = User("keyboard-focus-review", "Test User", "focus@example.test", ZoneId.of("Asia/Jakarta"), null)
         val activities = com.example.wastenot.navigationActivityFixture(
             InstrumentationRegistry.getInstrumentation().targetContext, user)
         val guides = DummyGuideStore()
@@ -78,26 +78,26 @@ class KeyboardFocusDesignTest {
         compose.waitUntil(20_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
-            compose.onNode(tabs and hasText("Beranda")).performClick()
+            compose.onNode(tabs and hasText("Home")).performClick()
             keyboardMode()
-            compose.onNode(tabs and hasText("Beranda")).performSemanticsAction(SemanticsActions.RequestFocus)
+            compose.onNode(tabs and hasText("Home")).performSemanticsAction(SemanticsActions.RequestFocus)
             compose.onRoot().performKeyInput { pressKey(Key.Tab) }
-            compose.onNode(tabs and hasText("Riwayat")).assertIsFocused().assertIsNotSelected()
-            compose.onNode(tabs and hasText("Beranda")).assertIsSelected()
-            capture("navigation-${if (theme) "dark" else "light"}", compose.onNode(tabs and hasText("Riwayat")))
+            compose.onNode(tabs and hasText("History")).assertIsFocused().assertIsNotSelected()
+            compose.onNode(tabs and hasText("Home")).assertIsSelected()
+            capture("navigation-${if (theme) "dark" else "light"}", compose.onNode(tabs and hasText("History")))
             compose.onRoot().performKeyInput { pressKey(Key.Enter) }
-            compose.onNode(tabs and hasText("Riwayat")).assertIsSelected()
-            val record = compose.onNodeWithContentDescription("Catat atau scan sampah")
+            compose.onNode(tabs and hasText("History")).assertIsSelected()
+            val record = compose.onNodeWithContentDescription("Log or scan waste")
             record.performSemanticsAction(SemanticsActions.RequestFocus)
             record.assertIsFocused().performKeyInput { pressKey(Key.Enter) }
-            compose.onNodeWithText("Scan sampah").assertIsDisplayed()
+            compose.onNodeWithText("Scan waste").assertIsDisplayed()
             InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_TAB)
             compose.waitForIdle()
-            compose.onNodeWithContentDescription("Tutup scan").performSemanticsAction(SemanticsActions.RequestFocus)
-            compose.onNodeWithContentDescription("Tutup scan").assertIsFocused().performKeyInput { pressKey(Key.Enter) }
+            compose.onNodeWithContentDescription("Close scan").performSemanticsAction(SemanticsActions.RequestFocus)
+            compose.onNodeWithContentDescription("Close scan").assertIsFocused().performKeyInput { pressKey(Key.Enter) }
             compose.waitUntil(5_000) { compose.onAllNodes(isRoot()).fetchSemanticsNodes().size == 1 }
             record.assertIsFocused()
-            compose.onNode(tabs and hasText("Riwayat")).assertIsSelected()
+            compose.onNode(tabs and hasText("History")).assertIsSelected()
             capture("returned-${if (theme) "dark" else "light"}", record)
         }
     }

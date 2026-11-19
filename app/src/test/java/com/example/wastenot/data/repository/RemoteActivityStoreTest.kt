@@ -29,7 +29,7 @@ class RemoteActivityStoreTest {
     private val id = "12345678-9abc-4def-8123-456789abcdef"
     private val requestId = "00000000-0000-4000-8000-000000000011"
     private val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE,
-        Quantity.Weight.of(250), LocalDate.parse("2026-09-21"), "Catatan pengguna")
+        Quantity.Weight.of(250), LocalDate.parse("2026-09-21"), "User note")
 
     @Before fun setup() {
         server = MockWebServer().apply { start(InetAddress.getByName("127.0.0.1"), 0) }
@@ -140,7 +140,7 @@ class RemoteActivityStoreTest {
             val failure = (store.create(input, requestId) as ApiResult.Failure).error
             assertEquals(expected, failure.kind);assertEquals(status, failure.status);assertEquals(code, failure.code)
             assertEquals("fixture-request", failure.requestId);assertNotNull(failure.retryAt)
-            if (status == 422) assertEquals("Periksa jumlah.", failure.fields["weight_g"])
+            if (status == 422) assertEquals("Check the amount.", failure.fields["weight_g"])
         }
         assertEquals(4, server.requestCount)
     }
@@ -241,5 +241,5 @@ class RemoteActivityStoreTest {
     private fun json(body: String, status: Int = 200) = MockResponse().setResponseCode(status)
         .addHeader("Content-Type", "application/json").setBody(body)
     private fun reply(record: JsonObject, status: Int = 200) = json(buildJsonObject { put("data", record) }.toString(), status)
-    private fun error(status: Int, code: String) = json("""{"error":{"code":"$code","fields":{"weight_g":"Periksa jumlah."}},"request_id":"fixture-request"}""", status)
+    private fun error(status: Int, code: String) = json("""{"error":{"code":"$code","fields":{"weight_g":"Check the amount."}},"request_id":"fixture-request"}""", status)
 }

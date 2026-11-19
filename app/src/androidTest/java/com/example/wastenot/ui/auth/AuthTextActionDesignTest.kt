@@ -35,7 +35,7 @@ class AuthTextActionDesignTest {
         } }
         for (theme in listOf(false, true)) for (registration in listOf(false, true)) {
             compose.runOnIdle { dark = theme; register = registration }
-            val label = if (registration) "Sudah punya akun? Masuk" else "Belum punya akun? Daftar"
+            val label = if (registration) "Already have an account? Sign in" else "New here? Create an account"
             val node = compose.onNodeWithText(label).performScrollTo().assertIsDisplayed().assertIsNotEnabled().assertHeightIsAtLeast(48.dp)
             val layouts = mutableListOf<TextLayoutResult>()
             compose.onNodeWithText(label, useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
@@ -47,7 +47,7 @@ class AuthTextActionDesignTest {
             compose.runOnIdle { assertEquals(0, switches) }
         }
         compose.runOnIdle { pending = false }
-        compose.onNodeWithText("Sudah punya akun? Masuk").performScrollTo().assertIsEnabled().performTouchInput { click() }
+        compose.onNodeWithText("Already have an account? Sign in").performScrollTo().assertIsEnabled().performTouchInput { click() }
         compose.runOnIdle { assertEquals(1, switches) }
     }
 

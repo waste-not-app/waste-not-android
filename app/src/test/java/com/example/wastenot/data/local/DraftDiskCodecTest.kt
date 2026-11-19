@@ -12,7 +12,7 @@ class DraftDiskCodecTest {
     private val date = LocalDate.of(2026, 10, 24)
     private fun draft() = EditorDraft.from(null, date).apply {
         change(EditorField.QUANTITY, values.copy(category = WasteCategory.PLASTIC, method = DisposalMethod.RECYCLE,
-            quantity = QuantityInput("0,250", QuantityUnit.KILOGRAM), notes = "  Isian mentah\nberikutnya  "))
+            quantity = QuantityInput("0,250", QuantityUnit.KILOGRAM), notes = "  Raw entry\nnext  "))
     }
     private val key = LogEditor(null, "7b20f6b4-278c-492c-bddf-8ef2daaf28e5")
 

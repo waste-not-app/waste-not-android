@@ -21,7 +21,7 @@ class EditorPersistenceViewModelTest {
     private val owners = mutableListOf<ViewModelStoreOwner>()
     private val key = LogEditor(null, "949aebd2-53d4-4e04-a66c-dcf50b161d80")
     private fun form() = EditorDraft.from(null, LocalDate.of(2026, 10, 24)).apply {
-        change(EditorField.NOTES, values.copy(notes = "Isian pengguna"))
+        change(EditorField.NOTES, values.copy(notes = "User entry"))
     }
     @Before fun before() { Dispatchers.setMain(dispatcher) }
     @After fun after() { owners.forEach { it.viewModelStore.clear() }; Dispatchers.resetMain() }

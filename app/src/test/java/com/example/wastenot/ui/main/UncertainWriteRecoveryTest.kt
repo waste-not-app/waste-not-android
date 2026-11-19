@@ -54,7 +54,7 @@ class UncertainWriteRecoveryTest {
 
     private fun form() = EditorDraft.from(null, date).apply {
         change(EditorField.QUANTITY, values.copy(category = WasteCategory.PLASTIC, method = DisposalMethod.RECYCLE,
-            quantity = QuantityInput("0,250", QuantityUnit.KILOGRAM), notes = "  Isian awal  "))
+            quantity = QuantityInput("0,250", QuantityUnit.KILOGRAM), notes = "  Original entry  "))
     }
 
     @Test fun aLaterRejectionDoesNotResolveTheFirstUnknownCreate() {
@@ -117,7 +117,7 @@ class UncertainWriteRecoveryTest {
         }
         val vm = model { WorkspaceViewModel(gateway) }
         val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE,
-            Quantity.Weight.of(250), source.referenceDate, "Isian awal")
+            Quantity.Weight.of(250), source.referenceDate, "Original entry")
         vm.save(input, null, null, key.requestId); advanceUntilIdle()
         vm.save(input, null, null, key.requestId); advanceUntilIdle()
         vm.save(input.copy(notes = "Changed"), null, null, key.requestId); advanceUntilIdle()
@@ -133,7 +133,7 @@ class UncertainWriteRecoveryTest {
     @Test fun aRestoredPendingCreateSeedsTheGuardBeforeItsFirstNewAttempt() = runTest {
         val source = DemoActivityStore(ZoneId.of("Asia/Jakarta"))
         val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE,
-            Quantity.Weight.of(250), source.referenceDate, "Isian awal")
+            Quantity.Weight.of(250), source.referenceDate, "Original entry")
         assertTrue(source.create(input, key.requestId) is ApiResult.Success)
         val calls = mutableListOf<ActivityInput>()
         val gateway = object : ActivityStore by source {
@@ -173,7 +173,7 @@ class UncertainWriteRecoveryTest {
         }
         val vm = model { WorkspaceViewModel(gateway) }
         val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE,
-            Quantity.Weight.of(250), source.referenceDate, "Isian awal")
+            Quantity.Weight.of(250), source.referenceDate, "Original entry")
         vm.save(input, null, null, key.requestId); advanceUntilIdle()
         assertNull(vm.state.value.save)
         assertFalse(vm.state.value.saving)

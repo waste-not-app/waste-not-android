@@ -44,7 +44,7 @@ class TalkBackNavigationTest {
                     orientation == Configuration.ORIENTATION_LANDSCAPE
                 }
             }
-            await("login screen") { text(appRoot(automation)).contains("Catat kebiasaanmu lagi.") }
+            await("login screen") { text(appRoot(automation)).contains("Pick up your habit again.") }
             fun isEmail(node: AccessibilityNodeInfo) =
                 node.className == "android.widget.EditText" && !node.isPassword && text(node).contains("Email")
             fun isPassword(node: AccessibilityNodeInfo) = node.isEditable && node.isPassword
@@ -75,16 +75,16 @@ class TalkBackNavigationTest {
                 findNode(appRoot(automation), ::isPassword)?.let { setText(it, "short") } == true
             }
             focusFormControl(automation, "password visibility") {
-                it.contentDescription == "Tampilkan kata sandi"
+                it.contentDescription == "Show password"
             }
             shortcut(79)
-            await("TalkBack moves from password visibility to Masuk") {
+            await("TalkBack moves from password visibility to Sign in") {
                 automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)?.let(::isSubmit) == true
             }
             assertTrue(keyboardVisible())
             if (recordSpeech) SystemClock.sleep(2_000)
             shortcut(clickKey)
-            val error = "Kata sandi perlu 12–128 karakter, termasuk spasi."
+            val error = "Passwords need 12 to 128 characters, including spaces."
             await("password validation") { text(appRoot(automation)).contains(error) }
             if (landscape) {
                 await("landscape validation dismisses the keyboard") { !keyboardVisible() }
@@ -115,7 +115,7 @@ class TalkBackNavigationTest {
         val application = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as WasteNotApplication
         val container = application.container
         fun scanTrigger(node: AccessibilityNodeInfo) =
-            node.isClickable && text(node).contains("Catat atau scan sampah")
+            node.isClickable && text(node).contains("Log or scan waste")
         fun matches(label: String, node: AccessibilityNodeInfo) =
             node.isClickable && (node.contentDescription?.contains(label) == true || text(node).trim() == label)
         fun activate(label: String) {
@@ -137,15 +137,15 @@ class TalkBackNavigationTest {
         }
         fun verifyScanSheet(fromTab: String) {
             // Start in the dock so navigating to the trigger does not enter a text field.
-            focusFormControl(automation, "Beranda tab in the dock") {
-                text(it).trim() == "Beranda" && (it.isClickable || it.isSelected)
+            focusFormControl(automation, "Home tab in the dock") {
+                text(it).trim() == "Home" && (it.isClickable || it.isSelected)
             }
             seek(automation, { shortcut(80) }, ::scanTrigger)
-            if (recordSpeech && fromTab == "Riwayat") SystemClock.sleep(2_500)
+            if (recordSpeech && fromTab == "History") SystemClock.sleep(2_500)
             shortcut(clickKey)
-            show("disabled scan explanation") { it.text?.contains("Scan foto dinonaktifkan.") == true }
-            activate("Tutup scan")
-            await("scan sheet closed") { !text(appRoot(automation)).contains("Scan foto dinonaktifkan.") }
+            show("disabled scan explanation") { it.text?.contains("Photo scanning is turned off.") == true }
+            activate("Close scan")
+            await("scan sheet closed") { !text(appRoot(automation)).contains("Photo scanning is turned off.") }
             await("TalkBack focus returns to scan trigger from $fromTab") {
                 automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)
                     ?.let(::scanTrigger) == true
@@ -155,14 +155,14 @@ class TalkBackNavigationTest {
         }
         try {
             ActivityScenario.launch(MainActivity::class.java).use {
-                await("login screen") { text(appRoot(automation)).contains("Catat kebiasaanmu lagi.") }
-                show("Daftar link") { matches("Belum punya akun? Daftar", it) }
+                await("login screen") { text(appRoot(automation)).contains("Pick up your habit again.") }
+                show("Daftar link") { matches("New here? Create an account", it) }
                 shortcut(clickKey)
-                await("register screen") { text(appRoot(automation)).contains("Mulai dari kebiasaan kecil.") }
-                show("registration heading") { it.isHeading && it.text?.toString() == "Mulai dari kebiasaan kecil." }
+                await("register screen") { text(appRoot(automation)).contains("Start with small habits.") }
+                show("registration heading") { it.isHeading && it.text?.toString() == "Start with small habits." }
                 if (recordSpeech) SystemClock.sleep(3_500)
                 show("registration name field") {
-                    it.className == "android.widget.EditText" && text(it).contains("Nama")
+                    it.className == "android.widget.EditText" && text(it).contains("Name")
                 }
                 if (recordSpeech) SystemClock.sleep(3_500)
                 println("TALKBACK_REGISTER heading_and_name")
@@ -175,35 +175,35 @@ class TalkBackNavigationTest {
                         Quantity.Weight.of(250), dashboard.value.date, "QA TalkBack")
                     check(container.core.createLog(activity, UUID.randomUUID().toString()) is ApiResult.Success)
                 }
-                await("workspace") { text(appRoot(automation)).contains("Input manual") }
-                tab("Riwayat")
-                verifyScanSheet("Riwayat")
-                tab("Panduan")
-                verifyScanSheet("Panduan")
-                tab("Statistik")
-                show("daily chart text action") { matches("Lihat angka harian", it) }
+                await("workspace") { text(appRoot(automation)).contains("Log manually") }
+                tab("History")
+                verifyScanSheet("History")
+                tab("Guide")
+                verifyScanSheet("Guide")
+                tab("Stats")
+                show("daily chart text action") { matches("Show daily numbers", it) }
                 shortcut(clickKey)
-                show("daily chart text value") { it.text?.contains("250 g · 0 benda") == true }
+                show("daily chart text value") { it.text?.contains("250 g · 0 items") == true }
                 if (recordSpeech) SystemClock.sleep(3_500)
-                println("TALKBACK_CHART 250 g, 0 benda")
-                verifyScanSheet("Statistik")
-                tab("Profil")
-                show("streak status") { it.text?.toString() == "Kamu sudah mencatat hari ini." }
+                println("TALKBACK_CHART 250 g, 0 items")
+                verifyScanSheet("Stats")
+                tab("Profile")
+                show("streak status") { it.text?.toString() == "You've logged today." }
                 if (recordSpeech) SystemClock.sleep(3_500)
                 println("TALKBACK_STREAK logged_today")
-                verifyScanSheet("Profil")
-                tab("Beranda")
-                verifyScanSheet("Beranda")
-                tab("Profil")
-                show("settings row") { matches("Pengaturan", it) }
-                seek(automation, { shortcut(79) }) { matches("Keluar", it) }
+                verifyScanSheet("Profile")
+                tab("Home")
+                verifyScanSheet("Home")
+                tab("Profile")
+                show("settings row") { matches("Settings", it) }
+                seek(automation, { shortcut(79) }) { matches("Sign out", it) }
                 shortcut(clickKey)
-                show("logout dialog heading") { it.text?.toString() == "Keluar dari akun?" }
+                show("logout dialog heading") { it.text?.toString() == "Sign out?" }
                 if (recordSpeech) SystemClock.sleep(3_500)
-                activate("Batal")
-                await("logout dialog dismissed") { !text(appRoot(automation)).contains("Keluar dari akun?") }
+                activate("Cancel")
+                await("logout dialog dismissed") { !text(appRoot(automation)).contains("Sign out?") }
                 await("TalkBack focus returns to logout trigger") {
-                    automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)?.let { matches("Keluar", it) } == true
+                    automation.findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY)?.let { matches("Sign out", it) } == true
                 }
                 println("TALKBACK_LOGOUT_DIALOG dismissed_focus_restored")
             }
@@ -240,17 +240,17 @@ class TalkBackNavigationTest {
                         landscape
                     }
                 }
-                await("login screen") { text(appRoot(automation)).contains("Catat kebiasaanmu lagi.") }
+                await("login screen") { text(appRoot(automation)).contains("Pick up your habit again.") }
                 runBlocking {
                     check(container.sessions.register("Android QA 112", "candidate-$runId@example.test",
                         UUID.randomUUID().toString(), ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
                 }
-                showControl(automation, "scan trigger") { it.isClickable && text(it).contains("Catat atau scan sampah") }
+                showControl(automation, "scan trigger") { it.isClickable && text(it).contains("Log or scan waste") }
                 shortcut(clickKey)
-                click("Aktifkan kamera")
-                click("Ambil foto")
-                click("Scan foto")
-                await("scan candidate response") { text(appRoot(automation)).contains("Periksa objek") }
+                click("Turn on camera")
+                click("Take photo")
+                click("Scan photo")
+                await("scan candidate response") { text(appRoot(automation)).contains("Check the object") }
                 showControl(automation, "first radio candidate") { candidate(90, it) && it.isChecked }
                 if (recordSpeech) SystemClock.sleep(4_500)
                 showControl(automation, "second radio candidate") { candidate(80, it) && !it.isChecked }
@@ -261,9 +261,9 @@ class TalkBackNavigationTest {
                 }
                 if (recordSpeech) SystemClock.sleep(3_000)
                 showControl(automation, "first candidate unchecked") { candidate(90, it) && !it.isChecked }
-                showControl(automation, "manual entry") { it.isClickable && text(it).trim() == "Input manual" }
+                showControl(automation, "manual entry") { it.isClickable && text(it).trim() == "Log manually" }
                 println("TALKBACK_CANDIDATE selected_80_unchecked_90")
-                click("Tutup scan")
+                click("Close scan")
             }
         } finally {
             runBlocking { container.sessions.logout() }
@@ -356,7 +356,7 @@ class TalkBackNavigationTest {
         return (0 until node.childCount).firstNotNullOfOrNull { findNode(node.getChild(it), matches) }
     }
 
-    private fun isSubmit(node: AccessibilityNodeInfo) = node.isClickable && node.isEnabled && text(node).trim() == "Masuk"
+    private fun isSubmit(node: AccessibilityNodeInfo) = node.isClickable && node.isEnabled && text(node).trim() == "Sign in"
 
     private fun seek(automation: UiAutomation, next: () -> Unit, predicate: (AccessibilityNodeInfo) -> Boolean): AccessibilityNodeInfo {
         val observed = linkedSetOf<String>()

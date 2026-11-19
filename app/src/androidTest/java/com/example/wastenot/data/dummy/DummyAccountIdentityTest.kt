@@ -45,7 +45,7 @@ class DummyAccountIdentityTest {
     @Test fun legacyActiveProfileIsRetainedOnLogoutAndDoesNotBecomeTheNextAccount() = runTest {
         val email = "legacy@example.invalid"
         val id = UUID.nameUUIDFromBytes(email.toByteArray(Charsets.UTF_8)).toString()
-        preferences.edit().clear().putString("id", id).putString("name", "Akun Lama")
+        preferences.edit().clear().putString("id", id).putString("name", "Old Account")
             .putString("email", email).putString("timezone", tokyo.id).commit()
         try {
             val session = DummyAccountSession(preferences)
@@ -119,7 +119,7 @@ class DummyAccountIdentityTest {
         try {
             val session = DummyAccountSession(preferences)
             assertEquals(ApiFailureKind.INVALID_REQUEST,
-                (session.register("Nama", "valid@example.invalid", password, ZoneId.of("+07:00")) as ApiResult.Failure).error.kind)
+                (session.register("Name", "valid@example.invalid", password, ZoneId.of("+07:00")) as ApiResult.Failure).error.kind)
             assertEquals(ApiFailureKind.INVALID_REQUEST, (session.login("invalid", password) as ApiResult.Failure).error.kind)
             assertEquals(ApiFailureKind.INVALID_REQUEST,
                 (session.register("N", "valid@example.invalid", password, tokyo) as ApiResult.Failure).error.kind)

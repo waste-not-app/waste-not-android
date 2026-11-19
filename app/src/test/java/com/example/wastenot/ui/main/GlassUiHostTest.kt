@@ -89,7 +89,7 @@ class GlassUiHostTest {
     }
 
     @Test fun longActionLabelsWrapAndRemainOperableAtLargeText() {
-        val labels = listOf("Simpan aktivitas setelah peninjauan", "Lanjutkan tanpa lampiran foto", "Buka sumber panduan pengelolaan")
+        val labels = listOf("Save activity after review", "Continue without a photo attachment", "Open the handling guide source")
         val clicked = mutableListOf<Int>()
         content {
             Column(Modifier.verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {

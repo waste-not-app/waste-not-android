@@ -5,10 +5,10 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ScanObjectChoicesTest {
-    private val other = AiCatalogItem("plastic_other", "Plastik lain", WasteCategory.PLASTIC, false, AiGuideStatus.UNAVAILABLE)
-    private val pet = AiCatalogItem("pet_bottle", "Botol PET", WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED)
-    private val hdpe = AiCatalogItem("hdpe_bottle", "Botol HDPE", WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED)
-    private val glass = AiCatalogItem("glass_bottle", "Botol kaca", WasteCategory.GLASS, false, AiGuideStatus.UNAVAILABLE)
+    private val other = AiCatalogItem("plastic_other", "Other plastic", WasteCategory.PLASTIC, false, AiGuideStatus.UNAVAILABLE)
+    private val pet = AiCatalogItem("pet_bottle", "PET bottle", WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED)
+    private val hdpe = AiCatalogItem("hdpe_bottle", "HDPE bottle", WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED)
+    private val glass = AiCatalogItem("glass_bottle", "Glass bottle", WasteCategory.GLASS, false, AiGuideStatus.UNAVAILABLE)
     private fun candidate(id: String, hints: List<String>) = AiDetectionObject(id, 39, "bottle", .91,
         ScanBounds(.1f, .1f, .5f, .5f), AiConfidenceBand.OFFERED, true, true, hints, emptyList(), emptyList(), null)
     private fun catalog(items: List<AiCatalogItem>) = AiCatalog("fixture", items, null, null, "fixture", emptyMap(), emptySet(), emptyMap())
@@ -52,7 +52,7 @@ class ScanObjectChoicesTest {
     }
 
     @Test fun dynamicCatalogChoicesDoNotDependOnPilotNamesOrPublishedGuides() {
-        val choices = (0 until 85).map { AiCatalogItem("dynamic_$it", "Pilihan $it", WasteCategory.PLASTIC, false, AiGuideStatus.UNAVAILABLE) }
+        val choices = (0 until 85).map { AiCatalogItem("dynamic_$it", "Option $it", WasteCategory.PLASTIC, false, AiGuideStatus.UNAVAILABLE) }
         val value = state(listOf("dynamic_84")).copy(catalog = catalog(choices))
         assertEquals(listOf(choices.last()) + choices.dropLast(1), value.objectChoices)
     }

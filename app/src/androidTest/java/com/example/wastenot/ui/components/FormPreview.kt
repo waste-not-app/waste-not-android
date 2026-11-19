@@ -33,14 +33,14 @@ private fun FormPreview() {
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                WasteTextField("", {}, "Email", Modifier.fillMaxWidth(), helper = "nama@contoh.id")
-                WasteTextField("", {}, "Kata sandi", Modifier.fillMaxWidth(), errorText = "Gunakan 12–128 karakter.", password = true)
-                WasteTextField("Pengguna Demo", {}, "Nama", Modifier.fillMaxWidth(), enabled = false)
+                WasteTextField("", {}, "Email", Modifier.fillMaxWidth(), helper = "name@example.com")
+                WasteTextField("", {}, "Password", Modifier.fillMaxWidth(), errorText = "Use 12 to 128 characters.", password = true)
+                WasteTextField("Pengguna Demo", {}, "Name", Modifier.fillMaxWidth(), enabled = false)
                 CategoryPicker(null, {}, Modifier.fillMaxWidth())
                 MethodSelector(null, {}, Modifier.fillMaxWidth())
                 QuantityField(input, { input = it }, Modifier.fillMaxWidth())
-                ActionButton("Simpan", {}, Modifier.fillMaxWidth(), loading = true, loadingLabel = "Menyimpan…")
-                ActionButton("Hapus catatan", {}, Modifier.fillMaxWidth(), destructive = true)
+                ActionButton("Save", {}, Modifier.fillMaxWidth(), loading = true, loadingLabel = "Saving…")
+                ActionButton("Delete log", {}, Modifier.fillMaxWidth(), destructive = true)
             }
         }
     }

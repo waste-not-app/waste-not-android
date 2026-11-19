@@ -22,9 +22,9 @@ import org.junit.Test
 
 class ExitDialogsTest {
     @get:Rule val compose = createComposeRule()
-    private val titles = listOf("Keluar dari akun?", "Buang perubahan?", "Tutup formulir?")
-    private val confirms = listOf("Keluar", "Buang perubahan", "Tutup formulir")
-    private fun cancel(kind: Int) = if (kind == 0) "Batal" else "Lanjut mengisi"
+    private val titles = listOf("Sign out?", "Discard changes?", "Close the form?")
+    private val confirms = listOf("Sign out", "Discard changes", "Close form")
+    private fun cancel(kind: Int) = if (kind == 0) "Cancel" else "Keep editing"
 
     @Composable private fun Dialog(kind: Int, onDismiss: () -> Unit, onConfirm: () -> Unit) {
         if (kind == 0) LogoutDialog(onDismiss, onConfirm)
@@ -43,7 +43,7 @@ class ExitDialogsTest {
             compose.runOnIdle { dark = theme; kind = state }
             assertReadable(titles[state])
             capture("exit-${if (theme) "dark" else "light"}-$state-heading")
-            val body = if (state == 0) "Kamu perlu masuk lagi" else if (state == 1) "Perubahan belum disimpan." else "Menutup formulir tidak membatalkan"
+            val body = if (state == 0) "You'll need to sign in again" else if (state == 1) "Your changes aren't saved." else "Closing the form doesn't cancel"
             val message = compose.onNodeWithText(body, substring = true).fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsProperties.Text].single().text
             assertReadable(message)
             listOf(this.confirms[state], cancel(state)).forEach { label ->
@@ -55,8 +55,8 @@ class ExitDialogsTest {
             }
             capture("exit-${if (theme) "dark" else "light"}-$state-actions")
             if (state == 2) {
-                compose.onNodeWithText("Buang perubahan").assertDoesNotExist()
-                compose.onNodeWithText("Hasilnya mungkin sudah tersimpan.", substring = true).assertExists()
+                compose.onNodeWithText("Discard changes").assertDoesNotExist()
+                compose.onNodeWithText("Check your history before logging the same thing again.", substring = true).assertExists()
             }
             compose.onNodeWithText("simulasi", substring = true, ignoreCase = true).assertDoesNotExist()
             compose.onNodeWithText("demo", substring = true, ignoreCase = true).assertDoesNotExist()
@@ -118,7 +118,7 @@ class ExitDialogsTest {
         var pending by mutableStateOf(true)
         var draftFailed by mutableStateOf(false)
         var confirms = 0; var dismisses = 0
-        val failure = "Sesi perangkat belum bisa ditutup. Kamu masih masuk. Coba lagi untuk keluar."
+        val failure = "Couldn't sign out on this device. You're still signed in. Try signing out again."
         compose.setContent { WasteNotTheme(dark) {
             Surface(color = MaterialTheme.colorScheme.background) { Box(Modifier.fillMaxSize()) }
             LogoutDialog({ dismisses++ }, { confirms++ }, error = draftFailed, sessionPending = pending, sessionFailed = !pending)
@@ -127,23 +127,23 @@ class ExitDialogsTest {
             val waiting = state == 0
             val name = when(state) { 0 -> "pending"; 1 -> "failed"; else -> "draft-failed" }
             compose.runOnIdle { dark = theme; pending = waiting; draftFailed = state == 2 }
-            assertReadable("Keluar dari akun?")
+            assertReadable("Sign out?")
             if (!waiting) {
-                val message = if (draftFailed) "Penyimpanan draf belum bisa diperbarui. Isian belum ditutup. Coba lagi." else failure
+                val message = if (draftFailed) "Couldn't update the saved draft. The form is still open. Try again." else failure
                 assertReadable(message)
                 compose.onNodeWithText(message).assert(SemanticsMatcher.expectValue(
                     androidx.compose.ui.semantics.SemanticsProperties.LiveRegion, androidx.compose.ui.semantics.LiveRegionMode.Polite))
                 if (draftFailed) compose.onNodeWithText(failure).assertDoesNotExist()
             }
             capture("logout-${if(theme) "dark" else "light"}-$name-heading")
-            val label = if (waiting) "Menutup sesi perangkat…" else "Keluar"
+            val label = if (waiting) "Signing out on this device…" else "Sign out"
             assertReadable(label)
             val primary = compose.onNodeWithText(label).performScrollTo().assertHeightIsAtLeast(48.dp)
             if (waiting) primary.assertIsNotEnabled() else primary.assertIsEnabled()
-            val cancel = compose.onNodeWithText("Batal").performScrollTo().assertHeightIsAtLeast(48.dp)
+            val cancel = compose.onNodeWithText("Cancel").performScrollTo().assertHeightIsAtLeast(48.dp)
             if (waiting) cancel.assertIsNotEnabled() else cancel.assertIsEnabled()
             val labels = mutableListOf<TextLayoutResult>()
-            compose.onNodeWithText("Batal", useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(labels) }
+            compose.onNodeWithText("Cancel", useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(labels) }
             val expected = if (waiting) {
                 if (theme) com.example.wastenot.theme.OnSurfaceVariantDark else com.example.wastenot.theme.OnSurfaceVariant
             } else if (theme) com.example.wastenot.theme.OnPrimaryContainerDark else com.example.wastenot.theme.OnPrimaryContainer
@@ -151,8 +151,8 @@ class ExitDialogsTest {
             capture("logout-${if(theme) "dark" else "light"}-$name-actions")
         }
         assertEquals(0, confirms); assertEquals(0, dismisses)
-        compose.onNodeWithText("Keluar").performScrollTo().performClick()
-        compose.onNodeWithText("Batal").performScrollTo().performClick()
+        compose.onNodeWithText("Sign out").performScrollTo().performClick()
+        compose.onNodeWithText("Cancel").performScrollTo().performClick()
         assertEquals(1, confirms); assertEquals(1, dismisses)
     }
 

@@ -85,11 +85,11 @@ class CoreAsyncStateDesignTest {
 
     private fun waitForQuery(value: String) {
         compose.waitUntil(5_000) {
-            compose.onAllNodesWithContentDescription("Cari panduan").fetchSemanticsNodes().any {
+            compose.onAllNodesWithContentDescription("Search guides").fetchSemanticsNodes().any {
                 it.config.contains(SemanticsProperties.EditableText) && it.config[SemanticsProperties.EditableText].text == value
             }
         }
-        compose.onNodeWithContentDescription("Cari panduan").assertTextContains(value)
+        compose.onNodeWithContentDescription("Search guides").assertTextContains(value)
     }
 
     @Test fun historyUnknownIsNotZeroAndRecoveryKeepsCachedRecords() {
@@ -105,32 +105,32 @@ class CoreAsyncStateDesignTest {
         for (theme in listOf(false, true)) {
             val suffix = if (theme) "dark" else "light"
             compose.runOnIdle { dark.value = theme; page.value = "loading"; data = HistoryUiState() }
-            inspect("history-loading-$suffix", "Memuat catatan…")
-            if (compose.onAllNodesWithText("0 catatan dimuat.").fetchSemanticsNodes().isNotEmpty())
+            inspect("history-loading-$suffix", "Loading logs…")
+            if (compose.onAllNodesWithText("0 logs loaded.").fetchSemanticsNodes().isNotEmpty())
                 problems.add("history-loading-$suffix: unresolved data presented as zero")
             compose.runOnIdle { page.value = "error"; data = HistoryUiState(loading = false, error = ApiFailureKind.NETWORK) }
-            inspect("history-error-$suffix", "Catatan belum bisa dimuat.")
-            compose.onNodeWithText("Coba lagi").performScrollTo().assertIsEnabled().performClick()
+            inspect("history-error-$suffix", "Couldn't load your logs.")
+            compose.onNodeWithText("Try again").performScrollTo().assertIsEnabled().performClick()
             compose.runOnIdle { page.value = "empty"; data = HistoryUiState(loading = false) }
-            inspect("history-empty-$suffix", "Belum ada catatan")
-            compose.onNodeWithText("Input manual").performScrollTo().assertIsEnabled().performClick()
+            inspect("history-empty-$suffix", "No logs yet")
+            compose.onNodeWithText("Log manually").performScrollTo().assertIsEnabled().performClick()
             compose.runOnIdle { page.value = "cached"; data = HistoryUiState(listOf(log), false, error = ApiFailureKind.NETWORK) }
             compose.onNodeWithText("250 g").assertExists()
             captureUiPreview(compose, "history-cached-error-$suffix", "core-async-review")
             compose.onNodeWithTag("async-state-symbol").assertDoesNotExist()
-            compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+            compose.onNodeWithText("Try again").performScrollTo().performClick()
             compose.runOnIdle { page.value = "paging"; data = HistoryUiState(listOf(log), false, loadingMore = true) }
-            compose.onNodeWithTag("history-list").performScrollToNode(hasText("Memuat catatan berikutnya…"))
-            compose.onNodeWithText("Memuat catatan berikutnya…").assertIsDisplayed()
+            compose.onNodeWithTag("history-list").performScrollToNode(hasText("Loading more logs…"))
+            compose.onNodeWithText("Loading more logs…").assertIsDisplayed()
             captureUiPreview(compose, "history-paging-$suffix", "core-async-review")
             compose.runOnIdle { page.value = "page-error"; data = HistoryUiState(listOf(log), false,
                 nextCursor = "next", pageError = ApiFailureKind.NETWORK) }
-            compose.onNodeWithText("Catatan berikutnya belum bisa dimuat.").assertIsDisplayed()
+            compose.onNodeWithText("Couldn't load more logs.").assertIsDisplayed()
             compose.onNodeWithText("250 g").assertExists()
             captureUiPreview(compose, "history-page-error-$suffix", "core-async-review")
-            compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+            compose.onNodeWithText("Try again").performScrollTo().performClick()
             compose.runOnIdle { page.value = "page-restart"; data = data.copy(nextCursor = null, pageRestartRequired = true) }
-            compose.onNodeWithText("Muat ulang riwayat").performScrollTo().assertIsEnabled().performClick()
+            compose.onNodeWithText("Reload history").performScrollTo().assertIsEnabled().performClick()
         }
         compose.runOnIdle { assertEquals(6, retries); assertEquals(2, moreRetries); assertEquals(2, records) }
         assertTrue(problems.joinToString("; "), problems.isEmpty())
@@ -152,27 +152,27 @@ class CoreAsyncStateDesignTest {
         for (theme in listOf(false, true)) {
             val suffix = if (theme) "dark" else "light"
             compose.runOnIdle { dark.value = theme; page.value = "loading"; data = GuideUiState() }
-            inspect("guide-loading-$suffix", "Memuat panduan…")
+            inspect("guide-loading-$suffix", "Loading guides…")
             compose.runOnIdle { page.value = "catalog"; data = GuideUiState(loading = false) }
-            inspect("guide-catalog-empty-$suffix", "Panduan belum ditemukan")
-            val reload = compose.onAllNodesWithText("Muat ulang panduan").fetchSemanticsNodes()
-            if (reload.size == 1) compose.onNodeWithText("Muat ulang panduan").performScrollTo().performClick()
+            inspect("guide-catalog-empty-$suffix", "No guides found")
+            val reload = compose.onAllNodesWithText("Reload guides").fetchSemanticsNodes()
+            if (reload.size == 1) compose.onNodeWithText("Reload guides").performScrollTo().performClick()
             else problems.add("guide-catalog-empty-$suffix: no reload action for an unfiltered empty catalog")
             compose.runOnIdle { page.value = "filtered"; data = GuideUiState(query = "karton", loading = false) }
             waitForQuery("karton")
-            inspect("guide-search-empty-$suffix", "Panduan belum ditemukan")
-            compose.onNodeWithText("Hapus pencarian").performScrollTo().performClick()
+            inspect("guide-search-empty-$suffix", "No guides found")
+            compose.onNodeWithText("Clear search").performScrollTo().performClick()
             compose.runOnIdle { assertEquals("", data.query); assertNull(data.category) }
             compose.runOnIdle { page.value = "error"; data = GuideUiState(query = "karton", loading = false, error = ApiFailureKind.NETWORK) }
             waitForQuery("karton")
-            inspect("guide-error-$suffix", "Panduan belum bisa dimuat")
-            compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+            inspect("guide-error-$suffix", "Couldn't load the guides")
+            compose.onNodeWithText("Try again").performScrollTo().performClick()
             compose.runOnIdle { page.value = "detail-loading"; detail = null }
-            inspect("guide-detail-loading-$suffix", "Memuat panduan…")
+            inspect("guide-detail-loading-$suffix", "Loading guides…")
             compose.runOnIdle { page.value = "detail-missing"; detail = GuideDetailState("missing", loading = false, error = ApiFailureKind.NOT_FOUND) }
-            inspect("guide-detail-missing-$suffix", "Panduan sudah tidak tersedia")
-            compose.onNodeWithText("Catat aktivitas ini").assertDoesNotExist()
-            compose.onNodeWithText("Kembali ke panduan").performScrollTo().performClick()
+            inspect("guide-detail-missing-$suffix", "This guide is no longer available")
+            compose.onNodeWithText("Log this activity").assertDoesNotExist()
+            compose.onNodeWithText("Back to guides").performScrollTo().performClick()
         }
         compose.runOnIdle {
             if (searches != 4) problems.add("guide recovery callbacks: expected 4, actual $searches")
@@ -200,27 +200,27 @@ class CoreAsyncStateDesignTest {
         for (theme in listOf(false, true)) {
             val suffix = if (theme) "dark" else "light"
             compose.runOnIdle { dark.value = theme; page.value = "home-loading"; dashboard = SnapshotState() }
-            inspect("home-loading-$suffix", "Memuat ringkasan…")
+            inspect("home-loading-$suffix", "Loading summary…")
             compose.runOnIdle { page.value = "home-error"; dashboard = SnapshotState(loading = false, error = ApiFailureKind.NETWORK) }
-            inspect("home-error-$suffix", "Ringkasan belum bisa dimuat")
-            compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+            inspect("home-error-$suffix", "Couldn't load the summary")
+            compose.onNodeWithText("Try again").performScrollTo().performClick()
             compose.runOnIdle { page.value = "statistics-loading"; statistics = SnapshotState() }
-            inspect("statistics-loading-$suffix", "Memuat ringkasan…")
-            compose.onNodeWithText("30 hari").assertIsSelected()
-            compose.onNodeWithText("7 hari").assertIsEnabled()
+            inspect("statistics-loading-$suffix", "Loading summary…")
+            compose.onNodeWithText("30 days").assertIsSelected()
+            compose.onNodeWithText("7 days").assertIsEnabled()
             compose.runOnIdle { page.value = "statistics-empty"; statistics = SnapshotState(dummyStatistics(emptyList(), ActivityDateRange.lastDays(date, 30), zone), false) }
-            inspect("statistics-empty-$suffix", "Belum ada catatan pada periode ini")
-            compose.onNodeWithText("Catat aktivitas").performScrollTo().performClick()
+            inspect("statistics-empty-$suffix", "No logs in this period")
+            compose.onNodeWithText("Log activity").performScrollTo().performClick()
             compose.runOnIdle { page.value = "home-cached"; dashboard = SnapshotState(dummyDashboard(listOf(log), date, zone), false, ApiFailureKind.NETWORK) }
             compose.onAllNodesWithText("250 g").assertCountEquals(2)
             compose.onNodeWithTag("async-state-symbol").assertDoesNotExist()
             captureUiPreview(compose, "home-cached-error-$suffix", "core-async-review")
-            for ((mode, title) in listOf("log-loading" to "Memuat catatan…", "log-error" to "Catatan belum bisa dimuat.", "log-missing" to "Catatan tidak tersedia")) {
+            for ((mode, title) in listOf("log-loading" to "Loading logs…", "log-error" to "Couldn't load your logs.", "log-missing" to "Log unavailable")) {
                 compose.runOnIdle { page.value = mode }
                 inspect("$mode-$suffix", title)
-                if (mode == "log-error") compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
-                if (mode == "log-missing") compose.onNodeWithText("Lihat riwayat").performScrollTo().performClick()
-                compose.onNodeWithText("Ubah catatan").assertDoesNotExist()
+                if (mode == "log-error") compose.onNodeWithText("Try again").performScrollTo().performClick()
+                if (mode == "log-missing") compose.onNodeWithText("See history").performScrollTo().performClick()
+                compose.onNodeWithText("Edit log").assertDoesNotExist()
             }
         }
         compose.runOnIdle { assertEquals(4, retries); assertEquals(2, records); assertEquals(2, histories) }

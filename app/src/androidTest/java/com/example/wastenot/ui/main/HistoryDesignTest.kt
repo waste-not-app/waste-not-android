@@ -46,7 +46,7 @@ class HistoryDesignTest {
     private val records = (1..25).map { index ->
         WasteLog("record-${index.toString().padStart(2, '0')}", if (index % 2 == 0) WasteCategory.PLASTIC else WasteCategory.PAPER,
             if (index % 3 == 0) DisposalMethod.REDUCE else DisposalMethod.RECYCLE, Quantity.Count.of(index),
-            if (index <= 20) today else today.minusDays(1), ZoneId.of("Asia/Jakarta"), "Catatan $index", 1, Instant.EPOCH, Instant.EPOCH)
+            if (index <= 20) today else today.minusDays(1), ZoneId.of("Asia/Jakarta"), "Note $index", 1, Instant.EPOCH, Instant.EPOCH)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -71,8 +71,8 @@ class HistoryDesignTest {
             WasteNotTheme(darkTheme = dark?.value ?: false) {
                 var open by rememberSaveable { mutableStateOf(false) }
                 Column(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas).systemBarsPadding()) {
-                    TopAppBar(title = { Text("Riwayat") }, actions = {
-                        TextButton(onClick = { open = true }) { Text("Filter riwayat") }
+                    TopAppBar(title = { Text("History") }, actions = {
+                        TextButton(onClick = { open = true }) { Text("Filter history") }
                     })
                     HistoryScreen(data, PaddingValues(), {}, onDetail, vm::refresh, vm::filter, vm::more,
                         Modifier.weight(1f).fillMaxWidth(), today, open, { open = true }, { open = false },
@@ -83,52 +83,52 @@ class HistoryDesignTest {
         if (restoration == null) compose.setContent(content) else restoration.setContent(content)
     }
 
-    private fun open() { compose.onNodeWithText("Filter riwayat").performClick() }
+    private fun open() { compose.onNodeWithText("Filter history").performClick() }
     private fun chooseCategory(label: String) {
-        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Category").performScrollTo().performClick()
         compose.onNode(hasText(label) and hasAnyAncestor(isPopup())).performClick()
     }
-    private fun apply() { compose.onNodeWithText("Terapkan filter").performScrollTo().performClick() }
+    private fun apply() { compose.onNodeWithText("Apply filters").performScrollTo().performClick() }
     private fun chooseDate(index: Int, day: String) {
-        compose.onAllNodesWithText("Pilih tanggal")[index].performScrollTo().performClick()
+        compose.onAllNodesWithText("Choose a date")[index].performScrollTo().performClick()
         val label = if (day == "21") "Monday, September 21, 2026" else "Monday, September 14, 2026"
         compose.onNodeWithText(label).performScrollTo().performClick()
-        compose.onNodeWithText("Terapkan", substring = false).performClick()
+        compose.onNodeWithText("Apply", substring = false).performClick()
     }
     private fun listText(text: String) { compose.onNodeWithTag("history-list").performScrollToNode(hasText(text)) }
 
     @Test fun draftCancelResetApplyAndRotationKeepTheirSeparateMeaning() {
         val restoration = StateRestorationTester(compose)
         show(restoration)
-        compose.onNodeWithText("20 catatan dimuat.").assertIsDisplayed()
-        open(); chooseCategory("Plastik")
+        compose.onNodeWithText("20 logs loaded.").assertIsDisplayed()
+        open(); chooseCategory("Plastic")
         restoration.emulateSavedInstanceStateRestore()
-        compose.onNode(hasText("Plastik") and hasAnyAncestor(hasTestTag("history-filter-sheet"))).assertExists()
-        compose.onNodeWithText("Batal").performScrollTo().performClick()
-        compose.onNodeWithText("20 catatan dimuat.").assertIsDisplayed()
-        open(); chooseCategory("Plastik"); apply()
-        compose.onNodeWithText("12 catatan sesuai filter dimuat.").assertIsDisplayed()
-        open(); compose.onNodeWithText("Reset pilihan").performScrollTo().performClick()
-        compose.onNodeWithText("Batal").performScrollTo().performClick()
-        compose.onNodeWithText("12 catatan sesuai filter dimuat.").assertIsDisplayed()
+        compose.onNode(hasText("Plastic") and hasAnyAncestor(hasTestTag("history-filter-sheet"))).assertExists()
+        compose.onNodeWithText("Cancel").performScrollTo().performClick()
+        compose.onNodeWithText("20 logs loaded.").assertIsDisplayed()
+        open(); chooseCategory("Plastic"); apply()
+        compose.onNodeWithText("12 matching logs loaded.").assertIsDisplayed()
+        open(); compose.onNodeWithText("Reset").performScrollTo().performClick()
+        compose.onNodeWithText("Cancel").performScrollTo().performClick()
+        compose.onNodeWithText("12 matching logs loaded.").assertIsDisplayed()
         restoration.emulateSavedInstanceStateRestore()
-        compose.onNodeWithText("12 catatan sesuai filter dimuat.").assertIsDisplayed()
-        open(); compose.onNodeWithText("Reset pilihan").performScrollTo().performClick(); apply()
-        compose.onNodeWithText("20 catatan dimuat.").assertIsDisplayed()
+        compose.onNodeWithText("12 matching logs loaded.").assertIsDisplayed()
+        open(); compose.onNodeWithText("Reset").performScrollTo().performClick(); apply()
+        compose.onNodeWithText("20 logs loaded.").assertIsDisplayed()
     }
 
     @Test fun incompleteAndReversedDatesStayInSheetUntilCorrected() {
         show()
         open(); chooseDate(0, "21"); apply()
-        compose.onNodeWithText("Isi tanggal mulai dan akhir, atau kosongkan keduanya.").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Fill in both dates, or leave both empty.").performScrollTo().assertIsDisplayed()
         chooseDate(0, "14"); apply()
-        compose.onNodeWithText("Tanggal mulai tidak boleh melewati tanggal akhir.").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Reset pilihan").performScrollTo().performClick()
+        compose.onNodeWithText("The start date can't be after the end date.").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Reset").performScrollTo().performClick()
         chooseDate(0, "21"); chooseDate(0, "21"); apply()
-        compose.onNodeWithText("20 catatan sesuai filter dimuat.").assertIsDisplayed()
-        compose.onNodeWithText("Hari ini").assertIsDisplayed()
-        listText("Input manual")
-        compose.onNodeWithText("Kemarin").assertDoesNotExist()
+        compose.onNodeWithText("20 matching logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Today").assertIsDisplayed()
+        listText("Log manually")
+        compose.onNodeWithText("Yesterday").assertDoesNotExist()
     }
 
     @Test fun paginationRestoresScrollAndShowsGroupedRowsInBothThemes() {
@@ -137,23 +137,23 @@ class HistoryDesignTest {
         var selected: String? = null
         show(restoration, dark) { selected = it }
         capture("history-light")
-        listText("Muat catatan berikutnya")
-        compose.onNodeWithText("Muat catatan berikutnya").performScrollTo().performClick()
-        listText("Catatan 21")
-        compose.onNodeWithText("Catatan 21").performClick()
+        listText("Load more logs")
+        compose.onNodeWithText("Load more logs").performScrollTo().performClick()
+        listText("Note 21")
+        compose.onNodeWithText("Note 21").performClick()
         assertEquals("record-21", selected)
         restoration.emulateSavedInstanceStateRestore()
-        compose.onNodeWithText("Catatan 21").assertIsDisplayed()
-        listText("Semua catatan sudah dimuat.")
-        compose.onNodeWithText("Muat catatan berikutnya").assertDoesNotExist()
-        listText("Kemarin")
-        compose.onNodeWithText("Kemarin").assertIsDisplayed()
-        listText("25 catatan dimuat.")
+        compose.onNodeWithText("Note 21").assertIsDisplayed()
+        listText("All logs loaded.")
+        compose.onNodeWithText("Load more logs").assertDoesNotExist()
+        listText("Yesterday")
+        compose.onNodeWithText("Yesterday").assertIsDisplayed()
+        listText("25 logs loaded.")
         compose.runOnIdle { dark.value = true }
         capture("history-dark")
         open(); capture("filter-dark")
-        compose.onNodeWithText("Terapkan filter").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Batal").performScrollTo().performClick()
+        compose.onNodeWithText("Apply filters").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Cancel").performScrollTo().performClick()
         compose.runOnIdle { dark.value = false }
         open(); capture("filter-light")
     }
@@ -161,12 +161,12 @@ class HistoryDesignTest {
     @Test fun deletionNoticeStaysVisibleAboveAScrolledHistory() {
         val notice = mutableStateOf(false)
         show(notice = notice)
-        listText("Input manual")
+        listText("Log manually")
         compose.runOnIdle { notice.value = true }
-        compose.onNodeWithText("Catatan dihapus.").assertIsDisplayed()
-        compose.onNodeWithText("Tutup").performClick()
-        compose.onNodeWithText("Catatan dihapus.").assertDoesNotExist()
-        compose.onNodeWithText("Input manual").assertIsDisplayed()
+        compose.onNodeWithText("Log deleted.").assertIsDisplayed()
+        compose.onNodeWithText("Close").performClick()
+        compose.onNodeWithText("Log deleted.").assertDoesNotExist()
+        compose.onNodeWithText("Log manually").assertIsDisplayed()
     }
 
     @Test fun measuresNativeHistoryLoadingAndScrollingOneThousandRecords() {
@@ -179,7 +179,7 @@ class HistoryDesignTest {
         ).bufferedReader().use { it.readText() }
 
         val dataset = (1..1_000).map { index ->
-            records.first().copy(id = "record-${index.toString().padStart(4, '0')}", notes = "Catatan $index")
+            records.first().copy(id = "record-${index.toString().padStart(4, '0')}", notes = "Note $index")
         }
         val requests = mutableListOf<String?>()
         show(dataset = dataset, pageFailure = { cursor ->
@@ -187,31 +187,31 @@ class HistoryDesignTest {
             if (requests.size == 2) ApiFailure(ApiFailureKind.NETWORK) else null
         })
         val list = compose.onNodeWithTag("history-list")
-        compose.onNodeWithText("20 catatan dimuat.").assertIsDisplayed()
+        compose.onNodeWithText("20 logs loaded.").assertIsDisplayed()
         compose.runOnIdle { assertEquals(listOf(null), requests) }
 
         graphics(" reset")
         val startPss = Debug.getPss()
         val startedAt = SystemClock.elapsedRealtime()
         list.performScrollToIndex(22)
-        compose.onNodeWithText("Muat catatan berikutnya").performClick()
-        compose.onNodeWithText("Catatan berikutnya belum bisa dimuat.").assertIsDisplayed()
+        compose.onNodeWithText("Load more logs").performClick()
+        compose.onNodeWithText("Couldn't load more logs.").assertIsDisplayed()
         list.performScrollToIndex(0)
-        compose.onNodeWithText("20 catatan dimuat.").assertIsDisplayed()
+        compose.onNodeWithText("20 logs loaded.").assertIsDisplayed()
         list.performScrollToIndex(22)
-        compose.onNodeWithText("Coba lagi").performClick()
+        compose.onNodeWithText("Try again").performClick()
 
         for (loaded in 40 until 1_000 step 20) {
             list.performScrollToIndex(loaded + 2)
-            compose.onNodeWithText("Muat catatan berikutnya").performClick()
+            compose.onNodeWithText("Load more logs").performClick()
         }
         list.performScrollToIndex(1_002)
-        compose.onNodeWithText("Semua catatan sudah dimuat.").assertIsDisplayed()
+        compose.onNodeWithText("All logs loaded.").assertIsDisplayed()
         list.performScrollToIndex(1_001)
-        compose.onNodeWithText("Catatan 1").assertIsDisplayed()
+        compose.onNodeWithText("Note 1").assertIsDisplayed()
         list.performScrollToIndex(0)
-        compose.onNodeWithText("1.000 catatan dimuat.").assertIsDisplayed()
-        compose.onNodeWithText("Catatan 1000").assertIsDisplayed()
+        compose.onNodeWithText("1.000 logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Note 1000").assertIsDisplayed()
         repeat(4) { list.performTouchInput { swipeUp() } }
         repeat(4) { list.performTouchInput { swipeDown() } }
         list.performScrollToIndex(0)

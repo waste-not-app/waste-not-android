@@ -101,7 +101,7 @@ class SessionRepositoryTest {
         assertTrue(session.register(" Nama ", " FIXTURE-A@example.com ", "fixture-password", java.time.ZoneId.of("Asia/Jakarta")) is ApiResult.Success)
         val body = Json.parseToJsonElement(server.takeRequest().body.readUtf8()).jsonObject
         assertEquals(setOf("name", "email", "password", "timezone"), body.keys)
-        assertEquals("Nama", body["name"]?.jsonPrimitive?.content)
+        assertEquals("Name", body["name"]?.jsonPrimitive?.content)
         assertEquals("fixture-a@example.com", body["email"]?.jsonPrimitive?.content)
         assertEquals(USER_A, (session.state.value as SessionState.Authenticated).user.id)
     }

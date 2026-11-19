@@ -336,7 +336,7 @@ class OfflineActivityStoreTest {
         val firstRequest = request()
         val otherRequest = request()
         val firstId = store().create(input, firstRequest).value().log.id
-        val otherId = store(other).create(input.copy(notes = "milik akun lain"), otherRequest).value().log.id
+        val otherId = store(other).create(input.copy(notes = "belongs to another account"), otherRequest).value().log.id
         val dao = database.activities()
         dao.snapshot(ServerSnapshot(owner.id, "acknowledgement", "first", 1))
         dao.snapshot(ServerSnapshot(other.id, "acknowledgement", "other", 2))

@@ -49,14 +49,14 @@ class SessionRootTest {
             bootstrapTarget = SessionState.SignedOut()
         }
         start(source)
-        compose.onNodeWithText("Menyiapkan catatanmu…").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Getting your logs ready…").performScrollTo().assertIsDisplayed()
         compose.onAllNodes(tabs).assertCountEquals(0)
         compose.onNodeWithText("Fixture A").assertDoesNotExist()
         assertEquals(1, source.bootstrapCalls)
         observeResolution { source.bootstrapGate!!.complete(Unit) }
-        compose.waitUntil(5_000) { compose.onAllNodes(hasText("Masuk") and hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
+        compose.waitUntil(5_000) { compose.onAllNodes(hasText("Sign in") and hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
         compose.waitForIdle()
-        compose.onNodeWithText("Menyiapkan catatanmu…").assertDoesNotExist()
+        compose.onNodeWithText("Getting your logs ready…").assertDoesNotExist()
         compose.onNodeWithText("Simulasikan", substring = true).assertDoesNotExist()
         compose.onAllNodes(tabs).assertCountEquals(0)
         assertEquals(1, source.bootstrapCalls)
@@ -73,7 +73,7 @@ class SessionRootTest {
             for (frame in 0 until 60) {
                 compose.mainClock.advanceTimeByFrame()
                 compose.waitForIdle()
-                val login = compose.onAllNodes(hasText("Masuk") and hasClickAction()).fetchSemanticsNodes().isNotEmpty()
+                val login = compose.onAllNodes(hasText("Sign in") and hasClickAction()).fetchSemanticsNodes().isNotEmpty()
                 compose.onAllNodes(tabs).assertCountEquals(0)
                 compose.onNodeWithText("Fixture A").assertDoesNotExist()
                 if (destinationFrame == null && login) destinationFrame = frame
@@ -97,23 +97,23 @@ class SessionRootTest {
     @Test fun unverifiedIdentityHidesOldProfileAndRetryReplacesRootOnce() {
         val source = FixtureSession().apply { state.value = SessionState.Authenticated(user, 1) }
         start(source)
-        compose.onNode(tabs and hasText("Profil")).performClick()
+        compose.onNode(tabs and hasText("Profile")).performClick()
         compose.onNodeWithText("Fixture A").assertIsDisplayed()
         compose.runOnIdle { source.state.value = SessionState.ConnectionRequired(ApiFailure(ApiFailureKind.NETWORK)) }
-        compose.onNodeWithText("Belum bisa memeriksa sesi").assertIsDisplayed()
+        compose.onNodeWithText("Can't check your session yet").assertIsDisplayed()
         compose.onNodeWithText("Fixture A").assertDoesNotExist()
         compose.onAllNodes(tabs).assertCountEquals(0)
         source.bootstrapTarget = SessionState.SignedOut(SignOutReason.EXPIRED)
-        compose.onNodeWithText("Coba lagi").performClick()
+        compose.onNodeWithText("Try again").performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("Masuk").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Lihat data contoh").assertDoesNotExist()
+        compose.onNodeWithText("Sign in").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("See sample data").assertDoesNotExist()
         assertEquals(2, source.bootstrapCalls)
         compose.onNodeWithText("Fixture A").assertDoesNotExist()
         compose.runOnIdle { source.state.value = SessionState.Authenticated(source.user.copy(
             id = "00000000-0000-4000-8000-000000000010", name = "Fixture B", email = "b@example.invalid"), 2) }
-        compose.onNode(tabs and hasText("Beranda")).assertIsSelected()
-        compose.onNode(tabs and hasText("Profil")).performClick()
+        compose.onNode(tabs and hasText("Home")).assertIsSelected()
+        compose.onNode(tabs and hasText("Profile")).performClick()
         compose.onNodeWithText("Fixture B").assertIsDisplayed()
         compose.onNodeWithText("Fixture A").assertDoesNotExist()
     }
@@ -122,16 +122,16 @@ class SessionRootTest {
         val source = FixtureSession().apply { loginGate = CompletableDeferred() }
         start(source)
         val email = compose.onNode(hasContentDescription("Email") and hasSetTextAction())
-        val password = compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction())
+        val password = compose.onNode(hasContentDescription("Password") and hasSetTextAction())
         email.assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentType, ContentType.EmailAddress))
         password.assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentType, ContentType.Password))
         email.performTextReplacement("fixture@example.invalid")
         password.performTextReplacement(" fixture-password-12 ")
         password.performImeAction()
-        compose.onNodeWithText("Sedang masuk…").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Signing in…").performScrollTo().assertIsNotEnabled()
         assertEquals(1, source.loginCalls)
         source.loginGate!!.complete(Unit)
-        compose.waitUntil(5_000) { compose.onAllNodesWithText("Email atau kata sandi belum cocok.").fetchSemanticsNodes().isNotEmpty() }
+        compose.waitUntil(5_000) { compose.onAllNodesWithText("That email and password don't match.").fetchSemanticsNodes().isNotEmpty() }
         email.assertTextContains("fixture@example.invalid")
         assertEquals("•".repeat(" fixture-password-12 ".length), password.fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
         assertEquals(" fixture-password-12 ", source.receivedPassword)
@@ -142,55 +142,55 @@ class SessionRootTest {
         val source = FixtureSession().apply { state.value = SessionState.ConnectionRequired(ApiFailure(ApiFailureKind.NETWORK)) }
         start(source)
         compose.onAllNodes(tabs).assertCountEquals(0)
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
         compose.waitForIdle()
         assertEquals(2, source.bootstrapCalls)
-        compose.onNodeWithText("Masuk ulang").performScrollTo().performClick()
-        compose.onNodeWithText("Masuk").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Sign in again").performScrollTo().performClick()
+        compose.onNodeWithText("Sign in").performScrollTo().assertIsDisplayed()
         compose.onAllNodes(tabs).assertCountEquals(0)
     }
 
     @Test fun registrationValidatesFirstThenUsesVisibleTimezoneAndClearsAuthRoot() {
         val source = FixtureSession()
         start(source)
-        compose.onNodeWithText("Belum punya akun? Daftar").performScrollTo().performClick()
-        compose.onNodeWithText("Buat akun").performScrollTo().performClick()
-        compose.onNode(hasContentDescription("Nama") and hasSetTextAction()).assertIsFocused()
+        compose.onNodeWithText("New here? Create an account").performScrollTo().performClick()
+        compose.onNodeWithText("Create account").performScrollTo().performClick()
+        compose.onNode(hasContentDescription("Name") and hasSetTextAction()).assertIsFocused()
         assertEquals(0, source.registerCalls)
-        compose.onNode(hasContentDescription("Nama") and hasSetTextAction()).performTextReplacement("Sam Demo")
+        compose.onNode(hasContentDescription("Name") and hasSetTextAction()).performTextReplacement("Sam Demo")
         compose.onNode(hasContentDescription("Email") and hasSetTextAction()).performTextReplacement("sam@example.invalid")
-        compose.onNode(hasContentDescription("Kata sandi") and hasSetTextAction()).performTextReplacement(" fixture-password-12 ")
-        val confirmation = compose.onNode(hasContentDescription("Konfirmasi kata sandi") and hasSetTextAction())
+        compose.onNode(hasContentDescription("Password") and hasSetTextAction()).performTextReplacement(" fixture-password-12 ")
+        val confirmation = compose.onNode(hasContentDescription("Confirm password") and hasSetTextAction())
         confirmation.assert(SemanticsMatcher.expectValue(SemanticsProperties.ContentType, ContentType.NewPassword))
         confirmation.performTextReplacement("fixture-password-12")
-        compose.onNodeWithText("Buat akun").performScrollTo().performClick()
-        compose.onNodeWithText("Konfirmasi kata sandi belum sama.").assertExists()
+        compose.onNodeWithText("Create account").performScrollTo().performClick()
+        compose.onNodeWithText("The passwords don't match yet.").assertExists()
         assertEquals(0, source.registerCalls)
         confirmation.performTextReplacement(" fixture-password-12 ")
         confirmation.performImeAction()
         compose.waitForIdle()
         compose.onAllNodes(tabs).assertCountEquals(5)
-        compose.onNode(tabs and hasText("Profil")).performClick()
+        compose.onNode(tabs and hasText("Profile")).performClick()
         compose.onNodeWithText("Sam Demo").assertIsDisplayed()
         assertNotNull(source.receivedTimezone)
         compose.onNodeWithText(source.receivedTimezone!!.id).assertIsDisplayed()
         assertEquals(1, source.registerCalls)
-        compose.onNodeWithText("Buat akun contoh").assertDoesNotExist()
+        compose.onNodeWithText("Create sample account").assertDoesNotExist()
     }
 
     @Test fun aNewAccountLifetimeDoesNotRestoreThePreviousGuideQuery() {
         val source = FixtureSession().apply { state.value = SessionState.Authenticated(user, 1) }
         start(source)
-        compose.onNode(tabs and hasText("Panduan")).performClick()
-        compose.onNodeWithContentDescription("Cari panduan").performTextReplacement("karton")
-        compose.onNodeWithContentDescription("Cari panduan").performImeAction()
+        compose.onNode(tabs and hasText("Guide")).performClick()
+        compose.onNodeWithContentDescription("Search guides").performTextReplacement("karton")
+        compose.onNodeWithContentDescription("Search guides").performImeAction()
         compose.runOnIdle { source.state.value = SessionState.SignedOut() }
-        compose.waitUntil(5_000) { compose.onAllNodes(hasText("Masuk") and hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
+        compose.waitUntil(5_000) { compose.onAllNodes(hasText("Sign in") and hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
         compose.onAllNodes(tabs).assertCountEquals(0)
         compose.runOnIdle { source.state.value = SessionState.Authenticated(source.user, 2) }
-        compose.waitUntil(5_000) { compose.onAllNodes(tabs and hasText("Panduan")).fetchSemanticsNodes().isNotEmpty() }
-        compose.onNode(tabs and hasText("Panduan")).performClick()
-        assertEquals("", compose.onNodeWithContentDescription("Cari panduan").fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
+        compose.waitUntil(5_000) { compose.onAllNodes(tabs and hasText("Guide")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNode(tabs and hasText("Guide")).performClick()
+        assertEquals("", compose.onNodeWithContentDescription("Search guides").fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
     }
 
     @Test fun changingIdentityNeverRestoresAnotherAccountsDraft() {
@@ -200,8 +200,8 @@ class SessionRootTest {
         source.state.value = SessionState.Authenticated(a, 1)
         start(source)
         compose.waitUntil(10_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
-        compose.onNodeWithText("Input manual").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Draf akun A pribadi")
+        compose.onNodeWithText("Log manually").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().performTextReplacement("Account A draft, private")
         fun disk(owner: String): StoredEditorDraft? {
             var draft: StoredEditorDraft? = null
             kotlinx.coroutines.test.runTest {
@@ -209,21 +209,21 @@ class SessionRootTest {
             }
             return draft
         }
-        compose.waitUntil(10_000) { disk(a.id)?.fields?.get(12) == "Draf akun A pribadi" }
+        compose.waitUntil(10_000) { disk(a.id)?.fields?.get(12) == "Account A draft, private" }
         val requestA = checkNotNull(disk(a.id)).requestId
-        compose.onNodeWithContentDescription("Catatan (opsional)").performTextReplacement("Draf akun A terkini")
+        compose.onNodeWithContentDescription("Notes (optional)").performTextReplacement("Account A draft, latest")
         compose.runOnIdle { source.state.value = SessionState.Authenticated(b, 2) }
         compose.waitUntil(10_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
-        compose.onNodeWithText("Draf akun A", substring = true).assertDoesNotExist()
-        compose.onNodeWithText("Input manual").performScrollTo().performClick()
-        assertEquals("", compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo()
+        compose.onNodeWithText("Account A draft", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Log manually").performScrollTo().performClick()
+        assertEquals("", compose.onNodeWithContentDescription("Notes (optional)").performScrollTo()
             .fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
         compose.waitUntil(10_000) { disk(b.id) != null }
         assertEquals("", checkNotNull(disk(b.id)).fields[12])
         org.junit.Assert.assertNotEquals(requestA, checkNotNull(disk(b.id)).requestId)
         compose.runOnIdle { source.state.value = SessionState.Authenticated(a, 3) }
-        compose.waitUntil(10_000) { compose.onAllNodesWithText("Draf dipulihkan. Periksa isian sebelum menyimpan.").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().assertTextContains("Draf akun A", substring = true)
+        compose.waitUntil(10_000) { compose.onAllNodesWithText("Draft restored. Check your entries before saving.").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().assertTextContains("Account A draft", substring = true)
         assertEquals(requestA, checkNotNull(disk(a.id)).requestId)
         captureDraftFixture("draft-account-A-restored")
     }
@@ -235,22 +235,22 @@ class SessionRootTest {
         }
         start(source)
         compose.waitUntil(10_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
-        compose.onNode(tabs and hasText("Profil")).performClick()
-        compose.onNodeWithText("Keluar").performScrollTo().performClick()
-        compose.onNode(hasText("Keluar") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.onNode(tabs and hasText("Profile")).performClick()
+        compose.onNodeWithText("Sign out").performScrollTo().performClick()
+        compose.onNode(hasText("Sign out") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
         compose.waitUntil(5_000) { source.logoutCompletions == 1 }
         org.junit.Assert.assertTrue(source.state.value is SessionState.Authenticated)
         compose.onNode(isDialog()).assertExists()
-        compose.onNodeWithText("Sesi perangkat belum bisa ditutup. Kamu masih masuk. Coba lagi untuk keluar.").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Couldn't sign out on this device. You're still signed in. Try signing out again.").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Fixture A").assertExists()
         captureDraftFixture("logout-account-failed")
-        compose.onNode(hasText("Batal") and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.onNode(hasText("Cancel") and hasAnyAncestor(isDialog())).performScrollTo().performClick()
         compose.onNode(isDialog()).assertDoesNotExist()
-        compose.onNode(tabs and hasText("Profil")).assertIsSelected()
+        compose.onNode(tabs and hasText("Profile")).assertIsSelected()
         source.logoutResult = LogoutResult(true, false)
-        compose.onNodeWithText("Keluar").performScrollTo().performClick()
-        compose.onNode(hasText("Keluar") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
-        compose.waitUntil(10_000) { compose.onAllNodes(hasText("Masuk") and hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Sign out").performScrollTo().performClick()
+        compose.onNode(hasText("Sign out") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.waitUntil(10_000) { compose.onAllNodes(hasText("Sign in") and hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
         compose.onAllNodes(tabs).assertCountEquals(0)
         compose.onNodeWithText("Fixture A").assertDoesNotExist()
         assertEquals(2, source.logoutCalls)
@@ -265,24 +265,24 @@ class SessionRootTest {
         val restoration = StateRestorationTester(compose)
         start(source, restoration)
         compose.waitUntil(10_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
-        compose.onNode(tabs and hasText("Profil")).performClick()
-        compose.onNodeWithText("Keluar").performScrollTo().performClick()
-        compose.onNode(hasText("Keluar") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.onNode(tabs and hasText("Profile")).performClick()
+        compose.onNodeWithText("Sign out").performScrollTo().performClick()
+        compose.onNode(hasText("Sign out") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
         compose.waitUntil(5_000) { source.logoutCalls == 1 }
         restoration.emulateSavedInstanceStateRestore()
-        compose.waitUntil(10_000) { compose.onAllNodesWithText("Menutup sesi perangkat…").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Menutup sesi perangkat…").performScrollTo().assertIsNotEnabled()
-        compose.onNode(hasText("Batal") and hasAnyAncestor(isDialog())).assertIsNotEnabled()
+        compose.waitUntil(10_000) { compose.onAllNodesWithText("Signing out on this device…").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Signing out on this device…").performScrollTo().assertIsNotEnabled()
+        compose.onNode(hasText("Cancel") and hasAnyAncestor(isDialog())).assertIsNotEnabled()
         InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
         InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_ESCAPE)
         compose.onNode(isDialog()).assertExists()
-        compose.onNodeWithText("Menutup sesi perangkat…").performScrollTo().performTouchInput { click() }
+        compose.onNodeWithText("Signing out on this device…").performScrollTo().performTouchInput { click() }
         assertEquals(1, source.logoutCalls)
         captureDraftFixture("logout-account-pending")
         source.logoutGate!!.complete(Unit)
         compose.waitUntil(5_000) { source.logoutCompletions == 1 }
-        compose.onNodeWithText("Sesi perangkat belum bisa ditutup. Kamu masih masuk. Coba lagi untuk keluar.").performScrollTo().assertIsDisplayed()
-        compose.onNode(hasText("Batal") and hasAnyAncestor(isDialog())).assertIsEnabled()
+        compose.onNodeWithText("Couldn't sign out on this device. You're still signed in. Try signing out again.").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasText("Cancel") and hasAnyAncestor(isDialog())).assertIsEnabled()
     }
 
     @Test fun aClosedAccountRootKeepsSessionCleanupRetryOnTheLoginScreen() {
@@ -294,27 +294,27 @@ class SessionRootTest {
         }
         start(source)
         compose.waitUntil(10_000) { compose.onAllNodes(tabs).fetchSemanticsNodes().size == 5 }
-        compose.onNode(tabs and hasText("Profil")).performClick()
-        compose.onNodeWithText("Keluar").performScrollTo().performClick()
-        compose.onNode(hasText("Keluar") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
-        compose.waitUntil(10_000) { compose.onAllNodesWithText("Menutup sesi perangkat…").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNode(tabs and hasText("Profile")).performClick()
+        compose.onNodeWithText("Sign out").performScrollTo().performClick()
+        compose.onNode(hasText("Sign out") and hasClickAction() and hasAnyAncestor(isDialog())).performScrollTo().performClick()
+        compose.waitUntil(10_000) { compose.onAllNodesWithText("Signing out on this device…").fetchSemanticsNodes().isNotEmpty() }
         compose.onAllNodes(tabs).assertCountEquals(0)
         compose.onNodeWithText("Fixture A").assertDoesNotExist()
         source.logoutGate!!.complete(Unit)
         compose.waitUntil(5_000) { source.logoutCompletions == 1 }
-        compose.onNodeWithText("Catatan sudah ditutup, tetapi penyimpanan sesi belum bisa dibersihkan. Coba lagi sebelum meninggalkan perangkat ini.")
+        compose.onNodeWithText("Your logs are closed, but the saved session couldn't be cleared. Try again before you hand over this device.")
             .performScrollTo().assertIsDisplayed()
         val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
-        compose.onNodeWithText("Coba bersihkan sesi", useUnmergedTree = true).performScrollTo()
+        compose.onNodeWithText("Try clearing the session", useUnmergedTree = true).performScrollTo()
             .performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult) { it(layouts) }
         org.junit.Assert.assertFalse("cleanup label box=${layouts.single().size}, paragraph=${layouts.single().multiParagraph.width}", layouts.single().didOverflowWidth)
         org.junit.Assert.assertFalse(layouts.single().didOverflowHeight)
         captureDraftFixture("logout-auth-cleanup-failed")
         source.logoutResult = LogoutResult(true, false)
-        compose.onNodeWithText("Coba bersihkan sesi").performScrollTo().performClick()
+        compose.onNodeWithText("Try clearing the session").performScrollTo().performClick()
         compose.waitUntil(5_000) { source.logoutCompletions == 2 }
-        compose.onNodeWithText("Coba bersihkan sesi").assertDoesNotExist()
-        compose.onNode(hasText("Masuk") and hasClickAction()).performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Try clearing the session").assertDoesNotExist()
+        compose.onNode(hasText("Sign in") and hasClickAction()).performScrollTo().assertIsDisplayed()
         compose.onAllNodes(tabs).assertCountEquals(0)
     }
 

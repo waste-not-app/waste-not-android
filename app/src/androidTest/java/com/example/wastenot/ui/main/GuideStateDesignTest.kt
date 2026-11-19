@@ -34,8 +34,8 @@ class GuideStateDesignTest {
                     {}, {}, { searches++ }, {}, {}, Modifier.fillMaxSize())
             }
         } }
-        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasContentDescription("Cari panduan"))
-        val field = compose.onNodeWithContentDescription("Cari panduan")
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasContentDescription("Search guides"))
+        val field = compose.onNodeWithContentDescription("Search guides")
         field.performClick().assertIsFocused().performImeAction()
         compose.runOnIdle { assertEquals(1, searches) }
         field.assertIsNotFocused()
@@ -49,11 +49,11 @@ class GuideStateDesignTest {
                     {}, {}, { retries++ }, {}, {}, Modifier.fillMaxSize())
             }
         } }
-        compose.onNodeWithContentDescription("Cari panduan").assertTextContains("kaca")
-        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Panduan belum bisa dimuat"))
-        compose.onNodeWithText("Panduan belum bisa dimuat").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithContentDescription("Search guides").assertTextContains("kaca")
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Couldn't load the guides"))
+        compose.onNodeWithText("Couldn't load the guides").performScrollTo().assertIsDisplayed()
         capture("guide-search-error")
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, retries) }
     }
 
@@ -65,10 +65,10 @@ class GuideStateDesignTest {
                     {}, { exits++ }, { error("Missing article must not create an editor") }, {}, Modifier.fillMaxSize())
             }
         } }
-        compose.onNodeWithText("Panduan sudah tidak tersedia").assertIsDisplayed()
-        compose.onNodeWithText("Catat aktivitas ini").assertDoesNotExist()
+        compose.onNodeWithText("This guide is no longer available").assertIsDisplayed()
+        compose.onNodeWithText("Log this activity").assertDoesNotExist()
         capture("guide-removed")
-        compose.onNodeWithText("Kembali ke panduan").performClick()
+        compose.onNodeWithText("Back to guides").performClick()
         compose.runOnIdle { assertEquals(1, exits) }
     }
 
@@ -80,18 +80,18 @@ class GuideStateDesignTest {
                     {}, {}, { retries++ }, {}, {}, Modifier.fillMaxSize())
             }
         } }
-        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Botol plastik"))
-        compose.onNodeWithText("Botol plastik").assertExists()
-        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Panduan belum bisa dimuat"))
-        compose.onNodeWithText("Panduan belum bisa dimuat").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Plastic bottles"))
+        compose.onNodeWithText("Plastic bottles").assertExists()
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Couldn't load the guides"))
+        compose.onNodeWithText("Couldn't load the guides").performScrollTo().assertIsDisplayed()
         capture("guide-refresh-error")
-        compose.onNodeWithText("Coba lagi").performScrollTo().performClick()
+        compose.onNodeWithText("Try again").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, retries) }
     }
 
     @Test fun suppliedReviewMetadataShowsItsHostAndAPlatformFailureRemainsRecoverable() {
         val source = "https://example.org/materials/glass"
-        val article = DummyGuideStore.fixtures[1].copy(cautions = listOf("Penerimaan material berbeda antar fasilitas."),
+        val article = DummyGuideStore.fixtures[1].copy(cautions = listOf("What facilities accept varies."),
             review = GuideReview(URI(source), LocalDate.of(2026, 1, 15), "Reviewer fixture"))
         var sourceError by mutableStateOf(false)
         val calls = mutableListOf<String>()
@@ -101,15 +101,15 @@ class GuideStateDesignTest {
                     { calls.add(it); sourceError = true }, Modifier.fillMaxSize(), sourceUnavailable = sourceError)
             }
         } }
-        compose.onNodeWithText("Perlu diperhatikan").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Penerimaan material berbeda antar fasilitas.").assertExists()
+        compose.onNodeWithText("Keep in mind").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("What facilities accept varies.").assertExists()
         compose.onNodeWithText("example.org").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(listOf(source), calls) }
-        compose.onNodeWithText("Ditinjau 15 Jan 2026").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Ditinjau oleh Reviewer fixture").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Draf panduan").assertDoesNotExist()
-        compose.onNodeWithText("Draf editorial").assertDoesNotExist()
-        compose.onNodeWithText("Tautan sumber belum bisa dibuka. Coba lagi dari tautan di atas.").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Reviewed 15 Jan 2026").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Reviewed by Reviewer fixture").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Draft guide").assertDoesNotExist()
+        compose.onNodeWithText("Editorial draft").assertDoesNotExist()
+        compose.onNodeWithText("Couldn't open the source link. Try again from the link above.").performScrollTo().assertIsDisplayed()
         capture("guide-source-error")
         compose.onNodeWithText("example.org").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(listOf(source, source), calls) }

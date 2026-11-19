@@ -45,7 +45,7 @@ class ThemeTest {
             val font = ResourcesCompat.getFont(context, resource)
             assertNotNull(font)
             val paint = Paint().apply { typeface = font; textSize = 32f }
-            assertTrue(paint.measureText("650 g · 2 benda") > 0)
+            assertTrue(paint.measureText("650 g · 2 items") > 0)
         }
         val license = context.assets.open("licenses/OFL-PlusJakartaSans.txt").bufferedReader().use { it.readText() }
         assertTrue(license.contains("SIL OPEN FONT LICENSE Version 1.1"))
@@ -100,7 +100,7 @@ class ThemeTest {
                 }
             }
         }
-        listOf("Gelap" to ThemeMode.DARK, "Terang" to ThemeMode.LIGHT, "Ikuti sistem" to ThemeMode.SYSTEM).forEach { (label, mode) ->
+        listOf("Dark" to ThemeMode.DARK, "Light" to ThemeMode.LIGHT, "Follow system" to ThemeMode.SYSTEM).forEach { (label, mode) ->
             compose.onNodeWithText(label).assertIsDisplayed().performClick().assertIsSelected()
             assertEquals(mode, store.modes.first { it == mode })
         }

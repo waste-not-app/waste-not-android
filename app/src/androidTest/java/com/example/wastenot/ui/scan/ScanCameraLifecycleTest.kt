@@ -100,26 +100,26 @@ class ScanCameraLifecycleTest {
     @Test fun settingsGrantRemovesTheBlockedStateWithoutActivatingCamera() {
         show()
         repeat(2) {
-            compose.onNodeWithText("Aktifkan kamera").performScrollTo().performClick()
+            compose.onNodeWithText("Turn on camera").performScrollTo().performClick()
             denyPermission()
-            compose.onNodeWithText("Izin kamera belum diberikan. Kamu tetap bisa menggunakan input manual.")
+            compose.onNodeWithText("Camera permission wasn't granted. You can still log manually.")
                 .performScrollTo().assertIsDisplayed()
         }
-        compose.onNodeWithText("Buka pengaturan kamera").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Open camera settings").performScrollTo().assertIsDisplayed()
         capture("permission-blocked")
-        compose.onNodeWithText("Buka pengaturan kamera").performClick()
+        compose.onNodeWithText("Open camera settings").performClick()
         assertEquals(1, settings)
         compose.activityRule.scenario.moveToState(Lifecycle.State.CREATED)
         instrumentation.uiAutomation.grantRuntimePermission(context.packageName, Manifest.permission.CAMERA)
         compose.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
         compose.waitForIdle()
         capture("permission-granted-return")
-        if (compose.onAllNodesWithText("Aktifkan kamera").fetchSemanticsNodes().size != 1)
+        if (compose.onAllNodesWithText("Turn on camera").fetchSemanticsNodes().size != 1)
             problems.add("Granted permission must restore the explicit activate action after Settings")
-        if (compose.onAllNodesWithText("Buka pengaturan kamera").fetchSemanticsNodes().isNotEmpty())
+        if (compose.onAllNodesWithText("Open camera settings").fetchSemanticsNodes().isNotEmpty())
             problems.add("The blocked Settings action must disappear after permission is granted")
         assertNull("Permission grant alone must not start the camera", preview())
-        compose.onNodeWithText("Input manual").assertIsDisplayed().performClick()
+        compose.onNodeWithText("Log manually").assertIsDisplayed().performClick()
         compose.onNodeWithText("Scan ditutup").assertIsDisplayed()
         assertEquals(1, manuals)
         assertEquals(0, photos)
@@ -133,34 +133,34 @@ class ScanCameraLifecycleTest {
         val view = checkNotNull(preview())
         val controller = compose.runOnIdle { checkNotNull(view.controller as? LifecycleCameraController) }
         awaitStream(view)
-        compose.onNodeWithText("Ambil foto").performScrollTo().assertIsEnabled()
+        compose.onNodeWithText("Take photo").performScrollTo().assertIsEnabled()
         capture("preview-streaming")
         compose.runOnIdle { controller.unbind() }
         compose.waitUntil(15_000) { compose.runOnIdle { view.previewStreamState.value == PreviewView.StreamState.IDLE } }
         capture("preview-idle")
-        if (compose.onAllNodes(hasText("Ambil foto") and isEnabled()).fetchSemanticsNodes().isNotEmpty())
+        if (compose.onAllNodes(hasText("Take photo") and isEnabled()).fetchSemanticsNodes().isNotEmpty())
             problems.add("Capture must be disabled while the actual preview is IDLE")
-        if (compose.onAllNodesWithText("Menyiapkan kamera…").fetchSemanticsNodes().isEmpty())
+        if (compose.onAllNodesWithText("Starting the camera…").fetchSemanticsNodes().isEmpty())
             problems.add("IDLE preview needs its preparing status")
-        else compose.onNodeWithText("Menyiapkan kamera…").assertIsNotEnabled()
+        else compose.onNodeWithText("Starting the camera…").assertIsNotEnabled()
         compose.runOnIdle { controller.bindToLifecycle(compose.activity) }
         awaitStream(view)
-        compose.onNodeWithText("Ambil foto").performScrollTo().assertIsEnabled().performClick()
+        compose.onNodeWithText("Take photo").performScrollTo().assertIsEnabled().performClick()
         compose.waitUntil(30_000) { state.phase == ScanPhase.PHOTO }
         val photo = checkNotNull(state.photo)
         assertTrue(File(photo.path).isFile && File(photo.path).length() in 1..5 * 1024 * 1024)
         assertTrue(photo.width in 1..1600 && photo.height in 1..1600)
-        compose.onNodeWithText("Tinjau foto").assertIsDisplayed()
+        compose.onNodeWithText("Review photo").assertIsDisplayed()
         capture("photo-review")
         awaitReleased(view)
         assertEquals(1, photos)
-        compose.onNodeWithContentDescription("Tutup scan").performClick()
+        compose.onNodeWithContentDescription("Close scan").performClick()
         compose.runOnIdle { state = ScanState(session = "camera-second"); open = true }
         activate()
         val closing = checkNotNull(preview())
         awaitStream(closing)
         capture("preview-before-close")
-        compose.onNodeWithContentDescription("Tutup scan").performClick()
+        compose.onNodeWithContentDescription("Close scan").performClick()
         compose.onNodeWithText("Scan ditutup").assertIsDisplayed()
         awaitReleased(closing)
         assertEquals(1, photos)
@@ -173,18 +173,18 @@ class ScanCameraLifecycleTest {
         val cameras = context.getSystemService(android.hardware.camera2.CameraManager::class.java)
         assertEquals(0, cameras.cameraIdList.size)
         show()
-        compose.onNodeWithText("Aktifkan kamera").performScrollTo().performClick()
+        compose.onNodeWithText("Turn on camera").performScrollTo().performClick()
         compose.waitUntil(30_000) { state.problem == ScanProblem.CAMERA }
-        compose.onNodeWithText("Kamera belum bisa dibuka. Coba lagi atau gunakan input manual.")
+        compose.onNodeWithText("Couldn't open the camera. Try again or log manually.")
             .performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Input manual").performClick()
+        compose.onNodeWithText("Log manually").performClick()
         compose.onNodeWithText("Scan ditutup").assertIsDisplayed()
         assertEquals(1, manuals)
         assertEquals(0, photos)
     }
 
     private fun activate() {
-        compose.onNodeWithText("Aktifkan kamera").performScrollTo().performClick()
+        compose.onNodeWithText("Turn on camera").performScrollTo().performClick()
         compose.waitUntil(30_000) { preview() != null || state.phase == ScanPhase.FAILURE }
         assertNotEquals("Camera must open on the configured emulator", ScanPhase.FAILURE, state.phase)
     }
@@ -227,7 +227,7 @@ class ScanCameraLifecycleTest {
             .put("cameraPermission", context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
         val view = preview()
         info.put("previewState", compose.runOnIdle { view?.previewStreamState?.value?.name ?: "absent" })
-        info.put("captureEnabled", compose.onAllNodes(hasText("Ambil foto") and isEnabled()).fetchSemanticsNodes().isNotEmpty())
+        info.put("captureEnabled", compose.onAllNodes(hasText("Take photo") and isEnabled()).fetchSemanticsNodes().isNotEmpty())
         File(context.getExternalFilesDir(null), "camera-lifecycle-review/$name-$suffix.json").writeText(info.toString(2))
     }
 

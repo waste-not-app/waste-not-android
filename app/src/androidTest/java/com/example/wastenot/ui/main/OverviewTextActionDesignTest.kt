@@ -41,9 +41,9 @@ class OverviewTextActionDesignTest {
         } }
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
-            val action = compose.onNodeWithText("Lihat riwayat").performScrollTo().assertIsDisplayed()
+            val action = compose.onNodeWithText("See history").performScrollTo().assertIsDisplayed()
             val layouts = mutableListOf<TextLayoutResult>()
-            compose.onNodeWithText("Aktivitas terbaru", useUnmergedTree = true)
+            compose.onNodeWithText("Recent activity", useUnmergedTree = true)
                 .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
             val instrumentation = InstrumentationRegistry.getInstrumentation()
             instrumentation.uiAutomation.waitForIdle(300, 5_000)

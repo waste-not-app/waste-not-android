@@ -38,21 +38,21 @@ class OnboardingDesignTest {
             }
         }
 
-        compose.onNodeWithText("Catat kebiasaan tanpa ribet.").assertIsDisplayed()
-        compose.onNodeWithText("Lewati").assertIsDisplayed()
-        compose.onNodeWithText("Lanjut").performClick()
+        compose.onNodeWithText("Log your habits without the hassle.").assertIsDisplayed()
+        compose.onNodeWithText("Skip").assertIsDisplayed()
+        compose.onNodeWithText("Next").performClick()
 
-        compose.onNodeWithText("Foto sampah, cek cara tangani.").assertIsDisplayed()
-        compose.onNodeWithText("Lanjut").performClick()
+        compose.onNodeWithText("Snap your waste, see how to handle it.").assertIsDisplayed()
+        compose.onNodeWithText("Next").performClick()
 
-        compose.onNodeWithText("Pantau tren dari waktu ke waktu.").assertIsDisplayed()
-        compose.onNodeWithText("Mulai sekarang").assertIsDisplayed().performClick()
-        compose.onNodeWithText("Sudah punya akun? Masuk").assertIsDisplayed().performClick()
-        compose.onNodeWithText("Lewati").performClick()
-        compose.onNodeWithContentDescription("Tampilan").performClick()
+        compose.onNodeWithText("Watch your trends over time.").assertIsDisplayed()
+        compose.onNodeWithText("Get started").assertIsDisplayed().performClick()
+        compose.onNodeWithText("Already have an account? Sign in").assertIsDisplayed().performClick()
+        compose.onNodeWithText("Skip").performClick()
+        compose.onNodeWithContentDescription("Display").performClick()
 
         compose.runOnIdle { dark = true }
-        compose.onNodeWithText("Pantau tren dari waktu ke waktu.").assertIsDisplayed()
+        compose.onNodeWithText("Watch your trends over time.").assertIsDisplayed()
 
         assertEquals(1, starts)
         assertEquals(1, logins)

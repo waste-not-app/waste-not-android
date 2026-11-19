@@ -349,9 +349,9 @@ class ScanViewModelTest {
         val uploadIds = mutableListOf<String>()
         val retired = mutableListOf<String>()
         var catalogResult: ApiResult<AiCatalog> = ApiResult.Success(AiCatalog("fixture", listOf(
-            AiCatalogItem("plastic_bottle", "Botol plastik", WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED),
-            AiCatalogItem("glass_bottle", "Botol kaca", WasteCategory.GLASS, false, AiGuideStatus.PUBLISHED),
-        ), "fixture", "fixture", "fixture", emptyMap(), emptySet(), mapOf("bottle" to "Botol")))
+            AiCatalogItem("plastic_bottle", "Plastic bottles", WasteCategory.PLASTIC, false, AiGuideStatus.PUBLISHED),
+            AiCatalogItem("glass_bottle", "Glass bottle", WasteCategory.GLASS, false, AiGuideStatus.PUBLISHED),
+        ), "fixture", "fixture", "fixture", emptyMap(), emptySet(), mapOf("bottle" to "Bottle")))
         var detector: suspend (String) -> ApiResult<AiDetection> = { ApiResult.Success(detection(it)) }
         var recommender: suspend (AiRecommendationRequest) -> ApiResult<AiRecommendation> = { ApiResult.Success(recommendation(it)) }
         override suspend fun catalog() = catalogResult

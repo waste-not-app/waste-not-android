@@ -4,12 +4,34 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.Locale
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
+import org.junit.Before
 import org.junit.Test
 
 class WasteFormatTest {
+    private val original = Locale.getDefault()
+
+    @Before
+    fun useIndonesianLocale() {
+        Locale.setDefault(Locale.forLanguageTag("id-ID"))
+    }
+
+    @After
+    fun restoreLocale() {
+        Locale.setDefault(original)
+    }
+
+    @Test
+    fun followsTheDeviceLocaleForEnglish() {
+        Locale.setDefault(Locale.US)
+        assertEquals(FormattedQuantity("1.234", QuantityUnit.KILOGRAM), WasteFormat.quantity(Quantity.Weight.of(1234)))
+        assertEquals("21 Sep 2026", WasteFormat.activityDate(LocalDate.parse("2026-09-21")))
+    }
+
     @Test
     fun formatsDetailAndSummaryWeightsWithSeparateUnitAndNoPrecisionLossInTheModel() {
         assertEquals(FormattedQuantity("250", QuantityUnit.GRAM), WasteFormat.quantity(Quantity.Weight.of(250)))
@@ -36,8 +58,8 @@ class WasteFormatTest {
     fun formatsActivityDateWithoutReinterpretingItAsUtc() {
         assertEquals("21 Sep 2026", WasteFormat.activityDate(LocalDate.parse("2026-09-21")))
         val instant = Instant.parse("2026-09-20T17:30:00Z")
-        assertEquals("21 Sep 2026, 00.30", WasteFormat.timestamp(instant, ZoneId.of("Asia/Jakarta")))
-        assertEquals("20 Sep 2026, 10.30", WasteFormat.timestamp(instant, ZoneId.of("America/Los_Angeles")))
+        assertEquals("21 Sep 2026, 00:30", WasteFormat.timestamp(instant, ZoneId.of("Asia/Jakarta")))
+        assertEquals("20 Sep 2026, 10:30", WasteFormat.timestamp(instant, ZoneId.of("America/Los_Angeles")))
     }
 
     @Test

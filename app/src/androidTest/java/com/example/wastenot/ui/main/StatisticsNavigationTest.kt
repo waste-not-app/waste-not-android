@@ -32,37 +32,37 @@ class StatisticsNavigationTest {
 
     @Test fun statisticsRangeTableAndScrollSurviveTabsRecreationAndManualEntry() {
         compose.waitUntil(30_000) { compose.onAllNodesWithText("650 g").fetchSemanticsNodes().isNotEmpty() }
-        tab("Statistik")
-        compose.onNodeWithText("1,4 kg").assertExists()
+        tab("Stats")
+        compose.onNodeWithText("1.4 kg").assertExists()
         capture("statistics-app-top-light")
         compose.onNodeWithTag("daily-weight-chart").performScrollTo().assertIsDisplayed()
         capture("statistics-app-chart-light")
-        compose.onNodeWithText("30 hari").performScrollTo().performClick()
-        compose.onNodeWithText("Lihat angka harian").performScrollTo().performClick()
-        compose.onNodeWithText("Angka harian").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("30 days").performScrollTo().performClick()
+        compose.onNodeWithText("Show daily numbers").performScrollTo().performClick()
+        compose.onNodeWithText("Daily numbers").performScrollTo().assertIsDisplayed()
         compose.activityRule.scenario.recreate()
-        compose.onNodeWithText("Tutup angka harian").assertExists()
-        tab("Profil")
-        compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
-        compose.onNode(hasText("Gelap") and hasAnyAncestor(isDialog())).performClick()
-        compose.onNodeWithText("Tutup").performClick()
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        tab("Statistik")
-        compose.onNodeWithText("30 hari").performScrollTo().assertIsSelected()
+        compose.onNodeWithText("Hide daily numbers").assertExists()
+        tab("Profile")
+        compose.onNodeWithText("Settings").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("App theme").performScrollTo().performClick()
+        compose.onNode(hasText("Dark") and hasAnyAncestor(isDialog())).performClick()
+        compose.onNodeWithText("Close").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
+        tab("Stats")
+        compose.onNodeWithText("30 days").performScrollTo().assertIsSelected()
         capture("statistics-app-top-dark")
         compose.onNodeWithTag("daily-weight-chart").performScrollTo().assertIsDisplayed()
         capture("statistics-app-chart-dark")
         val chartTop = compose.onNodeWithTag("daily-weight-chart").fetchSemanticsNode().boundsInRoot.top
-        compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
-        compose.onNodeWithText("Cara pengelolaan").assertExists()
+        compose.onNodeWithContentDescription("Log or scan waste").performClick()
+        compose.onNode(hasText("Log manually") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
+        compose.onNodeWithText("How you handled it").assertExists()
         compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
-        compose.onNode(tabs and hasText("Statistik")).assertIsSelected()
-        compose.onNodeWithText("Tutup angka harian").assertExists()
+        compose.onNode(tabs and hasText("Stats")).assertIsSelected()
+        compose.onNodeWithText("Hide daily numbers").assertExists()
         assertEquals(chartTop, compose.onNodeWithTag("daily-weight-chart").fetchSemanticsNode().boundsInRoot.top, 1f)
         compose.onNodeWithText("50 XP total").assertDoesNotExist()
-        tab("Profil")
+        tab("Profile")
         compose.onNodeWithText("50 XP total").performScrollTo().assertIsDisplayed()
     }
 
@@ -78,11 +78,11 @@ class StatisticsNavigationTest {
         val directory = File(instrumentation.targetContext.getExternalFilesDir(null), "statistics-qa").apply { mkdirs() }
         val bitmap = instrumentation.uiAutomation.takeScreenshot()
         File(directory, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-        val label = compose.onNodeWithText("Catat / Scan", useUnmergedTree = true).fetchSemanticsNode().boundsInWindow
+        val label = compose.onNodeWithText("Log / Scan", useUnmergedTree = true).fetchSemanticsNode().boundsInWindow
         val pixels = (label.top.toInt() until label.bottom.toInt()).sumOf { y ->
             (label.left.toInt() until label.right.toInt()).count { x -> bitmap.getPixel(x, y) == OnAccent.toArgb() }
         }
-        assertTrue("Catat/Scan label must be painted in $name: $pixels foreground pixels", pixels > 30)
+        assertTrue("Log/Scan label must be painted in $name: $pixels foreground pixels", pixels > 30)
         bitmap.recycle()
     }
 }

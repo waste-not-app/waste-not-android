@@ -40,63 +40,63 @@ class NavigationTransitionTest {
     private fun create(dark: Boolean) {
         openEditor(dark)
         compose.onNodeWithText("Recycle").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Kategori").performScrollTo().performClick()
-        compose.onNode(hasText("Plastik") and hasAnyAncestor(isPopup())).performClick()
-        compose.onNodeWithContentDescription("Berat").performScrollTo().performTextReplacement("250")
-        compose.onNodeWithText("Simpan catatan").performScrollTo()
-        traceExit(if (dark) "create-dark" else "create", "+10 XP untuk aktivitas baru ini.") {
-            compose.onNodeWithText("Simpan catatan").performClick()
+        compose.onNodeWithContentDescription("Category").performScrollTo().performClick()
+        compose.onNode(hasText("Plastic") and hasAnyAncestor(isPopup())).performClick()
+        compose.onNodeWithContentDescription("Weight").performScrollTo().performTextReplacement("250")
+        compose.onNodeWithText("Save log").performScrollTo()
+        traceExit(if (dark) "create-dark" else "create", "+10 XP for this new activity.") {
+            compose.onNodeWithText("Save log").performClick()
         }
     }
 
     @Test fun confirmedEditKeepsItsFormUntilTheUpdatedReceiptAppears() {
         home()
-        compose.onNodeWithText("Aktivitas terbaru").performScrollTo()
+        compose.onNodeWithText("Recent activity").performScrollTo()
         val bodyScroll = compose.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange) and !hasAnyDescendant(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)))
         val scrollMax = bodyScroll.fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].maxValue()
         bodyScroll.performSemanticsAction(SemanticsActions.ScrollBy) { it(0f, scrollMax) }
         compose.waitForIdle()
         compose.onNodeWithText("250 g").performClick()
         compose.waitUntil(30_000) {
-            compose.onAllNodes(hasText("Ubah catatan") and hasClickAction() and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodes(hasText("Edit log") and hasClickAction() and isEnabled()).fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onNode(hasText("Ubah catatan") and hasClickAction()).performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Perubahan saat audit")
-        compose.onNodeWithText("Simpan perubahan").performScrollTo()
-        traceExit("edit", "Catatanmu sudah tersimpan. Tidak ada XP tambahan.") {
-            compose.onNodeWithText("Simpan perubahan").performClick()
+        compose.onNode(hasText("Edit log") and hasClickAction()).performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().performTextReplacement("Perubahan saat audit")
+        compose.onNodeWithText("Save changes").performScrollTo()
+        traceExit("edit", "Your log was already saved. No extra XP.") {
+            compose.onNodeWithText("Save changes").performClick()
         }
     }
 
     @Test fun cleanBackKeepsItsFormUntilHomeReturns() {
         openEditor()
-        traceExit("clean-back", "650 g") { compose.onNodeWithContentDescription("Kembali").performClick() }
+        traceExit("clean-back", "650 g") { compose.onNodeWithContentDescription("Back").performClick() }
     }
 
     @Test fun dirtyEditorHeaderBackUsesTheCurrentDraft() {
         openEditor()
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Draf belum disimpan")
-        compose.onNodeWithContentDescription("Kembali").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick) { it() }
-        compose.onNodeWithText("Buang perubahan?").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().performTextReplacement("Unsaved draft")
+        compose.onNodeWithContentDescription("Back").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnClick) { it() }
+        compose.onNodeWithText("Discard changes?").assertIsDisplayed()
         InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK)
-        compose.onNodeWithText("Buang perubahan?").assertDoesNotExist()
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().assertTextContains("Draf belum disimpan")
+        compose.onNodeWithText("Discard changes?").assertDoesNotExist()
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().assertTextContains("Unsaved draft")
     }
 
     @Test fun discardKeepsItsFormDuringExitAndTheNextDraftStartsEmpty() {
         openEditor()
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Draf belum disimpan")
-        compose.onNodeWithContentDescription("Kembali").performClick()
-        compose.onNodeWithText("Lanjut mengisi").performClick()
-        compose.onNodeWithContentDescription("Catatan (opsional)").assertTextContains("Draf belum disimpan")
-        compose.onNodeWithContentDescription("Kembali").performClick()
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().performTextReplacement("Unsaved draft")
+        compose.onNodeWithContentDescription("Back").performClick()
+        compose.onNodeWithText("Keep editing").performClick()
+        compose.onNodeWithContentDescription("Notes (optional)").assertTextContains("Unsaved draft")
+        compose.onNodeWithContentDescription("Back").performClick()
         traceExit("discard-back", "650 g") {
-            compose.onNode(hasText("Buang perubahan") and hasAnyAncestor(isDialog())).performClick()
+            compose.onNode(hasText("Discard changes") and hasAnyAncestor(isDialog())).performClick()
         }
         openEditor()
-        assertEquals("", compose.onNodeWithContentDescription("Catatan (opsional)").fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
+        assertEquals("", compose.onNodeWithContentDescription("Notes (optional)").fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
         compose.onNodeWithText("Recycle").assertIsNotSelected()
-        compose.onNodeWithText("Pilih kategori").assertExists()
+        compose.onNodeWithText("Choose a category").assertExists()
     }
 
     private fun home() {
@@ -107,20 +107,20 @@ class NavigationTransitionTest {
         home()
         if (dark) {
             val tab = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)
-            compose.onNode(tab and hasText("Profil")).performClick()
-            compose.onNodeWithText("Pengaturan").performScrollTo().performClick()
-            compose.onNodeWithContentDescription("Tema aplikasi").performScrollTo().performClick()
-            compose.onNode(hasText("Gelap") and hasAnyAncestor(isDialog())).performClick()
-            compose.onNodeWithText("Tutup").performClick()
-            compose.onNodeWithContentDescription("Kembali").performClick()
-            compose.onNode(tab and hasText("Beranda")).performClick()
+            compose.onNode(tab and hasText("Profile")).performClick()
+            compose.onNodeWithText("Settings").performScrollTo().performClick()
+            compose.onNodeWithContentDescription("App theme").performScrollTo().performClick()
+            compose.onNode(hasText("Dark") and hasAnyAncestor(isDialog())).performClick()
+            compose.onNodeWithText("Close").performClick()
+            compose.onNodeWithContentDescription("Back").performClick()
+            compose.onNode(tab and hasText("Home")).performClick()
         }
-        compose.onNodeWithContentDescription("Catat atau scan sampah").performClick()
-        compose.onNode(hasText("Input manual") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
+        compose.onNodeWithContentDescription("Log or scan waste").performClick()
+        compose.onNode(hasText("Log manually") and hasAnyAncestor(hasTestTag("capture-sheet"))).assertIsDisplayed().performClick()
     }
 
     private fun traceExit(phase: String, target: String, action: () -> Unit) {
-        compose.onNodeWithText("Catatan belum bisa dimuat.").assertDoesNotExist()
+        compose.onNodeWithText("Couldn't load your logs.").assertDoesNotExist()
         val flashes = mutableListOf<Int>()
         val captures = mutableListOf<String>()
         var confirmationAt: Int? = null
@@ -133,7 +133,7 @@ class NavigationTransitionTest {
                 lastFrame = frame
                 compose.mainClock.advanceTimeByFrame()
                 compose.waitForIdle()
-                if (compose.onAllNodesWithText("Catatan belum bisa dimuat.").fetchSemanticsNodes().isNotEmpty()) {
+                if (compose.onAllNodesWithText("Couldn't load your logs.").fetchSemanticsNodes().isNotEmpty()) {
                     flashes.add(frame)
                     capture("$phase-exit-error-$frame")
                 }

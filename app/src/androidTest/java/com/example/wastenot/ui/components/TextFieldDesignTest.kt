@@ -50,9 +50,9 @@ class TextFieldDesignTest {
             assertEquals("pengguna@example.com", layout(email).layoutInput.text.text)
             checkColor("pending value", layout(email).layoutInput.style.color, scheme.onSurfaceVariant)
             capture(email, theme, "account-email", scheme.outlineVariant, scheme.surfaceContainer)
-            val password = compose.onNodeWithContentDescription("Kata sandi").performScrollTo().assertIsNotEnabled()
+            val password = compose.onNodeWithContentDescription("Password").performScrollTo().assertIsNotEnabled()
             password.assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Password))
-            val visibility = compose.onNodeWithContentDescription("Tampilkan kata sandi").assertIsNotEnabled()
+            val visibility = compose.onNodeWithContentDescription("Show password").assertIsNotEnabled()
             capture(password, theme, "account-password", scheme.outlineVariant, scheme.surfaceContainer, visibility)
             assertEquals("•".repeat("contoh-aman-12".length), layout(password).layoutInput.text.text)
             compose.runOnIdle { assertEquals(0, changes) }
@@ -65,14 +65,14 @@ class TextFieldDesignTest {
         compose.setContent { WasteNotTheme(dark) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                 WasteTextField("", {}, "Email", Modifier.padding(20.dp).fillMaxWidth(), enabled = false,
-                    labelAbove = true, placeholder = "nama@example.com")
+                    labelAbove = true, placeholder = "name@example.com")
             }
         } }
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
             val scheme = if (theme) DarkColorScheme else LightColorScheme
             val field = compose.onNodeWithContentDescription("Email").assertIsNotEnabled()
-            val hint = layout(compose.onNodeWithText("nama@example.com", useUnmergedTree = true))
+            val hint = layout(compose.onNodeWithText("name@example.com", useUnmergedTree = true))
             checkColor("disabled placeholder", hint.layoutInput.style.color, scheme.onSurfaceVariant)
             capture(field, theme, "disabled-empty", scheme.outlineVariant, scheme.surfaceContainer)
         }
@@ -88,21 +88,21 @@ class TextFieldDesignTest {
         var error by mutableStateOf<String?>(null)
         compose.setContent { WasteNotTheme(dark) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                WasteTextField(value, { value = it }, "Catatan", Modifier.padding(20.dp).fillMaxWidth(),
-                    helper = "Informasi tambahan", errorText = error, labelAbove = true, placeholder = "Tulis catatan")
+                WasteTextField(value, { value = it }, "Notes", Modifier.padding(20.dp).fillMaxWidth(),
+                    helper = "Extra information", errorText = error, labelAbove = true, placeholder = "Write a note")
             }
         } }
         val scheme = if (dark) DarkColorScheme else LightColorScheme
         val fieldWell = if (dark) FieldWellDark else FieldWell
         val fieldFocus = if (dark) FieldWellFocusDark else FieldWellFocus
-        val field = compose.onNodeWithContentDescription("Catatan").assertIsEnabled().assertIsNotFocused()
+        val field = compose.onNodeWithContentDescription("Notes").assertIsEnabled().assertIsNotFocused()
         capture(field, dark, "idle", null, fieldWell)
-        field.performClick().performTextReplacement("Catatan diperbarui")
-        field.assertIsFocused().assertTextContains("Catatan diperbarui")
+        field.performClick().performTextReplacement("Updated note")
+        field.assertIsFocused().assertTextContains("Updated note")
         capture(field, dark, "focus", scheme.primary, fieldFocus)
-        compose.runOnIdle { error = "Periksa catatan" }
-        field.assert(SemanticsMatcher.expectValue(SemanticsProperties.Error, "Periksa catatan"))
-        compose.onNodeWithText("Periksa catatan").assertIsDisplayed()
+        compose.runOnIdle { error = "Check the note" }
+        field.assert(SemanticsMatcher.expectValue(SemanticsProperties.Error, "Check the note"))
+        compose.onNodeWithText("Check the note").assertIsDisplayed()
         capture(field, dark, "error", scheme.error, fieldFocus)
         assertTrue(violations.joinToString("\n"), violations.isEmpty())
     }

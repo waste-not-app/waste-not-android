@@ -26,7 +26,7 @@ import java.io.File
 class LogDetailDesignTest {
     @get:Rule val compose = createComposeRule()
     private val log = WasteLog("detail", WasteCategory.METAL, DisposalMethod.RECYCLE, Quantity.Weight.of(99_999),
-        LocalDate.of(2026, 10, 19), ZoneId.of("Asia/Jakarta"), "Catatan pribadi", 1, Instant.EPOCH, Instant.EPOCH)
+        LocalDate.of(2026, 10, 19), ZoneId.of("Asia/Jakarta"), "Private note", 1, Instant.EPOCH, Instant.EPOCH)
 
     @Test fun pendingDeleteUsesTheKitDisabledCancelInBothThemes() {
         var dark by mutableStateOf(false)
@@ -35,9 +35,9 @@ class LogDetailDesignTest {
         } }
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
-            compose.onNodeWithText("Batal").performScrollTo().assertIsNotEnabled()
+            compose.onNodeWithText("Cancel").performScrollTo().assertIsNotEnabled()
             val layouts = mutableListOf<TextLayoutResult>()
-            compose.onNodeWithText("Batal", useUnmergedTree = true)
+            compose.onNodeWithText("Cancel", useUnmergedTree = true)
                 .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
             val instrumentation = InstrumentationRegistry.getInstrumentation()
             instrumentation.uiAutomation.waitForIdle(300, 5_000)
@@ -65,7 +65,7 @@ class LogDetailDesignTest {
         listOf(Quantity.Weight.of(99_999), Quantity.Count.of(10_000)).forEach { value ->
             compose.runOnIdle { quantity.value = value }
             val formatted = WasteFormat.quantity(value)
-            val label = formatted.amount + if (value is Quantity.Weight) " kg" else " benda"
+            val label = formatted.amount + if (value is Quantity.Weight) " kg" else " items"
             val text = compose.onNodeWithText(label).performScrollTo()
             val layouts = mutableListOf<TextLayoutResult>()
             text.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
@@ -73,8 +73,8 @@ class LogDetailDesignTest {
             assertEquals(1, formatted.amount.indices.map { layouts.single().getLineForOffset(it) }.toSet().size)
         }
         compose.runOnIdle { error.value = true }
-        compose.onNodeWithText("Ubah catatan").performScrollTo().assertIsNotEnabled()
-        compose.onNodeWithText("Hapus catatan").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Edit log").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Delete log").performScrollTo().assertIsNotEnabled()
     }
 
     @Test fun conflictRequiresReloadAndStorageFailureCanRetryWithoutAutoDelete() {
@@ -86,14 +86,14 @@ class LogDetailDesignTest {
         } }
         listOf(ApiFailureKind.VERSION_CONFLICT, ApiFailureKind.PRECONDITION_REQUIRED).forEach { kind ->
             compose.runOnIdle { error.value = kind }
-            compose.onNodeWithText("Hapus", substring = false).assertDoesNotExist()
-            compose.onNodeWithText("Muat versi terbaru").performScrollTo().performClick()
+            compose.onNodeWithText("Clear", substring = false).assertDoesNotExist()
+            compose.onNodeWithText("Load the latest version").performScrollTo().performClick()
         }
         assertEquals(2, reloads)
         assertEquals(0, confirmations)
         compose.runOnIdle { error.value = ApiFailureKind.STORAGE }
-        compose.onNodeWithText("Catatan belum dihapus.", substring = true).performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Hapus", substring = false).performScrollTo().performClick()
+        compose.onNodeWithText("The log wasn't deleted.", substring = true).performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Clear", substring = false).performScrollTo().performClick()
         assertEquals(1, confirmations)
     }
 
@@ -104,8 +104,8 @@ class LogDetailDesignTest {
         compose.setContent { WasteNotTheme {
             DeleteLogDialog(log, busy.value, null, { cancellations++ }, { confirmations++ }, {}, {})
         } }
-        val confirm = compose.onNodeWithText("Hapus", substring = false)
-        val cancel = compose.onNodeWithText("Batal")
+        val confirm = compose.onNodeWithText("Clear", substring = false)
+        val cancel = compose.onNodeWithText("Cancel")
         confirm.performScrollTo().assertHeightIsAtLeast(48.dp)
         cancel.performScrollTo().assertHeightIsAtLeast(48.dp)
         val confirmBounds = confirm.getUnclippedBoundsInRoot()
@@ -115,7 +115,7 @@ class LogDetailDesignTest {
         cancel.performClick()
         assertEquals(1, cancellations)
         compose.runOnIdle { busy.value = true }
-        compose.onNodeWithText("Menghapus…").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Deleting…").performScrollTo().assertIsNotEnabled()
         cancel.performScrollTo().assertIsNotEnabled()
         assertEquals(0, confirmations)
     }
@@ -125,10 +125,10 @@ class LogDetailDesignTest {
         compose.setContent { WasteNotTheme {
             LogDetailScreen(null, false, false, PaddingValues(), {}, {}, { history++ }, {}, Modifier.fillMaxSize())
         } }
-        compose.onNodeWithText("Catatan tidak tersedia").assertIsDisplayed()
-        compose.onNodeWithText("Ubah catatan").assertDoesNotExist()
-        compose.onNodeWithText("Hapus catatan").assertDoesNotExist()
-        compose.onNodeWithText("Lihat riwayat").performClick()
+        compose.onNodeWithText("Log unavailable").assertIsDisplayed()
+        compose.onNodeWithText("Edit log").assertDoesNotExist()
+        compose.onNodeWithText("Delete log").assertDoesNotExist()
+        compose.onNodeWithText("See history").performClick()
         assertEquals(1, history)
     }
 }

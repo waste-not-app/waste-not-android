@@ -56,7 +56,7 @@ class RemoteSessionRecoveryTest {
         assertTrue(BuildConfig.DEBUG)
         assertEquals("https://waste-not-api.bccdev.id/v1/", BuildConfig.API_BASE_URL)
         assertTrue(container.accountSession is RemoteAccountSession)
-        waitFor("Belum punya akun? Daftar")
+        waitFor("New here? Create an account")
         assertTrue(sessions.state.value is SessionState.SignedOut)
         assertEquals(TokenReadResult.Absent, tokenStore.read())
 
@@ -70,7 +70,7 @@ class RemoteSessionRecoveryTest {
             val originalSession = sessions.state.value as SessionState.Authenticated
             assertEquals(user.id, originalSession.user.id)
             evidence.put("user_id", user.id)
-            waitFor("Input manual")
+            waitFor("Log manually")
             assertTrue(container.core.dashboard() is ApiResult.Success)
             assertTrue(tokenStore.read() is TokenReadResult.Available)
             verifyVersionConflict(container.core, runId)
@@ -81,7 +81,7 @@ class RemoteSessionRecoveryTest {
             check(refreshed is ApiResult.Success) { "Probe refresh failed: ${refreshed.failureKind()}" }
             assertEquals(originalSession, sessions.state.value)
             assertTrue(tokenStore.read() is TokenReadResult.Available)
-            waitFor("Input manual")
+            waitFor("Log manually")
             captureUiPreview(compose, "root-after-refresh", "session-recovery/$runId", capturePanel = false)
             record("awaiting_revocation")
 
@@ -90,9 +90,9 @@ class RemoteSessionRecoveryTest {
             assertEquals(ApiFailureKind.UNAUTHENTICATED, revoked.failureKind())
             assertEquals(SessionState.SignedOut(SignOutReason.EXPIRED), sessions.state.value)
             assertEquals(TokenReadResult.Absent, tokenStore.read())
-            waitFor("Sesi belum dapat digunakan. Masuk lagi untuk membuka catatanmu.")
-            waitFor("Belum punya akun? Daftar")
-            compose.onNodeWithText("Input manual").assertDoesNotExist()
+            waitFor("Your session can't be used right now. Sign in again to open your logs.")
+            waitFor("New here? Create an account")
+            compose.onNodeWithText("Log manually").assertDoesNotExist()
             captureUiPreview(compose, "root-after-revocation", "session-recovery/$runId", capturePanel = false)
             record("passed")
         } finally {
@@ -102,42 +102,42 @@ class RemoteSessionRecoveryTest {
 
     private suspend fun verifyVersionConflict(core: CoreRepository, runId: String) {
         val date = success(core.dashboard()).date
-        val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE, Quantity.Weight.of(250), date, "Catatan awal")
+        val input = ActivityInput(WasteCategory.PLASTIC, DisposalMethod.RECYCLE, Quantity.Weight.of(250), date, "Original note")
         val initial = success(core.createLog(input, UUID.randomUUID().toString())).log
         assertEquals(10, success(core.dashboard()).progress.xp)
 
-        compose.onNode(hasText("Riwayat") and isSelectable()).performClick()
+        compose.onNode(hasText("History") and isSelectable()).performClick()
         waitFor("250 g")
         compose.onNodeWithText("250 g").performClick()
-        waitFor("Ubah catatan")
-        compose.onNodeWithText("Ubah catatan").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Berat").performScrollTo().performTextReplacement("300")
-        compose.onNodeWithContentDescription("Catatan (opsional)").performScrollTo().performTextReplacement("Draf 300 g")
+        waitFor("Edit log")
+        compose.onNodeWithText("Edit log").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Weight").performScrollTo().performTextReplacement("300")
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().performTextReplacement("300 g draft")
 
         val latest = success(core.updateLog(initial.id, initial.version,
-            input.copy(quantity = Quantity.Weight.of(275), notes = "Versi lain")))
-        compose.onNodeWithText("Simpan perubahan").performScrollTo().performClick()
-        waitFor("Catatan telah berubah")
+            input.copy(quantity = Quantity.Weight.of(275), notes = "Version lain")))
+        compose.onNodeWithText("Save changes").performScrollTo().performClick()
+        waitFor("This log has changed")
         fun dialogText(text: String) = compose.onNode(hasText(text) and hasAnyAncestor(isDialog()))
-        dialogText("Muat versi terbaru").performScrollTo().performClick()
+        dialogText("Load the latest version").performScrollTo().performClick()
         waitFor("Versi terbaru · v${latest.version}")
-        dialogText("Versi lain").performScrollTo().assertIsDisplayed()
-        dialogText("Draf 300 g").performScrollTo().assertIsDisplayed()
+        dialogText("Version lain").performScrollTo().assertIsDisplayed()
+        dialogText("300 g draft").performScrollTo().assertIsDisplayed()
         captureUiPreview(compose, "version-conflict", "session-recovery/$runId", capturePanel = false)
-        dialogText("Gunakan seluruh isian drafku").performScrollTo().performClick()
-        compose.onNodeWithContentDescription("Berat").performScrollTo().assertTextContains("300")
+        dialogText("Use everything from my draft").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Weight").performScrollTo().assertTextContains("300")
         assertEquals(latest, success(core.wasteLog(initial.id)))
 
-        compose.onNodeWithText("Simpan perubahan").performScrollTo().performClick()
-        waitFor("Catatanmu sudah tersimpan. Tidak ada XP tambahan.")
+        compose.onNodeWithText("Save changes").performScrollTo().performClick()
+        waitFor("Your log was already saved. No extra XP.")
         val updated = success(core.wasteLogs()).single()
         assertEquals(initial.id, updated.id)
         assertEquals(latest.version + 1, updated.version)
         assertEquals(Quantity.Weight.of(300), updated.quantity)
-        assertEquals("Draf 300 g", updated.notes)
+        assertEquals("300 g draft", updated.notes)
         assertEquals(10, success(core.dashboard()).progress.xp)
-        compose.onNodeWithText("Kembali ke beranda").performScrollTo().performClick()
-        waitFor("Input manual")
+        compose.onNodeWithText("Back to home").performScrollTo().performClick()
+        waitFor("Log manually")
     }
 
     private fun waitFor(text: String) {

@@ -58,8 +58,8 @@ class AchievementsAndPhotosNetworkTest {
                   {
                     "id":"00000000-0000-4000-8000-000000000101",
                     "code":"FIRST_STEP",
-                    "title":"Langkah pertama",
-                    "description":"Catat minimal 1 aktivitas.",
+                    "title":"First step",
+                    "description":"Log at least 1 activity.",
                     "requirement_type":"ACTIVE_LOG_COUNT",
                     "current_value":1,
                     "target_value":1,
@@ -69,8 +69,8 @@ class AchievementsAndPhotosNetworkTest {
                   {
                     "id":"00000000-0000-4000-8000-000000000102",
                     "code":"STREAK_3",
-                    "title":"Konsisten 3 hari",
-                    "description":"Capai streak terbaik 3 hari.",
+                    "title":"Three days in a row",
+                    "description":"Reach a best streak of 3 days.",
                     "requirement_type":"BEST_STREAK",
                     "current_value":2,
                     "target_value":3,
