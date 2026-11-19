@@ -24,5 +24,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # CI and the Gradle toolchain build on JDK 17; change the image and CI together.
+      - dependency-name: eclipse-temurin
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: build
