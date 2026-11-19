@@ -4,6 +4,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Host tests run Robolectric on API 35; the instrumented jar must match that SDK level.
+      - dependency-name: "org.robolectric:android-all-instrumented"
     groups:
       androidx:
         patterns: ["androidx.*"]
