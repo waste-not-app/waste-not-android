@@ -47,8 +47,8 @@ For an interactive visual reference, including the AI scan flow, open [`docs/des
 | Camera | CameraX |
 | Storage | Room for account-scoped activity, outbox, and snapshots; DataStore for the theme; SharedPreferences for drafts; Android Keystore for the refresh token |
 | Dependency injection | Constructor injection through a simple `AppContainer` |
-| Build | AGP 9.0.1, Gradle 9.1.0, JDK 17, Compose BOM 2026.03.01 |
-| SDK | Min 30 (Android 11), compile and target 36 |
+| Build | AGP 9.5.1, Gradle 9.6.0, JDK 17, Compose BOM 2026.09.00 |
+| SDK | Min 30 (Android 11), compile 37, target 36 |
 
 ## Rules
 
