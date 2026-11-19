@@ -2,7 +2,7 @@
 
 **Track everyday waste through Reduce, Reuse, Recycle, and Trash, with AI-assisted detection and guidance.**
 
-![Kotlin 2.3](https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white)
+![Kotlin 2.4](https://img.shields.io/badge/Kotlin-2.4-7F52FF?logo=kotlin&logoColor=white)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white)
 ![Min SDK 30](https://img.shields.io/badge/minSdk-30%20(Android%2011)-3DDC84?logo=android&logoColor=white)
 ![Target SDK 36](https://img.shields.io/badge/targetSdk-36-3DDC84?logo=android&logoColor=white)
