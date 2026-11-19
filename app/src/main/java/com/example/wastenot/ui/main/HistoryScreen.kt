@@ -3,7 +3,7 @@ package com.example.wastenot.ui.main
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,7 +33,8 @@ import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.DateField
 import com.example.wastenot.ui.components.labelResource
 import com.example.wastenot.ui.components.GroupSectionLabel
-import com.example.wastenot.ui.components.InsetGroupCard
+import com.example.wastenot.ui.components.InsetGroupItemContainer
+import com.example.wastenot.ui.components.wasteTextFieldColors
 import java.time.LocalDate
 import kotlinx.coroutines.launch
 
@@ -147,16 +148,17 @@ fun HistoryScreen(
                         modifier = Modifier.padding(top = 18.dp, bottom = 8.dp),
                     )
                 }
-                item(key = "group:$date") {
-                    InsetGroupCard {
-                        records.forEachIndexed { idx, log ->
-                            ActivityRow(
-                                log = log,
-                                onClick = { onDetail(log.id) },
-                                modifier = Modifier.fillMaxWidth(),
-                                showDivider = idx < records.lastIndex,
-                            )
-                        }
+                itemsIndexed(records, key = { _, log -> log.id }) { idx, log ->
+                    InsetGroupItemContainer(
+                        isFirst = idx == 0,
+                        isLast = idx == records.lastIndex,
+                    ) {
+                        ActivityRow(
+                            log = log,
+                            onClick = { onDetail(log.id) },
+                            modifier = Modifier.fillMaxWidth(),
+                            showDivider = idx < records.lastIndex,
+                        )
                     }
                 }
             }
@@ -252,10 +254,17 @@ private fun <T> FilterChoice(
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(fieldLabel, style = MaterialTheme.typography.titleSmall)
         ExposedDropdownMenuBox(expanded, onExpandedChange = { expanded = it }) {
-            OutlinedTextField(value = stringResource(value?.let(optionLabel) ?: all), onValueChange = {}, readOnly = true,
+            OutlinedTextField(
+                value = stringResource(value?.let(optionLabel) ?: all),
+                onValueChange = {},
+                readOnly = true,
+                singleLine = true,
+                shape = RoundedCornerShape(15.dp),
+                colors = wasteTextFieldColors(),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
                 modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).semantics { contentDescription = fieldLabel }
-                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable))
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            )
             ExposedDropdownMenu(expanded, onDismissRequest = { expanded = false }) {
                 DropdownMenuItem(text = { Text(stringResource(all)) }, onClick = { onSelect(null); expanded = false })
                 options.forEach { option ->

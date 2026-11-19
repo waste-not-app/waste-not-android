@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.ui.platform.LocalLayoutDirection
+import com.example.wastenot.theme.LocalWasteNotScaffoldPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
@@ -124,10 +128,18 @@ fun AccountDeletionScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier.padding(padding).consumeWindowInsets(padding), contentAlignment = Alignment.TopCenter) {
+    val scaffold = LocalWasteNotScaffoldPadding.current
+    val direction = LocalLayoutDirection.current
+    val contentPadding = PaddingValues(
+        start = padding.calculateStartPadding(direction) + scaffold.calculateStartPadding(direction) + 20.dp,
+        top = padding.calculateTopPadding() + scaffold.calculateTopPadding() + 16.dp,
+        end = padding.calculateEndPadding(direction) + scaffold.calculateEndPadding(direction) + 20.dp,
+        bottom = padding.calculateBottomPadding() + scaffold.calculateBottomPadding() + 24.dp,
+    )
+    Box(modifier.consumeWindowInsets(padding).consumeWindowInsets(scaffold), contentAlignment = Alignment.TopCenter) {
         Column(
             Modifier.widthIn(max = 560.dp).fillMaxWidth()
-                .imePadding().verticalScroll(rememberScrollState()).padding(20.dp),
+                .imePadding().verticalScroll(rememberScrollState()).padding(contentPadding),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             Text(stringResource(R.string.delete_account_title), style = MaterialTheme.typography.headlineMedium,

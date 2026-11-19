@@ -45,6 +45,7 @@ data class WasteNotSurfaceTokens(
     val glassTintStrong: Color,
     val glassEdge: Color,
     val cardEdge: Color,
+    val glassHighlight: Color = GlassHighlight,
 )
 
 internal val LightSurfaceTokens = WasteNotSurfaceTokens(
@@ -56,6 +57,7 @@ internal val LightSurfaceTokens = WasteNotSurfaceTokens(
     glassTintStrong = GlassTintStrong,
     glassEdge = DockEdge,
     cardEdge = CardEdge,
+    glassHighlight = GlassHighlight,
 )
 
 internal val DarkSurfaceTokens = WasteNotSurfaceTokens(
@@ -67,6 +69,7 @@ internal val DarkSurfaceTokens = WasteNotSurfaceTokens(
     glassTintStrong = GlassTintStrongDark,
     glassEdge = DockEdgeDark,
     cardEdge = CardEdgeDark,
+    glassHighlight = GlassHighlightDark,
 )
 
 internal val LightGradients = WasteNotGradients(

@@ -294,15 +294,15 @@ private fun SlideScanIllustration() {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
-            color = Color(0xFF13261D),
+            color = CameraViewportStart,
             contentColor = Color.White,
-            border = BorderStroke(1.dp, Color(0xFF3E634D)),
+            border = BorderStroke(1.dp, CameraViewportPreviewBorder),
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 190.dp)
-                    .background(Brush.linearGradient(listOf(Color(0xFF13261D), Color(0xFF244935))))
+                    .background(Brush.linearGradient(listOf(CameraViewportStart, CameraViewportPreviewEnd)))
                     .padding(horizontal = 40.dp, vertical = 24.dp),
                 contentAlignment = Alignment.Center,
             ) {

@@ -5,9 +5,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
+import android.view.HapticFeedbackConstants
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -45,6 +47,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -82,6 +86,7 @@ fun ReminderSettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val view = LocalView.current
     var enabled by rememberSaveable(setting) { mutableStateOf(setting.enabled) }
     var hour by rememberSaveable(setting) { mutableIntStateOf(setting.hour) }
     var minute by rememberSaveable(setting) { mutableIntStateOf(setting.minute) }
@@ -174,6 +179,7 @@ fun ReminderSettingsScreen(
     }
 
     val changeEnabled: (Boolean) -> Unit = { checked ->
+        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
         savedMessage = null
         if (!checked) {
             enabled = false
@@ -248,20 +254,21 @@ fun ReminderSettingsScreen(
         }
 
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            val tokens = LocalWasteNotSurfaceTokens.current
             Text(stringResource(R.string.reminder_time_label), style = MaterialTheme.typography.titleSmall)
             OutlinedButton(
                 onClick = { pickingTime = true },
                 modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
                 enabled = enabled,
-                shape = MaterialTheme.shapes.small,
+                shape = RoundedCornerShape(15.dp),
                 border = BorderStroke(
-                    1.dp,
-                    if (enabled) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outlineVariant,
+                    1.5.dp,
+                    if (enabled) tokens.fieldEdge else MaterialTheme.colorScheme.outlineVariant,
                 ),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = tokens.fieldWell,
                     contentColor = MaterialTheme.colorScheme.onSurface,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),

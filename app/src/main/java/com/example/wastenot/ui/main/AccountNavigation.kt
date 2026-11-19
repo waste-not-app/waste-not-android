@@ -12,9 +12,12 @@ import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.repository.CoreRepository
 import com.example.wastenot.data.repository.AccountManagement
 import com.example.wastenot.model.Metadata
+import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalView
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
@@ -630,6 +633,8 @@ fun AccountNavigation(
                         Box(Modifier.fillMaxSize()) {
                             entry.Content()
                             if (activityStore is com.example.wastenot.data.repository.OfflineActivityStore) {
+                                val syncToastTopPadding = if (key is LogEditor) 8.dp
+                                else LocalWasteNotScaffoldPadding.current.calculateTopPadding() + 8.dp
                                 ActivitySyncToast(
                                     count = syncIssues.size,
                                     ready = historyReady,
@@ -638,7 +643,7 @@ fun AccountNavigation(
                                     onOpen = { showingSync = true },
                                     modifier = Modifier
                                         .align(Alignment.TopCenter)
-                                        .padding(top = LocalWasteNotScaffoldPadding.current.calculateTopPadding() + 8.dp),
+                                        .padding(top = syncToastTopPadding),
                                 )
                             }
                         }
@@ -679,8 +684,8 @@ internal fun AccountPage(
         HazeStyle(
             backgroundColor = colors.surface,
             tint = HazeTint(tokens.glassTintStrong),
-            blurRadius = 22.dp,
-            noiseFactor = 0f,
+            blurRadius = 24.dp,
+            noiseFactor = 0.035f,
             fallbackTint = HazeTint(colors.surface),
         )
     }
@@ -764,40 +769,70 @@ private fun TabDock(
     modifier: Modifier = Modifier,
 ) {
     val dockShape = androidx.compose.foundation.shape.RoundedCornerShape(30.dp)
-    BoxWithConstraints(modifier.navigationBarsPadding().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
-        val measurer = rememberTextMeasurer()
-        val density = LocalDensity.current
-        val labelStyle = MaterialTheme.typography.labelMedium
-        val labels = MainTab.entries.map { stringResource(it.label) }
-        val widest = with(density) {
-            labels.maxOf { measurer.measure(it, style = labelStyle, softWrap = false).size.width }.toDp()
-        }
-        val cellWidth = maxOf((maxWidth - 8.dp) / MainTab.entries.size, widest + 8.dp, 48.dp)
-        val scroll = rememberScrollState()
-        LaunchedEffect(selected, cellWidth) {
-            scroll.scrollTo(with(density) { (selected.ordinal * cellWidth.toPx()).roundToInt() })
-        }
-        GlassChromeSurface(
-            hazeState = hazeState,
-            style = glassStyle,
-            shape = dockShape,
-            modifier = Modifier
+    val context = LocalContext.current
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    Box(modifier.fillMaxWidth()) {
+        // Soft edge fade keeps scrolled rows from peeking harshly in the gap below the floating pill.
+        Box(
+            Modifier
+                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(top = 24.dp),
+                .height(navBottom + 24.dp)
+                .background(Brush.verticalGradient(listOf(Color.Transparent, backgroundColor.copy(alpha = 0.94f)))),
+        )
+        BoxWithConstraints(
+            Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
         ) {
-            Row(
-                modifier = Modifier
-                    .horizontalScroll(scroll)
-                    .height(IntrinsicSize.Max)
-                    .padding(top = 28.dp, bottom = 7.dp, start = 4.dp, end = 4.dp)
-                    .selectableGroup(),
-            ) {
-                MainTab.entries.forEach { tab ->
-                    TabItem(tab, tab == selected, { onSelect(tab) }, Modifier.width(cellWidth).fillMaxHeight())
+            val measurer = rememberTextMeasurer()
+            val density = LocalDensity.current
+            val labelStyle = MaterialTheme.typography.labelMedium
+            val labels = MainTab.entries.map { stringResource(it.label) }
+            val widest = with(density) {
+                labels.maxOf { measurer.measure(it, style = labelStyle, softWrap = false).size.width }.toDp()
+            }
+            val cellWidth = maxOf((maxWidth - 8.dp) / MainTab.entries.size, widest + 8.dp, 48.dp)
+            val scroll = rememberScrollState()
+            LaunchedEffect(selected, cellWidth) {
+                val targetPx = with(density) { (selected.ordinal * cellWidth.toPx()).roundToInt() }
+                val animatorScale = runCatching {
+                    android.provider.Settings.Global.getFloat(
+                        context.contentResolver,
+                        android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
+                        1f,
+                    )
+                }.getOrDefault(1f)
+                if (animatorScale > 0f && scroll.maxValue > 0) {
+                    scroll.animateScrollTo(targetPx)
+                } else {
+                    scroll.scrollTo(targetPx)
                 }
             }
+            GlassChromeSurface(
+                hazeState = hazeState,
+                style = glassStyle,
+                shape = dockShape,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 22.dp),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .horizontalScroll(scroll)
+                        .height(IntrinsicSize.Max)
+                        .padding(top = 34.dp, bottom = 7.dp, start = 4.dp, end = 4.dp)
+                        .selectableGroup(),
+                ) {
+                    MainTab.entries.forEach { tab ->
+                        TabItem(tab, tab == selected, { onSelect(tab) }, Modifier.width(cellWidth).fillMaxHeight())
+                    }
+                }
+            }
+            RecordAction(onRecord, Modifier.align(Alignment.TopCenter))
         }
-        RecordAction(onRecord, Modifier.align(Alignment.TopCenter))
     }
 }
 
@@ -820,6 +855,7 @@ private fun TabRail(selected: MainTab, onSelect: (MainTab) -> Unit, onRecord: ()
 
 @Composable
 private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val view = LocalView.current
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
     val shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
@@ -831,8 +867,16 @@ private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifi
             .focusOutline(focused, shape, if (selected) colors.onTertiary else colors.primary, colors.surface)
             .clip(shape)
             .then(if (selected) Modifier.background(colors.tertiary, shape) else Modifier)
-            .selectable(selected, role = Role.Tab, onClick = onClick,
-                interactionSource = interactions, indication = LocalIndication.current)
+            .selectable(
+                selected = selected,
+                role = Role.Tab,
+                onClick = {
+                    if (!selected) view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                    onClick()
+                },
+                interactionSource = interactions,
+                indication = LocalIndication.current,
+            )
             .padding(horizontal = 2.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),

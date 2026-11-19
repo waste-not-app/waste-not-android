@@ -1,6 +1,8 @@
 package com.example.wastenot.ui.components
 
+import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -68,10 +70,14 @@ fun ActionButton(
 ) {
     val actionable = enabled && !loading
     val colors = MaterialTheme.colorScheme
+    val view = LocalView.current
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
     Button(
-        onClick = onClick,
+        onClick = {
+            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            onClick()
+        },
         modifier = modifier
             .heightIn(min = 52.dp)
             .focusOutline(actionable && focused, MaterialTheme.shapes.small, colors.primary, colors.surface)

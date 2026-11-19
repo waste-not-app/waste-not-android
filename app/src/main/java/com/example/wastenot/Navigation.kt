@@ -59,6 +59,7 @@ import com.example.wastenot.ui.auth.StartupScreen
 import com.example.wastenot.ui.auth.PasswordRecoveryViewModel
 import com.example.wastenot.ui.auth.PasswordRecoveryState
 import com.example.wastenot.ui.auth.PasswordRecoveryScreen
+import com.example.wastenot.ui.components.ambientCanvasBackground
 import com.example.wastenot.ui.components.rememberPrivacyPolicyAction
 import com.example.wastenot.ui.main.AccountNavigation
 import com.github.skydoves.navgraph.annotations.NavGraphRoot
@@ -185,7 +186,7 @@ private fun AuthNavigation(
         if (register) stack.add(Register)
     }
     Scaffold(
-        modifier = Modifier.background(LocalWasteNotGradients.current.canvas),
+        modifier = Modifier.ambientCanvasBackground(),
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,
         contentWindowInsets = WindowInsets.safeDrawing,

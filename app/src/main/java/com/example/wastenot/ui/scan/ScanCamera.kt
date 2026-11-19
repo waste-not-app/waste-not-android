@@ -56,6 +56,10 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.wastenot.R
 import com.example.wastenot.data.local.ScanPhotoCache
 import com.example.wastenot.model.ScanPhoto
+import com.example.wastenot.theme.CameraFramingGuide
+import com.example.wastenot.theme.CameraViewportBorder
+import com.example.wastenot.theme.CameraViewportEnd
+import com.example.wastenot.theme.CameraViewportStart
 import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.SecondaryActionButton
 import java.util.concurrent.Executors
@@ -97,12 +101,12 @@ internal fun ScanCamera(session: String, cache: ScanPhotoCache, onPhoto: (ScanPh
     Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (active) key(session, lifecycle) { LiveCamera(cache, latestPhoto, latestProblem, Modifier.fillMaxWidth()) }
         else {
-            Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFF13261D), contentColor = Color.White,
-                border = BorderStroke(1.dp, Color(0xFF647A6A))) {
+            Surface(shape = RoundedCornerShape(16.dp), color = CameraViewportStart, contentColor = Color.White,
+                border = BorderStroke(1.dp, CameraViewportBorder)) {
                 Box(Modifier.fillMaxWidth().heightIn(min = 230.dp)
-                    .background(Brush.linearGradient(listOf(Color(0xFF13261D), Color(0xFF294735)))) , contentAlignment = Alignment.Center) {
+                    .background(Brush.linearGradient(listOf(CameraViewportStart, CameraViewportEnd))) , contentAlignment = Alignment.Center) {
                     Canvas(Modifier.matchParentSize()) {
-                        drawRoundRect(Color(0xFF99B9A0), Offset(24.dp.toPx(), 24.dp.toPx()),
+                        drawRoundRect(CameraFramingGuide, Offset(24.dp.toPx(), 24.dp.toPx()),
                             Size(size.width - 48.dp.toPx(), size.height - 48.dp.toPx()), CornerRadius(14.dp.toPx()),
                             style = Stroke(1.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(5.dp.toPx(), 5.dp.toPx()))))
                     }
@@ -182,7 +186,7 @@ private fun LiveCamera(cache: ScanPhotoCache, onPhoto: (ScanPhoto) -> Unit, onPr
             this.controller = controller
             previewStreamState.observe(owner, streamObserver)
         } }, modifier = Modifier.fillMaxWidth().aspectRatio(4f / 3f).clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFF13261D)), onReset = null, onRelease = {
+            .background(CameraViewportStart), onReset = null, onRelease = {
             it.previewStreamState.removeObserver(streamObserver)
             it.controller = null
         })

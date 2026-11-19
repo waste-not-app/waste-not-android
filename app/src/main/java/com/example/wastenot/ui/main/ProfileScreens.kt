@@ -110,7 +110,7 @@ fun ProfileScreen(
             val hasStreak = progress.currentStreak != null || progress.bestStreak != null
             val streakLabel = progress.currentStreak?.let {
                 stringResource(R.string.profile_current_streak, WasteFormat.integer(it.toLong()))
-            } ?: "—"
+            } ?: "-"
             val streakSubtitle = if (!stale && progress.currentStreak != null && progress.currentStreak > 0) {
                 stringResource(if (progress.hasLoggedToday) R.string.profile_streak_today_logged else R.string.profile_streak_today_pending)
             } else null
