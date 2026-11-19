@@ -132,7 +132,7 @@ def generate_html(versions):
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                         </svg>
-                        Unduh APK
+                        Download APK
                     </a>
                 </div>
             </div>
@@ -140,20 +140,20 @@ def generate_html(versions):
     else:
         version_cards_html = """
         <div class="no-version">
-            <p>Belum ada build APK yang tersedia. Build baru akan otomatis muncul setelah pipeline CI/CD dijalankan.</p>
+            <p>No APK builds yet. New builds show up here automatically after the CI/CD pipeline runs.</p>
         </div>
         """
 
     latest_version_str = f"v{latest['version']}" if latest else "v1.0.0"
-    latest_meta_str = f"{latest['size']} · {latest['date']}" if latest else "Siap di-build via GitHub Actions"
+    latest_meta_str = f"{latest['size']} · {latest['date']}" if latest else "Ready to build with GitHub Actions"
 
     return f"""<!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WasteNot Android — Unduh APK Resmi</title>
-    <meta name="description" content="Aplikasi pencatatan kebiasaan 3R (Reduce, Reuse, Recycle) dengan AI Waste Detection. Unduh APK resmi untuk Android.">
+    <title>WasteNot Android: official APK downloads</title>
+    <meta name="description" content="An app for logging how you reduce, reuse, recycle, and throw away waste, with AI waste detection. Download the official Android APK.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -524,14 +524,14 @@ def generate_html(versions):
         <div class="brand-badge">🌱 OFFICIAL ANDROID BUILD</div>
         <div class="logo-container">♻️</div>
         <h1>WasteNot Android</h1>
-        <p class="tagline">Personal Waste Tracking & AI-Assisted Waste Detection (3R: Reduce, Reuse, Recycle, dan Trash).</p>
+        <p class="tagline">Personal Waste Tracking & AI-Assisted Waste Detection (Reduce, Reuse, Recycle, and Trash).</p>
         
         <div class="hero-action">
             <a href="/apk/latest.apk" class="btn-main" id="btn-download-latest">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                 </svg>
-                Download APK Terbaru ({latest_version_str})
+                Download the latest APK ({latest_version_str})
             </a>
             <span class="hero-meta">{latest_meta_str}</span>
         </div>
@@ -542,8 +542,8 @@ def generate_html(versions):
         <section class="card">
             <div class="card-header">
                 <div>
-                    <h2 class="card-title">📦 Versi Tersedia</h2>
-                    <p class="card-subtitle">Maksimal 3 versi terakhir tersimpan (terbaru + 2 versi sebelumnya). Build terlama otomatis dihapus.</p>
+                    <h2 class="card-title">📦 Available versions</h2>
+                    <p class="card-subtitle">We keep the 3 most recent versions (the latest plus the 2 before it). Older builds are removed automatically.</p>
                 </div>
                 <span class="badge badge-latest">MAX 3 BUILDS</span>
             </div>
@@ -557,8 +557,8 @@ def generate_html(versions):
         <section class="card">
             <div class="card-header">
                 <div>
-                    <h2 class="card-title">✨ Fitur Utama Aplikasi</h2>
-                    <p class="card-subtitle">Dirancang native dengan Jetpack Compose & Navigation 3</p>
+                    <h2 class="card-title">✨ Main features</h2>
+                    <p class="card-subtitle">Built natively with Jetpack Compose and Navigation 3</p>
                 </div>
             </div>
             
@@ -566,22 +566,22 @@ def generate_html(versions):
                 <div class="feature-box">
                     <div class="feature-icon">🌿</div>
                     <h3 class="feature-title">Personal 3R Tracking</h3>
-                    <p class="feature-desc">Pencatatan sampah mudah dalam berat (gram) atau jumlah item tanpa konversi spekulatif.</p>
+                    <p class="feature-desc">Log waste by weight in grams or by item count, with no guesswork conversions.</p>
                 </div>
                 <div class="feature-box">
                     <div class="feature-icon">📷</div>
                     <h3 class="feature-title">AI Waste Detection</h3>
-                    <p class="feature-desc">Deteksi jenis objek sampah via kamera dengan YOLO dan panduan penanganan rekomendasi LLM.</p>
+                    <p class="feature-desc">Detect waste items with the camera using YOLO, and get handling advice from an LLM.</p>
                 </div>
                 <div class="feature-box">
                     <div class="feature-icon">📊</div>
-                    <h3 class="feature-title">Statistik & Evaluasi</h3>
-                    <p class="feature-desc">Visualisasi grafik mingguan/bulanan dan recycling rate yang terhitung otomatis dan akurat.</p>
+                    <h3 class="feature-title">Statistics</h3>
+                    <p class="feature-desc">Weekly and monthly charts, plus a recycling rate calculated for you.</p>
                 </div>
                 <div class="feature-box">
                     <div class="feature-icon">🏆</div>
-                    <h3 class="feature-title">Gamifikasi XP & Level</h3>
-                    <p class="feature-desc">Peroleh 10 XP untuk setiap catatan aktivitas baru untuk mendorong kebiasaan ramah lingkungan.</p>
+                    <h3 class="feature-title">XP and levels</h3>
+                    <p class="feature-desc">Earn 10 XP for every new activity you log, to help build greener habits.</p>
                 </div>
             </div>
         </section>
@@ -590,8 +590,8 @@ def generate_html(versions):
         <section class="card">
             <div class="card-header">
                 <div>
-                    <h2 class="card-title">📲 Panduan Instalasi APK</h2>
-                    <p class="card-subtitle">Langkah cepat menginstal aplikasi di perangkat Android</p>
+                    <h2 class="card-title">📲 How to install the APK</h2>
+                    <p class="card-subtitle">Quick steps to install the app on an Android phone</p>
                 </div>
             </div>
 
@@ -599,29 +599,29 @@ def generate_html(versions):
                 <div class="step-row">
                     <div class="step-num">1</div>
                     <div class="step-text">
-                        <h4>Unduh File APK</h4>
-                        <p>Tekan tombol <strong>Download APK Terbaru</strong> di atas atau pilih versi tertentu pada daftar riwayat.</p>
+                        <h4>Download the APK</h4>
+                        <p>Tap <strong>Download the latest APK</strong> above, or pick a specific version from the list.</p>
                     </div>
                 </div>
                 <div class="step-row">
                     <div class="step-num">2</div>
                     <div class="step-text">
-                        <h4>Buka File APK yang Diunduh</h4>
-                        <p>Buka notifikasi unduhan browser atau cari file APK di folder <code>Downloads</code> perangkat Android kamu.</p>
+                        <h4>Open the downloaded APK</h4>
+                        <p>Open the browser's download notification, or find the APK in your phone's <code>Downloads</code> folder.</p>
                     </div>
                 </div>
                 <div class="step-row">
                     <div class="step-num">3</div>
                     <div class="step-text">
-                        <h4>Izinkan Instalasi dari Sumber Tidak Dikenal</h4>
-                        <p>Jika muncul peringatan keamanan, pilih <strong>Pengaturan / Settings</strong> lalu aktifkan <em>"Izinkan dari sumber ini" (Allow from this source)</em>.</p>
+                        <h4>Allow installs from this source</h4>
+                        <p>If you see a security warning, tap <strong>Settings</strong> and turn on <em>Allow from this source</em>.</p>
                     </div>
                 </div>
                 <div class="step-row">
                     <div class="step-num">4</div>
                     <div class="step-text">
-                        <h4>Instal dan Buka WasteNot</h4>
-                        <p>Tekan <strong>Install</strong> dan tunggu hingga proses selesai. Buka WasteNot dan mulai catat kebiasaan 3R kamu!</p>
+                        <h4>Install and open WasteNot</h4>
+                        <p>Tap <strong>Install</strong> and wait for it to finish. Then open WasteNot and start logging your habits.</p>
                     </div>
                 </div>
             </div>
