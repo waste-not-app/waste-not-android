@@ -28,9 +28,9 @@
     <string name="method_reuse">Reuse</string>
     <string name="method_recycle">Recycle</string>
     <string name="method_trash">Trash</string>
-    <string name="method_reduce_description">Hindari pemakaian</string>
+    <string name="method_reduce_description">Tidak dipakai sejak awal</string>
     <string name="method_reuse_description">Gunakan kembali</string>
-    <string name="method_recycle_description">Daur ulang</string>
+    <string name="method_recycle_description">Kirim untuk didaur ulang</string>
     <string name="method_trash_description">Buang sebagai residu</string>
     <string name="quantity_unit_helper">Tanpa timbangan? Pilih satuan Benda.</string>
     <string name="editor_date_helper">%1$s · maksimum 30 hari sebelumnya.</string>
