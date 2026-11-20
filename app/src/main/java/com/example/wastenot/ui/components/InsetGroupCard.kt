@@ -181,7 +181,7 @@ fun MetricTile(
 ) {
     val tokens = LocalWasteNotSurfaceTokens.current
     Surface(
-        modifier = modifier,
+        modifier = modifier.semantics(mergeDescendants = true) {},
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, tokens.cardEdge),
