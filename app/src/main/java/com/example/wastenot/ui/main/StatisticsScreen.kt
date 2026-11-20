@@ -277,7 +277,7 @@ private fun DailyChart(daily: List<StatisticsDayTotal>, count: Boolean, modifier
             }
         }
         Text(
-            stringResource(R.string.daily_axis, unit),
+            stringResource(if (count) R.string.daily_axis_count else R.string.daily_axis_weight),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

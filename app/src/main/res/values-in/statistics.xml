@@ -6,7 +6,8 @@
     <string name="daily_count_title">Benda ditangani per hari</string>
     <string name="daily_chart_description">%1$s dalam %2$s, %3$s hingga %4$s. Buka Lihat angka harian untuk rincian setiap tanggal.</string>
     <string name="daily_scale">Nilai tertinggi: %1$s %2$s</string>
-    <string name="daily_axis">Tanggal · %1$s · hari tanpa aktivitas bernilai 0</string>
+    <string name="daily_axis_weight">Gram per hari. Hari tanpa aktivitas bernilai 0.</string>
+    <string name="daily_axis_count">Jumlah benda per hari. Hari tanpa aktivitas bernilai 0.</string>
     <string name="daily_scroll_hint">Geser grafik untuk melihat tanggal lainnya.</string>
     <string name="daily_show">Lihat angka harian</string>
     <string name="daily_hide">Tutup angka harian</string>
