@@ -75,7 +75,7 @@ class AppNavigationTest {
         compose.onNodeWithContentDescription("Back").performClick()
         tab("Home")
         compose.onNodeWithText("650 g").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("2 items avoided").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasText("Avoided") and hasText("2 items")).performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("1 of 2 handling activities", substring = true).performScrollTo().assertIsDisplayed()
         capture("home")
         listOf("Home", "History", "Guide", "Stats", "Profile").forEach { label ->
@@ -260,7 +260,7 @@ class AppNavigationTest {
         }
         compose.onNodeWithText("650 g").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("2 items handled").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("2 items avoided").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasText("Avoided") and hasText("2 items")).performScrollTo().assertIsDisplayed()
         tab("Profile")
         compose.onNodeWithText("Sign out").performScrollTo().performClick()
         compose.onNodeWithText("Cancel").performClick()

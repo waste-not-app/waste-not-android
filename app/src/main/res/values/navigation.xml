@@ -30,7 +30,10 @@
     <string name="handled_today">Waste handled today</string>
     <string name="handled_period">Waste handled in this period</string>
     <string name="handled_items">%1$s items handled</string>
-    <string name="avoided_items">%1$s items avoided</string>
+    <plurals name="avoided_items">
+        <item quantity="one">%1$s item</item>
+        <item quantity="other">%1$s items</item>
+    </plurals>
     <string name="avoided_weight">%1$s avoided</string>
     <string name="rate_unavailable">No handling activities yet to calculate a recycling rate.</string>
     <string name="recycling_rate">Recycling rate %1$s%% · %2$d of %3$d handling activities</string>

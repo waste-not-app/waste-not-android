@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -232,7 +233,8 @@ internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifi
         } else {
             stringResource(R.string.rate_no_handled)
         }
-        val avoidedText = stringResource(R.string.avoided_items, WasteFormat.integer(summary.avoided.itemCount))
+        val avoidedText = pluralStringResource(R.plurals.avoided_items, summary.avoided.itemCount.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
+            WasteFormat.integer(summary.avoided.itemCount))
         val avoidedSub = if (summary.avoided.weightGrams > 0) {
             stringResource(R.string.avoided_weight, formatted(WasteFormat.weight(summary.avoided.weightGrams, summary = true)))
         } else null

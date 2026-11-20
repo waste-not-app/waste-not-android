@@ -47,7 +47,7 @@ class StatisticsDesignTest {
         val records = store.load().value
         show({ WorkspaceUiState(records = records, loading = false) })
         compose.onNodeWithText("1.4 kg").assertExists()
-        compose.onNodeWithText("2 items avoided").assertExists()
+        compose.onNode(hasText("Avoided") and hasText("2 items")).assertExists()
         compose.onNodeWithTag("daily-weight-chart").performScrollTo().assertIsDisplayed()
         compose.onNodeWithTag("daily-count-chart").assertDoesNotExist()
         capture("statistics-chart")
@@ -76,7 +76,7 @@ class StatisticsDesignTest {
         compose.onNodeWithText("21 Sep 2026 · 0 g · 20 items").performScrollTo().assertIsDisplayed()
         compose.runOnIdle { records = listOf(record.copy(method = DisposalMethod.REDUCE, quantity = Quantity.Count.of(20))) }
         compose.onNodeWithTag("daily-count-chart").assertDoesNotExist()
-        compose.onNodeWithText("20 items avoided").assertExists()
+        compose.onNode(hasText("Avoided") and hasText("20 items")).assertExists()
         compose.onNodeWithText("No handling activities yet").performScrollTo().assertIsDisplayed()
         capture("statistics-reduce-only")
     }
