@@ -172,7 +172,7 @@ internal fun loadFailureHint(error: ApiFailureKind?): String = stringResource(wh
 
 @Composable
 internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifier = Modifier,
-    personal: Boolean = false, afterPrimary: @Composable () -> Unit = {}, beforeRate: @Composable () -> Unit = {}) {
+    personal: Boolean = false, afterPrimary: @Composable () -> Unit = {}) {
     var showMethodology by rememberSaveable { mutableStateOf(false) }
     val infoToggleDesc = stringResource(R.string.summary_info_toggle)
     Column(modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -225,7 +225,6 @@ internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifi
             }
         }
         afterPrimary()
-        beforeRate()
         val rate = WasteFormat.percentage(summary.recyclingRatePercent)
         val rateText = if (rate == null) stringResource(R.string.rate_empty) else stringResource(R.string.rate_value, rate)
         val rateSub = if (rate != null) {

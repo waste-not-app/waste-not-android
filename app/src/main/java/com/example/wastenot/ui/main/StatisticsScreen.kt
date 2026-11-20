@@ -2,6 +2,10 @@ package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.draw.rotate
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -70,41 +74,57 @@ fun StatisticsScreen(
                 ActionButton(stringResource(R.string.record_activity), onRecord, Modifier.fillMaxWidth())
             }
         } else {
-            SummaryBlock(period.summary, stringResource(R.string.handled_period), Modifier.testTag("statistics-summary"), beforeRate = {
-                InsetGroupCard(contentPadding = true) {
-                    DailyChart(period.daily, count = false, Modifier.fillMaxWidth())
-                    if (period.summary.handled.itemCount > 0) {
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                        DailyChart(period.daily, count = true, Modifier.fillMaxWidth())
-                    }
-                    val expansionState = stringResource(if (expanded) R.string.daily_expanded else R.string.daily_collapsed)
-                    TextActionButton(
+            SummaryBlock(period.summary, stringResource(R.string.handled_period), Modifier.testTag("statistics-summary"))
+            InsetGroupCard(contentPadding = true) {
+                DailyChart(period.daily, count = false, Modifier.fillMaxWidth())
+                if (period.summary.handled.itemCount > 0) {
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    DailyChart(period.daily, count = true, Modifier.fillMaxWidth())
+                }
+                val expansionState = stringResource(if (expanded) R.string.daily_expanded else R.string.daily_collapsed)
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable(role = Role.Button) { expanded = !expanded }
+                        .semantics { stateDescription = expansionState },
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
                         stringResource(if (expanded) R.string.daily_hide else R.string.daily_show),
-                        onClick = { expanded = !expanded },
-                        modifier = Modifier.semantics { stateDescription = expansionState },
+                        Modifier.weight(1f),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
                     )
-                    if (expanded) {
+                    Icon(
+                        painterResource(R.drawable.ic_chevron_down), null,
+                        Modifier.size(20.dp).rotate(if (expanded) 180f else 0f),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (expanded) {
+                    Text(
+                        stringResource(R.string.daily_values),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.semantics { heading() },
+                    )
+                    period.daily.forEachIndexed { idx, day ->
                         Text(
-                            stringResource(R.string.daily_values),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.semantics { heading() },
+                            stringResource(
+                                R.string.daily_row,
+                                WasteFormat.activityDate(day.date),
+                                WasteFormat.integer(day.handled.weightGrams),
+                                WasteFormat.integer(day.handled.itemCount),
+                            ),
+                            modifier = Modifier.testTag("statistics-day-${day.date}"),
+                            style = MaterialTheme.typography.bodySmall,
                         )
-                        period.daily.forEachIndexed { idx, day ->
-                            Text(
-                                stringResource(
-                                    R.string.daily_row,
-                                    WasteFormat.activityDate(day.date),
-                                    WasteFormat.integer(day.handled.weightGrams),
-                                    WasteFormat.integer(day.handled.itemCount),
-                                ),
-                                modifier = Modifier.testTag("statistics-day-${day.date}"),
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                            if (idx < period.daily.lastIndex) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                        }
+                        if (idx < period.daily.lastIndex) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
-            })
+            }
             GroupSectionLabel(stringResource(R.string.methods_title))
             val methodLabels = DisposalMethod.entries.map { stringResource(it.labelResource) }
             val percentages = DisposalMethod.entries.map { method ->
