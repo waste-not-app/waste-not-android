@@ -216,13 +216,15 @@ fun AuthScreen(
                     AuthSubmit(register, state.submitting, onSubmit, Modifier.fillMaxWidth())
                 }
             }
-            if (!register && onPasswordRecovery != null) TextActionButton(
-                stringResource(R.string.password_recovery_open), onPasswordRecovery,
-                Modifier.fillMaxWidth(), enabled = !state.submitting,
-            )
-            TextActionButton(stringResource(if (register) R.string.go_to_login else R.string.go_to_register),
-                onSwitchForm, Modifier.fillMaxWidth(), enabled = !state.submitting)
-            if (onPrivacy != null) TextActionButton(stringResource(R.string.privacy_policy_open), onPrivacy, Modifier.fillMaxWidth())
+            Column(Modifier.fillMaxWidth()) {
+                if (!register && onPasswordRecovery != null) TextActionButton(
+                    stringResource(R.string.password_recovery_open), onPasswordRecovery,
+                    Modifier.fillMaxWidth(), enabled = !state.submitting,
+                )
+                TextActionButton(stringResource(if (register) R.string.go_to_login else R.string.go_to_register),
+                    onSwitchForm, Modifier.fillMaxWidth(), enabled = !state.submitting)
+                if (onPrivacy != null) TextActionButton(stringResource(R.string.privacy_policy_open), onPrivacy, Modifier.fillMaxWidth())
+            }
         }
     }
 }
