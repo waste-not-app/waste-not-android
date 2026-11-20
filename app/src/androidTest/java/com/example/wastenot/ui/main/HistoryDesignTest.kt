@@ -100,21 +100,21 @@ class HistoryDesignTest {
     @Test fun draftCancelResetApplyAndRotationKeepTheirSeparateMeaning() {
         val restoration = StateRestorationTester(compose)
         show(restoration)
-        compose.onNodeWithText("20 logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Showing 20 logs").assertIsDisplayed()
         open(); chooseCategory("Plastic")
         restoration.emulateSavedInstanceStateRestore()
         compose.onNode(hasText("Plastic") and hasAnyAncestor(hasTestTag("history-filter-sheet"))).assertExists()
         compose.onNodeWithText("Cancel").performScrollTo().performClick()
-        compose.onNodeWithText("20 logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Showing 20 logs").assertIsDisplayed()
         open(); chooseCategory("Plastic"); apply()
-        compose.onNodeWithText("12 matching logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Showing 12 matching logs").assertIsDisplayed()
         open(); compose.onNodeWithText("Reset").performScrollTo().performClick()
         compose.onNodeWithText("Cancel").performScrollTo().performClick()
-        compose.onNodeWithText("12 matching logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Showing 12 matching logs").assertIsDisplayed()
         restoration.emulateSavedInstanceStateRestore()
-        compose.onNodeWithText("12 matching logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Showing 12 matching logs").assertIsDisplayed()
         open(); compose.onNodeWithText("Reset").performScrollTo().performClick(); apply()
-        compose.onNodeWithText("20 logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Showing 20 logs").assertIsDisplayed()
     }
 
     @Test fun incompleteAndReversedDatesStayInSheetUntilCorrected() {
@@ -125,7 +125,7 @@ class HistoryDesignTest {
         compose.onNodeWithText("The start date can't be after the end date.").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Reset").performScrollTo().performClick()
         chooseDate(0, "21"); chooseDate(0, "21"); apply()
-        compose.onNodeWithText("20 matching logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Showing 20 matching logs").assertIsDisplayed()
         compose.onNodeWithText("Today").assertIsDisplayed()
         listText("Log manually")
         compose.onNodeWithText("Yesterday").assertDoesNotExist()
@@ -144,11 +144,11 @@ class HistoryDesignTest {
         assertEquals("record-21", selected)
         restoration.emulateSavedInstanceStateRestore()
         compose.onNodeWithText("Note 21").assertIsDisplayed()
-        listText("All logs loaded.")
+        listText("You've reached the end of your logs.")
         compose.onNodeWithText("Load more logs").assertDoesNotExist()
         listText("Yesterday")
         compose.onNodeWithText("Yesterday").assertIsDisplayed()
-        listText("25 logs loaded.")
+        listText("Showing 25 logs")
         compose.runOnIdle { dark.value = true }
         capture("history-dark")
         open(); capture("filter-dark")
@@ -187,7 +187,7 @@ class HistoryDesignTest {
             if (requests.size == 2) ApiFailure(ApiFailureKind.NETWORK) else null
         })
         val list = compose.onNodeWithTag("history-list")
-        compose.onNodeWithText("20 logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Showing 20 logs").assertIsDisplayed()
         compose.runOnIdle { assertEquals(listOf(null), requests) }
 
         graphics(" reset")
@@ -197,7 +197,7 @@ class HistoryDesignTest {
         compose.onNodeWithText("Load more logs").performClick()
         compose.onNodeWithText("Couldn't load more logs.").assertIsDisplayed()
         list.performScrollToIndex(0)
-        compose.onNodeWithText("20 logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Showing 20 logs").assertIsDisplayed()
         list.performScrollToIndex(22)
         compose.onNodeWithText("Try again").performClick()
 
@@ -206,11 +206,11 @@ class HistoryDesignTest {
             compose.onNodeWithText("Load more logs").performClick()
         }
         list.performScrollToIndex(1_002)
-        compose.onNodeWithText("All logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("You've reached the end of your logs.").assertIsDisplayed()
         list.performScrollToIndex(1_001)
         compose.onNodeWithText("Note 1").assertIsDisplayed()
         list.performScrollToIndex(0)
-        compose.onNodeWithText("1.000 logs loaded.").assertIsDisplayed()
+        compose.onNodeWithText("Showing 1.000 logs").assertIsDisplayed()
         compose.onNodeWithText("Note 1000").assertIsDisplayed()
         repeat(4) { list.performTouchInput { swipeUp() } }
         repeat(4) { list.performTouchInput { swipeDown() } }

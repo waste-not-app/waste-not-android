@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
@@ -93,8 +94,9 @@ fun HistoryScreen(
             contentPadding = pagePadding(padding),
         ) {
             if (data.records.isNotEmpty() || (!data.loading && data.error == null)) item(key = "count") {
-                Text(stringResource(if (filter.active) R.string.history_filtered_count else R.string.history_count,
-                    WasteFormat.integer(data.records.size.toLong())), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(pluralStringResource(if (filter.active) R.plurals.history_filtered_count else R.plurals.history_count,
+                    data.records.size, WasteFormat.integer(data.records.size.toLong())),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             if (filter.active) item(key = "filters") {
                 FlowRow(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp),
