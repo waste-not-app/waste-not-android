@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -274,7 +275,10 @@ fun GroupedNavRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     showDivider: Boolean = true,
+    supporting: String? = null,
+    destructive: Boolean = false,
 ) {
+    val accent = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer
     Column(modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
@@ -296,15 +300,19 @@ fun GroupedNavRow(
                     painterResource(icon),
                     contentDescription = null,
                     modifier = Modifier.size(17.dp),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint = accent,
                 )
             }
-            Text(
-                label,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    label,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                    color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                )
+                if (supporting != null) {
+                    Text(supporting, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
             Icon(
                 painterResource(R.drawable.ic_next),
                 contentDescription = null,
@@ -317,6 +325,47 @@ fun GroupedNavRow(
                 modifier = Modifier.padding(start = 60.dp),
                 color = MaterialTheme.colorScheme.outlineVariant,
             )
+        }
+    }
+}
+
+/** A read-only label and value; the value moves under the label when both don't fit on one line. */
+@Composable
+fun MetaRow(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    supporting: String? = null,
+    showDivider: Boolean = true,
+) {
+    Column(modifier.fillMaxWidth()) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp)
+                .semantics(mergeDescendants = true) {}
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
+        ) {
+            FlowRow(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    label,
+                    modifier = Modifier.padding(end = 12.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(value, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+            }
+            if (supporting != null) {
+                Text(supporting, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        if (showDivider) {
+            HorizontalDivider(Modifier.padding(start = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
         }
     }
 }
