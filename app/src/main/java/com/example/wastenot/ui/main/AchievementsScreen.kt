@@ -100,7 +100,7 @@ fun AchievementsScreen(
         if (items.isEmpty()) {
             AsyncStatePanel(
                 title = stringResource(R.string.achievements_empty_title),
-                icon = R.drawable.ic_check,
+                icon = R.drawable.ic_trophy,
                 modifier = Modifier.fillMaxWidth(),
                 description = stringResource(R.string.achievements_empty_message),
             )
