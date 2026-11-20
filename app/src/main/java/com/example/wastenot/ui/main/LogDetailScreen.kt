@@ -28,6 +28,7 @@ import com.example.wastenot.ui.components.AsyncStatePanel
 import com.example.wastenot.ui.components.CategoryIconBadge
 import com.example.wastenot.ui.components.GroupSectionLabel
 import com.example.wastenot.ui.components.InsetGroupCard
+import com.example.wastenot.ui.components.MetaRow
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.TextActionButton
 import com.example.wastenot.ui.components.labelResource
@@ -110,9 +111,9 @@ fun LogDetailScreen(
                 }
             }
             InsetGroupCard {
-                DetailMetadata(stringResource(R.string.activity_date), WasteFormat.activityDate(log.activityDate), showDivider = true)
-                DetailMetadata(stringResource(R.string.timezone_label), log.activityTimezone.id, showDivider = true)
-                DetailMetadata(stringResource(R.string.method), stringResource(log.method.labelResource), showDivider = false)
+                MetaRow(stringResource(R.string.activity_date), WasteFormat.activityDate(log.activityDate))
+                MetaRow(stringResource(R.string.timezone_label), log.activityTimezone.id)
+                MetaRow(stringResource(R.string.method), stringResource(log.method.labelResource), showDivider = false)
             }
             InsetGroupCard(contentPadding = true) {
                 Text(stringResource(R.string.notes_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
@@ -165,16 +166,5 @@ fun LogDetailScreen(
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-    }
-}
-
-@Composable
-private fun DetailMetadata(label: String, value: String, showDivider: Boolean, modifier: Modifier = Modifier) {
-    Column(modifier.fillMaxWidth()) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
-            Text(value, style = MaterialTheme.typography.titleSmall)
-        }
-        if (showDivider) HorizontalDivider(Modifier.padding(start = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
     }
 }
