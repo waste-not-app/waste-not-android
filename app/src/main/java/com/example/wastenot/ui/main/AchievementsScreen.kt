@@ -1,6 +1,10 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.BorderStroke
+import com.example.wastenot.ui.components.InsetGroupCard
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -101,22 +105,25 @@ fun AchievementsScreen(
                 description = stringResource(R.string.achievements_empty_message),
             )
         } else {
-            items.forEach { item ->
-                val isOpen = expanded[item.id] == true
-                AchievementCard(
-                    item = item,
-                    accountTimezone = accountTimezone,
-                    expanded = isOpen,
-                    onToggle = { expanded[item.id] = !isOpen },
-                    modifier = Modifier.fillMaxWidth(),
-                )
+            InsetGroupCard {
+                items.forEachIndexed { index, item ->
+                    val isOpen = expanded[item.id] == true
+                    AchievementRow(
+                        item = item,
+                        accountTimezone = accountTimezone,
+                        expanded = isOpen,
+                        onToggle = { expanded[item.id] = !isOpen },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    if (index < items.lastIndex) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun AchievementCard(
+private fun AchievementRow(
     item: Achievement,
     accountTimezone: ZoneId,
     expanded: Boolean,
@@ -127,62 +134,47 @@ private fun AchievementCard(
     val toggleHint = stringResource(if (expanded) R.string.achievement_hide_details else R.string.achievement_toggle_details)
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
-    Surface(
-        modifier = modifier.focusOutline(focused, MaterialTheme.shapes.medium, MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.surface),
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(
-            1.dp,
-            if (item.isUnlocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
-        ),
+    val colors = MaterialTheme.colorScheme
+    Column(
+        modifier = modifier
+            .clickable(
+                interactionSource = interactions,
+                indication = LocalIndication.current,
+                role = Role.Button,
+                onClickLabel = toggleHint,
+                onClick = onToggle,
+            )
+            .focusOutline(focused, RoundedCornerShape(12.dp), colors.primary, colors.surface)
+            .semantics { stateDescription = "$statusLabel, $toggleHint" }
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Column(
-            modifier = Modifier
-                .clickable(
-                    interactionSource = interactions,
-                    indication = LocalIndication.current,
-                    role = Role.Button,
-                    onClickLabel = toggleHint,
-                    onClick = onToggle,
-                )
-                .semantics { stateDescription = "$statusLabel, $toggleHint" }
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+            Box(
+                Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(if (item.isUnlocked) colors.primaryContainer else colors.surfaceVariant),
+                contentAlignment = Alignment.Center,
             ) {
+                Icon(
+                    painterResource(if (item.isUnlocked) R.drawable.ic_check else R.drawable.ic_trophy),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = if (item.isUnlocked) colors.onPrimaryContainer else colors.onSurfaceVariant,
+                )
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
                     item.title,
                     modifier = Modifier.semantics { heading() },
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = colors.onSurface,
                 )
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (item.isUnlocked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (item.isUnlocked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                ) {
-                    Text(
-                        statusLabel,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
-            }
-            val fraction = (item.currentValue.toFloat() / item.targetValue.toFloat()).coerceIn(0f, 1f)
-            LinearProgressIndicator(
-                progress = { fraction },
-                modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(8.dp)),
-                color = if (item.isUnlocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                gapSize = 0.dp,
-            )
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
                 Text(
                     stringResource(
                         R.string.achievement_progress,
@@ -190,42 +182,63 @@ private fun AchievementCard(
                         WasteFormat.integer(item.targetValue),
                     ),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = colors.onSurfaceVariant,
                 )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        toggleHint,
-                        modifier = Modifier.weight(1f),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    Icon(
-                        painterResource(R.drawable.ic_chevron_down),
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp).rotate(if (expanded) 180f else 0f),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                }
             }
-            if (expanded) {
+            Surface(
+                shape = RoundedCornerShape(999.dp),
+                color = if (item.isUnlocked) colors.primaryContainer else colors.surface,
+                contentColor = if (item.isUnlocked) colors.onPrimaryContainer else colors.onSurfaceVariant,
+                border = if (item.isUnlocked) null else BorderStroke(1.dp, colors.outlineVariant),
+            ) {
                 Text(
-                    item.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    statusLabel,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.labelMedium,
                 )
-                item.unlockedAt?.let { unlockedAt ->
-                    Text(
-                        stringResource(
-                            R.string.achievement_unlocked_at,
-                            WasteFormat.timestamp(unlockedAt, accountTimezone),
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+            }
+        }
+        val fraction = (item.currentValue.toFloat() / item.targetValue.toFloat()).coerceIn(0f, 1f)
+        LinearProgressIndicator(
+            progress = { fraction },
+            modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(8.dp)),
+            color = if (item.isUnlocked) colors.primary else colors.outline,
+            trackColor = colors.surfaceVariant,
+            gapSize = 0.dp,
+            drawStopIndicator = {},
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                toggleHint,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.labelMedium,
+                color = colors.primary,
+            )
+            Icon(
+                painterResource(R.drawable.ic_chevron_down),
+                contentDescription = null,
+                modifier = Modifier.size(16.dp).rotate(if (expanded) 180f else 0f),
+                tint = colors.primary,
+            )
+        }
+        if (expanded) {
+            Text(
+                item.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.onSurface,
+            )
+            item.unlockedAt?.let { unlockedAt ->
+                Text(
+                    stringResource(
+                        R.string.achievement_unlocked_at,
+                        WasteFormat.timestamp(unlockedAt, accountTimezone),
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onSurfaceVariant,
+                )
             }
         }
     }
