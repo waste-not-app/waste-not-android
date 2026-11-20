@@ -142,7 +142,7 @@ fun ProfileScreen(
             if (achievementsEnabled) {
                 GroupedNavRow(
                     label = stringResource(R.string.achievements_title),
-                    icon = R.drawable.ic_check,
+                    icon = R.drawable.ic_trophy,
                     onClick = onAchievements,
                     showDivider = true,
                 )
