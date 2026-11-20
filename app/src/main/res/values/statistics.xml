@@ -5,7 +5,8 @@
     <string name="daily_count_title">Items handled per day</string>
     <string name="daily_chart_description">%1$s over %2$s, %3$s to %4$s. Open Show daily numbers for each date.</string>
     <string name="daily_scale">Highest value: %1$s %2$s</string>
-    <string name="daily_axis">Date · %1$s · days with no activity count as 0</string>
+    <string name="daily_axis_weight">Grams per day. Days without activity show 0.</string>
+    <string name="daily_axis_count">Items per day. Days without activity show 0.</string>
     <string name="daily_scroll_hint">Scroll the chart to see other dates.</string>
     <string name="daily_show">Show daily numbers</string>
     <string name="daily_hide">Hide daily numbers</string>
