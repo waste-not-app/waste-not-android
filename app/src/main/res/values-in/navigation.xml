@@ -31,7 +31,9 @@
     <string name="handled_today">Sampah ditangani hari ini</string>
     <string name="handled_period">Sampah ditangani pada periode ini</string>
     <string name="handled_items">%1$s benda ditangani</string>
-    <string name="avoided_items">%1$s benda dihindari</string>
+    <plurals name="avoided_items">
+        <item quantity="other">%1$s benda</item>
+    </plurals>
     <string name="avoided_weight">%1$s dihindari</string>
     <string name="rate_unavailable">Belum ada aktivitas penanganan untuk menghitung recycling rate.</string>
     <string name="recycling_rate">Recycling rate %1$s%% · %2$d dari %3$d aktivitas penanganan</string>
