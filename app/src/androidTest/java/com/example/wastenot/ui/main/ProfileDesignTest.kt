@@ -91,9 +91,10 @@ class ProfileDesignTest {
         compose.onNodeWithContentDescription("App theme").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(1, calls) }
         capture("settings-theme")
-        compose.onNodeWithText("Versi ${BuildConfig.VERSION_NAME}").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("Your account's time zone is set when you register.").assertExists()
-        compose.onNodeWithText("This summary isn't the official privacy policy.", substring = true).assertExists()
+        compose.onNodeWithText(BuildConfig.VERSION_NAME, substring = true).performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("App version", substring = true).assertExists()
+        compose.onNodeWithText("Your account's time zone is set when you register.", substring = true).assertExists()
+        compose.onNodeWithText("Privacy policy", substring = true).assertExists()
         compose.onNodeWithText("Daily reminder").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Achievement").assertDoesNotExist()
         capture("settings-privacy")

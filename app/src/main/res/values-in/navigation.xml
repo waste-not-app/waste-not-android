@@ -48,7 +48,6 @@
     <string name="date_range">%1$s sampai %2$s</string>
     <string name="method_activity_count">%1$s: %2$d aktivitas</string>
     <string name="theme_setting">Tampilan: %1$s</string>
-    <string name="app_version">Versi %1$s</string>
     <string name="log_not_loaded">Catatan ini belum tersedia dalam daftar yang dimuat.</string>
     <string name="no_notes">Tanpa catatan</string>
     <string name="record_version">Versi catatan %1$d</string>

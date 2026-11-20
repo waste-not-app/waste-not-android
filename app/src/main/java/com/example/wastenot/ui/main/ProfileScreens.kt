@@ -31,6 +31,7 @@ import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.GroupSectionLabel
 import com.example.wastenot.ui.components.GroupedNavRow
 import com.example.wastenot.ui.components.InsetGroupCard
+import com.example.wastenot.ui.components.MetaRow
 import com.example.wastenot.ui.components.MetricTile
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.TextActionButton
@@ -51,6 +52,7 @@ fun ProfileScreen(
     achievementsEnabled: Boolean = false,
     onAchievements: () -> Unit = {},
     onSync: (() -> Unit)? = null,
+    onRecyclingPoints: (() -> Unit)? = null,
     freshness: SnapshotFreshness? = null,
     stale: Boolean = false,
 ) {
@@ -157,6 +159,12 @@ fun ProfileScreen(
                 label = stringResource(R.string.settings_title),
                 icon = R.drawable.ic_settings,
                 onClick = onSettings,
+                showDivider = onRecyclingPoints != null,
+            )
+            if (onRecyclingPoints != null) GroupedNavRow(
+                label = stringResource(R.string.recycling_points_open),
+                icon = R.drawable.ic_pin,
+                onClick = onRecyclingPoints,
                 showDivider = false,
             )
         }
@@ -183,11 +191,10 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     onReminderSettings: () -> Unit = {},
     onDeleteAccount: (() -> Unit)? = null,
-    onRecyclingPoints: (() -> Unit)? = null,
 ) {
     val openPrivacy = com.example.wastenot.ui.components.rememberPrivacyPolicyAction()
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
-        GroupSectionLabel(stringResource(R.string.theme_title))
+        GroupSectionLabel(stringResource(R.string.settings_preferences))
         InsetGroupCard {
             val themeLabel = stringResource(R.string.theme_application)
             Row(
@@ -214,52 +221,33 @@ fun SettingsScreen(
             HorizontalDivider(Modifier.padding(start = 60.dp), color = MaterialTheme.colorScheme.outlineVariant)
             GroupedNavRow(
                 label = stringResource(R.string.reminder_title),
-                icon = R.drawable.ic_clock,
+                icon = R.drawable.ic_bell,
                 onClick = onReminderSettings,
-                showDivider = onRecyclingPoints != null,
-            )
-            if (onRecyclingPoints != null) GroupedNavRow(
-                label = stringResource(R.string.recycling_points_open),
-                icon = R.drawable.ic_guide,
-                onClick = onRecyclingPoints,
                 showDivider = false,
             )
         }
-        GroupSectionLabel(stringResource(R.string.personal_data))
+        GroupSectionLabel(stringResource(R.string.settings_account_privacy))
         InsetGroupCard {
-            SettingsMetaRow(stringResource(R.string.timezone_label), user.timezone.id, showDivider = true)
-            Text(
-                stringResource(R.string.timezone_read_only),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            MetaRow(stringResource(R.string.timezone_label), user.timezone.id, supporting = stringResource(R.string.timezone_read_only))
+            MetaRow(stringResource(R.string.app_version_label), BuildConfig.VERSION_NAME)
+            GroupedNavRow(
+                label = stringResource(R.string.privacy_policy_open),
+                icon = R.drawable.ic_shield,
+                onClick = openPrivacy,
+                showDivider = onDeleteAccount != null,
+                supporting = stringResource(R.string.privacy_policy_description),
             )
-            HorizontalDivider(Modifier.padding(start = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
-            SettingsMetaRow(stringResource(R.string.app_version, BuildConfig.VERSION_NAME), "", showDivider = false)
+            if (onDeleteAccount != null) GroupedNavRow(
+                label = stringResource(R.string.delete_account_title),
+                icon = R.drawable.ic_delete,
+                onClick = onDeleteAccount,
+                showDivider = false,
+                destructive = true,
+            )
         }
-        InsetGroupCard(contentPadding = true) {
+        Column(Modifier.padding(horizontal = 4.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(stringResource(R.string.privacy_account), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(stringResource(R.string.privacy_optional_photo), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(stringResource(R.string.privacy_policy_description), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            TextActionButton(stringResource(R.string.privacy_policy_open), openPrivacy, Modifier.fillMaxWidth())
         }
-        if (onDeleteAccount != null) TextActionButton(
-            stringResource(R.string.delete_account_title), onDeleteAccount, Modifier.fillMaxWidth(),
-        )
-    }
-}
-
-@Composable
-private fun SettingsMetaRow(label: String, value: String, showDivider: Boolean) {
-    Column(Modifier.fillMaxWidth()) {
-        FlowRow(
-            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            if (value.isNotEmpty()) Text(value, style = MaterialTheme.typography.titleSmall)
-        }
-        if (showDivider) HorizontalDivider(Modifier.padding(start = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
     }
 }
