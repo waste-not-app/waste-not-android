@@ -94,8 +94,8 @@ private fun QuantityUnitPicker(unit: QuantityUnit, onChange: (QuantityUnit) -> U
             OutlinedButton(
                 onClick = { expanded = true }, enabled = enabled,
                 shape = RoundedCornerShape(15.dp),
-                border = BorderStroke(1.5.dp, if (enabled) tokens.fieldEdge else MaterialTheme.colorScheme.outlineVariant),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 14.dp),
+                border = BorderStroke(1.dp, if (enabled) tokens.fieldEdge else MaterialTheme.colorScheme.outlineVariant),
+                contentPadding = PaddingValues(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = tokens.fieldWell,
                     contentColor = MaterialTheme.colorScheme.onSurface,
@@ -104,7 +104,7 @@ private fun QuantityUnitPicker(unit: QuantityUnit, onChange: (QuantityUnit) -> U
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 54.dp)
+                    .heightIn(min = 56.dp)
                     .semantics { contentDescription = label }
                     .focusProperties { canFocus = enabled },
             ) {
