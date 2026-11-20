@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.ImeAction
@@ -285,24 +286,40 @@ fun GuideDetailScreen(
                 val review = article.review
                 if (review == null) {
                     var showEditorial by rememberSaveable(article.id) { mutableStateOf(false) }
-                    InsetGroupCard(contentPadding = true) {
-                        FlowRow(
-                            Modifier.fillMaxWidth(),
+                    val editorialState = stringResource(if (showEditorial) R.string.daily_expanded else R.string.daily_collapsed)
+                    InsetGroupCard {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 56.dp)
+                                .clickable(role = Role.Button) { showEditorial = !showEditorial }
+                                .semantics { stateDescription = editorialState }
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Surface(color = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer, shape = RoundedCornerShape(999.dp)) {
                                 Text(stringResource(R.string.guide_editorial_draft), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium)
                             }
-                            val editorialState = stringResource(if (showEditorial) R.string.daily_expanded else R.string.daily_collapsed)
-                            TextActionButton(
+                            Text(
                                 stringResource(R.string.editorial_details_toggle),
-                                { showEditorial = !showEditorial },
-                                Modifier.semantics { stateDescription = editorialState },
+                                Modifier.weight(1f),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                            Icon(
+                                painterResource(R.drawable.ic_chevron_down), null,
+                                Modifier.size(20.dp).rotate(if (showEditorial) 180f else 0f),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                         if (showEditorial) {
-                            Text(stringResource(R.string.guide_review_pending), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                stringResource(R.string.guide_review_pending),
+                                Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
                 } else {
