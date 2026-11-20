@@ -83,7 +83,10 @@ fun GuideListScreen(
                         data.query,
                         { onQuery(it); resetScroll() },
                         Modifier.fillMaxWidth().semantics { contentDescription = label },
-                        placeholder = { Text(stringResource(R.string.guide_search_hint), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                        placeholder = {
+                            Text(stringResource(R.string.guide_search_hint), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodyMedium)
+                        },
                         singleLine = true,
                         shape = RoundedCornerShape(15.dp),
                         colors = wasteTextFieldColors(),
@@ -164,10 +167,13 @@ private fun GuideCategory(category: WasteCategory?, onCategory: (WasteCategory?)
     Box(modifier) {
         FilterChip(selected = category != null, onClick = { expanded = true }, label = {
             Text(category?.let { stringResource(it.labelResource) } ?: stringResource(R.string.guide_all_categories))
-        }, shape = androidx.compose.foundation.shape.CircleShape,
+        }, shape = RoundedCornerShape(15.dp),
+            trailingIcon = { Icon(painterResource(R.drawable.ic_chevron_down), null, Modifier.size(18.dp)) },
             colors = FilterChipDefaults.filterChipColors(containerColor = MaterialTheme.colorScheme.surfaceContainer,
             labelColor = MaterialTheme.colorScheme.onSurfaceVariant, selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer), modifier = Modifier.heightIn(min = 48.dp))
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            iconColor = MaterialTheme.colorScheme.onSurfaceVariant, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer),
+            modifier = Modifier.heightIn(min = 52.dp))
         DropdownMenu(expanded, onDismissRequest = { expanded = false }) {
             DropdownMenuItem(text = { Text(stringResource(R.string.guide_all_categories)) }, onClick = { expanded = false; onCategory(null) })
             WasteCategory.entries.forEach { option ->
