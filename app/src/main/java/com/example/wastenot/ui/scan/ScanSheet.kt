@@ -244,11 +244,29 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                             recommendation.conditionsToVerify.forEach { Text(stringResource(contextFieldLabel(it))) }
                         }
                         var expanded by remember(recommendation) { mutableStateOf(recommendation.conditionsToVerify.isNotEmpty()) }
-                        SecondaryActionButton(
-                            stringResource(if (expanded) R.string.scan_hide_basis else R.string.scan_basis),
-                            { expanded = !expanded },
-                            Modifier.fillMaxWidth(),
-                        )
+                        val basisState = stringResource(if (expanded) R.string.daily_expanded else R.string.daily_collapsed)
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 48.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable(role = Role.Button) { expanded = !expanded }
+                                .semantics { stateDescription = basisState },
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                stringResource(if (expanded) R.string.scan_hide_basis else R.string.scan_basis),
+                                Modifier.weight(1f),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                            Icon(
+                                painterResource(R.drawable.ic_chevron_down), null,
+                                Modifier.size(20.dp).rotate(if (expanded) 180f else 0f),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                         if (expanded) {
                             state.item?.label?.let { Text(it, style = MaterialTheme.typography.titleSmall) }
                             recommendation.steps.forEachIndexed { index, step -> Text("${index + 1}. $step") }
@@ -303,7 +321,7 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                     ScanSecondary(R.string.scan_correct_object, onCorrectObject)
                 }
                 ScanPhase.FAILURE -> {
-                    Text(stringResource(when (state.problem) {
+                    stringResource(when (state.problem) {
                         ScanProblem.NO_OBJECT -> R.string.scan_no_object
                         ScanProblem.EXPIRED -> R.string.scan_session_expired
                         ScanProblem.PHOTO -> R.string.scan_photo_error
@@ -313,7 +331,7 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                         ScanProblem.RECOMMENDATION -> R.string.scan_recommendation_error
                         ScanProblem.DISABLED -> R.string.scan_disabled
                         else -> R.string.scan_detection_error
-                    }), Modifier.semantics { liveRegion = LiveRegionMode.Polite }, style = MaterialTheme.typography.bodyLarge)
+                    }).let { ScanWarning(it, MaterialTheme.typography.bodyMedium) }
                     if (state.problem == ScanProblem.EXPIRED && state.objectConfirmed && state.confirmedMethod != null)
                         Text(stringResource(R.string.scan_manual_choice_retained), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     if (state.problem != ScanProblem.DISABLED) ScanSecondary(R.string.retry, onRetry)
@@ -403,7 +421,7 @@ internal fun <T> ScanChoice(label: String, value: String, options: List<T>, opti
     Text(stringResource(label), Modifier.semantics { liveRegion = LiveRegionMode.Polite },
         color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
-@Composable private fun ScanWarning(message: String) {
+@Composable private fun ScanWarning(message: String, style: TextStyle = MaterialTheme.typography.bodySmall) {
     Surface(
         Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
         shape = RoundedCornerShape(16.dp),
@@ -411,7 +429,7 @@ internal fun <T> ScanChoice(label: String, value: String, options: List<T>, opti
         contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
-        Text(message, Modifier.padding(14.dp), style = MaterialTheme.typography.bodySmall)
+        Text(message, Modifier.padding(14.dp), style = style)
     }
 }
 @Composable private fun cleanlinessLabel(value: Cleanliness) = stringResource(when (value) {
