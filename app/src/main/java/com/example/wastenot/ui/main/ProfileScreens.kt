@@ -119,19 +119,18 @@ fun ProfileScreen(
             val bestStreakSubtitle = progress.bestStreak?.let {
                 stringResource(R.string.profile_best_streak, WasteFormat.integer(it.toLong()))
             }
-            if (!hasStreak) {
-                MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_check, Modifier.fillMaxWidth())
-            } else {
+            // Without a streak, a lone Level tile would only repeat the level shown in the progress card above.
+            if (hasStreak) {
                 BoxWithConstraints(Modifier.fillMaxWidth()) {
                     val stacked = maxWidth < 280.dp || LocalDensity.current.fontScale >= 1.5f
                     if (stacked) {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_check, Modifier.fillMaxWidth())
+                            MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_trophy, Modifier.fillMaxWidth())
                             MetricTile(stringResource(R.string.streak_short_title), streakLabel, R.drawable.ic_clock, Modifier.fillMaxWidth(), limeHighlight = true, subtitle = streakSubtitle, secondarySubtitle = bestStreakSubtitle)
                         }
                     } else {
                         Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_check, Modifier.weight(1f).fillMaxHeight())
+                            MetricTile(stringResource(R.string.level_label), progress.level.toString(), R.drawable.ic_trophy, Modifier.weight(1f).fillMaxHeight())
                             MetricTile(stringResource(R.string.streak_short_title), streakLabel, R.drawable.ic_clock, Modifier.weight(1f).fillMaxHeight(), limeHighlight = true, subtitle = streakSubtitle, secondarySubtitle = bestStreakSubtitle)
                         }
                     }
