@@ -106,7 +106,7 @@ class CoreAsyncStateDesignTest {
             val suffix = if (theme) "dark" else "light"
             compose.runOnIdle { dark.value = theme; page.value = "loading"; data = HistoryUiState() }
             inspect("history-loading-$suffix", "Loading logs…")
-            if (compose.onAllNodesWithText("0 logs loaded.").fetchSemanticsNodes().isNotEmpty())
+            if (compose.onAllNodesWithText("Showing 0 logs").fetchSemanticsNodes().isNotEmpty())
                 problems.add("history-loading-$suffix: unresolved data presented as zero")
             compose.runOnIdle { page.value = "error"; data = HistoryUiState(loading = false, error = ApiFailureKind.NETWORK) }
             inspect("history-error-$suffix", "Couldn't load your logs.")

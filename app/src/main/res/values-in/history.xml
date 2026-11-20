@@ -11,8 +11,12 @@
     <string name="filter_dates_reversed">Tanggal mulai tidak boleh melewati tanggal akhir.</string>
     <string name="apply_filters">Terapkan filter</string>
     <string name="reset_filter_draft">Reset pilihan</string>
-    <string name="history_count">%1$s catatan dimuat.</string>
-    <string name="history_filtered_count">%1$s catatan sesuai filter dimuat.</string>
+    <plurals name="history_count">
+        <item quantity="other">Menampilkan %1$s catatan</item>
+    </plurals>
+    <plurals name="history_filtered_count">
+        <item quantity="other">Menampilkan %1$s catatan yang sesuai</item>
+    </plurals>
     <string name="history_today">Hari ini</string>
     <string name="history_yesterday">Kemarin</string>
     <string name="history_date_range">%1$s sampai %2$s</string>
@@ -20,6 +24,6 @@
     <string name="history_loading_more">Memuat catatan berikutnya…</string>
     <string name="history_page_failed">Catatan berikutnya belum bisa dimuat.</string>
     <string name="history_reload">Muat ulang riwayat</string>
-    <string name="history_all_loaded">Semua catatan sudah dimuat.</string>
+    <string name="history_all_loaded">Semua catatanmu sudah tampil.</string>
     <string name="avoided_label">dihindari</string>
 </resources>

@@ -160,7 +160,7 @@ class LocalBackendCoreTest {
                 }
             }
             compose.onNode(hasText("History") and isSelectable()).performClick()
-            waitFor("20 logs loaded.")
+            waitFor("Showing 20 logs")
             val list = compose.onNodeWithTag("history-list")
             val output = File(instrumentation.targetContext.getExternalFilesDir(null), "history-go-1000").apply { mkdirs() }
             fun graphics(suffix: String = "") = ParcelFileDescriptor.AutoCloseInputStream(
@@ -181,11 +181,11 @@ class LocalBackendCoreTest {
             compose.waitUntil(15_000) {
                 runCatching {
                     list.performScrollToIndex(1_002)
-                    compose.onNodeWithText("All logs loaded.").isDisplayed()
+                    compose.onNodeWithText("You've reached the end of your logs.").isDisplayed()
                 }.getOrDefault(false)
             }
             list.performScrollToIndex(0)
-            compose.onNodeWithText("1.000 logs loaded.").assertIsDisplayed()
+            compose.onNodeWithText("Showing 1.000 logs").assertIsDisplayed()
             repeat(4) { list.performTouchInput { swipeUp() } }
             repeat(4) { list.performTouchInput { swipeDown() } }
             list.performScrollToIndex(0)
@@ -218,7 +218,7 @@ class LocalBackendCoreTest {
                     today, note), UUID.randomUUID().toString()))
             }
             compose.onNode(hasText("History") and isSelectable()).performClick()
-            waitFor("4 logs loaded.")
+            waitFor("Showing 4 logs")
 
             fun openFilter() = compose.onNodeWithContentDescription("Filter history").performClick()
             fun choose(label: String, option: String) {
@@ -232,7 +232,7 @@ class LocalBackendCoreTest {
             choose("Category", "Paper")
             choose("Method", "Recycle")
             tap("Apply filters")
-            waitFor("1 matching logs loaded.")
+            waitFor("Showing 1 matching log")
             withContext(Dispatchers.IO) { delay(7_500) }
             compose.onNodeWithText("QA combined filter").assertIsDisplayed()
             compose.onNodeWithText("QA previous filter").assertDoesNotExist()
@@ -242,7 +242,7 @@ class LocalBackendCoreTest {
             choose("Category", "Plastic")
             tap("Apply filters")
             waitFor("QA previous filter")
-            compose.onNodeWithText("1 matching logs loaded.").assertExists()
+            compose.onNodeWithText("Showing 1 matching log").assertExists()
             compose.onNodeWithText("QA excluded plastic").assertDoesNotExist()
         } finally {
             if (container.sessions.state.value is SessionState.Authenticated) container.sessions.logout()
@@ -346,7 +346,7 @@ class LocalBackendCoreTest {
             assertEquals(40, before.xp)
 
             tab("History")
-            waitFor("4 logs loaded.")
+            waitFor("Showing 4 logs")
             compose.onNodeWithTag("history-list").performScrollToNode(hasText("QA remove middle day"))
             compose.onNodeWithText("QA remove middle day").performClick()
             waitFor("Delete log")

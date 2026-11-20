@@ -10,8 +10,14 @@
     <string name="filter_dates_reversed">The start date can\'t be after the end date.</string>
     <string name="apply_filters">Apply filters</string>
     <string name="reset_filter_draft">Reset</string>
-    <string name="history_count">%1$s logs loaded.</string>
-    <string name="history_filtered_count">%1$s matching logs loaded.</string>
+    <plurals name="history_count">
+        <item quantity="one">Showing %1$s log</item>
+        <item quantity="other">Showing %1$s logs</item>
+    </plurals>
+    <plurals name="history_filtered_count">
+        <item quantity="one">Showing %1$s matching log</item>
+        <item quantity="other">Showing %1$s matching logs</item>
+    </plurals>
     <string name="history_today">Today</string>
     <string name="history_yesterday">Yesterday</string>
     <string name="history_date_range">%1$s to %2$s</string>
@@ -19,6 +25,6 @@
     <string name="history_loading_more">Loading more logs…</string>
     <string name="history_page_failed">Couldn\'t load more logs.</string>
     <string name="history_reload">Reload history</string>
-    <string name="history_all_loaded">All logs loaded.</string>
+    <string name="history_all_loaded">You\'ve reached the end of your logs.</string>
     <string name="avoided_label">avoided</string>
 </resources>
