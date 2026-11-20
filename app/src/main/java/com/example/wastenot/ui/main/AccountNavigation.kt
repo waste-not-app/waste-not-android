@@ -416,6 +416,7 @@ fun AccountNavigation(
                 achievementsEnabled = achievementsEnabled,
                 onAchievements = { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(Achievements) },
                 onSync = if (activityStore is com.example.wastenot.data.repository.OfflineActivityStore) ({ showingSync = true }) else null,
+                onRecyclingPoints = { if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Profile) stacks.getValue(MainTab.PROFILE).add(RecyclingPointList) },
                 freshness = summaryData.dashboard.freshness, stale = summaryData.dashboard.stale) }
             entry<Achievements> {
                 LaunchedEffect(achievementsModel) { achievementsModel?.load() }
@@ -439,9 +440,6 @@ fun AccountNavigation(
                         deletion.dismiss()
                         if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Settings) stacks.getValue(MainTab.PROFILE).add(DeleteAccount)
                     }) },
-                    onRecyclingPoints = {
-                        if (stacks.getValue(MainTab.PROFILE).lastOrNull() == Settings) stacks.getValue(MainTab.PROFILE).add(RecyclingPointList)
-                    },
                 )
             }
             entry<DeleteAccount> {

@@ -13,8 +13,10 @@
     <string name="profile_refresh_failed">Couldn\'t refresh your progress. What\'s shown is still available.</string>
     <string name="profile_progress_unavailable">Progress not available yet.</string>
     <string name="theme_application">App theme</string>
-    <string name="personal_data">Personal data</string>
     <string name="privacy_account">Your logs are linked to your account. Sign out to close access in the app.</string>
     <string name="privacy_optional_photo">Camera and photo access is only used when you choose those features. Photo attachments are optional.</string>
     <string name="timezone_read_only">Your account\'s time zone is set when you register.</string>
+    <string name="settings_preferences">Preferences</string>
+    <string name="settings_account_privacy">Account &amp; privacy</string>
+    <string name="app_version_label">App version</string>
 </resources>

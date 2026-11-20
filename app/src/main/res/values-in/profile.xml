@@ -14,8 +14,10 @@
     <string name="profile_refresh_failed">Progres belum bisa diperbarui. Data yang sudah tampil tetap tersedia.</string>
     <string name="profile_progress_unavailable">Progres belum tersedia.</string>
     <string name="theme_application">Tema aplikasi</string>
-    <string name="personal_data">Data pribadi</string>
     <string name="privacy_account">Catatan pribadi terhubung dengan akunmu. Keluar dari akun untuk menutup akses di aplikasi.</string>
     <string name="privacy_optional_photo">Akses kamera atau foto hanya digunakan saat kamu memilih fitur tersebut. Lampiran foto bersifat opsional.</string>
     <string name="timezone_read_only">Zona akun ditetapkan saat pendaftaran.</string>
+    <string name="settings_preferences">Preferensi</string>
+    <string name="settings_account_privacy">Akun &amp; privasi</string>
+    <string name="app_version_label">Versi aplikasi</string>
 </resources>
