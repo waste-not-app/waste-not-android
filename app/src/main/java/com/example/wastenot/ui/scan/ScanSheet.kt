@@ -8,6 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import com.example.wastenot.ui.components.InsetGroupCard
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.draw.rotate
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
@@ -141,29 +145,31 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                 ScanPhase.OBJECT -> {
                     state.photo?.let { ScanPhotoPreview(it, state.objects, state.selectedId, onSelect) }
                     Text(stringResource(R.string.scan_object_hint), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Column(Modifier.selectableGroup()) {
-                        state.objects.forEach { candidate ->
-                            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp)
-                                .selectable(candidate.id == state.selectedId, role = Role.RadioButton, onClick = { onSelect(candidate.id) })
-                                .padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(candidate.id == state.selectedId, null)
-                                Column(Modifier.weight(1f).padding(start = 8.dp)) {
-                                    Text(state.catalog?.supportedObjectLabels?.get(candidate.rawClass)
-                                        ?: stringResource(R.string.scan_object_label, state.objects.indexOf(candidate) + 1, candidate.rawClass),
-                                        style = MaterialTheme.typography.titleMedium)
-                                    Text(stringResource(R.string.scan_detection_score, (candidate.confidence * 100).roundToInt()), style = MaterialTheme.typography.bodySmall)
-                                    if (candidate.band == AiConfidenceBand.UNCERTAIN) Text(stringResource(R.string.scan_uncertain), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    if (candidate.ambiguousWith.isNotEmpty()) Text(stringResource(R.string.scan_overlapping), style = MaterialTheme.typography.bodySmall)
+                    InsetGroupCard(contentPadding = true) {
+                        Column(Modifier.selectableGroup()) {
+                            state.objects.forEach { candidate ->
+                                Row(Modifier.fillMaxWidth().heightIn(min = 56.dp)
+                                    .selectable(candidate.id == state.selectedId, role = Role.RadioButton, onClick = { onSelect(candidate.id) })
+                                    .padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    RadioButton(candidate.id == state.selectedId, null)
+                                    Column(Modifier.weight(1f).padding(start = 8.dp)) {
+                                        Text(state.catalog?.supportedObjectLabels?.get(candidate.rawClass)
+                                            ?: stringResource(R.string.scan_object_label, state.objects.indexOf(candidate) + 1, candidate.rawClass),
+                                            style = MaterialTheme.typography.titleMedium)
+                                        Text(stringResource(R.string.scan_detection_score, (candidate.confidence * 100).roundToInt()), style = MaterialTheme.typography.bodySmall)
+                                        if (candidate.band == AiConfidenceBand.UNCERTAIN) Text(stringResource(R.string.scan_uncertain), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        if (candidate.ambiguousWith.isNotEmpty()) Text(stringResource(R.string.scan_overlapping), style = MaterialTheme.typography.bodySmall)
+                                    }
                                 }
                             }
                         }
+                        ScanChoice(stringResource(R.string.scan_material), state.category?.let { stringResource(it.labelResource) }
+                            ?: stringResource(R.string.scan_choose_material), WasteCategory.entries,
+                            { stringResource(it.labelResource) }, onCategory)
+                        val items = state.objectChoices
+                        if (state.category != null) ScanChoice(stringResource(R.string.scan_object_type),
+                            state.item?.label ?: stringResource(R.string.scan_choose_object_type), items, { it.label }, { onObjectKey(it.key) })
                     }
-                    ScanChoice(stringResource(R.string.scan_material), state.category?.let { stringResource(it.labelResource) }
-                        ?: stringResource(R.string.scan_choose_material), WasteCategory.entries,
-                        { stringResource(it.labelResource) }, onCategory)
-                    val items = state.objectChoices
-                    if (state.category != null) ScanChoice(stringResource(R.string.scan_object_type),
-                        state.item?.label ?: stringResource(R.string.scan_choose_object_type), items, { it.label }, { onObjectKey(it.key) })
                     ActionButton(stringResource(R.string.scan_confirm_object), onConfirmObject, Modifier.fillMaxWidth(),
                         enabled = state.item != null && state.selected != null)
                     ScanSecondary(R.string.scan_retake, onRetake)
@@ -177,40 +183,42 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                         ScanSecondary(R.string.scan_correct_object, onCorrectObject)
                     }
                     else {
-                        ScanChoice(stringResource(R.string.scan_cleanliness), cleanlinessLabel(state.context.cleanliness), Cleanliness.entries,
-                            { cleanlinessLabel(it) }, { onContext(state.context.copy(cleanliness = it)) })
-                        ScanChoice(stringResource(R.string.scan_integrity), integrityLabel(state.context.integrity), Integrity.entries,
-                            { integrityLabel(it) }, { onContext(state.context.copy(integrity = it)) })
-                        ScanChoice(stringResource(R.string.scan_reusability), reusableLabel(state.context.reusable), Reusability.entries,
-                            { reusableLabel(it) }, { onContext(state.context.copy(reusable = it)) })
-                        ScanChoice(stringResource(R.string.scan_reuse_intention), intentionLabel(state.context.reuseIntention), listOf(null, true, false),
-                            { intentionLabel(it) }, { onContext(state.context.copy(reuseIntention = it)) })
-                        if (state.context.cleanliness == Cleanliness.DIRTY || state.context.cleanable != AiAnswer.UNKNOWN ||
-                            AiContextField.CLEANABLE in state.requestedContext) {
-                            ScanChoice(stringResource(R.string.scan_cleanable), reusableLabel(state.context.cleanable), AiAnswer.entries,
-                                { reusableLabel(it) }, { onContext(state.context.copy(cleanable = it)) })
-                        }
-                        if (state.context.cleanliness == Cleanliness.DIRTY || state.context.soiling != AiSoiling.UNKNOWN ||
-                            AiContextField.SOILING in state.requestedContext) {
-                            ScanChoice(stringResource(R.string.scan_soiling), soilingLabel(state.context.soiling), AiSoiling.entries,
-                                { soilingLabel(it) }, { onContext(state.context.copy(soiling = it)) })
-                        }
-                        if (state.objectKey == "hdpe_bottle" || state.context.formerContents != AiFormerContents.UNKNOWN ||
-                            AiContextField.FORMER_CONTENTS in state.requestedContext) {
-                            ScanChoice(stringResource(R.string.scan_former_contents), formerContentsLabel(state.context.formerContents), AiFormerContents.entries,
-                                { formerContentsLabel(it) }, { onContext(state.context.copy(formerContents = it)) })
-                        }
-                        ScanChoice(stringResource(R.string.scan_recycling_access), reusableLabel(state.context.recyclingAccess), AiAnswer.entries,
-                            { reusableLabel(it) }, { onContext(state.context.copy(recyclingAccess = it)) })
-                        Text(stringResource(R.string.scan_receiver_hint), style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        ScanCheck(stringResource(R.string.scan_risk_flag), state.context.riskFlag,
-                            { onContext(state.context.copy(riskFlag = it)) })
-                        if (state.context.riskFlag || state.context.riskType != AiRiskType.UNKNOWN ||
-                            state.context.soiling == AiSoiling.HAZARDOUS || state.context.formerContents == AiFormerContents.CHEMICAL ||
-                            AiContextField.RISK_TYPE in state.requestedContext) {
-                            ScanChoice(stringResource(R.string.scan_risk_type), riskLabel(state.context.riskType), AiRiskType.entries,
-                                { riskLabel(it) }, { onContext(state.context.copy(riskType = it)) })
+                        InsetGroupCard(contentPadding = true) {
+                            ScanChoice(stringResource(R.string.scan_cleanliness), cleanlinessLabel(state.context.cleanliness), Cleanliness.entries,
+                                { cleanlinessLabel(it) }, { onContext(state.context.copy(cleanliness = it)) })
+                            ScanChoice(stringResource(R.string.scan_integrity), integrityLabel(state.context.integrity), Integrity.entries,
+                                { integrityLabel(it) }, { onContext(state.context.copy(integrity = it)) })
+                            ScanChoice(stringResource(R.string.scan_reusability), reusableLabel(state.context.reusable), Reusability.entries,
+                                { reusableLabel(it) }, { onContext(state.context.copy(reusable = it)) })
+                            ScanChoice(stringResource(R.string.scan_reuse_intention), intentionLabel(state.context.reuseIntention), listOf(null, true, false),
+                                { intentionLabel(it) }, { onContext(state.context.copy(reuseIntention = it)) })
+                            if (state.context.cleanliness == Cleanliness.DIRTY || state.context.cleanable != AiAnswer.UNKNOWN ||
+                                AiContextField.CLEANABLE in state.requestedContext) {
+                                ScanChoice(stringResource(R.string.scan_cleanable), reusableLabel(state.context.cleanable), AiAnswer.entries,
+                                    { reusableLabel(it) }, { onContext(state.context.copy(cleanable = it)) })
+                            }
+                            if (state.context.cleanliness == Cleanliness.DIRTY || state.context.soiling != AiSoiling.UNKNOWN ||
+                                AiContextField.SOILING in state.requestedContext) {
+                                ScanChoice(stringResource(R.string.scan_soiling), soilingLabel(state.context.soiling), AiSoiling.entries,
+                                    { soilingLabel(it) }, { onContext(state.context.copy(soiling = it)) })
+                            }
+                            if (state.objectKey == "hdpe_bottle" || state.context.formerContents != AiFormerContents.UNKNOWN ||
+                                AiContextField.FORMER_CONTENTS in state.requestedContext) {
+                                ScanChoice(stringResource(R.string.scan_former_contents), formerContentsLabel(state.context.formerContents), AiFormerContents.entries,
+                                    { formerContentsLabel(it) }, { onContext(state.context.copy(formerContents = it)) })
+                            }
+                            ScanChoice(stringResource(R.string.scan_recycling_access), reusableLabel(state.context.recyclingAccess), AiAnswer.entries,
+                                { reusableLabel(it) }, { onContext(state.context.copy(recyclingAccess = it)) })
+                            Text(stringResource(R.string.scan_receiver_hint), style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            ScanCheck(stringResource(R.string.scan_risk_flag), state.context.riskFlag,
+                                { onContext(state.context.copy(riskFlag = it)) })
+                            if (state.context.riskFlag || state.context.riskType != AiRiskType.UNKNOWN ||
+                                state.context.soiling == AiSoiling.HAZARDOUS || state.context.formerContents == AiFormerContents.CHEMICAL ||
+                                AiContextField.RISK_TYPE in state.requestedContext) {
+                                ScanChoice(stringResource(R.string.scan_risk_type), riskLabel(state.context.riskType), AiRiskType.entries,
+                                    { riskLabel(it) }, { onContext(state.context.copy(riskType = it)) })
+                            }
                         }
                         ActionButton(stringResource(R.string.scan_get_recommendation), onRecommend, Modifier.fillMaxWidth())
                         ScanSecondary(R.string.scan_correct_object, onCorrectObject)
