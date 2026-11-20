@@ -93,7 +93,7 @@ fun HistoryScreen(
             state = list,
             contentPadding = pagePadding(padding),
         ) {
-            if (data.records.isNotEmpty() || (!data.loading && data.error == null)) item(key = "count") {
+            if (data.records.isNotEmpty()) item(key = "count") {
                 Text(pluralStringResource(if (filter.active) R.plurals.history_filtered_count else R.plurals.history_count,
                     data.records.size, WasteFormat.integer(data.records.size.toLong())),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
