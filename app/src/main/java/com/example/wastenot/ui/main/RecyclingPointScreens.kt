@@ -3,8 +3,6 @@ package com.example.wastenot.ui.main
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,11 +28,11 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
+import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.data.RecyclingPoints
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.GroupSectionLabel
 import com.example.wastenot.ui.components.InsetGroupCard
-import com.example.wastenot.ui.components.focusOutline
 
 @Composable
 fun RecyclingPointListScreen(
@@ -138,17 +135,5 @@ fun RecyclingPointDetailScreen(
 
 @Composable
 private fun RecyclingPointButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val interactions = remember { MutableInteractionSource() }
-    val focused by interactions.collectIsFocusedAsState()
-    val colors = MaterialTheme.colorScheme
-    OutlinedButton(
-        onClick = onClick,
-        modifier = modifier
-            .heightIn(min = 52.dp)
-            .focusOutline(focused, MaterialTheme.shapes.small, colors.primary, colors.surface),
-        interactionSource = interactions,
-        shape = MaterialTheme.shapes.small,
-    ) {
-        Text(label)
-    }
+    SecondaryActionButton(label, onClick, modifier)
 }
