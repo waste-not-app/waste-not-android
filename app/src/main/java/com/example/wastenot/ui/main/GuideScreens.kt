@@ -202,7 +202,8 @@ private fun GuideRow(article: WasteGuide, onClick: () -> Unit, modifier: Modifie
             Text(article.name, style = MaterialTheme.typography.titleMedium)
             Text(if (article.review == null) stringResource(R.string.guide_method_draft, stringResource(article.method.labelResource)) else stringResource(article.method.labelResource),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(article.summary, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(article.summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
         Icon(painterResource(R.drawable.ic_next), null, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
