@@ -27,10 +27,10 @@
     <string name="method_reuse">Reuse</string>
     <string name="method_recycle">Recycle</string>
     <string name="method_trash">Trash</string>
-    <string name="method_reduce_description">Avoid using it</string>
+    <string name="method_reduce_description">Skip it to begin with</string>
     <string name="method_reuse_description">Use it again</string>
-    <string name="method_recycle_description">Recycle it</string>
-    <string name="method_trash_description">Throw it away</string>
+    <string name="method_recycle_description">Send it for recycling</string>
+    <string name="method_trash_description">Put it in residual waste</string>
     <string name="quantity_unit_helper">No scale? Choose Items as the unit.</string>
     <string name="editor_date_helper">%1$s · up to 30 days ago.</string>
     <string name="quantity_example_weight">e.g. 250</string>
