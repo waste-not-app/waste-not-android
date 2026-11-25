@@ -56,8 +56,10 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
@@ -106,6 +108,8 @@ fun LogEditorScreen(
     val reveal = remember { EditorField.entries.associateWith { BringIntoViewRequester() } }
     val focused = remember(draft) { mutableSetOf<EditorField>() }
     val value = draft.values
+    val submissionPending = !saveConfirmed && draft.locked && (saving || draft.submissionError == null)
+    val submissionError = draft.submissionError?.takeUnless { saveConfirmed || submissionPending }
     val enabled = !saving && !draft.locked && !saveConfirmed
     val focusManager = LocalFocusManager.current
     val submissionReveal = remember(draft) { BringIntoViewRequester() }
@@ -162,12 +166,13 @@ fun LogEditorScreen(
                 saveConfirmed -> R.string.draft_record_saved
                 draft.needsConflictResolution -> R.string.load_latest_log
                 draft.retryBlocked -> R.string.see_history
-                draft.locked && !saving -> R.string.retry
+                draft.locked -> R.string.retry
                 value.version != null -> R.string.save_changes
                 else -> R.string.save_activity
             }),
             {
                 when {
+                    saving || saveConfirmed || (draft.locked && draft.submissionError == null) -> Unit
                     draft.needsConflictResolution -> onResolveConflict()
                     draft.retryBlocked -> onHistory()
                     else -> {
@@ -185,7 +190,7 @@ fun LogEditorScreen(
                     }
                 }
             },
-            placement, loading = saving && !saveConfirmed,
+            placement, loading = (saving || submissionPending) && !saveConfirmed,
             loadingLabel = stringResource(R.string.saving), enabled = !saveConfirmed &&
                 (draft.needsConflictResolution || draft.retryBlocked || draft.locked || value.version == null || draft.dirty),
         )
@@ -197,8 +202,8 @@ fun LogEditorScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            LaunchedEffect(draft.submissionError) {
-                if (draft.submissionError != null) submissionReveal.bringIntoView()
+            LaunchedEffect(submissionError) {
+                if (submissionError != null) submissionReveal.bringIntoView()
             }
             LaunchedEffect(draft, draft.focusRequest) {
                 firstError()?.let { field ->
@@ -335,7 +340,7 @@ fun LogEditorScreen(
                 }
             }
             if (!scanPrefilled) dateHelp()
-            draft.submissionError?.takeUnless { saveConfirmed }?.let { error ->
+            submissionError?.let { error ->
                 val latestError = stringResource(when {
                     draft.needsConflictResolution -> R.string.conflict_form_message
                     error.saveOutcomeUnknown() -> R.string.save_outcome_unknown
@@ -362,7 +367,7 @@ fun LogEditorScreen(
                     }), isError = true)
                     SecondaryActionButton(stringResource(R.string.retry), onRetryPersistence,
                         Modifier.fillMaxWidth(), enabled = !persistence.busy)
-                } else Text(stringResource(when {
+                } else if (!submissionPending) Text(stringResource(when {
                     saveConfirmed -> R.string.draft_completing
                     persistence.persisted?.fields == draft.snapshot() && !persistence.writing -> R.string.draft_saved
                     else -> R.string.draft_saving
@@ -385,6 +390,19 @@ fun LogEditorScreen(
                 .fillMaxWidth()
                 .then(if (pinSave) Modifier.fillMaxHeight() else Modifier),
         ) {
+            if (submissionPending && !pinSave) {
+                Surface(Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surface) {
+                    Text(
+                        stringResource(R.string.save_waiting_for_result),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 12.dp)
+                            .semantics { liveRegion = LiveRegionMode.Polite },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
             form(if (pinSave) Modifier.weight(1f) else Modifier, pinSave)
             if (pinSave) {
                 Surface(Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surface) {

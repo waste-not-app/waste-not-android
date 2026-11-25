@@ -25,6 +25,7 @@
     <string name="scan_send">Scan foto</string>
     <string name="scan_retake">Ambil ulang</string>
     <string name="scan_detecting">Mengenali objek…</string>
+    <string name="scan_review_captured_photo">Tinjau kembali foto</string>
     <string name="scan_object_hint">Pilih satu objek dan periksa materialnya. Label botol belum memastikan plastik atau kaca.</string>
     <string name="scan_detection_score">Skor deteksi %1$d%%</string>
     <string name="scan_uncertain">Belum yakin. Periksa atau ambil ulang foto.</string>
@@ -50,6 +51,8 @@
     <string name="scan_get_recommendation">Lihat saran</string>
     <string name="scan_correct_object">Koreksi objek</string>
     <string name="scan_recommending">Menyiapkan saran…</string>
+    <string name="scan_stop_and_check_object">Hentikan dan periksa objek</string>
+    <string name="scan_review_answers">Periksa kembali jawaban</string>
     <string name="scan_suggested_method">Saran penanganan</string>
     <string name="scan_initial_guidance">Panduan penanganan awal</string>
     <string name="scan_special_guidance">Panduan penanganan khusus</string>
@@ -68,9 +71,13 @@
     <string name="scan_manual_choice_retained">Kategori dan metode yang sudah kamu pilih tetap dibawa ke input manual tanpa referensi AI.</string>
     <string name="scan_guide_revision">Referensi panduan: %1$s · versi %2$d</string>
     <string name="scan_photo_error">Foto belum bisa digunakan. Coba ambil ulang dengan ukuran lebih kecil.</string>
+    <string name="scan_photo_rejected">Foto ini tidak bisa digunakan. Ambil foto lain atau catat secara manual.</string>
     <string name="scan_permission_denied">Izin kamera belum diberikan. Kamu tetap bisa menggunakan input manual.</string>
     <string name="scan_camera_error">Kamera belum bisa dibuka. Coba lagi atau gunakan input manual.</string>
-    <string name="scan_recommendation_error">Saran belum bisa dimuat. Kondisi yang sudah kamu isi tetap tersimpan.</string>
+    <string name="scan_recommendation_error">Saran belum bisa dimuat. Jawabanmu masih ada.</string>
     <string name="scan_detection_error">Objek belum bisa dikenali sekarang. Coba lagi atau gunakan input manual.</string>
+    <string name="scan_timeout">Permintaan ini memakan waktu terlalu lama.</string>
+    <string name="scan_connection_error">Periksa koneksi sebelum mencoba lagi.</string>
+    <string name="scan_wait_before_retry">Tunggu sebentar sebelum mengirim permintaan lagi.</string>
     <string name="scan_photo_description">Foto sampah yang akan diperiksa</string>
 </resources>

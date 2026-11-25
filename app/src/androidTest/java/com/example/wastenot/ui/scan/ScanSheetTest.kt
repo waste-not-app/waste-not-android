@@ -17,10 +17,14 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.*
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.model.*
 import com.example.wastenot.data.local.ScanPhotoCache
+import com.example.wastenot.data.network.ApiFailure
+import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.dto.AiCatalogDto
 import com.example.wastenot.data.network.dto.AiRecommendationDto
 import com.example.wastenot.theme.WasteNotTheme
@@ -93,9 +97,11 @@ class ScanSheetTest {
             val phases = listOf(
                 Triple("S21-camera", ScanPhase.CAMERA, "Turn on camera"),
                 Triple("S21-photo", ScanPhase.PHOTO, "Retake"),
+                Triple("S21-scanning", ScanPhase.DETECTING, "Identifying the object…"),
                 Triple("S22", ScanPhase.OBJECT, "Confirm object"),
                 Triple("S23", ScanPhase.CONTEXT, "See advice"),
                 Triple("S24", ScanPhase.RECOMMENDATION, "Use this, add amount"),
+                Triple("S23-waiting", ScanPhase.RECOMMENDING, "Stop and check object"),
             )
             for (theme in listOf(false, true)) {
                 for ((id, phase, action) in phases) {
@@ -105,12 +111,14 @@ class ScanSheetTest {
                             prototypeOnly = false, reason = "Example: check the material and what the collector accepts before recycling.",
                             caution = "", sourceDetails = emptyList(), sources = emptyList()), method = DisposalMethod.RECYCLE)
                     }
-                    if (phase == ScanPhase.PHOTO || phase == ScanPhase.OBJECT) {
+                    if (phase == ScanPhase.PHOTO || phase == ScanPhase.DETECTING || phase == ScanPhase.OBJECT) {
                         val description = instrumentation.targetContext.getString(com.example.wastenot.R.string.scan_photo_description)
                         compose.waitUntil(5_000) {
                             compose.onAllNodesWithContentDescription(description).fetchSemanticsNodes().isNotEmpty()
                         }
                     }
+                    if (phase == ScanPhase.DETECTING) assertBusy("Identifying the object…")
+                    if (phase == ScanPhase.RECOMMENDING) assertBusy("Preparing advice…")
                     val name = "$id-${if (theme) "dark" else "light"}"
                     captureUiPreview(compose, name, "scan-design-preview")
                     if (phase == ScanPhase.CONTEXT) {
@@ -125,7 +133,9 @@ class ScanSheetTest {
                         ScanPhase.RECOMMENDATION -> "Check the item's condition"
                         else -> action
                     }
-                    compose.onNodeWithText(tail).performScrollTo().assertIsDisplayed()
+                    val tailTarget = compose.onNodeWithText(tail)
+                    if (!tailTarget.isDisplayed()) tailTarget.performScrollTo()
+                    tailTarget.assertIsDisplayed()
                     captureUiPreview(compose, "$name-end", "scan-design-preview")
                 }
             }
@@ -224,6 +234,75 @@ class ScanSheetTest {
         compose.onNodeWithText("I'll reuse it").performClick()
         assertEquals(true, state.context.reuseIntention)
         assertEquals(Integrity.UNKNOWN, state.context.integrity)
+    }
+
+    @Test fun adviceShowsStatusAfterSubmittingBelowTheFoldAndCanReturnToTheObject() {
+        var state by mutableStateOf(objects.copy(phase = ScanPhase.CONTEXT, category = WasteCategory.PLASTIC,
+            objectKey = "plastic_bottle", objectConfirmed = true, context = ScanContext(cleanliness = Cleanliness.CLEAN)))
+        var requests = 0
+        compose.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
+                WasteNotTheme {
+                    Box(Modifier.size(320.dp, 280.dp)) {
+                        ScanSheetContent(
+                            state = state,
+                            onDismiss = {}, onManual = {}, onRetake = {}, onDetect = {}, onSelect = {},
+                            onCategory = {}, onConfirmObject = { state = state.copy(phase = ScanPhase.CONTEXT) },
+                            onCorrectObject = { state = state.copy(phase = ScanPhase.OBJECT) },
+                            onContext = {}, onRecommend = { requests++; state = state.copy(phase = ScanPhase.RECOMMENDING) },
+                            onMethod = {}, onUse = {}, onRetry = {}, camera = {},
+                        )
+                    }
+                }
+            }
+        }
+        compose.onNodeWithText("See advice").performScrollTo().performClick()
+        assertBusy("Preparing advice…")
+        compose.onNodeWithContentDescription("Close scan").assertIsDisplayed().assertIsEnabled()
+        compose.onNodeWithText("See advice").assertDoesNotExist()
+        compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
+        val stop = compose.onNodeWithText("Stop and check object")
+        if (!stop.isDisplayed()) stop.performScrollTo()
+        assertBusy("Preparing advice…")
+        stop.assertIsEnabled().performClick()
+        compose.onNodeWithText("Confirm object").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Cleanliness").assertTextContains("Clean")
+        compose.runOnIdle { assertEquals(1, requests) }
+    }
+
+    private fun assertBusy(label: String) {
+        compose.onNodeWithText(label).assertIsDisplayed()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.ProgressBarRangeInfo, ProgressBarRangeInfo.Indeterminate))
+    }
+
+    @Test fun recommendationRecoveryReturnsToAnswersWithoutStartingAnotherRequest() {
+        val waiting = ApiFailure(ApiFailureKind.RATE_LIMITED, retryAt = Instant.MAX)
+        var state by mutableStateOf(objects.copy(
+            phase = ScanPhase.FAILURE, problem = ScanProblem.RECOMMENDATION, error = waiting,
+            category = WasteCategory.PLASTIC, objectKey = "plastic_bottle", objectConfirmed = true,
+            context = ScanContext(cleanliness = Cleanliness.CLEAN),
+        ))
+        var requests = 0
+        compose.setContent { WasteNotTheme {
+            Sheet(state,
+                onRetry = { state = state.copy(phase = ScanPhase.CONTEXT, problem = null) },
+                onRecommend = { requests++ },
+            )
+        } }
+        compose.onNodeWithText("Too many attempts.", substring = true).performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Review your answers").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Cleanliness").assertTextContains("Clean")
+        val advice = compose.onNodeWithText("See advice")
+        advice.performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Wait a moment before sending another request.").performScrollTo().assertIsDisplayed()
+
+        compose.runOnIdle {
+            assertEquals(0, requests)
+            state = state.copy(error = waiting.copy(retryAt = Instant.EPOCH))
+        }
+        advice.performScrollTo().assertIsEnabled().performClick()
+        compose.runOnIdle { assertEquals(1, requests) }
     }
 
     @Test fun recommendationAllowsThreeMethodsShowsBasisAndRequiresUseAction() {
@@ -414,8 +493,9 @@ class ScanSheetTest {
     private fun Sheet(state: ScanState, onManual: () -> Unit = {}, onCategory: (WasteCategory) -> Unit = {},
         onConfirm: () -> Unit = {}, onContext: (ScanContext) -> Unit = {}, onMethod: (DisposalMethod) -> Unit = {}, onUse: () -> Unit = {},
         onObjectKey: (String) -> Unit = {}, onReviewContext: () -> Unit = {}, onConfirmConditions: (Boolean) -> Unit = {},
+        onRetry: () -> Unit = {}, onRecommend: () -> Unit = {},
         camera: @Composable () -> Unit = { Text("Point at one item") }) {
-        ScanSheet(state, {}, onManual, {}, {}, {}, onCategory, onConfirm, {}, onContext, {}, onMethod, onUse, {},
+        ScanSheet(state, {}, onManual, {}, {}, {}, onCategory, onConfirm, {}, onContext, onRecommend, onMethod, onUse, onRetry,
             onObjectKey = onObjectKey, onReviewContext = onReviewContext, onConfirmConditions = onConfirmConditions, camera = camera)
     }
     private fun capture(name: String) {

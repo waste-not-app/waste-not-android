@@ -1,4 +1,5 @@
 <resources>
+    <string name="save_waiting_for_result">Waiting for the save result.</string>
     <string name="save_outcome_unknown">We don\'t know whether this was saved. Try again with the same entries before changing the log.</string>
     <string name="save_outcome_retry_error">%1$s\n\nLast attempt: %2$s</string>
     <string name="save_request_conflict">This request was already used for different entries. Check your history before creating a new log.</string>
