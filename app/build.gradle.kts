@@ -55,8 +55,8 @@ android {
         applicationId = "com.example.wastenot"
         minSdk = 30
         targetSdk = 36
-        versionCode = 6
-        versionName = "1.0.7"
+        versionCode = 7
+        versionName = "1.0.8"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
         testInstrumentationRunner = "com.example.wastenot.WasteNotTestRunner"
     }
