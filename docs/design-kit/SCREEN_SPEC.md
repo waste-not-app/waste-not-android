@@ -276,6 +276,8 @@ The 28 September revision added the Log/Scan action at the top center of the doc
 
 S21 to S25 are phases of one sheet flow in the product; they appear as five gallery entries for handoff. The HTML preview uses a labeled bounding box illustration, not boxes over a camera photo. Scores, objects, and the LLM are fixtures. The browser camera uses getUserMedia when the context is secure; nothing is uploaded. Android camera and API testing stay separate.
 
+On Android S24, one card shows the suggested or chosen method. Change opens a menu without advancing the flow or acknowledging conditions. Correction actions use text buttons; cautions and required conditions remain in the main content. A 150 ms fade marks scan step changes without moving the footer or keeping the previous step alive. Opening or closing the reasoning animates only the disclosure and its chevron. Android's animation scale applies.
+
 S05 after AI: only the confirmed category and method are prefilled; the amount comes first and is empty, the unit defaults to g, and the date follows the core rules. Category and method can be expanded to correct them. The primary action stays visible when there is room; on short or keyboard-constrained screens it stays reachable in the scrollable content. Cancelling a scan never creates a log. An existing dirty draft must be kept or confirmed with D03 before it's replaced; never force navigation and discard entries. Default guides that aren't verified in the mockup never become production knowledge.
 
 | Extra component | Compose equivalent | Behavior |

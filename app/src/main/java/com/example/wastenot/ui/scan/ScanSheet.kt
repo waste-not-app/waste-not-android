@@ -1,6 +1,14 @@
 package com.example.wastenot.ui.scan
 
 import android.graphics.BitmapFactory
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.BorderStroke
@@ -10,7 +18,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import com.example.wastenot.ui.components.InsetGroupCard
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.draw.rotate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -25,6 +32,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -32,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -46,6 +55,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
@@ -68,6 +78,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.min
 import kotlin.math.roundToInt
+
+private val scanHandlingMethods = listOf(DisposalMethod.REUSE, DisposalMethod.RECYCLE, DisposalMethod.TRASH)
 
 internal data class ScanImageRect(val left: Float, val top: Float, val width: Float, val height: Float)
 internal fun fitScanBounds(imageWidth: Int, imageHeight: Int, viewWidth: Float, viewHeight: Float, box: ScanBounds): ScanImageRect {
@@ -115,6 +127,19 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
     }
     val horizontalPadding = if (LocalConfiguration.current.screenWidthDp <= 400) 16.dp else 24.dp
     val scroll = remember(state.phase) { ScrollState(0) }
+    val stepAlpha = remember { Animatable(1f) }
+    var shownStep by remember { mutableIntStateOf(state.step) }
+    LaunchedEffect(state.step) {
+        if (shownStep != state.step) {
+            shownStep = state.step
+            if (coroutineContext[MotionDurationScale]?.scaleFactor == 0f) {
+                stepAlpha.snapTo(1f)
+            } else {
+                stepAlpha.snapTo(.85f)
+                stepAlpha.animateTo(1f, tween(150))
+            }
+        }
+    }
     val actions: @Composable (Modifier) -> Unit = { placement ->
         RecommendationActions(state, onUse, onMethod, onReviewContext, onManual, placement)
     }
@@ -122,6 +147,7 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
         Column(
             placement
                 .fillMaxWidth()
+                .graphicsLayer { alpha = stepAlpha.value }
                 .sheetVerticalScroll(scroll)
                 .padding(horizontal = horizontalPadding, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -301,13 +327,7 @@ private fun RecommendationContent(
         R.string.scan_special_guidance else R.string.scan_initial_guidance
     val suggestedMethod = recommendation?.method
     if (suggestedMethod != null) {
-        Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.primaryContainer) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(stringResource(R.string.scan_suggested_method), style = MaterialTheme.typography.labelLarge)
-                Text(stringResource(suggestedMethod.labelResource), style = MaterialTheme.typography.headlineMedium)
-            }
-        }
+        ScanMethodSummary(suggestedMethod, state.method.takeIf { state.canChooseMethod }, onMethod, Modifier.fillMaxWidth())
     } else {
         Text(
             stringResource(when {
@@ -333,12 +353,6 @@ private fun RecommendationContent(
                 ScanCheck(stringResource(R.string.scan_confirm_conditions), state.conditionsConfirmed, onConfirmConditions)
             }
         }
-        val method = state.method
-        if (state.canChooseMethod && method != null) {
-            ScanChoice(stringResource(R.string.scan_method_confirmation), stringResource(method.labelResource),
-                listOf(DisposalMethod.REUSE, DisposalMethod.RECYCLE, DisposalMethod.TRASH),
-                { stringResource(it.labelResource) }, onMethod)
-        }
         if (recommendation.scope == AiRecommendationScope.PREVENTION || suggestedMethod == DisposalMethod.REDUCE)
             Text(stringResource(R.string.ai_reduce_manual))
     }
@@ -353,8 +367,50 @@ private fun RecommendationContent(
             ScanSources(recommendation)
         }
     }
-    if (!needsContext) ScanSecondary(R.string.scan_review_context, onReviewContext)
-    ScanSecondary(R.string.scan_correct_object, onCorrectObject)
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (!needsContext) TextActionButton(stringResource(R.string.scan_review_context), onReviewContext)
+        TextActionButton(stringResource(R.string.scan_correct_object), onCorrectObject)
+    }
+}
+
+@Composable
+private fun ScanMethodSummary(
+    suggested: DisposalMethod,
+    choice: DisposalMethod?,
+    onMethod: (DisposalMethod) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var menuOpen by remember { mutableStateOf(false) }
+    val colors = MaterialTheme.colorScheme
+    Surface(modifier, shape = MaterialTheme.shapes.large,
+        color = colors.primaryContainer, contentColor = colors.onPrimaryContainer) {
+        Row(
+            Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(stringResource(if (choice == null || choice == suggested) R.string.scan_suggested_method else R.string.scan_selected_method),
+                    style = MaterialTheme.typography.labelLarge)
+                Text(stringResource((choice ?: suggested).labelResource), style = MaterialTheme.typography.headlineMedium)
+            }
+            if (choice != null) Box {
+                val actionLabel = stringResource(R.string.scan_method_confirmation)
+                TextActionButton(stringResource(R.string.scan_change), { menuOpen = true },
+                    Modifier.semantics { contentDescription = actionLabel })
+                DropdownMenu(menuOpen, { menuOpen = false }) {
+                    scanHandlingMethods.forEach { method ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(method.labelResource)) },
+                            onClick = { menuOpen = false; onMethod(method) },
+                            modifier = Modifier.heightIn(min = 48.dp).semantics { selected = method == choice },
+                            trailingIcon = if (method == choice) ({ Icon(painterResource(R.drawable.ic_check), null) }) else null,
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -412,6 +468,7 @@ private fun ScanRecommendationBasis(
     modifier: Modifier = Modifier,
 ) {
     var expanded by rememberSaveable(recommendation.id) { mutableStateOf(false) }
+    val chevronAngle = animateFloatAsState(if (expanded) 180f else 0f, tween(150), label = "Advice chevron")
     val basisState = stringResource(if (expanded) R.string.daily_expanded else R.string.daily_collapsed)
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
@@ -432,13 +489,20 @@ private fun ScanRecommendationBasis(
             Text(stringResource(if (expanded) R.string.scan_hide_basis else R.string.scan_basis),
                 Modifier.weight(1f), style = MaterialTheme.typography.labelLarge, color = colors.primary)
             Icon(painterResource(R.drawable.ic_chevron_down), null,
-                Modifier.size(20.dp).rotate(if (expanded) 180f else 0f), tint = colors.onSurfaceVariant)
+                Modifier.size(20.dp).graphicsLayer { rotationZ = chevronAngle.value }, tint = colors.onSurfaceVariant)
         }
-        if (expanded) {
-            itemLabel?.let { Text(it, style = MaterialTheme.typography.titleSmall) }
-            if (recommendation.reason.isNotBlank()) Text(recommendation.reason, style = MaterialTheme.typography.bodyMedium)
-            recommendation.steps.forEachIndexed { index, step -> Text("${index + 1}. $step") }
-            ScanSources(recommendation)
+        AnimatedVisibility(
+            visible = expanded,
+            enter = fadeIn(tween(150)) + expandVertically(tween(150)),
+            exit = fadeOut(tween(90)) + shrinkVertically(tween(110)),
+            label = "Advice details",
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                itemLabel?.let { Text(it, style = MaterialTheme.typography.titleSmall) }
+                if (recommendation.reason.isNotBlank()) Text(recommendation.reason, style = MaterialTheme.typography.bodyMedium)
+                recommendation.steps.forEachIndexed { index, step -> Text("${index + 1}. $step") }
+                ScanSources(recommendation)
+            }
         }
     }
 }

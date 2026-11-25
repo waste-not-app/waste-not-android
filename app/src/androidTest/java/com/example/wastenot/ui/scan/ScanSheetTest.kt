@@ -83,7 +83,7 @@ class ScanSheetTest {
         compose.setContent { WasteNotTheme(dark) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                 Box(Modifier.fillMaxSize().background(LocalWasteNotGradients.current.canvas)) {
-                    key(dark, state.phase) {
+                    key(dark) {
                         Sheet(state, camera = { ScanCamera("design-preview", cameraCache, {}, {}) })
                     }
                 }
@@ -237,6 +237,7 @@ class ScanSheetTest {
         val use = compose.onNodeWithText("Use this, add amount")
         use.assertIsDisplayed().assertHeightIsAtLeast(48.dp)
         compose.onNodeWithText("Log manually").assertDoesNotExist()
+        compose.onAllNodesWithText("Recycle").assertCountEquals(1)
         compose.onNodeWithText("Keep it apart from other waste.").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Why this advice").performScrollTo().performClick()
         compose.onNodeWithText("Plastic bottles").performScrollTo().assertIsDisplayed()
@@ -245,10 +246,14 @@ class ScanSheetTest {
         compose.runOnIdle { dark = true }
         compose.onNodeWithText("Guide reference: fixture-pet · version 6").assertIsDisplayed()
         captureUiPreview(compose, "guide-revision-dark", "scan-review-fixes")
-        compose.onNode(hasText("Recycle") and hasClickAction()).performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Change method").performScrollTo().assertHeightIsAtLeast(48.dp).performClick()
+        compose.onNode(hasText("Recycle") and hasAnyAncestor(isPopup())).assertIsSelected()
         compose.onNodeWithText("Reduce").assertDoesNotExist()
         compose.onNodeWithText("Trash").performClick()
         assertEquals(DisposalMethod.TRASH, state.method); assertEquals(0, used)
+        compose.onNodeWithText("Your handling choice").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Trash").assertIsDisplayed()
+        compose.onNodeWithText("Recycle").assertDoesNotExist()
         use.assertIsDisplayed().performClick()
         assertEquals(1, used)
     }
@@ -276,19 +281,28 @@ class ScanSheetTest {
             recommendation = recommendation.copy(basis = AiRecommendationBasis.CONDITIONAL,
                 conditionsToVerify = listOf(AiContextField.CLEANLINESS), specialHandling = true)))
         compose.setContent { WasteNotTheme {
-            Sheet(state, onConfirmConditions = { state = state.copy(conditionsConfirmed = it) })
+            Sheet(state, onMethod = { state = state.copy(method = it) },
+                onConfirmConditions = { state = state.copy(conditionsConfirmed = it) })
         } }
         val use = compose.onNodeWithText("Use this, add amount")
         use.assertIsDisplayed().assertIsNotEnabled()
+        compose.onNodeWithContentDescription("Change method").performScrollTo().performClick()
+        compose.onNodeWithText("Reuse").performClick()
+        use.assertIsNotEnabled()
+        compose.onNodeWithText("Your handling choice").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Fixture source").assertDoesNotExist()
         compose.onNodeWithText("Needs special handling.", substring = true).performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("I've checked the conditions for this advice").performScrollTo().performClick()
         use.assertIsEnabled()
+        val footer = use.fetchSemanticsNode().boundsInRoot
         compose.onNodeWithText("Why this advice").performScrollTo().performClick()
         compose.onNodeWithText("Fixture source").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(listOf("https://example.org/fixture"), openedSources) }
         compose.onNodeWithText("Reference checked: 2026-10-20").performScrollTo().assertIsDisplayed()
         capture("scan-conditional-source")
+        compose.onNodeWithText("Hide the reasoning").performScrollTo().performClick()
+        compose.onNodeWithText("Fixture source").assertDoesNotExist()
+        assertEquals(footer, use.assertIsEnabled().fetchSemanticsNode().boundsInRoot)
     }
 
     @Test fun needsContextAndPrototypeRemainSeparateFromAUsableLiveRecommendation() {
@@ -374,7 +388,7 @@ class ScanSheetTest {
             compose.runOnIdle { current = item; dark = theme }
             val name = "${item.status.name.lowercase()}-${if (theme) "dark" else "light"}"
             compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
-            compose.onNodeWithText("Confirm or change the method").assertDoesNotExist()
+            compose.onNodeWithContentDescription("Change method").assertDoesNotExist()
             compose.onNodeWithText(if (item.specialHandling) "Specialist handling advice" else "Starter handling advice")
                 .performScrollTo().assertIsDisplayed()
             compose.onNodeWithText("1. ${item.steps.first()}").performScrollTo().assertIsDisplayed()

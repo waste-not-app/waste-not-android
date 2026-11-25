@@ -54,7 +54,9 @@
     <string name="scan_initial_guidance">Panduan penanganan awal</string>
     <string name="scan_special_guidance">Panduan penanganan khusus</string>
     <string name="scan_object_label">Objek %1$d · %2$s</string>
-    <string name="scan_method_confirmation">Konfirmasi / ubah metode</string>
+    <string name="scan_method_confirmation">Ubah metode</string>
+    <string name="scan_change">Ubah</string>
+    <string name="scan_selected_method">Pilihan penangananmu</string>
     <string name="scan_basis">Lihat dasar saran</string>
     <string name="scan_hide_basis">Tutup dasar saran</string>
     <string name="scan_use">Gunakan pilihan, isi jumlah</string>

@@ -53,7 +53,9 @@
     <string name="scan_initial_guidance">Starter handling advice</string>
     <string name="scan_special_guidance">Specialist handling advice</string>
     <string name="scan_object_label">Object %1$d · %2$s</string>
-    <string name="scan_method_confirmation">Confirm or change the method</string>
+    <string name="scan_method_confirmation">Change method</string>
+    <string name="scan_change">Change</string>
+    <string name="scan_selected_method">Your handling choice</string>
     <string name="scan_basis">Why this advice</string>
     <string name="scan_hide_basis">Hide the reasoning</string>
     <string name="scan_use">Use this, add amount</string>
