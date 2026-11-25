@@ -34,6 +34,11 @@
     <string name="method_trash_description">Buang sebagai residu</string>
     <string name="quantity_unit_helper">Tanpa timbangan? Pilih satuan Benda.</string>
     <string name="editor_date_helper">%1$s · maksimum 30 hari sebelumnya.</string>
+    <string name="editor_required_amount">Jumlah (wajib)</string>
+    <string name="editor_scan_choices">Metode dan kategori</string>
+    <string name="editor_scan_choice_summary">%1$s · %2$s</string>
+    <string name="editor_extra_details">Tanggal dan catatan</string>
+    <string name="editor_extra_details_with_photo">Tanggal, catatan, dan foto</string>
     <string name="quantity_example_weight">Contoh: 250</string>
     <string name="quantity_example_kilogram">Contoh: 0,25</string>
     <string name="quantity_example_count">Contoh: 2</string>

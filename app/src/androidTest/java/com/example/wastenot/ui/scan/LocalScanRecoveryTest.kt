@@ -162,6 +162,7 @@ class LocalScanRecoveryTest {
             tap("Use this, add amount")
             val attached = compose.activity.getString(R.string.ai_provenance_attached)
             waitFor(attached)
+            tap(compose.activity.getString(R.string.editor_scan_choices))
             tap("Reduce")
             choose(R.string.quantity_unit, "Items")
             compose.onNodeWithContentDescription("Amount avoided").performScrollTo().performTextReplacement("2")
@@ -210,8 +211,9 @@ class LocalScanRecoveryTest {
             waitFor(compose.activity.getString(R.string.ai_provenance_attached))
             compose.onNodeWithContentDescription("Weight").performScrollTo().performTextReplacement("250")
             compose.runOnUiThread { compose.activity.window.insetsController?.hide(WindowInsets.Type.ime()) }
-            compose.onNode(hasText("Save log") and hasClickAction()).performScrollTo().assertIsEnabled()
-                .performTouchInput { doubleClick() }
+            val save = compose.onNode(hasText("Save log") and hasClickAction())
+            if (!save.isDisplayed()) save.performScrollTo()
+            save.assertIsEnabled().performTouchInput { doubleClick() }
             waitFor("Log saved")
             val dashboard = (container.core.dashboard() as ApiResult.Success).value
             assertEquals(1L, dashboard.summary.activityCount)
@@ -312,7 +314,9 @@ class LocalScanRecoveryTest {
     }
 
     private fun tap(text: String) {
-        compose.onNode(hasText(text) and hasClickAction()).performScrollTo().assertIsEnabled().performClick()
+        val action = compose.onNode(hasText(text) and hasClickAction())
+        if (!action.isDisplayed()) action.performScrollTo()
+        action.assertIsEnabled().performClick()
     }
 
     private fun waitFor(text: String) {

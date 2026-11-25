@@ -127,7 +127,7 @@ class RemoteAiNavigationTest {
             record("real_ai_ui_context_and_recommendation_do_not_auto_save")
 
             click("Use this, add amount")
-            waitFor("How you handled it")
+            waitFor(context.getString(R.string.editor_scan_choices))
             compose.onNodeWithContentDescription("Weight").performScrollTo()
                 .assert(SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("")))
                 .performTextReplacement("250")
@@ -184,7 +184,11 @@ class RemoteAiNavigationTest {
         compose.onNode(hasText(value) and hasAnyAncestor(isPopup())).performScrollTo().performClick()
     }
 
-    private fun click(label: String) = compose.onNodeWithText(label).performScrollTo().assertIsDisplayed().performClick()
+    private fun click(label: String) {
+        val action = compose.onNodeWithText(label)
+        if (!action.isDisplayed()) action.performScrollTo()
+        action.assertIsDisplayed().performClick()
+    }
     private fun waitFor(label: String, timeout: Long = 30_000) = compose.waitUntil(timeout) {
         compose.onAllNodesWithText(label).fetchSemanticsNodes().isNotEmpty()
     }

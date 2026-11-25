@@ -5,18 +5,24 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.*
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -53,11 +59,17 @@ class EditorSubmissionTest {
     @Test fun normalAiEditorKeepsAttributionWithoutRedundantManualAction() {
         val form = aiDraft()
         compose.setContent { EditorHost(false) {
-            LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(), {}, {}, {})
+            LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(), {}, {}, {},
+                scanPrefilled = true)
         } }
         compose.onNodeWithText("Continue as a manual log").assertDoesNotExist()
         compose.onNodeWithText(InstrumentationRegistry.getInstrumentation().targetContext.getString(
             com.example.wastenot.R.string.ai_provenance_attached)).assertIsDisplayed()
+        val save = compose.onNodeWithText("Save log")
+        save.assertIsDisplayed().assertHeightIsAtLeast(52.dp)
+        compose.onNodeWithText("Date and notes").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Notes (optional)").performScrollTo().assertIsDisplayed()
+        save.assertIsDisplayed()
         compose.runOnIdle {
             assertNotNull(form.values.aiProvenance)
             form.change(EditorField.METHOD, form.values.copy(method = DisposalMethod.REDUCE))
@@ -72,12 +84,14 @@ class EditorSubmissionTest {
 
     @Test fun expiredAiEditorOffersExplicitManualRecoveryWithoutChangingFields() {
         val form = aiDraft().apply {
+            change(EditorField.QUANTITY, values.copy(quantity = QuantityInput("250", QuantityUnit.GRAM)))
             prepareSubmission(today)
             submissionFailed(ApiFailureKind.AI_EXPIRED)
         }
         val before = form.values
         compose.setContent { EditorHost(true) {
-            LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(), {}, {}, {})
+            LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(), {}, {}, {},
+                scanPrefilled = true)
         } }
         compose.onNodeWithText("Continue as a manual log").performScrollTo().assertIsEnabled().performClick()
         compose.runOnIdle {
@@ -86,7 +100,57 @@ class EditorSubmissionTest {
         }
     }
 
-    private fun aiDraft() = draft().apply {
+    @Test fun scanStartsAtAnEmptyAmountAndShortEditorStillRequiresAnExplicitSave() {
+        val form = aiDraft()
+        val writes = mutableListOf<ActivityInput>()
+        compose.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
+                EditorHost(false) {
+                    Box(Modifier.size(320.dp, 300.dp)) {
+                        LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(), { writes.add(it) },
+                            {}, {}, scanPrefilled = true)
+                    }
+                }
+            }
+        }
+        val weight = compose.onNodeWithContentDescription("Weight")
+        weight.assertIsDisplayed().assert(SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("")))
+        compose.onNodeWithText("Reduce").assertDoesNotExist()
+        val save = compose.onNodeWithText("Save log")
+        save.performScrollTo().assertIsDisplayed().assertHeightIsAtLeast(48.dp).performClick()
+        weight.assertIsFocused().assertIsDisplayed().performTextReplacement("42")
+        compose.runOnIdle { assertTrue(writes.isEmpty()) }
+        save.performScrollTo().performClick()
+        compose.runOnIdle {
+            assertEquals(Quantity.Weight.of(42), writes.single().quantity)
+            assertEquals(DisposalMethod.RECYCLE, writes.single().method)
+            assertEquals(WasteCategory.PLASTIC, writes.single().category)
+            assertEquals(form.values.aiProvenance, writes.single().aiProvenance)
+        }
+    }
+
+    @Test fun rejectedCategoryReopensCollapsedScanChoicesAndFocusesTheField() {
+        val form = aiDraft().apply {
+            change(EditorField.QUANTITY, values.copy(quantity = QuantityInput("250", QuantityUnit.GRAM)))
+        }
+        compose.setContent { EditorHost(false) {
+            LogEditorScreen(form, today, "Asia/Jakarta", false, PaddingValues(),
+                { fail("Changing the scan category must not save with provenance") }, {}, {}, scanPrefilled = true)
+        } }
+        val choices = compose.onNodeWithText("Method and category")
+        val category = compose.onNodeWithContentDescription("Category")
+        choices.assertTextContains("Recycle · Plastic").performScrollTo().performClick()
+        category.performScrollTo().performClick()
+        compose.onNodeWithText("Glass").performClick()
+        choices.performScrollTo().performClick()
+        category.assertDoesNotExist()
+        val save = compose.onNodeWithText("Save log")
+        if (!save.isDisplayed()) save.performScrollTo()
+        save.assertIsDisplayed().performClick()
+        category.assertIsFocused().assertIsDisplayed().assertTextContains("Glass")
+    }
+
+    private fun aiDraft() = EditorDraft.from(null, today).apply {
         applyScan(com.example.wastenot.LogEditor(null, "ai-editor-ui", scanCategory = "PLASTIC",
             scanMethod = "RECYCLE", scanRecommendationId = "00000000-0000-4000-8000-000000000002"))
     }

@@ -57,7 +57,7 @@
     <string name="scan_basis">Why this advice</string>
     <string name="scan_hide_basis">Hide the reasoning</string>
     <string name="scan_use">Use this, add amount</string>
-    <string name="scan_quantity_next">Next, enter the amount yourself. Nothing is saved yet.</string>
+    <string name="scan_quantity_next">Nothing is saved yet.</string>
     <string name="scan_special">This object needs special handling. Pick a method yourself and check your local facility\'s guidance.</string>
     <string name="scan_no_guide">There\'s no matching guide yet. Continue with a manual choice.</string>
     <string name="scan_no_object">Nothing scored high enough. Retake a clearer photo or log it manually.</string>

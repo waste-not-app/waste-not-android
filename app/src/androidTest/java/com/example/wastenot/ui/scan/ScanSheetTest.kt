@@ -6,11 +6,14 @@ import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.*
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -113,7 +116,9 @@ class ScanSheetTest {
                     if (phase == ScanPhase.CONTEXT) {
                         compose.onNodeWithContentDescription("Cleanliness").assertHeightIsAtLeast(56.dp)
                     }
-                    compose.onNodeWithText(action).performScrollTo().assertIsDisplayed()
+                    val target = compose.onNodeWithText(action)
+                    if (!target.isDisplayed()) target.performScrollTo()
+                    target.assertIsDisplayed()
                     val tail = when (phase) {
                         ScanPhase.OBJECT -> "Retake"
                         ScanPhase.CONTEXT -> "Correct the object"
@@ -130,7 +135,7 @@ class ScanSheetTest {
         }
     }
 
-    @Test fun everyPhaseKeepsManualVisibleAndThemesRenderWithoutSimulationControls() {
+    @Test fun recoveryOffersManualEntryWithoutAddingItToUsableAdvice() {
         var state by mutableStateOf(ScanState())
         var dark by mutableStateOf(false)
         var manual = 0
@@ -138,17 +143,22 @@ class ScanSheetTest {
             Sheet(state, onManual = { manual++ })
         } }
         val states = listOf(
-            ScanState(), objects, objects.copy(phase = ScanPhase.CONTEXT, category = WasteCategory.PLASTIC, objectConfirmed = true),
-            objects.copy(phase = ScanPhase.RECOMMENDATION, category = WasteCategory.PLASTIC, recommendation = recommendation, method = DisposalMethod.RECYCLE),
-            objects.copy(phase = ScanPhase.RECOMMENDATION, recommendation = recommendation.copy(method = null), method = null),
-            ScanState(phase = ScanPhase.FAILURE, problem = ScanProblem.CAMERA),
-            ScanState(phase = ScanPhase.DETECTING), ScanState(phase = ScanPhase.RECOMMENDING),
+            ScanState() to true,
+            objects to false,
+            objects.copy(phase = ScanPhase.CONTEXT, category = WasteCategory.PLASTIC, objectConfirmed = true) to false,
+            objects.copy(phase = ScanPhase.RECOMMENDATION, category = WasteCategory.PLASTIC, objectKey = "plastic_bottle",
+                objectConfirmed = true, recommendation = recommendation, method = DisposalMethod.RECYCLE) to false,
+            objects.copy(phase = ScanPhase.RECOMMENDATION, recommendation = recommendation.copy(
+                status = AiRecommendationStatus.UNAVAILABLE, method = null, scope = null, basis = null), method = null) to true,
+            ScanState(phase = ScanPhase.FAILURE, problem = ScanProblem.CAMERA) to true,
+            ScanState(phase = ScanPhase.DETECTING) to false,
+            ScanState(phase = ScanPhase.RECOMMENDING) to false,
         )
         for (theme in listOf(false, true)) {
             compose.runOnIdle { dark = theme }
-            states.forEachIndexed { index, next ->
+            states.forEachIndexed { index, (next, manualExpected) ->
                 compose.runOnIdle { state = next }
-                if (next.phase in listOf(ScanPhase.CAMERA, ScanPhase.PHOTO, ScanPhase.FAILURE)) {
+                if (manualExpected) {
                     compose.onNodeWithText("Log manually").assertIsDisplayed().performClick()
                 } else {
                     compose.onNodeWithText("Log manually").assertDoesNotExist()
@@ -163,8 +173,7 @@ class ScanSheetTest {
                 capture("scan-${if (theme) "dark" else "light"}-$index")
             }
         }
-        val scanPhaseCount = states.count { it.phase in listOf(ScanPhase.CAMERA, ScanPhase.PHOTO, ScanPhase.FAILURE) }
-        assertEquals(scanPhaseCount * 2, manual)
+        assertEquals(states.count { it.second } * 2, manual)
     }
 
     @Test fun objectNeedsMaterialBeforeConfirmationAndOnlyExplicitChoiceUpdatesIt() {
@@ -225,6 +234,9 @@ class ScanSheetTest {
         compose.setContent { WasteNotTheme(dark) {
             Sheet(state, onMethod = { state = state.copy(method = it) }, onUse = { used++ })
         } }
+        val use = compose.onNodeWithText("Use this, add amount")
+        use.assertIsDisplayed().assertHeightIsAtLeast(48.dp)
+        compose.onNodeWithText("Log manually").assertDoesNotExist()
         compose.onNodeWithText("Keep it apart from other waste.").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Why this advice").performScrollTo().performClick()
         compose.onNodeWithText("Plastic bottles").performScrollTo().assertIsDisplayed()
@@ -237,7 +249,7 @@ class ScanSheetTest {
         compose.onNodeWithText("Reduce").assertDoesNotExist()
         compose.onNodeWithText("Trash").performClick()
         assertEquals(DisposalMethod.TRASH, state.method); assertEquals(0, used)
-        compose.onNodeWithText("Use this, add amount").performScrollTo().performClick()
+        use.assertIsDisplayed().performClick()
         assertEquals(1, used)
     }
 
@@ -266,9 +278,13 @@ class ScanSheetTest {
         compose.setContent { WasteNotTheme {
             Sheet(state, onConfirmConditions = { state = state.copy(conditionsConfirmed = it) })
         } }
-        compose.onNodeWithText("Use this, add amount").performScrollTo().assertIsNotEnabled()
+        val use = compose.onNodeWithText("Use this, add amount")
+        use.assertIsDisplayed().assertIsNotEnabled()
+        compose.onNodeWithText("Fixture source").assertDoesNotExist()
+        compose.onNodeWithText("Needs special handling.", substring = true).performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("I've checked the conditions for this advice").performScrollTo().performClick()
-        compose.onNodeWithText("Use this, add amount").performScrollTo().assertIsEnabled()
+        use.assertIsEnabled()
+        compose.onNodeWithText("Why this advice").performScrollTo().performClick()
         compose.onNodeWithText("Fixture source").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(listOf("https://example.org/fixture"), openedSources) }
         compose.onNodeWithText("Reference checked: 2026-10-20").performScrollTo().assertIsDisplayed()
@@ -285,13 +301,47 @@ class ScanSheetTest {
         compose.onNodeWithText("Tell us more about the item").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Risk type").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
-        compose.onNodeWithText("Check the item's condition").performScrollTo().performClick()
+        compose.onNodeWithText("Check the item's condition").assertIsDisplayed().performClick()
+        compose.onNodeWithText("Log manually").assertIsDisplayed()
         assertEquals(1, reviews)
         capture("scan-needs-context")
         compose.runOnIdle { state = state.copy(recommendation = recommendation.copy(prototypeOnly = true)) }
         compose.onNodeWithText("Prototype result. This advice can't be used for an AI log yet.").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Use this, add amount").assertDoesNotExist()
         capture("scan-prototype-unusable")
+    }
+
+    @Test fun shortViewportAtDoubleFontScaleKeepsReviewAndActionReachable() {
+        var state by mutableStateOf(objects.copy(phase = ScanPhase.RECOMMENDATION, category = WasteCategory.PLASTIC,
+            objectKey = "plastic_bottle", objectConfirmed = true, method = DisposalMethod.RECYCLE,
+            recommendation = recommendation.copy(basis = AiRecommendationBasis.CONDITIONAL,
+                conditionsToVerify = listOf(AiContextField.CLEANLINESS))))
+        var used = 0
+        compose.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
+                WasteNotTheme {
+                    Box(Modifier.size(320.dp, 280.dp)) {
+                        ScanSheetContent(
+                            state = state,
+                            onDismiss = {}, onManual = {}, onRetake = {}, onDetect = {}, onSelect = {},
+                            onCategory = {}, onConfirmObject = {}, onCorrectObject = {}, onContext = {},
+                            onRecommend = {}, onMethod = {}, onUse = { used++ }, onRetry = {},
+                            onConfirmConditions = { state = state.copy(conditionsConfirmed = it) },
+                            camera = {},
+                        )
+                    }
+                }
+            }
+        }
+        val use = compose.onNodeWithText("Use this, add amount")
+        use.performScrollTo().assertIsDisplayed().assertHeightIsAtLeast(48.dp).assertIsNotEnabled()
+        compose.onNodeWithText("Cleanliness").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("I've checked the conditions for this advice").performScrollTo().assertIsDisplayed().performClick()
+        use.performScrollTo().assertIsEnabled().performClick()
+        compose.runOnIdle { assertEquals(1, used) }
+        compose.onNodeWithText("Why this advice").performScrollTo().performClick()
+        compose.onNodeWithText("Fixture source").performScrollTo().assertIsDisplayed().performClick()
+        compose.runOnIdle { assertEquals(listOf("https://example.org/fixture"), openedSources) }
     }
 
     @Test fun nonReadyGuidanceKeepsServerStepsSourcesAndManualWithoutOfferingAnAiSave() {
@@ -336,9 +386,11 @@ class ScanSheetTest {
             val source = item.sourceDetails.first()
             compose.onNodeWithText(source.title).performScrollTo().assertIsDisplayed().performClick()
             compose.runOnIdle { assertEquals(source.url.toString(), openedSources.lastOrNull()) }
-            compose.onNodeWithText("Check the item's condition").performScrollTo().assertIsDisplayed()
+            val review = compose.onNodeWithText("Check the item's condition")
+            if (!review.isDisplayed()) review.performScrollTo()
+            review.assertIsDisplayed()
             captureUiPreview(compose, "$name-sources", "policy08-ui")
-            compose.onNodeWithText("Check the item's condition").performClick()
+            review.performClick()
             compose.onNodeWithText("Log manually").assertIsDisplayed().performClick()
         }
         compose.runOnIdle { assertEquals(4, manual); assertEquals(4, reviews); assertEquals(4, openedSources.size) }

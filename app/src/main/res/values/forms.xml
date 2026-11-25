@@ -33,6 +33,11 @@
     <string name="method_trash_description">Put it in residual waste</string>
     <string name="quantity_unit_helper">No scale? Choose Items as the unit.</string>
     <string name="editor_date_helper">%1$s · up to 30 days ago.</string>
+    <string name="editor_required_amount">Amount (required)</string>
+    <string name="editor_scan_choices">Method and category</string>
+    <string name="editor_scan_choice_summary">%1$s · %2$s</string>
+    <string name="editor_extra_details">Date and notes</string>
+    <string name="editor_extra_details_with_photo">Date, notes, and photo</string>
     <string name="quantity_example_weight">e.g. 250</string>
     <string name="quantity_example_kilogram">e.g. 0.25</string>
     <string name="quantity_example_count">e.g. 2</string>

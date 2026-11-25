@@ -555,6 +555,7 @@ fun AccountNavigation(
                         } },
                         { if (stack.lastOrNull() == key) conflictRequest = key.requestId }, Modifier.fillMaxSize(),
                         persistence = disk, restored = wasRestored, saveConfirmed = confirmed,
+                        scanPrefilled = key.scanCategory != null && key.scanMethod != null,
                         onRetryPersistence = { if (confirmed) finishSave() else persistence.update(form.stored(key, selected)) },
                         photosEnabled = photosEnabled,
                         photoPreviewBytes = editorPhotoId?.let { photoBytesCache[it] },

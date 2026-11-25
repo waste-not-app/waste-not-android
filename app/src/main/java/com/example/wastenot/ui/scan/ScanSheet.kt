@@ -14,11 +14,15 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +58,7 @@ import com.example.wastenot.ui.components.ActionButton
 import com.example.wastenot.ui.components.SecondaryActionButton
 import com.example.wastenot.ui.components.IconActionButton
 import com.example.wastenot.ui.components.TextActionButton
-import com.example.wastenot.ui.components.summarySurface
+import com.example.wastenot.ui.components.focusOutline
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.ui.components.labelResource
@@ -84,7 +88,7 @@ internal fun ScanSheet(state: ScanState, onDismiss: () -> Unit, onManual: () -> 
     onConfirmConditions: (Boolean) -> Unit = {}, camera: @Composable () -> Unit) {
     ModalBottomSheet(onDismissRequest = onDismiss, modifier = modifier,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        shape = MaterialTheme.shapes.extraLarge.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize),
         containerColor = MaterialTheme.colorScheme.surface,
         dragHandle = null) {
         SheetSystemBar()
@@ -110,13 +114,13 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
         ScanPhase.FAILURE -> R.string.scan_unavailable
     }
     val horizontalPadding = if (LocalConfiguration.current.screenWidthDp <= 400) 16.dp else 24.dp
-    Column(modifier.fillMaxWidth().fillMaxHeight(.94f).navigationBarsPadding().imePadding().testTag("capture-sheet")) {
-        Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp).size(38.dp, 4.dp)
-            .background(MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(2.dp)))
-        val scroll = remember(state.phase) { ScrollState(0) }
+    val scroll = remember(state.phase) { ScrollState(0) }
+    val actions: @Composable (Modifier) -> Unit = { placement ->
+        RecommendationActions(state, onUse, onMethod, onReviewContext, onManual, placement)
+    }
+    val body: @Composable (Modifier, Boolean) -> Unit = { placement, inlineActions ->
         Column(
-            Modifier
-                .weight(1f)
+            placement
                 .fillMaxWidth()
                 .sheetVerticalScroll(scroll)
                 .padding(horizontal = horizontalPadding, vertical = 16.dp),
@@ -126,8 +130,10 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                 Text(stringResource(title), Modifier.weight(1f).semantics { heading() }, style = MaterialTheme.typography.headlineSmall)
                 IconActionButton(R.drawable.ic_close, stringResource(R.string.scan_close), onDismiss)
             }
-            Text(stringResource(R.string.scan_capture_notice),
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (state.phase != ScanPhase.RECOMMENDATION) {
+                Text(stringResource(R.string.scan_capture_notice),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             HorizontalDivider()
             ScanSteps(state.step)
             if (state.error?.kind == ApiFailureKind.RATE_LIMITED) MessageBanner(stringResource(R.string.error_rate_limited), isError = true)
@@ -224,102 +230,10 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                         ScanSecondary(R.string.scan_correct_object, onCorrectObject)
                     }
                 }
-                ScanPhase.RECOMMENDATION -> {
-                    val recommendation = state.recommendation
-                    if (recommendation != null && recommendation.method != null) {
-                        Surface(Modifier.fillMaxWidth().summarySurface(), shape = MaterialTheme.shapes.large,
-                            color = Color.Transparent, contentColor = Color.White) {
-                            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                Text(stringResource(R.string.scan_suggested_method), style = MaterialTheme.typography.labelLarge)
-                                Text(stringResource(recommendation.method.labelResource), style = MaterialTheme.typography.headlineMedium)
-                                Text(recommendation.reason, style = MaterialTheme.typography.bodyMedium)
-                            }
-                        }
-                        if (recommendation.prototypeOnly) ScanWarning(stringResource(
-                            R.string.scan_prototype_advice))
-                        if (recommendation.specialHandling) ScanWarning(stringResource(R.string.scan_special_warning))
-                        if (recommendation.caution.isNotBlank()) Text(recommendation.caution, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        if (recommendation.conditionsToVerify.isNotEmpty()) {
-                            Text(stringResource(R.string.scan_conditional_advice), style = MaterialTheme.typography.titleMedium)
-                            recommendation.conditionsToVerify.forEach { Text(stringResource(contextFieldLabel(it))) }
-                        }
-                        var expanded by remember(recommendation) { mutableStateOf(recommendation.conditionsToVerify.isNotEmpty()) }
-                        val basisState = stringResource(if (expanded) R.string.daily_expanded else R.string.daily_collapsed)
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 48.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable(role = Role.Button) { expanded = !expanded }
-                                .semantics { stateDescription = basisState },
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                stringResource(if (expanded) R.string.scan_hide_basis else R.string.scan_basis),
-                                Modifier.weight(1f),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                            Icon(
-                                painterResource(R.drawable.ic_chevron_down), null,
-                                Modifier.size(20.dp).rotate(if (expanded) 180f else 0f),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        if (expanded) {
-                            state.item?.label?.let { Text(it, style = MaterialTheme.typography.titleSmall) }
-                            recommendation.steps.forEachIndexed { index, step -> Text("${index + 1}. $step") }
-                            ScanSources(recommendation)
-                        }
-                        if (recommendation.conditionsToVerify.isNotEmpty()) {
-                            ScanCheck(stringResource(R.string.scan_confirm_conditions), state.conditionsConfirmed, onConfirmConditions)
-                        }
-                        if (state.canChooseMethod && state.method != null) {
-                            ScanChoice(stringResource(R.string.scan_method_confirmation), stringResource(state.method.labelResource),
-                                listOf(DisposalMethod.REUSE, DisposalMethod.RECYCLE, DisposalMethod.TRASH),
-                                { stringResource(it.labelResource) }, onMethod)
-                        }
-                        if (state.canChooseMethod) {
-                            if (recommendation.prototypeOnly) {
-                                ActionButton(stringResource(R.string.ai_use_manual), {
-                                    if (state.confirmedMethod == null && state.method != null) onMethod(state.method)
-                                    onManual()
-                                }, Modifier.fillMaxWidth())
-                            } else {
-                                ActionButton(stringResource(R.string.scan_use), onUse, Modifier.fillMaxWidth(), enabled = state.canUseRecommendation)
-                                Text(stringResource(R.string.scan_quantity_next), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        } else if (recommendation.scope == AiRecommendationScope.PREVENTION || recommendation.method == DisposalMethod.REDUCE) {
-                            Text(stringResource(R.string.ai_reduce_manual))
-                            ActionButton(stringResource(R.string.ai_use_manual), onManual, Modifier.fillMaxWidth())
-                        }
-                    } else {
-                        val guidanceTitle = if (recommendation?.specialHandling == true)
-                            R.string.scan_special_guidance else R.string.scan_initial_guidance
-                        Text(stringResource(when {
-                            recommendation?.status == AiRecommendationStatus.NEEDS_CONTEXT -> R.string.scan_more_context
-                            !recommendation?.steps.isNullOrEmpty() -> guidanceTitle
-                            else -> R.string.scan_no_guide
-                        }),
-                            style = MaterialTheme.typography.titleMedium)
-                        recommendation?.reason?.takeIf { it.isNotBlank() }?.let { Text(it) }
-                        if (recommendation?.prototypeOnly == true) ScanWarning(stringResource(
-                            R.string.scan_prototype_advice))
-                        if (recommendation?.specialHandling == true) ScanWarning(stringResource(R.string.scan_special_warning))
-                        recommendation?.caution?.takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-                        recommendation?.missingContext?.forEach { Text(stringResource(contextFieldLabel(it))) }
-                        if (!recommendation?.steps.isNullOrEmpty()) {
-                            if (recommendation.status == AiRecommendationStatus.NEEDS_CONTEXT)
-                                Text(stringResource(guidanceTitle), Modifier.semantics { heading() }, style = MaterialTheme.typography.titleMedium)
-                            recommendation.steps.forEachIndexed { index, step -> Text("${index + 1}. $step") }
-                        }
-                        recommendation?.let { ScanSources(it) }
-                        ActionButton(stringResource(R.string.manual_input), onManual, Modifier.fillMaxWidth())
-                    }
-                    ScanSecondary(R.string.scan_review_context, onReviewContext)
-                    ScanSecondary(R.string.scan_correct_object, onCorrectObject)
-                }
+                ScanPhase.RECOMMENDATION -> RecommendationContent(
+                    state, onMethod, onReviewContext, onCorrectObject, onConfirmConditions,
+                    inlineActions = if (inlineActions) ({ actions(Modifier.fillMaxWidth()) }) else null,
+                )
                 ScanPhase.FAILURE -> {
                     stringResource(when (state.problem) {
                         ScanProblem.NO_OBJECT -> R.string.scan_no_object
@@ -343,6 +257,179 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                 ScanSecondary(R.string.manual_input, onManual)
             }
+        }
+    }
+    BoxWithConstraints(
+        modifier
+            .fillMaxWidth()
+            .fillMaxHeight(.94f)
+            .navigationBarsPadding()
+            .imePadding()
+            .testTag("capture-sheet"),
+    ) {
+        val pinActions = state.phase == ScanPhase.RECOMMENDATION && maxHeight >= 400.dp
+        Column(Modifier.fillMaxSize()) {
+            Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp).size(38.dp, 4.dp)
+                .background(MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(2.dp)))
+            body(Modifier.weight(1f), !pinActions)
+            if (pinActions) actions(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding))
+        }
+    }
+}
+
+@Composable
+private fun RecommendationContent(
+    state: ScanState,
+    onMethod: (DisposalMethod) -> Unit,
+    onReviewContext: () -> Unit,
+    onCorrectObject: () -> Unit,
+    onConfirmConditions: (Boolean) -> Unit,
+    inlineActions: (@Composable () -> Unit)?,
+) {
+    val recommendation = state.recommendation
+    val needsContext = recommendation?.status == AiRecommendationStatus.NEEDS_CONTEXT
+    val guidanceTitle = if (recommendation?.specialHandling == true)
+        R.string.scan_special_guidance else R.string.scan_initial_guidance
+    val suggestedMethod = recommendation?.method
+    if (suggestedMethod != null) {
+        Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.primaryContainer) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(stringResource(R.string.scan_suggested_method), style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(suggestedMethod.labelResource), style = MaterialTheme.typography.headlineMedium)
+            }
+        }
+    } else {
+        Text(
+            stringResource(when {
+                needsContext -> R.string.scan_more_context
+                !recommendation?.steps.isNullOrEmpty() -> guidanceTitle
+                else -> R.string.scan_no_guide
+            }),
+            Modifier.semantics { heading() },
+            style = MaterialTheme.typography.titleMedium,
+        )
+    }
+    if (recommendation != null) {
+        if (recommendation.prototypeOnly) ScanWarning(stringResource(R.string.scan_prototype_advice))
+        if (recommendation.specialHandling) ScanWarning(stringResource(R.string.scan_special_warning))
+        if (recommendation.caution.isNotBlank()) Text(recommendation.caution, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (suggestedMethod == null && recommendation.reason.isNotBlank()) Text(recommendation.reason)
+        recommendation.missingContext.forEach { Text(stringResource(contextFieldLabel(it))) }
+        if (recommendation.conditionsToVerify.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.scan_conditional_advice), Modifier.semantics { heading() },
+                    style = MaterialTheme.typography.titleMedium)
+                recommendation.conditionsToVerify.forEach { Text(stringResource(contextFieldLabel(it))) }
+                ScanCheck(stringResource(R.string.scan_confirm_conditions), state.conditionsConfirmed, onConfirmConditions)
+            }
+        }
+        val method = state.method
+        if (state.canChooseMethod && method != null) {
+            ScanChoice(stringResource(R.string.scan_method_confirmation), stringResource(method.labelResource),
+                listOf(DisposalMethod.REUSE, DisposalMethod.RECYCLE, DisposalMethod.TRASH),
+                { stringResource(it.labelResource) }, onMethod)
+        }
+        if (recommendation.scope == AiRecommendationScope.PREVENTION || suggestedMethod == DisposalMethod.REDUCE)
+            Text(stringResource(R.string.ai_reduce_manual))
+    }
+    inlineActions?.invoke()
+    if (recommendation != null) {
+        if (suggestedMethod != null) {
+            ScanRecommendationBasis(recommendation, state.item?.label, Modifier.fillMaxWidth())
+        } else {
+            if (needsContext && recommendation.steps.isNotEmpty())
+                Text(stringResource(guidanceTitle), Modifier.semantics { heading() }, style = MaterialTheme.typography.titleMedium)
+            recommendation.steps.forEachIndexed { index, step -> Text("${index + 1}. $step") }
+            ScanSources(recommendation)
+        }
+    }
+    if (!needsContext) ScanSecondary(R.string.scan_review_context, onReviewContext)
+    ScanSecondary(R.string.scan_correct_object, onCorrectObject)
+}
+
+@Composable
+private fun RecommendationActions(
+    state: ScanState,
+    onUse: () -> Unit,
+    onMethod: (DisposalMethod) -> Unit,
+    onReviewContext: () -> Unit,
+    onManual: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val recommendation = state.recommendation
+    val needsContext = recommendation?.status == AiRecommendationStatus.NEEDS_CONTEXT
+    val useAdvice = state.canChooseMethod && recommendation?.prototypeOnly != true
+    val manualLabel = when {
+        recommendation?.method == null -> R.string.manual_input
+        recommendation.prototypeOnly || recommendation.scope == AiRecommendationScope.PREVENTION ||
+            recommendation.method == DisposalMethod.REDUCE -> R.string.ai_use_manual
+        else -> null
+    }
+    if (!needsContext && !useAdvice && manualLabel == null) return
+
+    Surface(color = MaterialTheme.colorScheme.surface) {
+        Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+            HorizontalDivider()
+            Column(
+                Modifier.padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                when {
+                    needsContext -> {
+                        ActionButton(stringResource(R.string.scan_review_context), onReviewContext, Modifier.fillMaxWidth())
+                        TextActionButton(stringResource(R.string.manual_input), onManual, Modifier.fillMaxWidth())
+                    }
+                    useAdvice -> {
+                        ActionButton(stringResource(R.string.scan_use), onUse, Modifier.fillMaxWidth(), enabled = state.canUseRecommendation)
+                        Text(stringResource(R.string.scan_quantity_next), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    manualLabel != null -> ActionButton(stringResource(manualLabel), {
+                        if (state.canChooseMethod && state.confirmedMethod == null) state.method?.let(onMethod)
+                        onManual()
+                    }, Modifier.fillMaxWidth())
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ScanRecommendationBasis(
+    recommendation: AiRecommendation,
+    itemLabel: String?,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by rememberSaveable(recommendation.id) { mutableStateOf(false) }
+    val basisState = stringResource(if (expanded) R.string.daily_expanded else R.string.daily_collapsed)
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusedAsState()
+    val colors = MaterialTheme.colorScheme
+    val shape = MaterialTheme.shapes.small
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp)
+                .focusOutline(focused, shape, colors.primary, colors.surface)
+                .clip(shape)
+                .clickable(interactionSource = interactions, indication = ripple(), role = Role.Button) { expanded = !expanded }
+                .semantics { stateDescription = basisState },
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(stringResource(if (expanded) R.string.scan_hide_basis else R.string.scan_basis),
+                Modifier.weight(1f), style = MaterialTheme.typography.labelLarge, color = colors.primary)
+            Icon(painterResource(R.drawable.ic_chevron_down), null,
+                Modifier.size(20.dp).rotate(if (expanded) 180f else 0f), tint = colors.onSurfaceVariant)
+        }
+        if (expanded) {
+            itemLabel?.let { Text(it, style = MaterialTheme.typography.titleSmall) }
+            if (recommendation.reason.isNotBlank()) Text(recommendation.reason, style = MaterialTheme.typography.bodyMedium)
+            recommendation.steps.forEachIndexed { index, step -> Text("${index + 1}. $step") }
+            ScanSources(recommendation)
         }
     }
 }
@@ -391,7 +478,7 @@ internal fun <T> ScanChoice(label: String, value: String, options: List<T>, opti
                 onClick = { expanded = true },
                 modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
                     .semantics { contentDescription = label; stateDescription = value },
-                shape = RoundedCornerShape(15.dp),
+                shape = MaterialTheme.shapes.small,
                 color = tokens.fieldWell,
                 contentColor = MaterialTheme.colorScheme.onSurface,
                 border = BorderStroke(1.dp, tokens.fieldEdge),

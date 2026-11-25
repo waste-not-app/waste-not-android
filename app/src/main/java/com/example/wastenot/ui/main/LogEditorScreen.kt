@@ -1,10 +1,11 @@
 package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import android.net.Uri
@@ -14,13 +15,22 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ripple
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -31,7 +41,11 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
@@ -40,7 +54,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.R
 import com.example.wastenot.data.network.ApiFailureKind
@@ -55,6 +74,8 @@ import com.example.wastenot.ui.components.MethodSelector
 import com.example.wastenot.ui.components.QuantityField
 import com.example.wastenot.ui.components.WasteTextField
 import com.example.wastenot.ui.components.TextActionButton
+import com.example.wastenot.ui.components.focusOutline
+import com.example.wastenot.ui.components.labelResource
 import java.time.LocalDate
 
 @Composable
@@ -79,6 +100,7 @@ fun LogEditorScreen(
     onPickPhoto: (Uri) -> Unit = {},
     onRemovePhoto: () -> Unit = {},
     onDismissPhotoError: () -> Unit = {},
+    scanPrefilled: Boolean = false,
 ) {
     val focus = remember { EditorField.entries.associateWith { FocusRequester() } }
     val reveal = remember { EditorField.entries.associateWith { BringIntoViewRequester() } }
@@ -87,14 +109,12 @@ fun LogEditorScreen(
     val enabled = !saving && !draft.locked && !saveConfirmed
     val focusManager = LocalFocusManager.current
     val submissionReveal = remember(draft) { BringIntoViewRequester() }
-    LaunchedEffect(draft.submissionError) {
-        if (draft.submissionError != null) submissionReveal.bringIntoView()
-    }
-    LaunchedEffect(draft, draft.focusRequest) {
-        draft.errors.keys.firstOrNull()?.let { field ->
-            reveal.getValue(field).bringIntoView()
-            focus.getValue(field).requestFocus()
-        }
+    var choicesExpanded by rememberSaveable { mutableStateOf(false) }
+    var detailsExpanded by rememberSaveable { mutableStateOf(false) }
+    fun firstError(): EditorField? =
+        if (scanPrefilled && EditorField.QUANTITY in draft.errors) EditorField.QUANTITY else draft.errors.keys.firstOrNull()
+    LaunchedEffect(scanPrefilled, photoError) {
+        if (scanPrefilled && photoError != null) detailsExpanded = true
     }
     fun inputModifier(field: EditorField) = Modifier
         .bringIntoViewRequester(reveal.getValue(field))
@@ -107,18 +127,109 @@ fun LogEditorScreen(
             else if (focused.remove(field)) draft.validateField(field, referenceDate)
         }
         .then(if (field == EditorField.METHOD || field == EditorField.QUANTITY) Modifier.focusGroup() else Modifier)
-    Box(modifier, contentAlignment = Alignment.TopCenter) {
+    val method: @Composable () -> Unit = {
+        MethodSelector(value.method, { draft.change(EditorField.METHOD, value.copy(method = it)) }, fieldModifier(EditorField.METHOD),
+            draft.errors[EditorField.METHOD]?.let { stringResource(it) }, enabled = enabled,
+            initialFocusModifier = inputModifier(EditorField.METHOD))
+    }
+    val category: @Composable () -> Unit = {
+        CategoryPicker(value.category, { draft.change(EditorField.CATEGORY, value.copy(category = it)) }, fieldModifier(EditorField.CATEGORY),
+            draft.errors[EditorField.CATEGORY]?.let { stringResource(it) }, enabled = enabled)
+    }
+    val amount: @Composable () -> Unit = {
+        QuantityField(value.quantity, { draft.change(EditorField.QUANTITY, value.copy(quantity = it)) },
+            fieldModifier(EditorField.QUANTITY),
+            error = draft.errors[EditorField.QUANTITY]?.let { stringResource(it) }, avoided = value.method == DisposalMethod.REDUCE, enabled = enabled,
+            inputModifier = inputModifier(EditorField.QUANTITY),
+        )
+    }
+    val date: @Composable () -> Unit = {
+        DateField(value.date, referenceDate.minusDays(30), referenceDate,
+            { draft.change(EditorField.DATE, value.copy(date = it)) }, fieldModifier(EditorField.DATE), enabled = enabled,
+            error = draft.errors[EditorField.DATE]?.let { stringResource(it) },
+            preservedDate = draft.original.date.takeIf { draft.original.version != null })
+    }
+    val dateHelp: @Composable () -> Unit = {
+        Text(if (value.version != null) stringResource(R.string.edit_progress_message) else stringResource(R.string.editor_date_helper, accountTimezone),
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+    val picker = if (photosEnabled) rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) onPickPhoto(uri)
+    } else null
+    val save: @Composable (Modifier) -> Unit = { placement ->
+        ActionButton(
+            stringResource(when {
+                saveConfirmed -> R.string.draft_record_saved
+                draft.needsConflictResolution -> R.string.load_latest_log
+                draft.retryBlocked -> R.string.see_history
+                draft.locked && !saving -> R.string.retry
+                value.version != null -> R.string.save_changes
+                else -> R.string.save_activity
+            }),
+            {
+                when {
+                    draft.needsConflictResolution -> onResolveConflict()
+                    draft.retryBlocked -> onHistory()
+                    else -> {
+                        val input = draft.prepareSubmission(referenceDate)
+                        if (input != null) {
+                            focusManager.clearFocus()
+                            onSave(input)
+                        } else if (scanPrefilled) {
+                            when (firstError()) {
+                                EditorField.METHOD, EditorField.CATEGORY -> choicesExpanded = true
+                                EditorField.DATE, EditorField.NOTES -> detailsExpanded = true
+                                else -> Unit
+                            }
+                        }
+                    }
+                }
+            },
+            placement, loading = saving && !saveConfirmed,
+            loadingLabel = stringResource(R.string.saving), enabled = !saveConfirmed &&
+                (draft.needsConflictResolution || draft.retryBlocked || draft.locked || value.version == null || draft.dirty),
+        )
+    }
+    val form: @Composable (Modifier, Boolean) -> Unit = { placement, pinSave ->
         Column(
-            modifier = Modifier
-                .widthIn(max = 560.dp)
-                .fillMaxWidth()
-                .padding(padding)
-                .consumeWindowInsets(padding)
-                .imePadding()
+            modifier = placement
                 .verticalScroll(rememberScrollState())
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            LaunchedEffect(draft.submissionError) {
+                if (draft.submissionError != null) submissionReveal.bringIntoView()
+            }
+            LaunchedEffect(draft, draft.focusRequest) {
+                firstError()?.let { field ->
+                    val fieldVisible = !scanPrefilled || when (field) {
+                        EditorField.METHOD, EditorField.CATEGORY -> choicesExpanded
+                        EditorField.DATE, EditorField.NOTES -> detailsExpanded
+                        EditorField.QUANTITY -> true
+                    }
+                    if (!fieldVisible) return@LaunchedEffect
+                    reveal.getValue(field).bringIntoView()
+                    focus.getValue(field).requestFocus()
+                }
+            }
+            if (scanPrefilled) {
+                InsetGroupCard(contentPadding = true) {
+                    Text(stringResource(R.string.editor_required_amount), Modifier.semantics { heading() },
+                        style = MaterialTheme.typography.titleMedium)
+                    amount()
+                }
+                val methodLabel = value.method?.let { stringResource(it.labelResource) }
+                val categoryLabel = value.category?.let { stringResource(it.labelResource) }
+                EditorDisclosure(
+                    stringResource(R.string.editor_scan_choices),
+                    choicesExpanded,
+                    { choicesExpanded = !choicesExpanded },
+                    Modifier.fillMaxWidth(),
+                    summary = if (methodLabel != null && categoryLabel != null)
+                        stringResource(R.string.editor_scan_choice_summary, methodLabel, categoryLabel)
+                    else methodLabel ?: categoryLabel,
+                )
+            }
             if (restored) Text(stringResource(R.string.draft_restored), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (value.aiProvenance != null) {
@@ -129,33 +240,34 @@ fun LogEditorScreen(
                 MessageBanner(stringResource(reason), isError = true)
                 TextActionButton(stringResource(R.string.ai_use_manual), draft::useManualEntry, enabled = enabled)
             }
-            MethodSelector(value.method, { draft.change(EditorField.METHOD, value.copy(method = it)) }, fieldModifier(EditorField.METHOD),
-                draft.errors[EditorField.METHOD]?.let { stringResource(it) }, enabled = enabled,
-                initialFocusModifier = inputModifier(EditorField.METHOD))
-            InsetGroupCard(contentPadding = true) {
-                CategoryPicker(value.category, { draft.change(EditorField.CATEGORY, value.copy(category = it)) }, fieldModifier(EditorField.CATEGORY),
-                    draft.errors[EditorField.CATEGORY]?.let { stringResource(it) }, enabled = enabled)
-                QuantityField(value.quantity, { draft.change(EditorField.QUANTITY, value.copy(quantity = it)) },
-                    fieldModifier(EditorField.QUANTITY),
-                    error = draft.errors[EditorField.QUANTITY]?.let { stringResource(it) }, avoided = value.method == DisposalMethod.REDUCE, enabled = enabled,
-                    inputModifier = inputModifier(EditorField.QUANTITY),
-                )
-                DateField(value.date, referenceDate.minusDays(30), referenceDate,
-                    { draft.change(EditorField.DATE, value.copy(date = it)) }, fieldModifier(EditorField.DATE), enabled = enabled,
-                    error = draft.errors[EditorField.DATE]?.let { stringResource(it) },
-                    preservedDate = draft.original.date.takeIf { draft.original.version != null })
+            if (!scanPrefilled || choicesExpanded) {
+                method()
+                InsetGroupCard(contentPadding = true) {
+                    category()
+                    if (!scanPrefilled) {
+                        amount()
+                        date()
+                    }
+                }
             }
-            InsetGroupCard(contentPadding = true) {
+            if (scanPrefilled) {
+                EditorDisclosure(
+                    stringResource(if (photosEnabled) R.string.editor_extra_details_with_photo else R.string.editor_extra_details),
+                    detailsExpanded,
+                    { detailsExpanded = !detailsExpanded },
+                    Modifier.fillMaxWidth(),
+                )
+            }
+            if (!scanPrefilled || detailsExpanded) InsetGroupCard(contentPadding = true) {
+                if (scanPrefilled) {
+                    date()
+                    dateHelp()
+                }
                 WasteTextField(value.notes, { draft.change(EditorField.NOTES, value.copy(notes = it)) }, stringResource(R.string.notes_optional),
                     fieldModifier(EditorField.NOTES), helper = stringResource(R.string.notes_helper), singleLine = false,
                     errorText = draft.errors[EditorField.NOTES]?.let { stringResource(it) }, enabled = enabled, labelAbove = true,
                     placeholder = stringResource(R.string.notes_placeholder))
-                if (photosEnabled) {
-                    val picker = rememberLauncherForActivityResult(
-                        ActivityResultContracts.PickVisualMedia(),
-                    ) { uri ->
-                        if (uri != null) onPickPhoto(uri)
-                    }
+                if (picker != null) {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -222,8 +334,7 @@ fun LogEditorScreen(
                     }
                 }
             }
-            Text(if (value.version != null) stringResource(R.string.edit_progress_message) else stringResource(R.string.editor_date_helper, accountTimezone),
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (!scanPrefilled) dateHelp()
             draft.submissionError?.takeUnless { saveConfirmed }?.let { error ->
                 val latestError = stringResource(when {
                     draft.needsConflictResolution -> R.string.conflict_form_message
@@ -257,22 +368,67 @@ fun LogEditorScreen(
                     else -> R.string.draft_saving
                 }), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            ActionButton(
-                stringResource(when {
-                    saveConfirmed -> R.string.draft_record_saved
-                    draft.needsConflictResolution -> R.string.load_latest_log
-                    draft.retryBlocked -> R.string.see_history
-                    draft.locked && !saving -> R.string.retry
-                    value.version != null -> R.string.save_changes
-                    else -> R.string.save_activity
-                }),
-                { if (draft.needsConflictResolution) onResolveConflict() else if (draft.retryBlocked) onHistory() else draft.prepareSubmission(referenceDate)?.let {
-                    focusManager.clearFocus()
-                    onSave(it)
-                } }, Modifier.fillMaxWidth(), loading = saving && !saveConfirmed,
-                loadingLabel = stringResource(R.string.saving), enabled = !saveConfirmed &&
-                    (draft.needsConflictResolution || draft.retryBlocked || draft.locked || value.version == null || draft.dirty),
-            )
+            if (!pinSave) save(Modifier.fillMaxWidth())
         }
+    }
+    BoxWithConstraints(
+        modifier
+            .padding(padding)
+            .consumeWindowInsets(padding)
+            .imePadding(),
+        contentAlignment = Alignment.TopCenter,
+    ) {
+        val pinSave = scanPrefilled && constraints.hasBoundedHeight && maxHeight >= 380.dp
+        Column(
+            Modifier
+                .widthIn(max = 560.dp)
+                .fillMaxWidth()
+                .then(if (pinSave) Modifier.fillMaxHeight() else Modifier),
+        ) {
+            form(if (pinSave) Modifier.weight(1f) else Modifier, pinSave)
+            if (pinSave) {
+                Surface(Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surface) {
+                    Column {
+                        HorizontalDivider()
+                        save(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EditorDisclosure(
+    label: String,
+    expanded: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    summary: String? = null,
+) {
+    val expansionState = stringResource(if (expanded) R.string.daily_expanded else R.string.daily_collapsed)
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusedAsState()
+    val colors = MaterialTheme.colorScheme
+    val shape = MaterialTheme.shapes.medium
+    Row(
+        modifier
+            .heightIn(min = 48.dp)
+            .focusOutline(focused, shape, colors.primary, colors.surface)
+            .clip(shape)
+            .background(colors.surface)
+            .border(1.dp, colors.outline, shape)
+            .clickable(interactionSource = interactions, indication = ripple(), role = Role.Button, onClick = onClick)
+            .semantics { stateDescription = expansionState }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(label, style = MaterialTheme.typography.titleSmall, color = colors.onSurface)
+            if (summary != null) Text(summary, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
+        }
+        Icon(painterResource(R.drawable.ic_chevron_down), null,
+            Modifier.size(20.dp).rotate(if (expanded) 180f else 0f), tint = colors.onSurfaceVariant)
     }
 }
