@@ -118,7 +118,7 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
     val actions: @Composable (Modifier) -> Unit = { placement ->
         RecommendationActions(state, onUse, onMethod, onReviewContext, onManual, placement)
     }
-    val body: @Composable (Modifier, Boolean) -> Unit = { placement, inlineActions ->
+    val body: @Composable (Modifier, Boolean, Boolean) -> Unit = { placement, inlineActions, pinCameraManual ->
         Column(
             placement
                 .fillMaxWidth()
@@ -251,7 +251,7 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                     if (state.problem != ScanProblem.DISABLED) ScanSecondary(R.string.retry, onRetry)
                 }
             }
-            if (state.phase == ScanPhase.CAMERA || state.phase == ScanPhase.PHOTO || state.phase == ScanPhase.FAILURE) {
+            if ((!pinCameraManual && state.phase == ScanPhase.CAMERA) || state.phase == ScanPhase.PHOTO || state.phase == ScanPhase.FAILURE) {
                 HorizontalDivider()
                 Text(stringResource(R.string.scan_manual_hint), style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -268,11 +268,20 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
             .testTag("capture-sheet"),
     ) {
         val pinActions = state.phase == ScanPhase.RECOMMENDATION && maxHeight >= 400.dp
+        val pinCameraManual = state.phase == ScanPhase.CAMERA && maxHeight >= 200.dp && maxHeight < 400.dp
         Column(Modifier.fillMaxSize()) {
             Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp).size(38.dp, 4.dp)
                 .background(MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(2.dp)))
-            body(Modifier.weight(1f), !pinActions)
+            body(Modifier.weight(1f), !pinActions, pinCameraManual)
             if (pinActions) actions(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding))
+            if (pinCameraManual) {
+                Surface(color = MaterialTheme.colorScheme.surface) {
+                    Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding)) {
+                        HorizontalDivider()
+                        Box(Modifier.padding(vertical = 8.dp)) { ScanSecondary(R.string.manual_input, onManual) }
+                    }
+                }
+            }
         }
     }
 }
