@@ -42,7 +42,7 @@ internal fun GlassChromeSurface(
     }
     Surface(
         modifier = modifier
-            .shadow(8.dp, shape, clip = false)
+            .shadow(4.dp, shape, clip = false)
             .clip(shape)
             .hazeEffect(state = hazeState, style = style)
             .innerShadow(shape, Shadow(radius = 2.dp, color = tokens.glassHighlight, offset = DpOffset(0.dp, 1.dp))),

@@ -44,6 +44,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -684,13 +685,13 @@ internal fun AccountPage(
     val hazeState = rememberHazeState()
     val tokens = LocalWasteNotSurfaceTokens.current
     val colors = MaterialTheme.colorScheme
-    val glassStyle = remember(tokens, colors.surface) {
+    val glassStyle = remember(tokens, colors.surface, colors.background) {
         HazeStyle(
             backgroundColor = colors.surface,
             tint = HazeTint(tokens.glassTintStrong),
             blurRadius = 24.dp,
             noiseFactor = 0.035f,
-            fallbackTint = HazeTint(colors.surface),
+            fallbackTint = HazeTint(tokens.glassTintStrong.compositeOver(colors.background)),
         )
     }
     val headerShape = MaterialTheme.shapes.large
@@ -909,13 +910,13 @@ private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifi
     val focused by interactions.collectIsFocusedAsState()
     val shape = MaterialTheme.shapes.large
     val colors = MaterialTheme.colorScheme
-    val contentColor = if (selected) colors.onTertiary else colors.onSurfaceVariant
+    val contentColor = if (selected) colors.onPrimaryContainer else colors.onSurfaceVariant
     Column(
         modifier = modifier
             .heightIn(min = 54.dp)
-            .focusOutline(focused, shape, if (selected) colors.onTertiary else colors.primary, colors.surface)
+            .focusOutline(focused, shape, colors.primary, colors.surface)
             .clip(shape)
-            .then(if (selected) Modifier.background(colors.tertiary, shape) else Modifier)
+            .then(if (selected) Modifier.background(colors.primaryContainer, shape) else Modifier)
             .selectable(
                 selected = selected,
                 role = Role.Tab,

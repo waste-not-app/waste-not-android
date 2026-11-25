@@ -78,6 +78,8 @@ The dock has a radius of 26, a 16 px backdrop blur, 1.2 saturation, and a 1 px i
 
 Glass is limited to navigation; forms, error messages, and dialogs stay opaque. The summary gradient puts focus on the number, and thin highlights add depth without refraction animations. There's no full-screen blur, no pointer-following effect, and no looping motion. Browsers without backdrop-filter get an opaque surface for the dock, and a reduced-transparency preference also turns the blur off. The dark theme uses a dark tint that's tested separately.
 
+Android reserves the bright lime fill in navigation for Log/Scan. The selected tab on the dock and rail uses the quieter primary container with its matching foreground. The glass chrome has a botanical tint and a lower shadow than before; its opaque fallback keeps the same tint family. Content cards stay solid.
+
 In Compose, turn the gradients into brushes and the shapes and elevation into theme styling. The background blur is an optional enhancement: the Android baseline uses an opaque surface with the same highlight border and shadow. Choose a backdrop implementation after profiling on the minimum device; blurring a component's own content is not a substitute for blurring what's behind it. No glass dependency is needed to start. Test scrolling, frame time, fontScale, and contrast before turning it on in production.
 
 ## 3. Type and fonts
