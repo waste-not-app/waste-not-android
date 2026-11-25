@@ -72,3 +72,15 @@ Mengikuti hierarki Juno dari benchmark di atas: lime paling kuat untuk **Catat/S
 Saran menampilkan satu metode dengan aksi **Ubah**. Pilihan yang diubah diberi label sebagai pilihan pengguna, bukan saran baru. Peringatan dan syarat wajib tetap di luar rincian; membuka rincian tidak memindahkan posisi tombol lanjut. Pergantian langkah memakai fade 150 ms; rincian dan chevron bergerak singkat mengikuti pengaturan animasi Android. Alur simpan dan perhitungan XP tidak berubah.
 
 **Verifikasi:** 34 tes host lulus, termasuk kontras dan dock pada 320 dp. Di itel API 33, 14 skenario berbeda lulus: 11 tes sheet scan, dua perjalanan Panduan terang/gelap, dan satu tes rail landscape. Dua skenario scan diulang pada skala animasi 0; pengaturan ponsel dikembalikan. Screenshot kedua tema, tampilan rail, dan frame pergantian langkah diperiksa dari build QA. Ini bukan pengukuran frame timing release atau uji fallback pada perangkat API 30. Tanpa AVD; benchmark Appllama tetap memakai referensi publik karena endpoint MCP meminta autentikasi.
+
+## Grafik harian dan pemulihan scan
+
+Statistik mengikuti pola *Home Insights* dan *Symptom Trends* Juno: judul, rentang, satuan, dan angka berada dekat grafik. Di WasteNot, ketuk satu hari atau gunakan tombol hari sebelumnya/berikutnya untuk melihat tanggal dan nilai tepatnya. Berat tidak dicampur dengan jumlah benda. Hari nol tetap bisa dipilih dan muncul dalam daftar angka harian. Pilihan ditandai garis putus-putus, bukan hanya warna; saat ruang sempit atau font diperbesar, tombol pindah ke bawah angka.
+
+Area jam dan ikon sistem memakai latar solid agar judul kartu tidak bertabrakan dengan status bar saat digulir. Header dan dock tetap memakai liquid glass.
+
+Scan menampilkan status deteksi dan saran tanpa persentase perkiraan. Foto atau objek tetap terlihat selama menunggu. Gagal deteksi atau saran kembali ke foto atau jawaban yang sudah diisi; kirim lagi tetap tindakan pengguna. Simpan menunggu konfirmasi. Jika hasil belum diketahui, **Coba lagi** mengirim ulang catatan yang sama, bukan membuat catatan baru.
+
+**Verifikasi:** 36 tes host terpilih dan 37 skenario berbeda lulus di itel A666LN fisik (API 33), tanpa AVD. Statistik diperiksa dalam tema terang/gelap dan pada lebar 320 dp dengan font 200%. Uji scan memakai foto fixture, menunda deteksi/saran/simpan, dan mensimulasikan respons simpan yang hilang setelah catatan tersimpan. **Coba lagi** mengonfirmasi catatan yang sama; Riwayat menampilkan satu entri. Dengan TalkBack aktif, tombol lanjut juga berhasil difokuskan dan diaktifkan melalui API aksesibilitas Android. Pengaturan aksesibilitas HP dikembalikan. Ini bukan pengujian inferensi produksi, keluaran suara TalkBack, atau benchmark FPS release.
+
+Build QA dipasang terpisah sebagai `com.example.wastenot.qa`. APK publik v1.0.6 tidak dapat menggantikan instalasi utama di HP ini karena sertifikat penandatanganannya berbeda; aplikasi dan data utama tidak dihapus.
