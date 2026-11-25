@@ -54,6 +54,8 @@ For an interactive visual reference, including the AI scan flow, open [`docs/des
 
 ### Design and UI
 
+- **Appllama.** For Android UI audits, design, and implementation, load `appllama-usage` and `appllama-app-design-skill` before proposing changes. Study comparable screens and flows; use public references if MCP is unavailable and document the limit. Apply the patterns in Compose, Material 3, and Navigation 3 using the WasteNot design kit. Follow the device restrictions below.
+
 - **Design tokens.** Take colors, typography, and spacing from `DESIGN.md` §2 to §4. Never hardcode hex colors in composables. The theme is `WasteNotTheme`.
 - **Font.** Plus Jakarta Sans only.
 - **Layout.** Touch targets are at least 48 dp. Forms must never be covered by the keyboard. Layouts are edge-to-edge with correct insets.

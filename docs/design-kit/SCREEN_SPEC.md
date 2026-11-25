@@ -160,6 +160,8 @@ A production privacy link only appears once the document actually exists. The HT
 
 A switch that defaults to off, an adjustable time "Around 8:00 PM", the sentence "The reminder may arrive late depending on your device.", and a "Save reminder" button. Notification permission is requested after the user chooses to turn it on. If permission is denied, show an explanation and a link to system settings rather than asking again and again.
 
+On Android, Save waits for both local persistence and the WorkManager schedule or cancellation. The screen keeps the chosen time and setting when either operation fails and lets the user retry. Granting notification permission does not save or activate the reminder.
+
 When off, the time is disabled or stays visible as a preference with no active schedule. Signing out cancels the account's reminders. The HTML only simulates the preference; it doesn't ask for browser permission or send real notifications.
 
 ### S18: Photo (Stretch)
@@ -269,12 +271,12 @@ The 28 September revision added the Log/Scan action at the top center of the doc
 | S21 | Camera and photo review | Preview, turn on camera, take photo, review, scan, retake, manual | Permission denied, unavailable, capture not ready; send only after confirmation |
 | S22 | Detection / confirm one object | Boxes + list, scores, object choice, category correction, confirmation | Empty, low confidence, unknown material, multiple objects; the category can't be empty |
 | S23 | Object condition | Cleanliness, integrity, reusable, reuse intention; cleanable and soiling when dirty, former_contents for HDPE, and risk_type when there's a risk | UNKNOWN is valid; NEEDS_CONTEXT asks for the relevant fields; changes cancel old advice |
-| S24 | Recommendation | One Reduce/Reuse/Recycle/Trash label, reason, guide source and version, cautions, change or use | No auto-save; special_handling adds a warning without removing the method; continue to S05 for a manual amount |
+| S24 | Recommendation | Method, reason, cautions and required conditions; disclose guide steps and sources; one primary action | If advice is usable, continue to S05 without saving; if more input is needed, return to S23; offer manual entry only when the advice cannot be used or context is incomplete |
 | S25 | Failed / unavailable | Cause, retry, manual, close | Camera denied, unknown, offline, timeout, invalid LLM output, no reviewed guide; never adds XP |
 
 S21 to S25 are phases of one sheet flow in the product; they appear as five gallery entries for handoff. The HTML preview uses a labeled bounding box illustration, not boxes over a camera photo. Scores, objects, and the LLM are fixtures. The browser camera uses getUserMedia when the context is secure; nothing is uploaded. Android camera and API testing stay separate.
 
-S05 after AI: only the confirmed category and method are prefilled; the amount is empty, the unit defaults to g, and the date follows the core rules. The user can correct everything. Cancelling a scan never creates a log. An existing dirty draft must be kept or confirmed with D03 before it's replaced; never force navigation and discard entries. Default guides that aren't verified in the mockup never become production knowledge.
+S05 after AI: only the confirmed category and method are prefilled; the amount comes first and is empty, the unit defaults to g, and the date follows the core rules. Category and method can be expanded to correct them. The primary action stays visible when there is room; on short or keyboard-constrained screens it stays reachable in the scrollable content. Cancelling a scan never creates a log. An existing dirty draft must be kept or confirmed with D03 before it's replaced; never force navigation and discard entries. Default guides that aren't verified in the mockup never become production knowledge.
 
 | Extra component | Compose equivalent | Behavior |
 |---|---|---|
