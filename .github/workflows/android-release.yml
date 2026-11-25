@@ -23,6 +23,9 @@ jobs:
     name: Build, Sign, and Deploy APK
     runs-on: [self-hosted, alberd-staging-android]
     timeout-minutes: 60
+    env:
+      # Keep dependency caches, but don't store a second copy of build outputs on the VM.
+      GRADLE_OPTS: -Dorg.gradle.caching=false
 
     steps:
       - name: Checkout Repository
@@ -66,6 +69,7 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           WASTENOT_RELEASE_API_BASE_URL: ${{ vars.WASTENOT_RELEASE_API_BASE_URL }}
+          WASTENOT_GOOGLE_WEB_CLIENT_ID: ${{ vars.WASTENOT_GOOGLE_WEB_CLIENT_ID }}
         run: |
           set -euo pipefail
           if [ -z "$WASTENOT_RELEASE_API_BASE_URL" ]; then

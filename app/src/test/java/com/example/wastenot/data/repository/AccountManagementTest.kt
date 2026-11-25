@@ -7,6 +7,10 @@ import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.WasteNotNetwork
 import java.io.IOException
+import java.time.ZoneId
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -97,6 +101,36 @@ class AccountManagementTest {
         assertEquals(ApiFailureKind.STORAGE, (result as ApiResult.Failure).error.kind)
         assertEquals(SessionState.SignedOut(SignOutReason.DELETION_CLEANUP_FAILED), sessions.state.value)
         assertNull(credentials.token)
+    }
+
+    @Test fun googleDeletionRejectionKeepsTheSessionAndPendingCleanupPurgesOnlyTheAuthenticatedOwner() = runTest {
+        val fixture = requireNotNull(javaClass.getResource("/contracts/auth-session.json")).readText()
+            .replace("\"timezone\":", "\"has_password\":false,\"timezone\":")
+        server.enqueue(json(200, fixture))
+        val owner = (sessions.googleLogin("fixture-sign-in", ZoneId.of("UTC"), null) as ApiResult.Success).value.id
+        server.takeRequest()
+        server.enqueue(error(403, "GOOGLE_REAUTH_FAILED"))
+        val wrongAccount = accounts.deleteGoogleAccount("fixture-wrong") as ApiResult.Failure
+        assertEquals("GOOGLE_REAUTH_FAILED", wrongAccount.error.code)
+        assertEquals(2, server.requestCount)
+        assertTrue(sessions.state.value is SessionState.Authenticated)
+        assertNotNull(credentials.token)
+        assertTrue(purged.isEmpty())
+        server.takeRequest()
+
+        server.enqueue(error(503, "ACCOUNT_DELETION_PENDING"))
+        val pending = accounts.deleteGoogleAccount("fixture-fresh") as ApiResult.Failure
+        val request = server.takeRequest()
+        assertEquals("DELETE", request.method)
+        assertEquals("/v1/me", request.path)
+        assertEquals("Bearer fixture-access-old", request.getHeader("Authorization"))
+        val body = Json.parseToJsonElement(request.body.readUtf8()).jsonObject
+        assertEquals(setOf("google_id_token"), body.keys)
+        assertEquals("fixture-fresh", body["google_id_token"]?.jsonPrimitive?.content)
+        assertEquals("ACCOUNT_DELETION_PENDING", pending.error.code)
+        assertEquals(listOf(owner), purged)
+        assertNull(credentials.token)
+        assertEquals(SessionState.SignedOut(SignOutReason.ACCOUNT_DELETION_PENDING), sessions.state.value)
     }
 
     private fun json(status: Int, body: String) = MockResponse().setResponseCode(status)

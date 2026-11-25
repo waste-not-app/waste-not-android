@@ -18,6 +18,8 @@ import com.example.wastenot.data.network.dto.PasswordResetRequestDto
 import com.example.wastenot.data.network.dto.PasswordResetConfirmationDto
 import com.example.wastenot.data.network.dto.PasswordResetAcknowledgementDto
 import com.example.wastenot.data.network.dto.DeleteAccountDto
+import com.example.wastenot.data.network.dto.GoogleChallengeDto
+import com.example.wastenot.data.network.dto.GoogleLoginDto
 import okhttp3.MultipartBody
 import retrofit2.http.Multipart
 import retrofit2.http.Part
@@ -82,6 +84,12 @@ interface WasteNotApi {
 
     @POST("auth/register")
     suspend fun register(@Body input: RegisterDto): Response<DataEnvelope<SessionDto>>
+
+    @POST("auth/google/challenge")
+    suspend fun googleChallenge(): Response<DataEnvelope<GoogleChallengeDto>>
+
+    @POST("auth/google")
+    suspend fun googleLogin(@Body input: GoogleLoginDto): Response<DataEnvelope<SessionDto>>
 
     @POST("auth/refresh")
     suspend fun refresh(@Body input: RefreshDto): Response<DataEnvelope<SessionDto>>

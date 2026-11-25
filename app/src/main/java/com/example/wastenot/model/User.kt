@@ -8,6 +8,7 @@ data class User(
     val email: String,
     val timezone: ZoneId,
     val progress: UserProgress?,
+    val hasPassword: Boolean = true,
 )
 
 data class UserProgress(

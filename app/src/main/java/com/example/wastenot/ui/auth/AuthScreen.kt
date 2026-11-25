@@ -75,6 +75,9 @@ fun AuthScreen(
     onBack: (() -> Unit)? = null,
     onPasswordRecovery: (() -> Unit)? = null,
     onPrivacy: (() -> Unit)? = null,
+    onGoogle: (() -> Unit)? = null,
+    onGoogleLinkPassword: (String) -> Unit = {},
+    onDismissGoogleLink: () -> Unit = {},
 ) {
     val focus = LocalFocusManager.current
     val view = LocalView.current
@@ -194,7 +197,7 @@ fun AuthScreen(
                         verticalAlignment = Alignment.Bottom,
                     ) {
                         passwordField(Modifier.weight(1f).semantics { isTraversalGroup = true })
-                        AuthSubmit(false, state.submitting, onSubmit,
+                        AuthSubmit(false, state, onSubmit,
                             Modifier.widthIn(min = 128.dp, max = 160.dp)
                                 .bringIntoViewRequester(submitRequester)
                                 .semantics { traversalIndex = 1f })
@@ -213,8 +216,17 @@ fun AuthScreen(
                 }
                 if (!landscapeLogin) {
                     state.failure?.let { MessageBanner(stringResource(it.messageResource), isError = true) }
-                    AuthSubmit(register, state.submitting, onSubmit, Modifier.fillMaxWidth())
+                    AuthSubmit(register, state, onSubmit, Modifier.fillMaxWidth())
                 }
+            }
+            if (onGoogle != null) {
+                if (!state.googleLinkRequired) state.googleFailure?.let { MessageBanner(stringResource(it), isError = true) }
+                GoogleSignInButton(
+                    onClick = { focus.clearFocus(); onGoogle() },
+                    enabled = !state.submitting && logoutState !is LogoutUiState.Pending,
+                    loading = state.googleSubmitting,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
             Column(Modifier.fillMaxWidth()) {
                 if (!register && onPasswordRecovery != null) TextActionButton(
@@ -227,14 +239,18 @@ fun AuthScreen(
             }
         }
     }
+    if (onGoogle != null && state.googleLinkRequired) {
+        GoogleLinkDialog(state, onGoogleLinkPassword, onGoogle, onDismissGoogleLink)
+    }
 }
 
 @Composable
-private fun AuthSubmit(register: Boolean, submitting: Boolean, onSubmit: () -> Unit, modifier: Modifier) {
+private fun AuthSubmit(register: Boolean, state: AuthUiState, onSubmit: () -> Unit, modifier: Modifier) {
     ActionButton(
         label = stringResource(if (register) R.string.register_action else R.string.login_action),
         onClick = onSubmit,
-        loading = submitting,
+        enabled = !state.googleSubmitting,
+        loading = state.submitting && !state.googleSubmitting,
         loadingLabel = stringResource(if (register) R.string.register_loading else R.string.login_loading),
         modifier = modifier,
     )

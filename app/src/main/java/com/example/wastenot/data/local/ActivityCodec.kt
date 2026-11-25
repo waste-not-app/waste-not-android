@@ -55,8 +55,8 @@ internal fun StatisticsSnapshot.encode() = activityJson.encodeToString(Statistic
 
 @Serializable
 internal data class StoredIdentity(val id: String, val name: String, val email: String,
-    val timezone: String, val progress: ProgressDto?) {
-    fun user() = User(id, name, email, ZoneId.of(timezone), progress?.toModel())
+    val timezone: String, val progress: ProgressDto?, val hasPassword: Boolean = true) {
+    fun user() = User(id, name, email, ZoneId.of(timezone), progress?.toModel(), hasPassword)
 }
 
 interface SessionIdentityStore {
@@ -71,7 +71,7 @@ class RoomSessionIdentityStore(private val dao: ActivityDao) : SessionIdentitySt
     } }
     override suspend fun write(user: User) = storage { dao.identify(AccountIdentity(owner = user.id,
         payload = activityJson.encodeToString(StoredIdentity.serializer(),
-            StoredIdentity(user.id, user.name, user.email, user.timezone.id, user.progress?.dto())))) }
+            StoredIdentity(user.id, user.name, user.email, user.timezone.id, user.progress?.dto(), user.hasPassword)))) }
     override suspend fun clear() = storage { dao.clearIdentity() }
 
     private suspend fun <T> storage(block: suspend () -> T): T = try { block() }

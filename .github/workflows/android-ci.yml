@@ -40,6 +40,9 @@ jobs:
     name: Test and Build
     runs-on: [self-hosted, alberd-staging-android]
     timeout-minutes: 60
+    env:
+      # Keep dependency caches, but don't store a second copy of build outputs on the VM.
+      GRADLE_OPTS: -Dorg.gradle.caching=false
 
     steps:
       - name: Checkout Repository

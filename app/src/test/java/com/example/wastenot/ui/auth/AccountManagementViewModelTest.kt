@@ -113,6 +113,39 @@ class AccountManagementViewModelTest {
         assertFalse(model.state.value.acknowledged)
     }
 
+    @Test fun googleOnlyDeletionUsesASelectedCredentialOnlyAfterAcknowledgementAndCanRetry() = runTest {
+        val source = Accounts()
+        val model = AccountDeletionViewModel(source, hasPassword = false).also { models += it }
+        model.password("unused-password")
+        model.delete()
+        assertEquals(null, model.beginGoogle())
+        assertEquals(R.string.delete_account_confirm_required, model.state.value.failure)
+        model.acknowledge(true)
+        val canceled = requireNotNull(model.beginGoogle())
+        assertEquals(null, model.beginGoogle())
+        model.completeGoogle(canceled, GoogleSelection.Canceled)
+        assertFalse(model.state.value.submitting)
+        assertTrue(model.state.value.acknowledged)
+        assertTrue(source.googleTokens.isEmpty())
+        assertEquals(0, source.deletions)
+
+        source.deletionResult = ApiResult.Failure(ApiFailure(ApiFailureKind.HTTP, 403, "GOOGLE_REAUTH_FAILED"))
+        val failed = requireNotNull(model.beginGoogle())
+        model.completeGoogle(canceled, GoogleSelection.Selected("canceled-token", "fixture-account"))
+        model.completeGoogle(failed, GoogleSelection.Selected("wrong-account-token", "fixture-account"))
+        advanceUntilIdle()
+        assertEquals(R.string.google_auth_wrong_account, model.state.value.failure)
+        assertTrue(model.state.value.acknowledged)
+        assertFalse(model.state.value.deleted)
+
+        source.deletionResult = ApiResult.Success(Unit)
+        model.completeGoogle(requireNotNull(model.beginGoogle()), GoogleSelection.Selected("fresh-token", "fixture-account"))
+        advanceUntilIdle()
+        assertEquals(listOf("wrong-account-token", "fresh-token"), source.googleTokens)
+        assertTrue(model.state.value.deleted)
+        assertFalse(model.state.value.acknowledged)
+    }
+
     private class Accounts : AccountManagement {
         var requestResult: ApiResult<Unit> = ApiResult.Success(Unit)
         var confirmResult: ApiResult<Unit> = ApiResult.Success(Unit)
@@ -121,6 +154,7 @@ class AccountManagementViewModelTest {
         var deletionGate: CompletableDeferred<Unit>? = null
         var confirmations = 0
         var deletions = 0
+        val googleTokens = mutableListOf<String>()
         var confirmedPassword: String? = null
         override suspend fun requestPasswordReset(email: String) = requestResult
         override suspend fun confirmPasswordReset(token: String, password: String): ApiResult<Unit> {
@@ -129,6 +163,10 @@ class AccountManagementViewModelTest {
         }
         override suspend fun deleteAccount(password: String): ApiResult<Unit> {
             deletions++; deletionGate?.await()
+            return deletionResult
+        }
+        override suspend fun deleteGoogleAccount(idToken: String): ApiResult<Unit> {
+            googleTokens += idToken
             return deletionResult
         }
     }

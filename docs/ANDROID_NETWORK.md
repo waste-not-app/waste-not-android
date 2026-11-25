@@ -15,6 +15,7 @@ References: [API specification](design-kit/API.md) and [architecture §8](design
 
 - **Credential scoping.** Bearer tokens attach only to the API's scheme, host, port, and path prefix. Caller-supplied `Authorization` and `Cookie` headers are stripped from any other request.
   - Login, registration, refresh, and both password recovery endpoints never carry an old bearer token.
+  - Google challenge issuance and token exchange also carry no bearer. The Google ID token is kept only in memory for its one exchange and is not used as a WasteNot bearer.
   - Automatic redirects are disabled. Source links open through the external link flow, never through an authenticated endpoint.
 - **No body or header logging.** The optional diagnostic hook receives only the status, duration, and a sanitized request ID. It never sees URLs, exception messages, passwords, tokens, or payloads.
 - **Typed failures.** Repositories return either a success with pagination or an `ApiFailure`. The failure keeps the status, code, field errors, request ID, and retry deadline.
@@ -43,8 +44,9 @@ Shared fixtures live with the tests so the backend can use the same files:
   - The `202` response acknowledges the request; it does not prove an email was sent.
   - The recovery code is pasted into the app, not opened from a link.
   - Passwords are never trimmed, and DTOs and state redact secrets from `toString`.
-- **Account deletion.** `DELETE me` sends the password in the JSON body with the account's frozen credentials.
+- **Account deletion.** `DELETE me` sends the current password, or a fresh Google ID token for a passwordless account, with the account's frozen WasteNot credentials.
   - `403 WRONG_PASSWORD` is not a session expiry, so local data stays available.
+  - `403 GOOGLE_REAUTH_FAILED` also leaves the account and local data intact.
   - `204` revokes the session and clears that account's local data: Room, outbox, receipts, snapshots, identity, drafts, and scan cache. A normal sign-out keeps the queue, as described in [OFFLINE_SYNC.md](OFFLINE_SYNC.md).
 - **Pending deletion.** `503 ACCOUNT_DELETION_PENDING` means the server committed the deletion. The app clears the local account and signs out, noting that server-side attachment cleanup is still pending. A regular `503` or a network failure is never treated as a confirmed deletion. Local cleanup failures get their own notice, and the app never claims that every physical copy or backup is gone.
 

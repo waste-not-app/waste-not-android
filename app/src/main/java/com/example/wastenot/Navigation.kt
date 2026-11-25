@@ -59,6 +59,7 @@ import com.example.wastenot.ui.auth.StartupScreen
 import com.example.wastenot.ui.auth.PasswordRecoveryViewModel
 import com.example.wastenot.ui.auth.PasswordRecoveryState
 import com.example.wastenot.ui.auth.PasswordRecoveryScreen
+import com.example.wastenot.ui.auth.rememberGoogleAction
 import com.example.wastenot.ui.components.ambientCanvasBackground
 import com.example.wastenot.ui.components.rememberPrivacyPolicyAction
 import com.example.wastenot.ui.main.AccountNavigation
@@ -211,19 +212,31 @@ private fun AuthNavigation(
                     )
                 }
                 entry<Login> {
+                    val google = rememberGoogleAction(
+                        { if (stack.lastOrNull() == Login) model.beginGoogle() else null },
+                        model::googleChallenge, model::completeGoogle,
+                    )
                     AuthScreen(false, form, phase.reason, model::change, { model.submit(false) },
-                        { model.clearPasswords(); if (stack.last() != Register) stack.add(Register) },
+                        { if (stack.lastOrNull() == Login) { model.cancelSubmission(); stack.add(Register) } },
                         onTheme, Modifier.fillMaxSize(), logout, model::logout,
                         onPasswordRecovery = recoveryModel?.let { recovery -> ({
-                            model.clearPasswords()
+                            model.cancelSubmission()
                             recovery.requestAnother()
                             if (stack.lastOrNull() != PasswordRecovery) stack.add(PasswordRecovery)
                         }) },
-                        onPrivacy = openPrivacy)
+                        onPrivacy = openPrivacy,
+                        onGoogle = google.takeIf { BuildConfig.GOOGLE_WEB_CLIENT_ID.isNotBlank() && stack.lastOrNull() == Login },
+                        onGoogleLinkPassword = model::changeGoogleLinkPassword, onDismissGoogleLink = model::dismissGoogleLink)
                 }
                 entry<Register> {
+                    val google = rememberGoogleAction(
+                        { if (stack.lastOrNull() == Register) model.beginGoogle() else null },
+                        model::googleChallenge, model::completeGoogle,
+                    )
                     AuthScreen(true, form, phase.reason, model::change, { model.submit(true) }, ::back,
-                        onTheme, Modifier.fillMaxSize(), logout, model::logout, onBack = ::back, onPrivacy = openPrivacy)
+                        onTheme, Modifier.fillMaxSize(), logout, model::logout, onBack = ::back, onPrivacy = openPrivacy,
+                        onGoogle = google.takeIf { BuildConfig.GOOGLE_WEB_CLIENT_ID.isNotBlank() && stack.lastOrNull() == Register },
+                        onGoogleLinkPassword = model::changeGoogleLinkPassword, onDismissGoogleLink = model::dismissGoogleLink)
                 }
                 if (recoveryModel != null) entry<PasswordRecovery> {
                     PasswordRecoveryScreen(recoveryState, recoveryModel::change, recoveryModel::submit,

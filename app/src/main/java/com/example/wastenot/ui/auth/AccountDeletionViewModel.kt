@@ -23,12 +23,17 @@ data class AccountDeletionState(
     override fun toString() = "AccountDeletionState(submitting=$submitting, deleted=$deleted)"
 }
 
-class AccountDeletionViewModel(private val accounts: AccountManagement) : ViewModel() {
+class AccountDeletionViewModel(
+    private val accounts: AccountManagement,
+    private val hasPassword: Boolean = true,
+) : ViewModel() {
     private val mutableState = MutableStateFlow(AccountDeletionState())
     val state = mutableState.asStateFlow()
+    private var googleAttempt = 0L
+    private var googleSelecting = false
 
     fun password(value: String) {
-        if (!state.value.submitting) mutableState.update { it.copy(password = value, passwordError = null, failure = null) }
+        if (hasPassword && !state.value.submitting) mutableState.update { it.copy(password = value, passwordError = null, failure = null) }
     }
 
     fun acknowledge(value: Boolean) {
@@ -39,22 +44,50 @@ class AccountDeletionViewModel(private val accounts: AccountManagement) : ViewMo
         if (!state.value.submitting) mutableState.value = AccountDeletionState()
     }
 
+    internal suspend fun googleChallenge() = accounts.googleChallenge()
+
+    internal fun beginGoogle(): Long? {
+        if (hasPassword || state.value.submitting || state.value.deleted) return null
+        if (!confirmAcknowledgement()) return null
+        mutableState.update { it.copy(submitting = true, failure = null) }
+        googleSelecting = true
+        return ++googleAttempt
+    }
+
+    internal fun completeGoogle(attempt: Long, selection: GoogleSelection) {
+        if (attempt != googleAttempt || !googleSelecting) return
+        googleSelecting = false
+        when (selection) {
+            GoogleSelection.Canceled -> mutableState.update { it.copy(submitting = false) }
+            is GoogleSelection.Failure -> mutableState.update { it.copy(submitting = false, failure = selection.message) }
+            is GoogleSelection.Selected -> delete { accounts.deleteGoogleAccount(selection.idToken) }
+        }
+    }
+
     fun delete() {
         val input = state.value
-        if (input.submitting || input.deleted) return
+        if (!hasPassword || input.submitting || input.deleted) return
         if (!isValidAccountPassword(input.password)) {
             mutableState.update { it.copy(passwordError = R.string.error_password_length) }
             return
         }
-        if (!input.acknowledged) {
-            mutableState.update { it.copy(failure = R.string.delete_account_confirm_required) }
-            return
-        }
+        if (!confirmAcknowledgement()) return
         mutableState.update { it.copy(submitting = true, failure = null, passwordError = null) }
+        delete { accounts.deleteAccount(input.password) }
+    }
+
+    private fun confirmAcknowledgement(): Boolean {
+        if (state.value.acknowledged) return true
+        mutableState.update { it.copy(failure = R.string.delete_account_confirm_required) }
+        return false
+    }
+
+    private fun delete(request: suspend () -> ApiResult<Unit>) {
         viewModelScope.launch {
-            when (val result = accounts.deleteAccount(input.password)) {
+            when (val result = request()) {
                 is ApiResult.Success -> mutableState.value = AccountDeletionState(deleted = true)
                 is ApiResult.Failure -> mutableState.update {
+                    if (!hasPassword) return@update it.copy(submitting = false, failure = result.error.googleMessage())
                     if (result.error.status == 403) it.copy(submitting = false, passwordError = R.string.delete_account_wrong_password)
                     else it.copy(submitting = false, failure = when (result.error.kind) {
                         ApiFailureKind.NETWORK, ApiFailureKind.TIMEOUT -> R.string.account_management_network_error

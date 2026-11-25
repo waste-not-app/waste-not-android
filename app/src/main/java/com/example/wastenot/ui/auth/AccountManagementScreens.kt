@@ -127,6 +127,8 @@ fun AccountDeletionScreen(
     onPrivacy: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    hasPassword: Boolean = true,
+    googleAvailable: Boolean = false,
 ) {
     val scaffold = LocalWasteNotScaffoldPadding.current
     val direction = LocalLayoutDirection.current
@@ -147,10 +149,15 @@ fun AccountDeletionScreen(
             MessageBanner(stringResource(R.string.delete_account_warning), isError = true)
             Text(stringResource(R.string.delete_account_backup_notice), style = MaterialTheme.typography.bodyMedium)
             TextActionButton(stringResource(R.string.privacy_policy_open), onPrivacy, enabled = !state.submitting)
-            WasteTextField(state.password, onPassword, stringResource(R.string.delete_account_password),
-                modifier = Modifier.fillMaxWidth(), enabled = !state.submitting, password = true, labelAbove = true,
-                errorText = state.passwordError?.let { stringResource(it) }, autofillType = ContentType.Password,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done))
+            if (hasPassword) {
+                WasteTextField(state.password, onPassword, stringResource(R.string.delete_account_password),
+                    modifier = Modifier.fillMaxWidth(), enabled = !state.submitting, password = true, labelAbove = true,
+                    errorText = state.passwordError?.let { stringResource(it) }, autofillType = ContentType.Password,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done))
+            } else {
+                Text(stringResource(if (googleAvailable) R.string.delete_account_google_description else
+                    R.string.delete_account_google_unavailable), style = MaterialTheme.typography.bodyMedium)
+            }
             Row(
                 Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(state.acknowledged,
                     enabled = !state.submitting, role = Role.Checkbox, onValueChange = onAcknowledge),
@@ -160,8 +167,9 @@ fun AccountDeletionScreen(
                 Text(stringResource(R.string.delete_account_acknowledge), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
             }
             state.failure?.let { MessageBanner(stringResource(it), isError = true) }
-            ActionButton(stringResource(R.string.delete_account_confirm), onDelete, Modifier.fillMaxWidth(),
-                enabled = state.acknowledged, destructive = true, loading = state.submitting,
+            ActionButton(stringResource(if (hasPassword) R.string.delete_account_confirm else R.string.delete_account_google_confirm),
+                onDelete, Modifier.fillMaxWidth(),
+                enabled = state.acknowledged && (hasPassword || googleAvailable), destructive = true, loading = state.submitting,
                 loadingLabel = stringResource(R.string.account_management_processing))
             TextActionButton(stringResource(R.string.back), onBack, Modifier.fillMaxWidth(), enabled = !state.submitting)
         }

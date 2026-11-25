@@ -7,12 +7,30 @@ import com.example.wastenot.model.UserProgress
 import java.time.Instant
 import java.time.ZoneId
 import java.util.UUID
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class LoginDto(val email: String, val password: String) {
     override fun toString() = "LoginDto([redacted])"
+}
+
+@Serializable
+class GoogleChallengeDto(val nonce: String) {
+    override fun toString() = "GoogleChallengeDto([redacted])"
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+@Serializable
+class GoogleLoginDto(
+    @SerialName("id_token") val idToken: String,
+    val timezone: String,
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    @SerialName("current_password") val currentPassword: String? = null,
+) {
+    override fun toString() = "GoogleLoginDto([redacted])"
 }
 
 @Serializable
@@ -60,13 +78,14 @@ data class UserDto(
     val email: String,
     val timezone: String,
     val progress: ProgressDto? = null,
+    @SerialName("has_password") val hasPassword: Boolean = true,
 ) {
     fun toModel(): User {
         val canonicalId = UUID.fromString(id).toString()
         require(canonicalId.equals(id, ignoreCase = true))
         require(name.isNotBlank() && name.codePointCount(0, name.length) <= 60 && email.isNotBlank() && email.length <= 254)
         require(timezone in ZoneId.getAvailableZoneIds())
-        return User(canonicalId, name, email, ZoneId.of(timezone), progress?.toModel())
+        return User(canonicalId, name, email, ZoneId.of(timezone), progress?.toModel(), hasPassword)
     }
 }
 

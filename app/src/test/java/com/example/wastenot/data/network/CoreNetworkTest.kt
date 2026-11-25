@@ -174,7 +174,7 @@ class CoreNetworkTest {
 
     @Test
     fun publicAuthEndpointsNeverReceiveExistingBearerAndRedirectIsNotFollowed() {
-        listOf("login", "register", "refresh").forEach { endpoint ->
+        listOf("login", "register", "refresh", "google", "google/challenge").forEach { endpoint ->
             server.enqueue(MockResponse())
             network.client.newCall(Request.Builder().url(server.url("/v1/auth/$endpoint"))
                 .post("fixture-password".toRequestBody()).build()).execute().close()

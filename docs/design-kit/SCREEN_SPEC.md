@@ -58,6 +58,8 @@ Order: wordmark → the title "Pick up your habit again" → email → password 
 
 Empty and format checks happen before the request. Wrong credentials show a generic "That email and password don't match." Network errors are separate. While submitting, the button says "Signing in…" and is disabled. Success clears the auth stack. If the session expired, a banner explains why the user has to sign in again. Forgot password isn't shown as a dead link; it's not in the baseline yet.
 
+When Google sign-in is configured, sign in and registration also offer one explicit Google action. Android opens Credential Manager only after a tap. Cancel returns to the same screen. If a Google email matches an existing unlinked WasteNot account, ask for that account's password before linking; do not start a new account or discard history. A returning linked account does not need to enter its WasteNot password again.
+
 ### S03: Register
 
 Fields for name, email, password, password confirmation, and a visible starting time zone. The password helper says 12 characters minimum. Full validation is in PRD §8. A "Create account" button and an "Already have an account? Sign in" link. Don't add a checkbox agreeing to documents that don't exist yet.

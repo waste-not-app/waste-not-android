@@ -83,6 +83,8 @@ import com.example.wastenot.ui.auth.LogoutUiState
 import com.example.wastenot.ui.auth.AccountDeletionViewModel
 import com.example.wastenot.ui.auth.AccountDeletionState
 import com.example.wastenot.ui.auth.AccountDeletionScreen
+import com.example.wastenot.ui.auth.rememberGoogleAction
+import com.example.wastenot.BuildConfig
 import com.example.wastenot.ui.components.rememberPrivacyPolicyAction
 import com.example.wastenot.ui.components.IconActionButton
 import com.example.wastenot.ui.components.GlassChromeSurface
@@ -139,8 +141,10 @@ fun AccountNavigation(
     val historyReady by syncModel.historyReady.collectAsStateWithLifecycle()
     val syncBusy by syncModel.busy.collectAsStateWithLifecycle()
     val syncError by syncModel.error.collectAsStateWithLifecycle()
-    val accountDeletionFactory = remember(accountManagement) {
-        accountManagement?.let { accounts -> viewModelFactory { initializer { AccountDeletionViewModel(accounts) } } }
+    val accountDeletionFactory = remember(accountManagement, user.hasPassword) {
+        accountManagement?.let { accounts ->
+            viewModelFactory { initializer { AccountDeletionViewModel(accounts, user.hasPassword) } }
+        }
     }
     val accountDeletionModel: AccountDeletionViewModel? = accountDeletionFactory?.let { viewModel(factory = it) }
     val accountDeletionState = accountDeletionModel?.state?.collectAsStateWithLifecycle()?.value ?: remember { AccountDeletionState() }
@@ -454,12 +458,20 @@ fun AccountNavigation(
                 )
             }
             entry<DeleteAccount> {
-                if (accountDeletionModel != null) AccountDeletionScreen(
-                    state = accountDeletionState, padding = pageInsets,
-                    onPassword = accountDeletionModel::password, onAcknowledge = accountDeletionModel::acknowledge,
-                    onDelete = accountDeletionModel::delete, onPrivacy = openPrivacy, onBack = ::back,
-                    modifier = Modifier.fillMaxSize(),
-                )
+                if (accountDeletionModel != null) {
+                    val google = rememberGoogleAction(
+                        { if (stack.lastOrNull() == DeleteAccount) accountDeletionModel.beginGoogle() else null },
+                        accountDeletionModel::googleChallenge, accountDeletionModel::completeGoogle,
+                    )
+                    AccountDeletionScreen(
+                        state = accountDeletionState, padding = pageInsets,
+                        onPassword = accountDeletionModel::password, onAcknowledge = accountDeletionModel::acknowledge,
+                        onDelete = if (user.hasPassword) accountDeletionModel::delete else google,
+                        onPrivacy = openPrivacy, onBack = ::back,
+                        modifier = Modifier.fillMaxSize(), hasPassword = user.hasPassword,
+                        googleAvailable = BuildConfig.GOOGLE_WEB_CLIENT_ID.isNotBlank(),
+                    )
+                }
             }
             entry<RecyclingPointList> {
                 RecyclingPointListScreen(pageInsets, onDetail = { id ->

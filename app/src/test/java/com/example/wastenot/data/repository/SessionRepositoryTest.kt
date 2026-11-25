@@ -7,6 +7,9 @@ import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.network.WasteNotNetwork
 import com.example.wastenot.data.network.dto.DataEnvelope
+import com.example.wastenot.data.network.dto.DeleteAccountDto
+import com.example.wastenot.data.network.dto.GoogleChallengeDto
+import com.example.wastenot.data.network.dto.GoogleLoginDto
 import com.example.wastenot.data.network.dto.LoginDto
 import com.example.wastenot.data.network.dto.RegisterDto
 import com.example.wastenot.data.network.dto.RefreshDto
@@ -14,6 +17,7 @@ import com.example.wastenot.data.network.dto.SessionDto
 import com.example.wastenot.data.network.dto.toRequestFields
 import com.example.wastenot.model.Quantity
 import java.io.IOException
+import java.time.ZoneId
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -83,6 +87,7 @@ class SessionRepositoryTest {
         server.enqueue(json(fixture("auth-session")))
         val result = session.login(" FIXTURE-A@example.com ", login.password) as ApiResult.Success
         assertEquals(USER_A, result.value.id)
+        assertTrue(result.value.hasPassword)
         assertEquals(RefreshToken.of("fixture-refresh-old"), store.token)
         assertEquals(listOf(RefreshToken.of("fixture-refresh-old")), store.writes)
         assertTrue(session.state.value is SessionState.Authenticated)
@@ -93,6 +98,68 @@ class SessionRepositoryTest {
         assertEquals(login.password, body["password"]?.jsonPrimitive?.content)
         assertFalse(session.state.value.toString().contains("fixture-access-old"))
         assertFalse(session.state.value.toString().contains("fixture-refresh-old"))
+    }
+
+    @Test
+    fun googleUsesTheSessionStoreAndClearsProviderStateOnLogout() = runTest {
+        var clearedProviders = 0
+        val gateway = RemoteAccountSession(session, networkAvailable = { true }) { clearedProviders++ }
+        gateway.bootstrap()
+        server.enqueue(json("""{"data":{"nonce":"test_nonce-_123"}}"""))
+        assertEquals(ApiResult.Success("test_nonce-_123"), gateway.googleChallenge())
+        val challenge = server.takeRequest()
+        assertEquals("POST", challenge.method)
+        assertEquals("/v1/auth/google/challenge", challenge.path)
+        assertEquals(0L, challenge.bodySize)
+        assertNull(challenge.getHeader("Authorization"))
+
+        server.enqueue(json(fixture("auth-session").replace("\"timezone\":", "\"has_password\":false,\"timezone\":")))
+        val signIn = gateway.googleLogin("fixture-google-token", ZoneId.of("Asia/Jakarta"), null) as ApiResult.Success
+        val request = server.takeRequest()
+        assertEquals("/v1/auth/google", request.path)
+        assertNull(request.getHeader("Authorization"))
+        val body = Json.parseToJsonElement(request.body.readUtf8()).jsonObject
+        assertEquals(setOf("id_token", "timezone"), body.keys)
+        assertEquals("fixture-google-token", body["id_token"]?.jsonPrimitive?.content)
+        assertEquals("Asia/Jakarta", body["timezone"]?.jsonPrimitive?.content)
+        assertFalse(signIn.value.hasPassword)
+        assertFalse((gateway.state.value as SessionState.Authenticated).user.hasPassword)
+        assertEquals(listOf(RefreshToken.of("fixture-refresh-old")), store.writes)
+
+        server.enqueue(MockResponse().setResponseCode(204))
+        assertEquals(LogoutResult(true, true), gateway.logout())
+        assertEquals("Bearer fixture-access-old", server.takeRequest().getHeader("Authorization"))
+        assertEquals(1, clearedProviders)
+        assertEquals(SessionState.SignedOut(SignOutReason.LOGOUT_CONFIRMED), gateway.state.value)
+        assertNull(store.token)
+    }
+
+    @Test
+    fun linkRequiredAndRejectedProofDoNotInstallASession() = runTest {
+        session.bootstrap()
+        server.enqueue(json("""{"error":{"code":"GOOGLE_LINK_REQUIRED"}}""").setResponseCode(409))
+        val first = session.googleLogin("fixture-first", ZoneId.of("UTC"), null) as ApiResult.Failure
+        assertEquals("GOOGLE_LINK_REQUIRED", first.error.code)
+        server.takeRequest()
+
+        server.enqueue(json("""{"error":{"code":"UNAUTHENTICATED"}}""").setResponseCode(401))
+        val linked = session.googleLogin("fixture-new", ZoneId.of("UTC"), login.password) as ApiResult.Failure
+        assertEquals(ApiFailureKind.UNAUTHENTICATED, linked.error.kind)
+        val proof = Json.parseToJsonElement(server.takeRequest().body.readUtf8()).jsonObject
+        assertEquals(setOf("id_token", "current_password", "timezone"), proof.keys)
+        assertEquals("fixture-new", proof["id_token"]?.jsonPrimitive?.content)
+        assertEquals(login.password, proof["current_password"]?.jsonPrimitive?.content)
+        assertNull(store.token)
+        assertEquals(SessionState.SignedOut(), session.state.value)
+    }
+
+    @Test
+    fun googleChallengeRejectsAnInvalidNonceAndPreservesUnavailableCode() = runTest {
+        server.enqueue(json("""{"data":{"nonce":"not base64url"}}"""))
+        assertEquals(ApiFailureKind.MALFORMED_RESPONSE, (session.googleChallenge() as ApiResult.Failure).error.kind)
+        server.enqueue(json("""{"error":{"code":"GOOGLE_AUTH_UNAVAILABLE"}}""").setResponseCode(503))
+        assertEquals("GOOGLE_AUTH_UNAVAILABLE", (session.googleChallenge() as ApiResult.Failure).error.code)
+        assertEquals(2, server.requestCount)
     }
 
     @Test
@@ -129,7 +196,7 @@ class SessionRepositoryTest {
         store.saved.set(TokenReadResult.Available(token))
         var online = false
         var snapshots = 0
-        val gateway = RemoteAccountSession(session) { snapshots++; online }
+        val gateway = RemoteAccountSession(session, networkAvailable = { snapshots++; online })
         gateway.bootstrap()
         assertTrue(gateway.state.value is SessionState.ConnectionRequired)
         assertEquals(token, store.token)
@@ -155,6 +222,17 @@ class SessionRepositoryTest {
         assertEquals(2, server.requestCount)
         assertTrue(session.bootstrap() is SessionState.Authenticated)
         assertEquals(3, server.requestCount)
+    }
+
+    @Test
+    fun profileVerificationPreservesPasswordlessAccountAfterRefresh() = runTest {
+        store.saved.set(TokenReadResult.Available(RefreshToken.of("fixture-refresh-old")))
+        server.enqueue(json(fixture("auth-refresh")))
+        server.enqueue(json(fixture("me").replace("\"timezone\":", "\"has_password\":false,\"timezone\":")))
+        val state = session.bootstrap() as SessionState.Authenticated
+        assertFalse(state.user.hasPassword)
+        server.takeRequest()
+        assertEquals("/v1/me", server.takeRequest().path)
     }
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -560,8 +638,13 @@ class SessionRepositoryTest {
         val dto = Json.decodeFromString<DataEnvelope<SessionDto>>(fixture("auth-session")).data
         listOf(login.toString(), RegisterDto("name", "private-email", "private-password", "UTC").toString(),
             RefreshDto("private-refresh").toString(), dto.toString(), dto.toModel().toString(),
-            RequestCredential(AccessToken.of("private-access"), 1, 1).toString()).forEach { text ->
-            listOf("fixture-access-old", "fixture-refresh-old", login.password, "private-password", "private-refresh", "private-access")
+            RequestCredential(AccessToken.of("private-access"), 1, 1).toString(),
+            GoogleChallengeDto("private-nonce").toString(),
+            GoogleLoginDto("private-google-token", "UTC", "private-password").toString(),
+            DeleteAccountDto(googleIdToken = "private-google-token").toString(),
+            DeleteAccountDto(password = "private-password").toString()).forEach { text ->
+            listOf("fixture-access-old", "fixture-refresh-old", login.password, "private-password",
+                "private-refresh", "private-access", "private-google-token", "private-nonce")
                 .forEach { assertFalse(text, text.contains(it)) }
         }
     }
