@@ -45,7 +45,7 @@ Work uses a unique name per account with `APPEND_OR_REPLACE`, so changes made wh
 - **Pull safety.** A pull never overwrites activities that have pending local changes. Server pagination is not a snapshot, so an activity missing from a pull is checked with a `GET` before it is removed from the cache. An interrupted pull never deletes unseen cache entries.
 - **Summaries.** Summaries, statistics, XP, and streaks use the last snapshot the server confirmed. Recent activity on the home screen comes from Room, and saving locally never announces new XP. The sync panel explains the difference between local changes and server summaries.
 - **Snapshot staleness.** Snapshots carry their server confirmation time and a cache marker.
-  - Home, profile, and statistics show that marker, and data from a previous day or period is flagged rather than presented as today's.
+  - Home shows the cache marker in the summary's info disclosure. Profile and Statistics show it inline. Previous-day or previous-period data is still flagged rather than presented as current.
   - Refresh failures are stored separately from the payload, so an old snapshot stays readable without hiding the error.
 - **Achievement refresh.** Each acknowledged create, update, or delete stores a random revision in the snapshot metadata within the same transaction.
   - `ActivityStore.synchronizationAcknowledgements` replays the latest revision for the account, deduplicated.

@@ -18,6 +18,5 @@
     <string name="scan_camera_description">Foto satu benda untuk meninjau kategori dan cara penanganannya.</string>
     <string name="scan_camera_pending">Alur foto sedang disiapkan</string>
     <string name="scan_manual_description">Sudah tahu kategori dan metodenya? Langsung isi catatan.</string>
-    <string name="home_empty_today">Belum ada catatan hari ini.</string>
     <string name="date_method">%1$s · %2$s</string>
 </resources>

@@ -88,14 +88,16 @@ fun OverviewScreen(user: User, data: SnapshotState<DashboardSnapshot>, padding: 
             }
             IconActionButton(R.drawable.ic_profile, stringResource(R.string.open_profile), onProfile, circle = true)
         }
-        SummaryStatus(data.loading, data.error, true, onRetry, data.freshness, data.stale)
+        SummaryStatus(data.loading, data.error, true, onRetry, stale = data.stale)
         if (onResumeDraft != null) PausedDraftNotice(onResumeDraft)
-        if (!data.stale && snapshot.summary.activityCount == 0L && snapshot.recentLogs.none {
-                it.activityDate == snapshot.date || it.syncState != ActivitySyncState.SYNCED
-            }) MessageBanner(stringResource(R.string.home_empty_today))
-        SummaryBlock(snapshot.summary, if (data.stale) stringResource(
-            R.string.freshness_handled_date, WasteFormat.activityDate(snapshot.date),
-        ) else stringResource(R.string.handled_today), personal = true)
+        SummaryBlock(
+            summary = snapshot.summary,
+            title = if (data.stale) stringResource(
+                R.string.freshness_handled_date, WasteFormat.activityDate(snapshot.date),
+            ) else stringResource(R.string.handled_today),
+            personal = true,
+            freshness = data.freshness,
+        )
         InsetGroupCard(contentPadding = true) {
             ProgressMeter(snapshot.progress)
         }
@@ -152,15 +154,17 @@ internal fun SummaryStatus(loading: Boolean, error: ApiFailureKind?, hasValue: B
 @Composable
 internal fun SnapshotFreshnessBanner(freshness: SnapshotFreshness?, stale: Boolean) {
     if (stale) MessageBanner(stringResource(R.string.freshness_previous_period))
-    if (freshness?.cached == true) {
-        val confirmedAt = freshness.confirmedAt
-        val label = if (confirmedAt == null) stringResource(R.string.freshness_cached) else stringResource(
-            R.string.freshness_cached_at,
-            DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm 'UTC'", LocalConfiguration.current.locales[0])
-                .withZone(java.time.ZoneOffset.UTC).format(confirmedAt),
-        )
-        MessageBanner(label)
-    }
+    if (freshness?.cached == true) MessageBanner(cachedSnapshotLabel(freshness))
+}
+
+@Composable
+private fun cachedSnapshotLabel(freshness: SnapshotFreshness): String {
+    val confirmedAt = freshness.confirmedAt ?: return stringResource(R.string.freshness_cached)
+    return stringResource(
+        R.string.freshness_cached_at,
+        DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm 'UTC'", LocalConfiguration.current.locales[0])
+            .withZone(java.time.ZoneOffset.UTC).format(confirmedAt),
+    )
 }
 
 @Composable
@@ -172,7 +176,7 @@ internal fun loadFailureHint(error: ApiFailureKind?): String = stringResource(wh
 
 @Composable
 internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifier = Modifier,
-    personal: Boolean = false, afterPrimary: @Composable () -> Unit = {}) {
+    personal: Boolean = false, freshness: SnapshotFreshness? = null) {
     var showMethodology by rememberSaveable { mutableStateOf(false) }
     val infoToggleDesc = stringResource(R.string.summary_info_toggle)
     Column(modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -222,9 +226,11 @@ internal fun SummaryBlock(summary: WasteSummary, title: String, modifier: Modifi
             if (personal && showMethodology) {
                 HorizontalDivider(Modifier.padding(top = 6.dp), color = SummarySecondaryText.copy(alpha = 0.3f))
                 Text(stringResource(R.string.summary_footer), style = MaterialTheme.typography.bodySmall, color = SummarySecondaryText)
+                if (freshness?.cached == true) {
+                    Text(cachedSnapshotLabel(freshness), style = MaterialTheme.typography.bodySmall, color = SummarySecondaryText)
+                }
             }
         }
-        afterPrimary()
         val rate = WasteFormat.percentage(summary.recyclingRatePercent)
         val rateText = if (rate == null) stringResource(R.string.rate_empty) else stringResource(R.string.rate_value, rate)
         val rateSub = if (rate != null) {

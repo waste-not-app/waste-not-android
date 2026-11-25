@@ -17,6 +17,5 @@
     <string name="scan_camera_description">Take a photo of one item to check its category and how to handle it.</string>
     <string name="scan_camera_pending">Getting the photo flow ready</string>
     <string name="scan_manual_description">Already know the category and method? Fill in the log yourself.</string>
-    <string name="home_empty_today">Nothing logged today yet.</string>
     <string name="date_method">%1$s · %2$s</string>
 </resources>
