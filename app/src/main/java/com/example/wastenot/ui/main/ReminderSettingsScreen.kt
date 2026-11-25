@@ -9,10 +9,9 @@ import android.view.HapticFeedbackConstants
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +25,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -40,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -48,7 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
-import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -63,10 +63,12 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.wastenot.R
 import com.example.wastenot.ReminderSettings
+import com.example.wastenot.data.local.ReminderSaveResult
 import com.example.wastenot.data.local.ReminderSetting
 import com.example.wastenot.data.local.ReminderPermissionPreferences
 import com.example.wastenot.data.local.ReminderPermissionAction
 import com.example.wastenot.data.local.reminderPermissionAction
+import com.example.wastenot.theme.LocalWasteNotSurfaceTokens
 import com.example.wastenot.theme.WasteNotTheme
 import com.example.wastenot.ui.auth.MessageBanner
 import com.example.wastenot.ui.components.ActionButton
@@ -75,27 +77,49 @@ import com.example.wastenot.ui.components.TextActionButton
 import com.github.skydoves.navgraph.annotations.NavDestination
 import com.github.skydoves.navgraph.annotations.NavPreview
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @NavDestination(route = ReminderSettings::class)
 @Composable
 fun ReminderSettingsScreen(
-    setting: ReminderSetting,
+    setting: ReminderSetting?,
     padding: PaddingValues,
-    onSave: (ReminderSetting) -> Unit,
+    onSave: suspend (ReminderSetting) -> ReminderSaveResult,
     modifier: Modifier = Modifier,
+    accountSave: ReminderSaveProgress? = null,
 ) {
+    if (setting == null) {
+        ScrollPage(padding, modifier, maxWidth = 560.dp) {
+            Text(stringResource(R.string.reminder_loading), style = MaterialTheme.typography.bodyMedium)
+            LinearProgressIndicator(Modifier.fillMaxWidth())
+        }
+        return
+    }
+
     val context = LocalContext.current
     val view = LocalView.current
-    var enabled by rememberSaveable(setting) { mutableStateOf(setting.enabled) }
-    var hour by rememberSaveable(setting) { mutableIntStateOf(setting.hour) }
-    var minute by rememberSaveable(setting) { mutableIntStateOf(setting.minute) }
+    val scope = rememberCoroutineScope()
+    val recovery = accountSave?.takeUnless { it.result == ReminderSaveResult.SAVED }
+    val initialDraft = recovery?.setting ?: setting
+    var enabled by rememberSaveable { mutableStateOf(initialDraft.enabled) }
+    var hour by rememberSaveable { mutableIntStateOf(initialDraft.hour) }
+    var minute by rememberSaveable { mutableIntStateOf(initialDraft.minute) }
     var pickingTime by rememberSaveable { mutableStateOf(false) }
     val permissionPreferences = remember(context) { ReminderPermissionPreferences(context) }
     var permissionDenied by rememberSaveable { mutableStateOf(permissionPreferences.denied) }
     var pendingEnable by rememberSaveable { mutableStateOf(false) }
     var settingsFailed by remember { mutableStateOf(false) }
-    var savedMessage by remember { mutableStateOf<String?>(null) }
+    var saving by remember { mutableStateOf(false) }
+    var saveResult by rememberSaveable { mutableStateOf<ReminderSaveResult?>(null) }
+    var followAccountSave by rememberSaveable { mutableStateOf(recovery != null) }
+    val accountWorking = accountSave != null && accountSave.result == null
+    val working = saving || accountWorking
+
+    fun clearSaveFeedback() {
+        saveResult = null
+        followAccountSave = false
+    }
 
     fun notificationsAllowed(): Boolean = NotificationManagerCompat.from(context).areNotificationsEnabled() &&
         (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
@@ -113,7 +137,10 @@ fun ReminderSettingsScreen(
         if (notificationsAllowed()) {
             if (permissionPreferences.denied) permissionPreferences.recordResult(granted = true)
             permissionDenied = false
-            if (pendingEnable) enabled = true
+            if (pendingEnable && !enabled) {
+                enabled = true
+                clearSaveFeedback()
+            }
             pendingEnable = false
             settingsFailed = false
         } else {
@@ -127,12 +154,6 @@ fun ReminderSettingsScreen(
         }
     }
 
-    LaunchedEffect(setting) {
-        enabled = setting.enabled
-        hour = setting.hour
-        minute = setting.minute
-    }
-
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
@@ -141,6 +162,7 @@ fun ReminderSettingsScreen(
         if (granted) {
             permissionDenied = false
             enabled = true
+            clearSaveFeedback()
         } else {
             permissionDenied = true
             enabled = false
@@ -168,7 +190,7 @@ fun ReminderSettingsScreen(
                 TextActionButton(stringResource(R.string.apply), {
                     hour = pickerState.hour
                     minute = pickerState.minute
-                    savedMessage = null
+                    clearSaveFeedback()
                     pickingTime = false
                 })
             },
@@ -178,9 +200,10 @@ fun ReminderSettingsScreen(
         )
     }
 
-    val changeEnabled: (Boolean) -> Unit = { checked ->
+    val changeEnabled: (Boolean) -> Unit = change@{ checked ->
+        if (saving || accountWorking) return@change
         view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-        savedMessage = null
+        clearSaveFeedback()
         if (!checked) {
             enabled = false
             pendingEnable = false
@@ -192,6 +215,8 @@ fun ReminderSettingsScreen(
             ReminderPermissionAction.ENABLE -> {
                 permissionPreferences.recordResult(granted = true)
                 permissionDenied = false
+                pendingEnable = false
+                settingsFailed = false
                 enabled = true
             }
             ReminderPermissionAction.SETTINGS -> {
@@ -217,7 +242,7 @@ fun ReminderSettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp)
-                    .toggleable(enabled, role = Role.Switch, onValueChange = changeEnabled)
+                    .toggleable(enabled, enabled = !working, role = Role.Switch, onValueChange = changeEnabled)
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -237,6 +262,7 @@ fun ReminderSettingsScreen(
                 Switch(
                     checked = enabled,
                     onCheckedChange = null,
+                    enabled = !working,
                 )
             }
         }
@@ -247,6 +273,7 @@ fun ReminderSettingsScreen(
                 label = stringResource(R.string.reminder_open_settings),
                 onClick = ::openNotificationSettings,
                 modifier = Modifier.fillMaxWidth(),
+                enabled = !working,
             )
         }
         if (settingsFailed) {
@@ -257,13 +284,13 @@ fun ReminderSettingsScreen(
             val tokens = LocalWasteNotSurfaceTokens.current
             Text(stringResource(R.string.reminder_time_label), style = MaterialTheme.typography.titleSmall)
             OutlinedButton(
-                onClick = { pickingTime = true },
+                onClick = { if (!saving && !accountWorking) pickingTime = true },
                 modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
-                enabled = enabled,
-                shape = RoundedCornerShape(15.dp),
+                enabled = enabled && !working,
+                shape = MaterialTheme.shapes.small,
                 border = BorderStroke(
                     1.5.dp,
-                    if (enabled) tokens.fieldEdge else MaterialTheme.colorScheme.outlineVariant,
+                    if (enabled && !working) tokens.fieldEdge else MaterialTheme.colorScheme.outlineVariant,
                 ),
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = tokens.fieldWell,
@@ -282,18 +309,49 @@ fun ReminderSettingsScreen(
             }
         }
 
-        savedMessage?.let { MessageBanner(it) }
+        val outcome = if (working) null else saveResult ?: accountSave?.takeIf {
+            followAccountSave && it.setting.enabled == enabled && it.setting.hour == hour && it.setting.minute == minute
+        }?.result
+        when (outcome) {
+            ReminderSaveResult.SAVED -> MessageBanner(
+                if (enabled) stringResource(R.string.reminder_saved, formatTime(hour, minute))
+                else stringResource(R.string.reminder_disabled_saved),
+            )
+            ReminderSaveResult.PERSISTENCE_FAILED ->
+                MessageBanner(stringResource(R.string.reminder_persistence_failed), isError = true)
+            ReminderSaveResult.SCHEDULING_FAILED -> MessageBanner(
+                stringResource(if (enabled) R.string.reminder_schedule_failed else R.string.reminder_cancel_failed),
+                isError = true,
+            )
+            null -> Unit
+        }
 
-        val savedText = stringResource(R.string.reminder_saved, formatTime(hour, minute))
-        val disabledText = stringResource(R.string.reminder_disabled_saved)
+        val failed = outcome != null && outcome != ReminderSaveResult.SAVED
         ActionButton(
-            label = stringResource(R.string.reminder_save),
-            onClick = {
+            label = stringResource(if (failed) R.string.retry else R.string.reminder_save),
+            onClick = save@{
+                if (saving || accountWorking) return@save
+                if (enabled && !setting.enabled && !notificationsAllowed()) {
+                    permissionDenied = true
+                    return@save
+                }
                 val next = ReminderSetting(enabled = enabled, hour = hour, minute = minute)
-                onSave(next)
-                savedMessage = if (next.enabled) savedText else disabledText
+                pendingEnable = false
+                saveResult = null
+                followAccountSave = true
+                saving = true
+                scope.launch {
+                    try {
+                        saveResult = onSave(next)
+                    } finally {
+                        saving = false
+                    }
+                }
             },
             modifier = Modifier.fillMaxWidth(),
+            enabled = !enabled || setting.enabled || !permissionDenied,
+            loading = working,
+            loadingLabel = stringResource(R.string.reminder_saving),
         )
     }
 }
@@ -306,7 +364,7 @@ private fun ReminderSettingsScreenPreview() {
         ReminderSettingsScreen(
             setting = ReminderSetting(enabled = true, hour = 20, minute = 0),
             padding = PaddingValues(),
-            onSave = {},
+            onSave = { ReminderSaveResult.SAVED },
             modifier = Modifier.fillMaxSize(),
         )
     }

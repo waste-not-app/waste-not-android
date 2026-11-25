@@ -13,21 +13,59 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.Operation
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import androidx.work.await
 import androidx.work.workDataOf
 import com.example.wastenot.MainActivity
 import com.example.wastenot.R
 import com.example.wastenot.WasteNotApplication
+import java.io.IOException
 import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.first
 
 interface ReminderScheduler {
-    fun schedule(ownerId: String, hour: Int, minute: Int, zoneId: ZoneId)
-    fun cancel(ownerId: String)
+    fun schedule(ownerId: String, hour: Int, minute: Int, zoneId: ZoneId): Operation
+    fun cancel(ownerId: String): Operation
+}
+
+enum class ReminderSaveResult {
+    SAVED,
+    PERSISTENCE_FAILED,
+    SCHEDULING_FAILED,
+}
+
+internal suspend fun saveReminderSetting(
+    ownerId: String,
+    setting: ReminderSetting,
+    zoneId: ZoneId,
+    store: ReminderStore?,
+    scheduler: ReminderScheduler?,
+): ReminderSaveResult {
+    if (store == null) return ReminderSaveResult.PERSISTENCE_FAILED
+    try {
+        store.save(ownerId, setting)
+    } catch (_: Exception) {
+        currentCoroutineContext().ensureActive()
+        return ReminderSaveResult.PERSISTENCE_FAILED
+    }
+    if (scheduler == null) return ReminderSaveResult.SCHEDULING_FAILED
+    currentCoroutineContext().ensureActive()
+    try {
+        if (setting.enabled) scheduler.schedule(ownerId, setting.hour, setting.minute, zoneId).await()
+        else scheduler.cancel(ownerId).await()
+    } catch (_: Exception) {
+        currentCoroutineContext().ensureActive()
+        return ReminderSaveResult.SCHEDULING_FAILED
+    }
+    return ReminderSaveResult.SAVED
 }
 
 internal fun computeInitialDelayMillis(
@@ -43,22 +81,21 @@ internal fun computeInitialDelayMillis(
 class WorkManagerReminderScheduler(context: Context) : ReminderScheduler {
     private val work = WorkManager.getInstance(context.applicationContext)
 
-    override fun schedule(ownerId: String, hour: Int, minute: Int, zoneId: ZoneId) {
+    override fun schedule(ownerId: String, hour: Int, minute: Int, zoneId: ZoneId): Operation {
         val delayMs = computeInitialDelayMillis(ZonedDateTime.now(zoneId), hour, minute)
         val request = PeriodicWorkRequestBuilder<DailyReminderWorker>(24, TimeUnit.HOURS)
             .setInitialDelay(delayMs, TimeUnit.MILLISECONDS)
             .setInputData(workDataOf("owner" to ownerId, "zone" to zoneId.id))
             .build()
-        work.enqueueUniquePeriodicWork(
+        // Updating existing periodic work keeps its cadence instead of applying the new initial delay.
+        return work.enqueueUniquePeriodicWork(
             uniqueName(ownerId),
-            ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             request,
         )
     }
 
-    override fun cancel(ownerId: String) {
-        work.cancelUniqueWork(uniqueName(ownerId))
-    }
+    override fun cancel(ownerId: String): Operation = work.cancelUniqueWork(uniqueName(ownerId))
 
     private fun uniqueName(ownerId: String) = "daily-reminder-$ownerId"
 }
@@ -73,6 +110,13 @@ class DailyReminderWorker(
             .getOrDefault(ZoneId.of("Asia/Jakarta"))
         val container = (applicationContext as WasteNotApplication).container
         if (!container.isReminderEligible(owner, zoneId)) return Result.success()
+        // A failed cancellation can leave a previously enqueued worker behind.
+        val enabled = try {
+            container.reminders.observe(owner).first().enabled
+        } catch (_: IOException) {
+            return Result.retry()
+        }
+        if (!enabled) return Result.success()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED

@@ -20,6 +20,7 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.wastenot.data.local.ReminderPermissionPreferences
 import com.example.wastenot.data.local.ReminderSetting
+import com.example.wastenot.data.local.ReminderSaveResult
 import com.example.wastenot.theme.WasteNotTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -47,7 +48,10 @@ class ReminderPermissionRecoveryTest {
             compose.setContent {
                 CompositionLocalProvider(LocalContext provides context) {
                     WasteNotTheme {
-                        if (visible.value) ReminderSettingsScreen(ReminderSetting(), PaddingValues(), { saves++ })
+                        if (visible.value) ReminderSettingsScreen(ReminderSetting(), PaddingValues(), {
+                            saves++
+                            ReminderSaveResult.SAVED
+                        })
                     }
                 }
             }

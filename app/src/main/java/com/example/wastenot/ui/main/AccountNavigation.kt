@@ -201,8 +201,12 @@ fun AccountNavigation(
     }
     val achievementsModel: AchievementsViewModel? = achievementsFactory?.let { viewModel(factory = it) }
     val achievementsState = achievementsModel?.state?.collectAsStateWithLifecycle()?.value ?: AchievementsUiState()
-    val reminderSetting by (reminderStore?.observe(user.id) ?: remember { flowOf(ReminderSetting()) })
-        .collectAsStateWithLifecycle(initialValue = ReminderSetting())
+    val reminderFlow = remember(reminderStore, user.id) {
+        reminderStore?.observe(user.id) ?: flowOf(ReminderSetting())
+    }
+    val reminderSetting: ReminderSetting? by reminderFlow.collectAsStateWithLifecycle(initialValue = null)
+    val reminderSaveModel: ReminderSaveViewModel = viewModel()
+    val reminderSaveProgress by reminderSaveModel.progress.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     var photoBytesCache by remember { mutableStateOf<Map<String, ByteArray>>(emptyMap()) }
     var detailPhotoLoadingId by remember { mutableStateOf<String?>(null) }
@@ -462,13 +466,8 @@ fun AccountNavigation(
                 ReminderSettingsScreen(
                     setting = reminderSetting,
                     padding = pageInsets,
-                    onSave = { next ->
-                        coroutineScope.launch {
-                            reminderStore?.save(user.id, next)
-                            if (next.enabled) reminderScheduler?.schedule(user.id, next.hour, next.minute, user.timezone)
-                            else reminderScheduler?.cancel(user.id)
-                        }
-                    },
+                    onSave = { next -> reminderSaveModel.save(user.id, next, user.timezone, reminderStore, reminderScheduler) },
+                    accountSave = reminderSaveProgress,
                     modifier = Modifier.fillMaxSize(),
                 )
             }

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="reminder_settings_unavailable">Couldn\'t open notification settings. Open your device Settings, choose WasteNot, then allow notifications.</string>
+    <string name="reminder_loading">Loading reminder settings…</string>
+    <string name="reminder_saving">Saving reminder…</string>
+    <string name="reminder_persistence_failed">Couldn\'t save your reminder settings. Your changes are still here.</string>
+    <string name="reminder_schedule_failed">Your settings were saved, but the daily reminder couldn\'t be scheduled.</string>
+    <string name="reminder_cancel_failed">Your settings were saved, but the previous reminder schedule couldn\'t be removed.</string>
 </resources>

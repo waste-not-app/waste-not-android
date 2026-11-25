@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.example.wastenot.R
+import com.example.wastenot.data.local.ReminderSaveResult
 import com.example.wastenot.data.local.ReminderSetting
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.model.Achievement
@@ -108,16 +109,19 @@ class RemainingFeaturesUiTest {
                 ReminderSettingsScreen(
                     setting = ReminderSetting(enabled = true, hour = 19, minute = 30),
                     padding = PaddingValues(),
-                    onSave = { saved = it },
+                    onSave = {
+                        saved = it
+                        ReminderSaveResult.SAVED
+                    },
                     modifier = Modifier.fillMaxSize(),
                 )
             }
         }
 
-        compose.onNodeWithText("Around 19.30").assertIsDisplayed().assertIsEnabled()
+        compose.onNodeWithText("Around 19:30").assertIsDisplayed().assertIsEnabled()
         compose.onNodeWithText("Save reminder").performScrollTo().performClick()
-        assertEquals(ReminderSetting(enabled = true, hour = 19, minute = 30), saved)
-        compose.onNodeWithText("Daily reminder saved for around 19.30.").assertIsDisplayed()
+        compose.runOnIdle { assertEquals(ReminderSetting(enabled = true, hour = 19, minute = 30), saved) }
+        compose.onNodeWithText("Daily reminder saved for around 19:30.").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -127,12 +131,12 @@ class RemainingFeaturesUiTest {
                 ReminderSettingsScreen(
                     setting = ReminderSetting(enabled = false, hour = 20, minute = 0),
                     padding = PaddingValues(),
-                    onSave = {},
+                    onSave = { ReminderSaveResult.SAVED },
                     modifier = Modifier.fillMaxSize(),
                 )
             }
         }
-        compose.onNodeWithText("Around 20.00").assertIsNotEnabled()
+        compose.onNodeWithText("Around 20:00").assertIsNotEnabled()
     }
 
     @Test

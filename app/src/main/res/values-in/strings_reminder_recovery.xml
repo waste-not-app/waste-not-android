@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="reminder_settings_unavailable">Pengaturan notifikasi tidak dapat dibuka. Buka Pengaturan perangkat, pilih WasteNot, lalu izinkan notifikasi.</string>
+    <string name="reminder_loading">Memuat pengaturan pengingat…</string>
+    <string name="reminder_saving">Menyimpan pengingat…</string>
+    <string name="reminder_persistence_failed">Pengaturan pengingat gagal disimpan. Perubahanmu masih ada di sini.</string>
+    <string name="reminder_schedule_failed">Pengaturan tersimpan, tetapi pengingat harian gagal dijadwalkan.</string>
+    <string name="reminder_cancel_failed">Pengaturan tersimpan, tetapi jadwal pengingat sebelumnya gagal dihapus.</string>
 </resources>

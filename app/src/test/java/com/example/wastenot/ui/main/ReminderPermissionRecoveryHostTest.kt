@@ -10,7 +10,11 @@ import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.isToggleable
@@ -24,8 +28,10 @@ import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.wastenot.R
 import com.example.wastenot.data.local.ReminderPermissionPreferences
+import com.example.wastenot.data.local.ReminderSaveResult
 import com.example.wastenot.data.local.ReminderSetting
 import com.example.wastenot.theme.WasteNotTheme
+import kotlinx.coroutines.CompletableDeferred
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -43,6 +49,45 @@ class ReminderPermissionRecoveryHostTest {
 
     @Test fun recoveringPermissionWithoutEnablingRemindersKeepsOptInOff() = recover(enableThroughSwitch = false)
     @Test fun explicitEnableCanResumeAfterSettingsWithoutSavingAutomatically() = recover(enableThroughSwitch = true)
+
+    @Test fun saveWaitsForOutcomeAndRetriesTheSameDraftAfterFailure() {
+        val resources = compose.activity.resources
+        val observed = mutableStateOf(ReminderSetting(enabled = true, hour = 18, minute = 25))
+        val finish = CompletableDeferred<ReminderSaveResult>()
+        val requests = mutableListOf<ReminderSetting>()
+        compose.setContent {
+            WasteNotTheme {
+                ReminderSettingsScreen(observed.value, PaddingValues(), { next ->
+                    requests += next
+                    if (requests.size == 1) finish.await() else ReminderSaveResult.SAVED
+                })
+            }
+        }
+
+        compose.onNode(isToggleable()).performClick().assertIsOff()
+        val save = compose.onNodeWithText(resources.getString(R.string.reminder_save))
+        val off = compose.onNodeWithText(resources.getString(R.string.reminder_disabled_saved))
+        save.performScrollTo().performClick()
+        val working = compose.onNodeWithText(resources.getString(R.string.reminder_saving))
+        working.assertIsDisplayed().assertIsNotEnabled()
+        off.assertDoesNotExist()
+        compose.onNode(isToggleable()).assertIsNotEnabled()
+
+        compose.runOnIdle {
+            observed.value = ReminderSetting(enabled = true, hour = 20, minute = 0)
+            finish.complete(ReminderSaveResult.SCHEDULING_FAILED)
+        }
+        compose.onNode(isToggleable()).assertIsOff()
+        compose.onNodeWithText(resources.getString(R.string.reminder_cancel_failed)).performScrollTo().assertIsDisplayed()
+        off.assertDoesNotExist()
+        val retry = compose.onNodeWithText(resources.getString(R.string.retry))
+        retry.performScrollTo().assertIsEnabled().performClick()
+        off.performScrollTo().assertIsDisplayed()
+        compose.runOnIdle {
+            val draft = ReminderSetting(enabled = false, hour = 18, minute = 25)
+            assertEquals(listOf(draft, draft), requests)
+        }
+    }
 
     private fun recover(enableThroughSwitch: Boolean) {
         val application = RuntimeEnvironment.getApplication()
@@ -67,7 +112,12 @@ class ReminderPermissionRecoveryHostTest {
         compose.runOnIdle { owner.registry.currentState = Lifecycle.State.RESUMED }
         compose.setContent {
             CompositionLocalProvider(LocalContext provides context, LocalLifecycleOwner provides owner) {
-                WasteNotTheme { ReminderSettingsScreen(ReminderSetting(), PaddingValues(), { saved = it }) }
+                WasteNotTheme {
+                    ReminderSettingsScreen(ReminderSetting(), PaddingValues(), {
+                        saved = it
+                        ReminderSaveResult.SAVED
+                    })
+                }
             }
         }
         compose.onNode(isToggleable()).assertIsOff()
