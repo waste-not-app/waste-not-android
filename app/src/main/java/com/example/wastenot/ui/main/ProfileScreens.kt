@@ -14,8 +14,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.wastenot.BuildConfig
@@ -196,11 +198,16 @@ fun SettingsScreen(
         GroupSectionLabel(stringResource(R.string.settings_preferences))
         InsetGroupCard {
             val themeLabel = stringResource(R.string.theme_application)
+            val themeValue = stringResource(theme.label)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
                     .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onTheme)
+                    .semantics {
+                        contentDescription = themeLabel
+                        stateDescription = themeValue
+                    }
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -213,7 +220,7 @@ fun SettingsScreen(
                 }
                 Column(Modifier.weight(1f)) {
                     Text(themeLabel, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(stringResource(theme.label), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
+                    Text(themeValue, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
                 }
                 Icon(painterResource(R.drawable.ic_next), null, Modifier.size(20.dp).rotate(90f), tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
