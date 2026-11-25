@@ -2,10 +2,12 @@ package com.example.wastenot.ui.main
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -33,8 +35,7 @@ class RemainingFeaturesUiTest {
     @get:Rule val compose = createComposeRule()
 
     @Test
-    fun achievementsScreenRendersItemsExpandsRequirementsAndHandlesErrorRetry() {
-        var retried = false
+    fun achievementsScreenRestoresTheExpandedItemByIdAfterReordering() {
         val items = listOf(
             Achievement(
                 id = "00000000-0000-4000-8000-000000000101",
@@ -60,13 +61,15 @@ class RemainingFeaturesUiTest {
             ),
         )
 
-        compose.setContent {
+        val visibleItems = mutableStateOf(items)
+        val restoration = StateRestorationTester(compose)
+        restoration.setContent {
             WasteNotTheme {
                 AchievementsScreen(
-                    state = AchievementsUiState(items = items),
+                    state = AchievementsUiState(items = visibleItems.value),
                     accountTimezone = ZoneId.of("Asia/Jakarta"),
                     padding = PaddingValues(),
-                    onRetry = { retried = true },
+                    onRetry = {},
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -80,6 +83,11 @@ class RemainingFeaturesUiTest {
         compose.onNodeWithText("Reach a best streak of 3 days.").assertDoesNotExist()
         compose.onNodeWithText("Three days in a row").performClick()
         compose.onNodeWithText("Reach a best streak of 3 days.").assertIsDisplayed()
+
+        compose.runOnIdle { visibleItems.value = items.reversed() }
+        restoration.emulateSavedInstanceStateRestore()
+        compose.onNodeWithText("Reach a best streak of 3 days.").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Log at least 1 active activity.").assertDoesNotExist()
     }
 
     @Test

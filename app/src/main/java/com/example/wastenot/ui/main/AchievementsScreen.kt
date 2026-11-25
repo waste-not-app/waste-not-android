@@ -26,8 +26,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,6 +69,9 @@ fun AchievementsScreen(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var expandedIds by rememberSaveable(
+        stateSaver = listSaver<Set<String>, String>(save = { it.toList() }, restore = { it.toSet() }),
+    ) { mutableStateOf(emptySet()) }
     val items = state.items
     if (items == null) {
         ScrollPage(padding, modifier, maxWidth = 560.dp) {
@@ -82,7 +88,6 @@ fun AchievementsScreen(
         return
     }
 
-    val expanded = remember { mutableStateMapOf<String, Boolean>() }
     ScrollPage(padding, modifier, maxWidth = 560.dp) {
         Text(
             stringResource(R.string.achievements_subtitle),
@@ -107,12 +112,14 @@ fun AchievementsScreen(
         } else {
             InsetGroupCard {
                 items.forEachIndexed { index, item ->
-                    val isOpen = expanded[item.id] == true
+                    val isOpen = item.id in expandedIds
                     AchievementRow(
                         item = item,
                         accountTimezone = accountTimezone,
                         expanded = isOpen,
-                        onToggle = { expanded[item.id] = !isOpen },
+                        onToggle = {
+                            expandedIds = if (item.id in expandedIds) expandedIds - item.id else expandedIds + item.id
+                        },
                         modifier = Modifier.fillMaxWidth(),
                     )
                     if (index < items.lastIndex) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
