@@ -4,6 +4,8 @@
 
 Android CI and the `Android Release & Deploy` workflow run on the self-hosted `alberd-staging-android` runner. The backend, AI workers, and landing site use their own runners on the same staging host.
 
+The Android runner reuses Gradle dependencies and toolchains on disk. CI and release builds disable the Gradle build cache to avoid storing a second copy of task outputs on the shared host.
+
 | Resource | URL |
 |---|---|
 | Landing site | <https://waste-not.bccdev.id/> |
