@@ -34,6 +34,8 @@ CI never uses signing or deployment credentials.
 
 A deployment is refused if the APK is not signed with the release keystore.
 
+Before tagging, set `versionName` to the tag without its `v` prefix and increase `versionCode` above the public APK's code. The workflow names the APK from the tag; it does not rewrite the APK manifest. A GitHub Release can attach the signed APK from the verified public download after deployment.
+
 ### Configuration
 
 | Name | Type | Purpose |
