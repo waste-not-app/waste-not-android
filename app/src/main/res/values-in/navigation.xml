@@ -35,8 +35,8 @@
         <item quantity="other">%1$s benda</item>
     </plurals>
     <string name="avoided_weight">%1$s dihindari</string>
-    <string name="rate_unavailable">Belum ada aktivitas penanganan untuk menghitung recycling rate.</string>
-    <string name="recycling_rate">Recycling rate %1$s%% · %2$d dari %3$d aktivitas penanganan</string>
+    <string name="rate_unavailable">Belum ada aktivitas penanganan untuk menghitung tingkat daur ulang.</string>
+    <string name="recycling_rate">Tingkat daur ulang %1$s%% · %2$d dari %3$d aktivitas penanganan</string>
     <string name="activity_count">%1$d aktivitas</string>
     <string name="progress_summary">Level %1$d · %2$d/100 XP</string>
     <string name="summary_pending">Ringkasan belum tersedia.</string>

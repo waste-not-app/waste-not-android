@@ -67,7 +67,7 @@ fun DateField(
         OutlinedButton(
             onClick = { choosing = true },
             enabled = enabled,
-            shape = RoundedCornerShape(15.dp),
+            shape = MaterialTheme.shapes.small,
             border = BorderStroke(
                 1.5.dp,
                 when {

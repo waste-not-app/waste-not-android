@@ -2,7 +2,6 @@ package com.example.wastenot.ui.main
 
 import android.app.Application
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalInputModeManager
@@ -54,9 +54,9 @@ class GlassUiHostTest {
     @get:Rule(order = 1) val compose = createAndroidComposeRule<ComponentActivity>()
     private var dark by mutableStateOf(false)
 
-    private fun content(block: @Composable () -> Unit) {
+    private fun content(scale: Float = 2f, block: @Composable () -> Unit) {
         compose.setContent {
-            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2f)) {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, scale)) {
                 val inputMode = LocalInputModeManager.current
                 SideEffect { inputMode.requestInputMode(InputMode.Keyboard) }
                 WasteNotTheme(dark) { Surface(Modifier.fillMaxSize()) { block() } }
@@ -75,16 +75,12 @@ class GlassUiHostTest {
     private fun capture(name: String) {
         val directory = System.getenv("WASTENOT_UI_CAPTURE_DIR") ?: return
         val file = File(directory, "$name-${if (dark) "dark" else "light"}.png")
-        file.parentFile.mkdirs()
-        compose.runOnIdle {
-            val view = compose.activity.window.decorView
-            val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
-            view.draw(Canvas(bitmap))
-            try {
-                file.outputStream().use { assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) }
-            } finally {
-                bitmap.recycle()
-            }
+        checkNotNull(file.parentFile).mkdirs()
+        val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
+        try {
+            file.outputStream().use { assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) }
+        } finally {
+            bitmap.recycle()
         }
     }
 
@@ -111,6 +107,20 @@ class GlassUiHostTest {
         }
     }
 
+    @Test fun dockDoesNotScrollWhenEachLabelFits() {
+        content(scale = 1.55f) {
+            AccountPage(MainTab.HOME.key, MainTab.HOME, false, 0.dp, false, {}, {}, {}, {}) {}
+        }
+        val tabRole = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab)
+        MainTab.entries.forEach { tab ->
+            val label = compose.activity.getString(tab.label)
+            val node = compose.onNode(hasText(label) and tabRole).assertIsDisplayed().fetchSemanticsNode()
+            assertEquals("Tab is not fully visible: $label", node.size.width.toFloat(), node.boundsInRoot.width, 1f)
+            readable(label, hasText(label) and tabRole)
+        }
+        capture("dock-font155")
+    }
+
     @Test fun enlargedDockKeepsReadingSpaceAndEveryDestinationReachable() {
         var selected by mutableStateOf(MainTab.HOME)
         var records = 0
@@ -133,6 +143,12 @@ class GlassUiHostTest {
                 val reading = compose.onNodeWithTag("reading-viewport").fetchSemanticsNode().boundsInRoot
                 assertTrue("Chrome consumes more than half the screen", reading.height >= root.height / 2f)
             }
+            compose.onNode(hasText(compose.activity.getString(MainTab.PROFILE.label)) and tabRole)
+                .performSemanticsAction(SemanticsActions.RequestFocus) { it() }.assertIsFocused()
+            val first = compose.onNode(hasText(compose.activity.getString(MainTab.HOME.label)) and tabRole)
+            first.performSemanticsAction(SemanticsActions.RequestFocus) { it() }.assertIsFocused()
+            val focused = first.assertIsDisplayed().fetchSemanticsNode()
+            assertEquals("Focused tab remains clipped", focused.size.width.toFloat(), focused.boundsInRoot.width, 1f)
             compose.onNodeWithContentDescription(compose.activity.getString(R.string.scan_action_description)).performClick()
             capture("dock-font200")
         }

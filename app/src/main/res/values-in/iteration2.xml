@@ -5,7 +5,7 @@
     <string name="open_profile">Buka profil</string>
     <string name="summary_activity_count">%1$d aktivitas tercatat</string>
     <string name="summary_footer">Catatan pribadi, bukan dampak terverifikasi.</string>
-    <string name="rate_title">Recycling rate</string>
+    <string name="rate_title">Tingkat daur ulang</string>
     <string name="rate_basis">Berdasarkan aktivitas penanganan</string>
     <string name="rate_fraction">%1$d dari %2$d aktivitas penanganan</string>
     <string name="rate_empty">Belum ada</string>

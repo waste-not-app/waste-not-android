@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -124,7 +123,7 @@ fun WasteTextField(
     var visible by rememberSaveable { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
     val support = errorText ?: helper
-    val fieldShape = RoundedCornerShape(15.dp)
+    val fieldShape = MaterialTheme.shapes.small
     val field: @Composable (Modifier) -> Unit = { placement ->
         OutlinedTextField(
             value = value,

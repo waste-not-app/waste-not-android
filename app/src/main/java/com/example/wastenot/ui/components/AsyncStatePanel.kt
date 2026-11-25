@@ -37,7 +37,7 @@ internal fun AsyncStatePanel(
         ) {
             Surface(
                 modifier = Modifier.size(64.dp).testTag("async-state-symbol"),
-                shape = RoundedCornerShape(20.dp),
+                shape = MaterialTheme.shapes.large,
                 color = MaterialTheme.colorScheme.surfaceVariant,
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

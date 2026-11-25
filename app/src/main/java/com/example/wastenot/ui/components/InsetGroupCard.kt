@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -78,10 +79,9 @@ fun InsetGroupCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val tokens = LocalWasteNotSurfaceTokens.current
-    val shape = RoundedCornerShape(22.dp)
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = shape,
+        shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, tokens.cardEdge),
     ) {
@@ -105,9 +105,13 @@ fun InsetGroupItemContainer(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val tokens = LocalWasteNotSurfaceTokens.current
-    val top = if (isFirst) 22.dp else 0.dp
-    val bottom = if (isLast) 22.dp else 0.dp
-    val shape = RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom)
+    val cardShape = MaterialTheme.shapes.large
+    val shape = cardShape.copy(
+        topStart = if (isFirst) cardShape.topStart else ZeroCornerSize,
+        topEnd = if (isFirst) cardShape.topEnd else ZeroCornerSize,
+        bottomStart = if (isLast) cardShape.bottomStart else ZeroCornerSize,
+        bottomEnd = if (isLast) cardShape.bottomEnd else ZeroCornerSize,
+    )
     val edgeColor = tokens.cardEdge
     Surface(
         modifier = modifier
@@ -116,7 +120,7 @@ fun InsetGroupItemContainer(
                 val stroke = 1.dp.toPx()
                 val half = stroke / 2f
                 if (isFirst && isLast) {
-                    val radius = 22.dp.toPx()
+                    val radius = cardShape.topStart.toPx(size, this)
                     drawRoundRect(
                         color = edgeColor,
                         topLeft = Offset(half, half),
@@ -126,7 +130,7 @@ fun InsetGroupItemContainer(
                     )
                 } else {
                     val path = Path()
-                    val r = 22.dp.toPx()
+                    val r = cardShape.topStart.toPx(size, this)
                     val right = size.width - half
                     val bottomY = size.height - half
                     if (isFirst) {
@@ -182,7 +186,7 @@ fun MetricTile(
     val tokens = LocalWasteNotSurfaceTokens.current
     Surface(
         modifier = modifier.semantics(mergeDescendants = true) {},
-        shape = RoundedCornerShape(20.dp),
+        shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, tokens.cardEdge),
         shadowElevation = if (tokens.isDark) 0.dp else 1.dp,

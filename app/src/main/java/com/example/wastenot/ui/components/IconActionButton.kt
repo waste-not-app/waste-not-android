@@ -7,7 +7,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -34,7 +33,7 @@ fun IconActionButton(
     val tokens = LocalWasteNotSurfaceTokens.current
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
-    val shape = if (circle) CircleShape else RoundedCornerShape(14.dp)
+    val shape = if (circle) CircleShape else MaterialTheme.shapes.small
     val container = if (circle) tokens.glassTintStrong else colors.surfaceVariant
     val content = if (enabled) colors.onPrimaryContainer else colors.onSurfaceVariant
     val edge = if (circle) tokens.glassEdge else tokens.cardEdge

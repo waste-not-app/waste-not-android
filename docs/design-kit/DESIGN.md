@@ -165,6 +165,8 @@ The full C01 to C39 inventory is in [SCREEN_SPEC](SCREEN_SPEC.md). Visual rules 
 | Dialog | Surface, padding 24, heading 20 | Focus stays in the dialog | Destructive and cancel actions kept apart |
 | Empty / error | Functional icon, title, cause, one action | Focus goes to recovery | Never shows fake statistics |
 
+Android shape tokens: 14 dp for fields and controls, 16 dp for compact metrics, 20 dp for grouped cards and glass headers, and 28 dp for dialogs, sheets, and the dock. Pills, icon badges, and photos keep their own shapes. The dock sizes each destination from its label and minimum touch target; it shows a horizontal scroll indicator only when the row cannot fit.
+
 Fields in the HTML are native input, select, date, and time elements, not complex picker replicas. In Compose, use OutlinedTextField, SingleChoiceSegmentedButtonRow, RadioButton, FilterChip, DatePicker and TimePicker, ModalBottomSheet, and AlertDialog as fits. The design system doesn't require a Kotlin wrapper for every example.
 
 ## 7. Icons, imagery, and visualization

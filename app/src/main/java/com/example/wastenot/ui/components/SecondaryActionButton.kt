@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +33,7 @@ fun SecondaryActionButton(
     val colors = MaterialTheme.colorScheme
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
-    val shape = RoundedCornerShape(15.dp)
+    val shape = MaterialTheme.shapes.small
     OutlinedButton(
         onClick = onClick,
         modifier = modifier.heightIn(min = 52.dp)

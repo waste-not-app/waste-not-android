@@ -72,7 +72,7 @@ fun CategoryPicker(
                 isError = error != null,
                 supportingText = if (error != null) ({ Text(error) }) else null,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                shape = RoundedCornerShape(15.dp),
+                shape = MaterialTheme.shapes.small,
                 colors = wasteTextFieldColors(),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -111,7 +111,7 @@ fun MethodSelector(
                             val tokens = LocalWasteNotSurfaceTokens.current
                             Surface(
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
-                                shape = RoundedCornerShape(17.dp),
+                                shape = MaterialTheme.shapes.medium,
                                 color = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
                                 border = BorderStroke(
                                     if (selected) 1.5.dp else 1.dp,
@@ -156,7 +156,7 @@ fun RangeSelector(days: Int, onChange: (Int) -> Unit, modifier: Modifier = Modif
     val tokens = LocalWasteNotSurfaceTokens.current
     Surface(
         modifier,
-        shape = RoundedCornerShape(14.dp),
+        shape = MaterialTheme.shapes.small,
         color = MaterialTheme.colorScheme.surfaceVariant,
         border = BorderStroke(1.dp, tokens.cardEdge),
     ) {

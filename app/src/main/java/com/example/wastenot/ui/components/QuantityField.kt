@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -93,7 +92,7 @@ private fun QuantityUnitPicker(unit: QuantityUnit, onChange: (QuantityUnit) -> U
             val tokens = LocalWasteNotSurfaceTokens.current
             OutlinedButton(
                 onClick = { expanded = true }, enabled = enabled,
-                shape = RoundedCornerShape(15.dp),
+                shape = MaterialTheme.shapes.small,
                 border = BorderStroke(1.dp, if (enabled) tokens.fieldEdge else MaterialTheme.colorScheme.outlineVariant),
                 contentPadding = PaddingValues(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp),
                 colors = ButtonDefaults.outlinedButtonColors(

@@ -45,6 +45,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -56,6 +60,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -83,11 +88,11 @@ import com.example.wastenot.ui.components.GlassChromeSurface
 import com.example.wastenot.ui.components.focusOutline
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import kotlin.math.roundToInt
 import java.time.Clock
 import java.time.LocalDate
 import java.util.UUID
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
@@ -688,7 +693,7 @@ internal fun AccountPage(
             fallbackTint = HazeTint(colors.surface),
         )
     }
-    val headerShape = androidx.compose.foundation.shape.RoundedCornerShape(22.dp)
+    val headerShape = MaterialTheme.shapes.large
     // Each fading entry owns its chrome so an outgoing list keeps its scroll constraints.
     Box(modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize().ambientCanvasBackground().hazeSource(hazeState, zIndex = 0f))
@@ -767,7 +772,7 @@ private fun TabDock(
     glassStyle: HazeStyle,
     modifier: Modifier = Modifier,
 ) {
-    val dockShape = androidx.compose.foundation.shape.RoundedCornerShape(30.dp)
+    val dockShape = MaterialTheme.shapes.extraLarge
     val context = LocalContext.current
     val backgroundColor = MaterialTheme.colorScheme.background
     val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -789,14 +794,37 @@ private fun TabDock(
             val measurer = rememberTextMeasurer()
             val density = LocalDensity.current
             val labelStyle = MaterialTheme.typography.labelMedium
-            val labels = MainTab.entries.map { stringResource(it.label) }
-            val widest = with(density) {
-                labels.maxOf { measurer.measure(it, style = labelStyle, softWrap = false).size.width }.toDp()
+            val tabs = MainTab.entries
+            val labels = tabs.map { stringResource(it.label) }
+            val viewport = constraints.maxWidth
+            val edge = with(density) { 4.dp.roundToPx() }
+            val widths = remember(labels, measurer, labelStyle, density, viewport) {
+                with(density) {
+                    val minimumTouch = 48.dp.roundToPx()
+                    val maxCell = (viewport - edge * 2).coerceAtLeast(minimumTouch)
+                    val minimums = labels.map { label ->
+                        val textWidth = measurer.measure(label, style = labelStyle, softWrap = false).size.width
+                        (textWidth + 2.dp.roundToPx() * 2).coerceIn(minimumTouch, maxCell)
+                    }
+                    val spare = (viewport - edge * 2 - minimums.sum()).coerceAtLeast(0)
+                    minimums.mapIndexed { index, width ->
+                        width + spare / tabs.size + if (index < spare % tabs.size) 1 else 0
+                    }
+                }
             }
-            val cellWidth = maxOf((maxWidth - 8.dp) / MainTab.entries.size, widest + 8.dp, 48.dp)
             val scroll = rememberScrollState()
-            LaunchedEffect(selected, cellWidth) {
-                val targetPx = with(density) { (selected.ordinal * cellWidth.toPx()).roundToInt() }
+            val overflow = widths.sum() + edge * 2 > viewport
+            LaunchedEffect(selected, widths, viewport) {
+                if (!overflow) return@LaunchedEffect
+                snapshotFlow { scroll.viewportSize }.first { it == viewport }
+                var start = edge
+                for (index in 0 until selected.ordinal) start += widths[index]
+                val end = start + widths[selected.ordinal]
+                val target = when {
+                    start < scroll.value -> start
+                    end > scroll.value + viewport -> end - viewport
+                    else -> return@LaunchedEffect
+                }
                 val animatorScale = runCatching {
                     android.provider.Settings.Global.getFloat(
                         context.contentResolver,
@@ -804,11 +832,7 @@ private fun TabDock(
                         1f,
                     )
                 }.getOrDefault(1f)
-                if (animatorScale > 0f && scroll.maxValue > 0) {
-                    scroll.animateScrollTo(targetPx)
-                } else {
-                    scroll.scrollTo(targetPx)
-                }
+                if (animatorScale > 0f) scroll.animateScrollTo(target) else scroll.scrollTo(target)
             }
             GlassChromeSurface(
                 hazeState = hazeState,
@@ -818,15 +842,41 @@ private fun TabDock(
                     .fillMaxWidth()
                     .padding(top = 22.dp),
             ) {
-                Row(
-                    modifier = Modifier
-                        .horizontalScroll(scroll)
-                        .height(IntrinsicSize.Max)
-                        .padding(top = 34.dp, bottom = 7.dp, start = 4.dp, end = 4.dp)
-                        .selectableGroup(),
-                ) {
-                    MainTab.entries.forEach { tab ->
-                        TabItem(tab, tab == selected, { onSelect(tab) }, Modifier.width(cellWidth).fillMaxHeight())
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(scroll)
+                            .height(IntrinsicSize.Max)
+                            .padding(top = 34.dp, bottom = if (overflow) 2.dp else 7.dp, start = 4.dp, end = 4.dp)
+                            .selectableGroup(),
+                    ) {
+                        tabs.forEachIndexed { index, tab ->
+                            val width = with(density) { widths[index].toDp() }
+                            TabItem(tab, tab == selected, { onSelect(tab) }, Modifier.width(width).fillMaxHeight())
+                        }
+                    }
+                    if (overflow) {
+                        val colors = MaterialTheme.colorScheme
+                        Box(
+                            Modifier.padding(start = 24.dp, end = 24.dp, bottom = 3.dp)
+                                .fillMaxWidth()
+                                .height(2.dp)
+                                .drawBehind {
+                                    val range = scroll.maxValue
+                                    if (range <= 0 || range == Int.MAX_VALUE) return@drawBehind
+                                    val radius = CornerRadius(size.height / 2f)
+                                    val thumb = size.width * viewport / (viewport + range)
+                                    val progress = scroll.value.toFloat() / range
+                                    val offset = if (layoutDirection == LayoutDirection.Ltr) progress else 1f - progress
+                                    drawRoundRect(colors.outlineVariant, cornerRadius = radius)
+                                    drawRoundRect(
+                                        colors.onSurfaceVariant,
+                                        topLeft = Offset((size.width - thumb) * offset, 0f),
+                                        size = Size(thumb, size.height),
+                                        cornerRadius = radius,
+                                    )
+                                },
+                        )
                     }
                 }
             }
@@ -857,7 +907,7 @@ private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifi
     val view = LocalView.current
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
-    val shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
+    val shape = MaterialTheme.shapes.large
     val colors = MaterialTheme.colorScheme
     val contentColor = if (selected) colors.onTertiary else colors.onSurfaceVariant
     Column(
@@ -896,7 +946,6 @@ private fun TabItem(tab: MainTab, selected: Boolean, onClick: () -> Unit, modifi
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.labelMedium,
             textAlign = TextAlign.Center,
-            maxLines = 1,
             color = contentColor,
         )
     }
