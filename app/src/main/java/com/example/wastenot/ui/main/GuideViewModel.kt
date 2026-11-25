@@ -21,6 +21,8 @@ import kotlinx.coroutines.launch
 
 data class GuideDetailState(val id: String, val article: WasteGuide? = null, val loading: Boolean = true, val error: ApiFailureKind? = null)
 
+data class GuideSearchFilters(val query: String, val category: WasteCategory?)
+
 data class GuideUiState(
     val query: String = "",
     val category: WasteCategory? = null,
@@ -30,7 +32,12 @@ data class GuideUiState(
     val nextCursor: String? = null,
     val error: ApiFailureKind? = null,
     val detail: GuideDetailState? = null,
-)
+    val resultsFor: GuideSearchFilters? = null,
+    val searchPending: Boolean = false,
+) {
+    val showingPreviousResults: Boolean
+        get() = resultsFor?.let { it.query != query.trim() || it.category != category } == true
+    }
 
 class GuideViewModel(private val store: GuideStore, private val saved: SavedStateHandle,
     private val now: () -> Instant = Instant::now) : ViewModel() {
@@ -44,41 +51,63 @@ class GuideViewModel(private val store: GuideStore, private val saved: SavedStat
     private var started = false
     private var retryAt: Instant? = null
 
-    fun load() { if (!started) { started = true; search() } }
+    fun load() { if (!started) search() }
 
     fun query(value: String) {
         val query = value.truncateQuery()
-        if (query == mutableState.value.query) return
+        val before = mutableState.value
+        if (query == before.query) return
         saved["guide_query"] = query
-        mutableState.update { it.copy(query = query, articles = emptyList()) }
-        search(debounce = true)
+        if (query.trim() == before.query.trim()) {
+            mutableState.update { it.copy(query = query) }
+        } else {
+            request(before, query = query, debounce = true)
+        }
     }
 
     fun category(value: WasteCategory?) {
-        if (value == mutableState.value.category) return
+        val before = mutableState.value
+        if (value == before.category) return
         saved["guide_category"] = value?.name
-        mutableState.update { it.copy(category = value, articles = emptyList()) }
-        search()
+        request(before, category = value)
     }
 
-    fun search(more: Boolean = false, debounce: Boolean = false) {
+    fun search(more: Boolean = false) {
         val before = mutableState.value
-        val cursor = if (more) before.nextCursor?.takeUnless { before.loading || before.loadingMore } ?: return else null
+        if (!more && before.loading && searching?.isActive == true) return
+        val cursor = if (more) {
+            before.nextCursor?.takeUnless {
+                before.loading || before.loadingMore || before.searchPending || before.showingPreviousResults
+            } ?: return
+        } else null
+        request(before, cursor)
+    }
+
+    private fun request(
+        before: GuideUiState,
+        cursor: String? = null,
+        query: String = before.query,
+        category: WasteCategory? = before.category,
+        debounce: Boolean = false,
+    ) {
+        started = true
         searching?.cancel()
-        if (retryAt?.isAfter(now()) == true) {
-            mutableState.update { it.copy(loading = false, loadingMore = false,
-                nextCursor = if (more) it.nextCursor else null, error = ApiFailureKind.RATE_LIMITED) }
-            return
-        }
-        val query = before.query.trim()
-        val category = before.category
-        mutableState.update { it.copy(
-            loading = !more, loadingMore = more,
-            nextCursor = if (more) it.nextCursor else null, error = null,
-        ) }
+        val more = cursor != null
+        val filters = GuideSearchFilters(query.trim(), category)
+        mutableState.value = before.copy(
+            query = query, category = category,
+            loading = !more && !debounce, loadingMore = more, searchPending = debounce,
+            nextCursor = cursor, error = null,
+        )
         searching = viewModelScope.launch {
             if (debounce) delay(300)
-            val response = store.search(query, category, cursor)
+            if (retryAt?.isAfter(now()) == true) {
+                mutableState.update { it.copy(loading = false, loadingMore = false, searchPending = false,
+                    error = ApiFailureKind.RATE_LIMITED) }
+                return@launch
+            }
+            if (debounce) mutableState.update { it.copy(loading = true, searchPending = false) }
+            val response = store.search(filters.query, filters.category, cursor)
             currentCoroutineContext().ensureActive()
             if (response is ApiResult.Failure) rememberRetryAfter(response.error)
             mutableState.update { current -> when (response) {
@@ -89,7 +118,7 @@ class GuideViewModel(private val store: GuideStore, private val saved: SavedStat
                         current.copy(loading = false, loadingMore = false, error = ApiFailureKind.MALFORMED_RESPONSE)
                     } else current.copy(
                         articles = (if (more) current.articles + response.value else response.value).distinctBy { it.id },
-                        loading = false, loadingMore = false, nextCursor = next,
+                        loading = false, loadingMore = false, nextCursor = next, resultsFor = filters,
                     )
                 }
                 is ApiResult.Failure -> {

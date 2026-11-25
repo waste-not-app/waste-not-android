@@ -76,6 +76,87 @@ class GuideViewModelTest {
         assertEquals(100, calls.last().length)
     }
 
+    @Test fun explicitSubmitSkipsDebounceAndKeepsPriorRowsUntilTheNewSearchSucceeds() = runTest {
+        val source = DummyGuideStore()
+        val replacement = CompletableDeferred<ApiResult<List<WasteGuide>>>()
+        val calls = mutableListOf<String>()
+        val vm = model(object : GuideStore by source {
+            override suspend fun search(query: String, category: WasteCategory?, cursor: String?): ApiResult<List<WasteGuide>> {
+                calls += query
+                return if (query == "carton") replacement.await() else source.search(query, category, cursor)
+            }
+        })
+        vm.load(); runCurrent()
+        val initial = vm.state.value.articles
+        vm.query("car"); runCurrent()
+        vm.query("carton"); runCurrent()
+        assertEquals(listOf(""), calls)
+        assertEquals(initial, vm.state.value.articles)
+        assertTrue(vm.state.value.showingPreviousResults)
+        assertFalse(vm.state.value.loading)
+
+        vm.search(); runCurrent()
+        assertEquals(listOf("", "carton"), calls)
+        assertEquals(initial, vm.state.value.articles)
+        assertTrue(vm.state.value.loading)
+        assertTrue(vm.state.value.showingPreviousResults)
+        vm.search()
+        advanceTimeBy(300); runCurrent()
+        assertEquals(listOf("", "carton"), calls)
+
+        replacement.complete(source.search("carton")); runCurrent()
+        assertEquals("Paper and cardboard", vm.state.value.articles.single().name)
+        assertFalse(vm.state.value.showingPreviousResults)
+    }
+
+    @Test fun changingCategoryRejectsAnOldPageAndCannotReuseItsCursor() = runTest {
+        val catalog = (0..20).map { DummyGuideStore.fixtures.first().copy(id = "guide-$it") }
+        val source = DummyGuideStore(catalog + DummyGuideStore.fixtures.filter { it.category == WasteCategory.GLASS })
+        val previousPage = CompletableDeferred<ApiResult<List<WasteGuide>>>()
+        val cursors = mutableListOf<String?>()
+        val vm = model(object : GuideStore by source {
+            override suspend fun search(query: String, category: WasteCategory?, cursor: String?): ApiResult<List<WasteGuide>> {
+                cursors += cursor
+                return if (cursor == null) source.search(query, category, cursor)
+                else withContext(NonCancellable) { previousPage.await() }
+            }
+        })
+        vm.load(); runCurrent()
+        vm.search(more = true); runCurrent()
+        vm.category(WasteCategory.GLASS)
+        assertTrue(vm.state.value.showingPreviousResults)
+        assertEquals(20, vm.state.value.articles.size)
+        vm.search(more = true); runCurrent()
+        previousPage.complete(source.search("", cursor = "20")); advanceUntilIdle()
+
+        assertEquals(listOf(null, "20", null), cursors)
+        assertEquals("Glass containers", vm.state.value.articles.single().name)
+        assertFalse(vm.state.value.showingPreviousResults)
+        assertFalse(vm.state.value.loadingMore)
+    }
+
+    @Test fun failedNewSearchKeepsThePreviousRowsMarkedAndDoesNotPageThem() = runTest {
+        val source = DummyGuideStore((0..20).map { DummyGuideStore.fixtures.first().copy(id = "guide-$it") })
+        val calls = mutableListOf<Pair<String, String?>>()
+        val vm = model(object : GuideStore by source {
+            override suspend fun search(query: String, category: WasteCategory?, cursor: String?): ApiResult<List<WasteGuide>> {
+                calls += query to cursor
+                return if (query.isNotEmpty()) ApiResult.Failure(ApiFailure(ApiFailureKind.NETWORK))
+                else source.search(query, category, cursor)
+            }
+        })
+        vm.load(); runCurrent()
+        val initial = vm.state.value.articles
+        vm.query("carton"); vm.search(); runCurrent()
+        vm.search(more = true); runCurrent()
+
+        assertEquals(listOf("" to null, "carton" to null), calls)
+        assertEquals(initial, vm.state.value.articles)
+        assertEquals(ApiFailureKind.NETWORK, vm.state.value.error)
+        assertTrue(vm.state.value.showingPreviousResults)
+        assertNull(vm.state.value.nextCursor)
+    }
+
     @Test fun unicodeQueryLimitMatchesServerCodePointsAndSurvivesRestoration() = runTest {
         val source = DummyGuideStore()
         val symbol = String(Character.toChars(0x1F331))
@@ -180,7 +261,7 @@ class GuideViewModelTest {
         assertEquals(articles, vm.state.value.articles)
         assertNull(vm.state.value.error)
         vm.query("carton")
-        assertTrue(vm.state.value.articles.isEmpty())
+        assertEquals(articles, vm.state.value.articles)
         advanceUntilIdle()
         assertEquals("Paper and cardboard", vm.state.value.articles.single().name)
     }

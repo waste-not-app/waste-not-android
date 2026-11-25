@@ -14,6 +14,7 @@
     <string name="guide_clear_action">Hapus</string>
     <string name="guide_all_categories">Semua kategori</string>
     <string name="guide_loading">Memuat panduan…</string>
+    <string name="guide_previous_results">Menampilkan hasil sebelumnya</string>
     <string name="guide_error">Panduan belum bisa dimuat</string>
     <string name="guide_empty_title">Panduan belum ditemukan</string>
     <string name="guide_empty_message">Coba nama material yang lebih umum.</string>

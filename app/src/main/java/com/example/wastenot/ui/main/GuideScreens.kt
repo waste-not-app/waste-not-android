@@ -22,6 +22,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.Role
@@ -51,7 +53,6 @@ import com.example.wastenot.ui.components.InsetGroupCard
 import com.example.wastenot.ui.components.InsetGroupItemContainer
 import com.example.wastenot.ui.components.wasteTextFieldColors
 import com.example.wastenot.ui.components.focusOutline
-import kotlinx.coroutines.launch
 
 @Composable
 fun GuideListScreen(
@@ -65,13 +66,22 @@ fun GuideListScreen(
     modifier: Modifier = Modifier,
 ) {
     val list = rememberLazyListState()
-    val scope = rememberCoroutineScope()
+    var displayedQuery by rememberSaveable { mutableStateOf<String?>(null) }
+    var displayedCategory by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(data.resultsFor) {
+        val committed = data.resultsFor ?: return@LaunchedEffect
+        val categoryName = committed.category?.name
+        if (displayedQuery != null && (displayedQuery != committed.query || displayedCategory != categoryName)) {
+            list.requestScrollToItem(0)
+        }
+        displayedQuery = committed.query
+        displayedCategory = categoryName
+    }
     val focus = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
     val searchAction = remember { FocusRequester() }
-    fun resetScroll() { scope.launch { list.scrollToItem(0) } }
-    fun submit() { searchAction.requestFocus(); keyboard?.hide(); onSearch(); resetScroll() }
-    fun clear() { focus.clearFocus(); keyboard?.hide(); onQuery(""); onCategory(null); resetScroll() }
+    fun submit() { searchAction.requestFocus(); keyboard?.hide(); onSearch() }
+    fun clear() { focus.clearFocus(); keyboard?.hide(); onQuery(""); onCategory(null); onSearch() }
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         LazyColumn(Modifier.weight(1f).widthIn(max = 840.dp).fillMaxWidth(), state = list,
             contentPadding = pagePadding(padding)) {
@@ -82,17 +92,17 @@ fun GuideListScreen(
                     Text(stringResource(R.string.guide_intro), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     OutlinedTextField(
                         data.query,
-                        { onQuery(it); resetScroll() },
+                        onQuery,
                         Modifier.fillMaxWidth().semantics { contentDescription = label },
                         placeholder = {
                             Text(stringResource(R.string.guide_search_hint), maxLines = 1, overflow = TextOverflow.Ellipsis,
                                 style = MaterialTheme.typography.bodyMedium)
                         },
                         singleLine = true,
-                        shape = RoundedCornerShape(15.dp),
+                        shape = MaterialTheme.shapes.small,
                         colors = wasteTextFieldColors(),
                         trailingIcon = if (data.query.isNotEmpty()) ({
-                            IconButton(onClick = { onQuery(""); resetScroll() }) {
+                            IconButton(onClick = { onQuery("") }) {
                                 Icon(painterResource(R.drawable.ic_clear), stringResource(R.string.guide_clear))
                             }
                         }) else null,
@@ -102,22 +112,33 @@ fun GuideListScreen(
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         SecondaryActionButton(stringResource(R.string.guide_search_action), ::submit,
                             Modifier.focusProperties { canFocus = true }.focusRequester(searchAction), icon = R.drawable.ic_search)
-                        GuideCategory(data.category, { onCategory(it); resetScroll() })
+                        GuideCategory(data.category, onCategory)
                         if (data.query.isNotEmpty() || data.category != null) {
                             TextActionButton(stringResource(R.string.guide_clear_action), ::clear)
                         }
                     }
                 }
             }
-            if (data.loading) item(key = "loading") {
-                if (data.articles.isEmpty()) AsyncStatePanel(stringResource(R.string.guide_loading), R.drawable.ic_clock,
-                    Modifier.fillMaxWidth(), loading = true)
-                else {
-                    Text(stringResource(R.string.guide_loading), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 12.dp))
+            val hasRows = data.articles.isNotEmpty()
+            if (hasRows && (data.showingPreviousResults || data.loading)) item(key = "result-status") {
+                Column(
+                    Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        stringResource(if (data.showingPreviousResults) R.string.guide_previous_results else R.string.guide_loading),
+                        modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    if (data.loading) LinearProgressIndicator(Modifier.fillMaxWidth())
                 }
             }
-            if (!data.loading && data.articles.isEmpty()) item(key = "empty") {
+            if (!hasRows && data.loading) item(key = "loading") {
+                AsyncStatePanel(stringResource(R.string.guide_loading), R.drawable.ic_clock,
+                    Modifier.fillMaxWidth(), loading = true)
+            }
+            if (!hasRows && !data.loading && !data.searchPending) item(key = "empty") {
                 val filtered = data.query.isNotBlank() || data.category != null
                 AsyncStatePanel(
                     title = stringResource(if (data.error != null) guideErrorText(data.error) else R.string.guide_empty_title),
@@ -136,6 +157,12 @@ fun GuideListScreen(
                     }), if (data.error != null || !filtered) onSearch else ::clear, Modifier.fillMaxWidth())
                 }
             }
+            if (hasRows && data.error != null && data.nextCursor == null) item(key = "search-error") {
+                Column(Modifier.padding(bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MessageBanner(stringResource(guideErrorText(data.error)), isError = true)
+                    ActionButton(stringResource(R.string.retry), onSearch)
+                }
+            }
             if (data.articles.isNotEmpty()) itemsIndexed(data.articles, key = { _, article -> article.id }) { idx, article ->
                 InsetGroupItemContainer(
                     isFirst = idx == 0,
@@ -147,11 +174,8 @@ fun GuideListScreen(
                     }
                 }
             }
-            if (data.articles.isNotEmpty() && data.error != null) item(key = "page-error") {
-                Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    MessageBanner(stringResource(guideErrorText(data.error)), isError = true)
-                    if (data.nextCursor == null) ActionButton(stringResource(R.string.retry), onSearch)
-                }
+            if (hasRows && data.error != null && data.nextCursor != null) item(key = "page-error") {
+                MessageBanner(stringResource(guideErrorText(data.error)), isError = true, modifier = Modifier.padding(top = 16.dp))
             }
             if (data.nextCursor != null) item(key = "more") {
                 ActionButton(stringResource(if (data.error != null) R.string.retry else R.string.guide_more), onMore,
@@ -168,7 +192,7 @@ private fun GuideCategory(category: WasteCategory?, onCategory: (WasteCategory?)
     Box(modifier) {
         FilterChip(selected = category != null, onClick = { expanded = true }, label = {
             Text(category?.let { stringResource(it.labelResource) } ?: stringResource(R.string.guide_all_categories))
-        }, shape = RoundedCornerShape(15.dp),
+        }, shape = MaterialTheme.shapes.small,
             trailingIcon = { Icon(painterResource(R.drawable.ic_chevron_down), null, Modifier.size(18.dp)) },
             colors = FilterChipDefaults.filterChipColors(containerColor = MaterialTheme.colorScheme.surfaceContainer,
             labelColor = MaterialTheme.colorScheme.onSurfaceVariant, selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,

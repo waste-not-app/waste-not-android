@@ -41,6 +41,34 @@ class GuideStateDesignTest {
         field.assertIsNotFocused()
     }
 
+    @Test fun pendingSearchLabelsTheRetainedRowsInsteadOfReplacingThemWithLoading() {
+        val oldArticle = DummyGuideStore.fixtures.first { it.name == "Plastic bottles" }
+        val newArticle = DummyGuideStore.fixtures.first { it.name == "Paper and cardboard" }
+        var data by mutableStateOf(GuideUiState(articles = listOf(oldArticle), loading = false, resultsFor = GuideSearchFilters("", null)))
+        compose.setContent { WasteNotTheme(false) {
+            Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                GuideListScreen(data, PaddingValues(),
+                    { data = data.copy(query = it, searchPending = true) },
+                    {}, {}, {}, {}, Modifier.fillMaxSize())
+            }
+        } }
+        compose.onNodeWithContentDescription("Search guides").performTextReplacement("carton")
+        val list = compose.onNode(hasScrollToIndexAction())
+        list.performScrollToNode(hasText("Showing previous results"))
+        compose.onNodeWithText("Showing previous results").assertIsDisplayed()
+        compose.onNodeWithText("Loading guides…").assertDoesNotExist()
+        list.performScrollToNode(hasText("Plastic bottles"))
+        compose.onNodeWithText("Plastic bottles").assertExists()
+
+        compose.runOnIdle {
+            data = data.copy(articles = listOf(newArticle), resultsFor = GuideSearchFilters("carton", null), searchPending = false)
+        }
+        list.performScrollToNode(hasText("Paper and cardboard"))
+        compose.onNodeWithText("Paper and cardboard").assertExists()
+        compose.onNodeWithText("Showing previous results").assertDoesNotExist()
+        compose.onNodeWithText("Plastic bottles").assertDoesNotExist()
+    }
+
     @Test fun initialSearchErrorKeepsTheQueryAndRetryHasARealAction() {
         var retries = 0
         compose.setContent { WasteNotTheme(false) {

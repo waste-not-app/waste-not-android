@@ -407,6 +407,7 @@ fun AccountNavigation(
                     onSource = { url ->
                         try { uriHandler.openUri(url); sourceError = false }
                         catch (_: IllegalArgumentException) { sourceError = true }
+                        catch (_: SecurityException) { sourceError = true }
                     }, modifier = Modifier.fillMaxSize(), sourceUnavailable = sourceError)
             }
             entry<Statistics> {

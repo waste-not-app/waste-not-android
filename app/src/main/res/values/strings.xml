@@ -13,6 +13,7 @@
     <string name="guide_clear_action">Clear</string>
     <string name="guide_all_categories">All categories</string>
     <string name="guide_loading">Loading guides…</string>
+    <string name="guide_previous_results">Showing previous results</string>
     <string name="guide_error">Couldn\'t load the guides</string>
     <string name="guide_empty_title">No guides found</string>
     <string name="guide_empty_message">Try a more general material name.</string>
