@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="save_waiting_for_result">Menunggu hasil penyimpanan.</string>
     <string name="save_outcome_unknown">Hasil penyimpanan belum diketahui. Coba lagi dengan isian awal sebelum mengubah catatan.</string>
     <string name="save_outcome_retry_error">%1$s\n\nPercobaan terakhir: %2$s</string>
     <string name="save_request_conflict">Permintaan ini sudah dipakai untuk isian lain. Periksa riwayat sebelum membuat catatan baru.</string>

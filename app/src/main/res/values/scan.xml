@@ -24,6 +24,7 @@
     <string name="scan_send">Scan photo</string>
     <string name="scan_retake">Retake</string>
     <string name="scan_detecting">Identifying the object…</string>
+    <string name="scan_review_captured_photo">Review captured photo</string>
     <string name="scan_object_hint">Pick one object and check its material. A bottle label alone doesn\'t tell plastic from glass.</string>
     <string name="scan_detection_score">Detection score %1$d%%</string>
     <string name="scan_uncertain">Not sure yet. Check it or retake the photo.</string>
@@ -49,6 +50,8 @@
     <string name="scan_get_recommendation">See advice</string>
     <string name="scan_correct_object">Correct the object</string>
     <string name="scan_recommending">Preparing advice…</string>
+    <string name="scan_stop_and_check_object">Stop and check object</string>
+    <string name="scan_review_answers">Review your answers</string>
     <string name="scan_suggested_method">Suggested handling</string>
     <string name="scan_initial_guidance">Starter handling advice</string>
     <string name="scan_special_guidance">Specialist handling advice</string>
@@ -67,9 +70,13 @@
     <string name="scan_manual_choice_retained">The category and method you chose carry over to manual entry, without the AI reference.</string>
     <string name="scan_guide_revision">Guide reference: %1$s · version %2$d</string>
     <string name="scan_photo_error">Couldn\'t use that photo. Try retaking it at a smaller size.</string>
+    <string name="scan_photo_rejected">This photo couldn\'t be used. Take another photo or log manually.</string>
     <string name="scan_permission_denied">Camera permission wasn\'t granted. You can still log manually.</string>
     <string name="scan_camera_error">Couldn\'t open the camera. Try again or log manually.</string>
-    <string name="scan_recommendation_error">Couldn\'t load the advice. Your answers are still saved.</string>
+    <string name="scan_recommendation_error">Couldn\'t load the advice. Your answers are still here.</string>
     <string name="scan_detection_error">Couldn\'t identify the object right now. Try again or log manually.</string>
+    <string name="scan_timeout">The request took too long.</string>
+    <string name="scan_connection_error">Check your connection before trying again.</string>
+    <string name="scan_wait_before_retry">Wait a moment before sending another request.</string>
     <string name="scan_photo_description">Photo of the waste to check</string>
 </resources>

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.*
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
@@ -227,6 +228,8 @@ class EditorSubmissionTest {
         }
         compose.onNodeWithText("Save log").performScrollTo().performClick()
         compose.onNodeWithText("Saving…").assertIsNotEnabled()
+        compose.onNodeWithText("Waiting for the save result.").assertIsDisplayed()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite))
         assertFrozen()
         compose.runOnIdle {
             assertEquals(1, received.size)
@@ -244,6 +247,9 @@ class EditorSubmissionTest {
         compose.onNodeWithContentDescription("Notes (optional)").assertTextContains("  Original entry  ")
         compose.runOnIdle { assertEquals(1, received.size) }
         compose.onNodeWithText("Try again").performScrollTo().performClick()
+        compose.onNodeWithText("Saving…").assertIsNotEnabled()
+        compose.onNodeWithText("Waiting for the save result.").assertIsDisplayed()
+        compose.onNodeWithText("We don't know whether this was saved.", substring = true).assertDoesNotExist()
         compose.runOnIdle {
             assertEquals(2, received.size)
             assertEquals(received[0], received[1])

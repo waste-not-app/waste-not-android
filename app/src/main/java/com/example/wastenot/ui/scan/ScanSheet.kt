@@ -51,6 +51,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.stateDescription
@@ -74,10 +77,14 @@ import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.ui.components.labelResource
 import com.example.wastenot.ui.main.sheetVerticalScroll
 import com.example.wastenot.ui.main.SheetSystemBar
+import java.time.Duration
+import java.time.Instant
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.time.toKotlinDuration
 
 private val scanHandlingMethods = listOf(DisposalMethod.REUSE, DisposalMethod.RECYCLE, DisposalMethod.TRASH)
 
@@ -125,6 +132,19 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
         ScanPhase.RECOMMENDATION -> R.string.scan_review_recommendation
         ScanPhase.FAILURE -> R.string.scan_unavailable
     }
+    val busyLabel = when (state.phase) {
+        ScanPhase.DETECTING -> R.string.scan_detecting
+        ScanPhase.RECOMMENDING -> R.string.scan_recommending
+        else -> null
+    }
+    val retryAt = state.error?.retryAt
+    var canRequest by remember(retryAt) { mutableStateOf(retryAt?.isAfter(Instant.now()) != true) }
+    if (!canRequest && retryAt != null && retryAt != Instant.MAX) {
+        LaunchedEffect(retryAt) {
+            delay(Duration.between(Instant.now(), retryAt).toKotlinDuration())
+            canRequest = true
+        }
+    }
     val horizontalPadding = if (LocalConfiguration.current.screenWidthDp <= 400) 16.dp else 24.dp
     val scroll = remember(state.phase) { ScrollState(0) }
     val stepAlpha = remember { Animatable(1f) }
@@ -143,7 +163,13 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
     val actions: @Composable (Modifier) -> Unit = { placement ->
         RecommendationActions(state, onUse, onMethod, onReviewContext, onManual, placement)
     }
-    val body: @Composable (Modifier, Boolean, Boolean) -> Unit = { placement, inlineActions, pinCameraManual ->
+    val header: @Composable (Modifier) -> Unit = { placement ->
+        Row(placement.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+            Text(stringResource(title), Modifier.weight(1f).semantics { heading() }, style = MaterialTheme.typography.headlineSmall)
+            IconActionButton(R.drawable.ic_close, stringResource(R.string.scan_close), onDismiss)
+        }
+    }
+    val body: @Composable (Modifier, Boolean, Int?) -> Unit = { placement, inlineActions, pinnedSecondary ->
         Column(
             placement
                 .fillMaxWidth()
@@ -152,25 +178,24 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                 .padding(horizontal = horizontalPadding, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-                Text(stringResource(title), Modifier.weight(1f).semantics { heading() }, style = MaterialTheme.typography.headlineSmall)
-                IconActionButton(R.drawable.ic_close, stringResource(R.string.scan_close), onDismiss)
-            }
-            if (state.phase != ScanPhase.RECOMMENDATION) {
+            if (busyLabel == null) header(Modifier)
+            if (busyLabel == null && state.phase != ScanPhase.RECOMMENDATION) {
                 Text(stringResource(R.string.scan_capture_notice),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            if (state.phase == ScanPhase.RECOMMENDING && pinnedSecondary == null) {
+                ScanSecondary(R.string.scan_stop_and_check_object, onCorrectObject)
+            }
             HorizontalDivider()
             ScanSteps(state.step)
-            if (state.error?.kind == ApiFailureKind.RATE_LIMITED) MessageBanner(stringResource(R.string.error_rate_limited), isError = true)
             when (state.phase) {
                 ScanPhase.CAMERA -> camera()
                 ScanPhase.PHOTO, ScanPhase.DETECTING -> {
                     state.photo?.let { ScanPhotoPreview(it, emptyList(), null, onSelect) }
-                    Text(stringResource(R.string.scan_photo_consent), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    if (state.phase == ScanPhase.DETECTING) ScanBusy(R.string.scan_detecting)
-                    else {
-                        ActionButton(stringResource(R.string.scan_send), onDetect, Modifier.fillMaxWidth())
+                    if (state.phase == ScanPhase.PHOTO) {
+                        Text(stringResource(R.string.scan_photo_consent), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        if (!canRequest) ScanWarning(stringResource(R.string.scan_wait_before_retry))
+                        ActionButton(stringResource(R.string.scan_send), onDetect, Modifier.fillMaxWidth(), enabled = canRequest)
                         ScanSecondary(R.string.scan_retake, onRetake)
                     }
                 }
@@ -206,62 +231,67 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                         enabled = state.item != null && state.selected != null)
                     ScanSecondary(R.string.scan_retake, onRetake)
                 }
-                ScanPhase.CONTEXT, ScanPhase.RECOMMENDING -> {
+                ScanPhase.RECOMMENDING -> {
+                    state.item?.let { Text(it.label, style = MaterialTheme.typography.titleMedium) }
+                    state.category?.let {
+                        Text(stringResource(R.string.scan_context_category, stringResource(it.labelResource)),
+                            style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+                ScanPhase.CONTEXT -> {
                     Text(state.category?.let { stringResource(R.string.scan_context_summary, stringResource(it.labelResource)) }
                         ?: stringResource(R.string.scan_context_hint), style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    if (state.phase == ScanPhase.RECOMMENDING) {
-                        ScanBusy(R.string.scan_recommending)
-                        ScanSecondary(R.string.scan_correct_object, onCorrectObject)
-                    }
-                    else {
-                        InsetGroupCard(contentPadding = true) {
-                            ScanChoice(stringResource(R.string.scan_cleanliness), cleanlinessLabel(state.context.cleanliness), Cleanliness.entries,
-                                { cleanlinessLabel(it) }, { onContext(state.context.copy(cleanliness = it)) })
-                            ScanChoice(stringResource(R.string.scan_integrity), integrityLabel(state.context.integrity), Integrity.entries,
-                                { integrityLabel(it) }, { onContext(state.context.copy(integrity = it)) })
-                            ScanChoice(stringResource(R.string.scan_reusability), reusableLabel(state.context.reusable), Reusability.entries,
-                                { reusableLabel(it) }, { onContext(state.context.copy(reusable = it)) })
-                            ScanChoice(stringResource(R.string.scan_reuse_intention), intentionLabel(state.context.reuseIntention), listOf(null, true, false),
-                                { intentionLabel(it) }, { onContext(state.context.copy(reuseIntention = it)) })
-                            if (state.context.cleanliness == Cleanliness.DIRTY || state.context.cleanable != AiAnswer.UNKNOWN ||
-                                AiContextField.CLEANABLE in state.requestedContext) {
-                                ScanChoice(stringResource(R.string.scan_cleanable), reusableLabel(state.context.cleanable), AiAnswer.entries,
-                                    { reusableLabel(it) }, { onContext(state.context.copy(cleanable = it)) })
-                            }
-                            if (state.context.cleanliness == Cleanliness.DIRTY || state.context.soiling != AiSoiling.UNKNOWN ||
-                                AiContextField.SOILING in state.requestedContext) {
-                                ScanChoice(stringResource(R.string.scan_soiling), soilingLabel(state.context.soiling), AiSoiling.entries,
-                                    { soilingLabel(it) }, { onContext(state.context.copy(soiling = it)) })
-                            }
-                            if (state.objectKey == "hdpe_bottle" || state.context.formerContents != AiFormerContents.UNKNOWN ||
-                                AiContextField.FORMER_CONTENTS in state.requestedContext) {
-                                ScanChoice(stringResource(R.string.scan_former_contents), formerContentsLabel(state.context.formerContents), AiFormerContents.entries,
-                                    { formerContentsLabel(it) }, { onContext(state.context.copy(formerContents = it)) })
-                            }
-                            ScanChoice(stringResource(R.string.scan_recycling_access), reusableLabel(state.context.recyclingAccess), AiAnswer.entries,
-                                { reusableLabel(it) }, { onContext(state.context.copy(recyclingAccess = it)) })
-                            Text(stringResource(R.string.scan_receiver_hint), style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            ScanCheck(stringResource(R.string.scan_risk_flag), state.context.riskFlag,
-                                { onContext(state.context.copy(riskFlag = it)) })
-                            if (state.context.riskFlag || state.context.riskType != AiRiskType.UNKNOWN ||
-                                state.context.soiling == AiSoiling.HAZARDOUS || state.context.formerContents == AiFormerContents.CHEMICAL ||
-                                AiContextField.RISK_TYPE in state.requestedContext) {
-                                ScanChoice(stringResource(R.string.scan_risk_type), riskLabel(state.context.riskType), AiRiskType.entries,
-                                    { riskLabel(it) }, { onContext(state.context.copy(riskType = it)) })
-                            }
+                    InsetGroupCard(contentPadding = true) {
+                        ScanChoice(stringResource(R.string.scan_cleanliness), cleanlinessLabel(state.context.cleanliness), Cleanliness.entries,
+                            { cleanlinessLabel(it) }, { onContext(state.context.copy(cleanliness = it)) })
+                        ScanChoice(stringResource(R.string.scan_integrity), integrityLabel(state.context.integrity), Integrity.entries,
+                            { integrityLabel(it) }, { onContext(state.context.copy(integrity = it)) })
+                        ScanChoice(stringResource(R.string.scan_reusability), reusableLabel(state.context.reusable), Reusability.entries,
+                            { reusableLabel(it) }, { onContext(state.context.copy(reusable = it)) })
+                        ScanChoice(stringResource(R.string.scan_reuse_intention), intentionLabel(state.context.reuseIntention), listOf(null, true, false),
+                            { intentionLabel(it) }, { onContext(state.context.copy(reuseIntention = it)) })
+                        if (state.context.cleanliness == Cleanliness.DIRTY || state.context.cleanable != AiAnswer.UNKNOWN ||
+                            AiContextField.CLEANABLE in state.requestedContext) {
+                            ScanChoice(stringResource(R.string.scan_cleanable), reusableLabel(state.context.cleanable), AiAnswer.entries,
+                                { reusableLabel(it) }, { onContext(state.context.copy(cleanable = it)) })
                         }
-                        ActionButton(stringResource(R.string.scan_get_recommendation), onRecommend, Modifier.fillMaxWidth())
-                        ScanSecondary(R.string.scan_correct_object, onCorrectObject)
+                        if (state.context.cleanliness == Cleanliness.DIRTY || state.context.soiling != AiSoiling.UNKNOWN ||
+                            AiContextField.SOILING in state.requestedContext) {
+                            ScanChoice(stringResource(R.string.scan_soiling), soilingLabel(state.context.soiling), AiSoiling.entries,
+                                { soilingLabel(it) }, { onContext(state.context.copy(soiling = it)) })
+                        }
+                        if (state.objectKey == "hdpe_bottle" || state.context.formerContents != AiFormerContents.UNKNOWN ||
+                            AiContextField.FORMER_CONTENTS in state.requestedContext) {
+                            ScanChoice(stringResource(R.string.scan_former_contents), formerContentsLabel(state.context.formerContents), AiFormerContents.entries,
+                                { formerContentsLabel(it) }, { onContext(state.context.copy(formerContents = it)) })
+                        }
+                        ScanChoice(stringResource(R.string.scan_recycling_access), reusableLabel(state.context.recyclingAccess), AiAnswer.entries,
+                            { reusableLabel(it) }, { onContext(state.context.copy(recyclingAccess = it)) })
+                        Text(stringResource(R.string.scan_receiver_hint), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        ScanCheck(stringResource(R.string.scan_risk_flag), state.context.riskFlag,
+                            { onContext(state.context.copy(riskFlag = it)) })
+                        if (state.context.riskFlag || state.context.riskType != AiRiskType.UNKNOWN ||
+                            state.context.soiling == AiSoiling.HAZARDOUS || state.context.formerContents == AiFormerContents.CHEMICAL ||
+                            AiContextField.RISK_TYPE in state.requestedContext) {
+                            ScanChoice(stringResource(R.string.scan_risk_type), riskLabel(state.context.riskType), AiRiskType.entries,
+                                { riskLabel(it) }, { onContext(state.context.copy(riskType = it)) })
+                        }
                     }
+                    if (!canRequest) ScanWarning(stringResource(R.string.scan_wait_before_retry))
+                    ActionButton(stringResource(R.string.scan_get_recommendation), onRecommend, Modifier.fillMaxWidth(),
+                        enabled = canRequest)
+                    ScanSecondary(R.string.scan_correct_object, onCorrectObject)
                 }
                 ScanPhase.RECOMMENDATION -> RecommendationContent(
                     state, onMethod, onReviewContext, onCorrectObject, onConfirmConditions,
                     inlineActions = if (inlineActions) ({ actions(Modifier.fillMaxWidth()) }) else null,
                 )
                 ScanPhase.FAILURE -> {
-                    stringResource(when (state.problem) {
+                    val rejectedPhoto = state.problem == ScanProblem.DETECTION &&
+                        (state.error?.kind == ApiFailureKind.FILE_TOO_LARGE || state.error?.kind == ApiFailureKind.UNSUPPORTED_MEDIA)
+                    val failure = stringResource(if (rejectedPhoto) R.string.scan_photo_rejected else when (state.problem) {
                         ScanProblem.NO_OBJECT -> R.string.scan_no_object
                         ScanProblem.EXPIRED -> R.string.scan_session_expired
                         ScanProblem.PHOTO -> R.string.scan_photo_error
@@ -271,13 +301,30 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
                         ScanProblem.RECOMMENDATION -> R.string.scan_recommendation_error
                         ScanProblem.DISABLED -> R.string.scan_disabled
                         else -> R.string.scan_detection_error
-                    }).let { ScanWarning(it, MaterialTheme.typography.bodyMedium) }
+                    })
+                    val failureDetail = when (state.error?.kind) {
+                        ApiFailureKind.RATE_LIMITED -> R.string.error_rate_limited
+                        ApiFailureKind.NETWORK -> R.string.scan_connection_error
+                        ApiFailureKind.TIMEOUT -> R.string.scan_timeout
+                        else -> null
+                    }
+                    ScanWarning(failure, MaterialTheme.typography.bodyMedium, detail = failureDetail?.let { stringResource(it) })
                     if (state.problem == ScanProblem.EXPIRED && state.objectConfirmed && state.confirmedMethod != null)
                         Text(stringResource(R.string.scan_manual_choice_retained), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    if (state.problem != ScanProblem.DISABLED) ScanSecondary(R.string.retry, onRetry)
+                    when (state.problem) {
+                        ScanProblem.DISABLED -> Unit
+                        ScanProblem.NO_OBJECT, ScanProblem.EXPIRED, ScanProblem.PHOTO -> ScanSecondary(R.string.scan_retake, onRetake)
+                        ScanProblem.RECOMMENDATION -> ScanSecondary(R.string.scan_review_answers, onRetry)
+                        ScanProblem.CATALOG, ScanProblem.DETECTION -> when {
+                            rejectedPhoto -> ScanSecondary(R.string.scan_retake, onRetake)
+                            state.photo != null -> ScanSecondary(R.string.scan_review_captured_photo, onRetry)
+                            else -> ScanSecondary(R.string.retry, onRetry)
+                        }
+                        else -> ScanSecondary(R.string.retry, onRetry)
+                    }
                 }
             }
-            if ((!pinCameraManual && state.phase == ScanPhase.CAMERA) || state.phase == ScanPhase.PHOTO || state.phase == ScanPhase.FAILURE) {
+            if ((pinnedSecondary == null && state.phase == ScanPhase.CAMERA) || state.phase == ScanPhase.PHOTO || state.phase == ScanPhase.FAILURE) {
                 HorizontalDivider()
                 Text(stringResource(R.string.scan_manual_hint), style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -294,17 +341,27 @@ internal fun ScanSheetContent(state: ScanState, onDismiss: () -> Unit, onManual:
             .testTag("capture-sheet"),
     ) {
         val pinActions = state.phase == ScanPhase.RECOMMENDATION && maxHeight >= 400.dp
-        val pinCameraManual = state.phase == ScanPhase.CAMERA && maxHeight >= 200.dp && maxHeight < 400.dp
+        val pinnedSecondary = when {
+            state.phase == ScanPhase.RECOMMENDING && maxHeight >= 400.dp -> R.string.scan_stop_and_check_object
+            state.phase == ScanPhase.CAMERA && maxHeight >= 200.dp && maxHeight < 400.dp -> R.string.manual_input
+            else -> null
+        }
         Column(Modifier.fillMaxSize()) {
             Box(Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp).size(38.dp, 4.dp)
                 .background(MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(2.dp)))
-            body(Modifier.weight(1f), !pinActions, pinCameraManual)
+            if (busyLabel != null) {
+                header(Modifier.padding(start = horizontalPadding, end = horizontalPadding, top = 12.dp))
+                ScanBusy(busyLabel, Modifier.fillMaxWidth().padding(horizontal = horizontalPadding))
+            }
+            body(Modifier.weight(1f), !pinActions, pinnedSecondary)
             if (pinActions) actions(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding))
-            if (pinCameraManual) {
+            if (pinnedSecondary != null) {
                 Surface(color = MaterialTheme.colorScheme.surface) {
                     Column(Modifier.fillMaxWidth().padding(horizontal = horizontalPadding)) {
                         HorizontalDivider()
-                        Box(Modifier.padding(vertical = 8.dp)) { ScanSecondary(R.string.manual_input, onManual) }
+                        Box(Modifier.padding(vertical = 8.dp)) {
+                            ScanSecondary(pinnedSecondary, if (state.phase == ScanPhase.RECOMMENDING) onCorrectObject else onManual)
+                        }
                     }
                 }
             }
@@ -576,12 +633,29 @@ internal fun <T> ScanChoice(label: String, value: String, options: List<T>, opti
 @Composable private fun ScanSecondary(label: Int, onClick: () -> Unit) {
     SecondaryActionButton(stringResource(label), onClick, Modifier.fillMaxWidth())
 }
-@Composable private fun ScanBusy(label: Int) {
-    LinearProgressIndicator(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(8.dp)), gapSize = 0.dp)
-    Text(stringResource(label), Modifier.semantics { liveRegion = LiveRegionMode.Polite },
-        color = MaterialTheme.colorScheme.onSurfaceVariant)
+@Composable
+private fun ScanBusy(label: Int, modifier: Modifier = Modifier) {
+    Row(
+        modifier
+            .background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .semantics(mergeDescendants = true) {
+                liveRegion = LiveRegionMode.Polite
+                progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate
+            },
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CircularProgressIndicator(
+            Modifier.size(20.dp).clearAndSetSemantics {},
+            strokeWidth = 2.dp,
+        )
+        Text(stringResource(label), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface)
+    }
 }
-@Composable private fun ScanWarning(message: String, style: TextStyle = MaterialTheme.typography.bodySmall) {
+@Composable
+private fun ScanWarning(message: String, style: TextStyle = MaterialTheme.typography.bodySmall, detail: String? = null) {
     Surface(
         Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
         shape = RoundedCornerShape(16.dp),
@@ -589,7 +663,10 @@ internal fun <T> ScanChoice(label: String, value: String, options: List<T>, opti
         contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
-        Text(message, Modifier.padding(14.dp), style = style)
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(message, style = style)
+            if (detail != null) Text(detail, style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 @Composable private fun cleanlinessLabel(value: Cleanliness) = stringResource(when (value) {

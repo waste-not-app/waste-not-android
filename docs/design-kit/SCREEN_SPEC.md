@@ -136,6 +136,8 @@ A "7 days" / "30 days" toggle, an explicit date range, a summary of weight and c
 
 The 7-day reference dataset gives 1.4 kg, 5 activities, 2 items avoided, and a 50% recycling rate. The gram chart never mixes in counts; use a selector or separate series when handled COUNT data exists. Days with no data show 0 instead of disappearing. Every chart has a text description or table. An empty range shows "No logs in this period", a choice of other periods, and Log activity.
 
+On Android, tapping a daily column selects its date and shows the exact value in grams or items. Previous and next day buttons select the same dates without requiring a chart gesture. A dashed guide identifies the selection without relying on color. The daily numbers list includes both units and dates with no activity.
+
 When the range changes, only the statistics section shows loading, and an old response never overwrites the new range. If a request fails, the old range's data stays correctly labeled; never put a 30-day title over 7-day numbers.
 
 ### S14: Profile and progress
@@ -277,6 +279,8 @@ The 28 September revision added the Log/Scan action at the top center of the doc
 S21 to S25 are phases of one sheet flow in the product; they appear as five gallery entries for handoff. The HTML preview uses a labeled bounding box illustration, not boxes over a camera photo. Scores, objects, and the LLM are fixtures. The browser camera uses getUserMedia when the context is secure; nothing is uploaded. Android camera and API testing stay separate.
 
 On Android S24, one card shows the suggested or chosen method. Change opens a menu without advancing the flow or acknowledging conditions. Correction actions use text buttons; cautions and required conditions remain in the main content. A 150 ms fade marks scan step changes without moving the footer or keeping the previous step alive. Opening or closing the reasoning animates only the disclosure and its chevron. Android's animation scale applies.
+
+Detection and advice show indeterminate progress next to their current step until the response arrives. The photo stays visible during detection; advice keeps the confirmed object visible and can be stopped to check it again. A failed detection can return to the captured photo for review before a new upload, and failed advice returns to the existing answers before a new request.
 
 S05 after AI: only the confirmed category and method are prefilled; the amount comes first and is empty, the unit defaults to g, and the date follows the core rules. Category and method can be expanded to correct them. The primary action stays visible when there is room; on short or keyboard-constrained screens it stays reachable in the scrollable content. Cancelling a scan never creates a log. An existing dirty draft must be kept or confirmed with D03 before it's replaced; never force navigation and discard entries. Default guides that aren't verified in the mockup never become production knowledge.
 

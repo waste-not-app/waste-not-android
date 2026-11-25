@@ -7,7 +7,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.text.TextLayoutResult
@@ -46,7 +49,7 @@ class ServerSummaryScreenTest {
                     onProfile = { profiles++ })
             }
         } }
-        compose.onNodeWithText("6,25 kg").assertExists()
+        compose.onNodeWithText("6.25 kg").assertExists()
         compose.onNodeWithText("25 activities logged").assertExists()
         compose.onNodeWithText("Level 11").performScrollTo().assertIsDisplayed()
         capture("server-home")
@@ -84,11 +87,50 @@ class ServerSummaryScreenTest {
         assertFalse(layouts.single().hasVisualOverflow)
         capture("server-statistics-error")
         compose.runOnIdle { state = SnapshotState(dummyStatistics(emptyList(), ActivityDateRange.lastDays(date, 30), zone), false) }
-        compose.onNodeWithText("7 Okt 2026 to 5 Nov 2026").assertExists()
+        compose.onNodeWithText("7 Oct 2026 to 5 Nov 2026").assertExists()
         compose.onNodeWithText("No logs in this period").assertExists()
         compose.onNodeWithText("Log activity").performScrollTo().performClick()
         capture("server-statistics-empty")
         compose.runOnIdle { assertEquals(1, retries); assertEquals(1, records); assertEquals(30, days) }
+    }
+
+    @Test fun monthBarSelectionFollowsTheRenderedRangeAndClearsWhenItsDateLeaves() {
+        val firstDate = date.minusDays(29)
+        val month = dummyStatistics(
+            listOf(log, log.copy(id = "00000000-0000-4000-8000-000000000002", activityDate = firstDate)),
+            ActivityDateRange.lastDays(date, 30),
+            zone,
+        )
+        val week = dummyStatistics(listOf(log), ActivityDateRange.lastDays(date, 7), zone)
+        var state by mutableStateOf(SnapshotState(month, false))
+        var days by mutableIntStateOf(30)
+        compose.setContent { WasteNotTheme(dark) {
+            Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                StatisticsScreen(state, days, PaddingValues(), {}, {}, onDays = { days = it })
+            }
+        } }
+        val selection = hasAnyAncestor(hasTestTag("daily-weight-chart")) and
+            SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite)
+        val firstDay = selection and hasText(WasteFormat.activityDate(firstDate)) and hasText("250 g")
+        val lastDay = selection and hasText(WasteFormat.activityDate(date)) and hasText("250 g")
+        compose.onNodeWithTag("daily-weight-plot").performScrollTo().performTouchInput {
+            click(Offset(width * 0.5f / 30, height * 0.75f))
+        }
+        compose.onNode(firstDay).assertExists()
+        compose.onNodeWithContentDescription("Previous day").assertIsNotEnabled()
+
+        compose.onNodeWithText("7 days").performScrollTo().performClick()
+        compose.onNodeWithText("Last data · 30 days · 7 Oct 2026 to 5 Nov 2026").assertExists()
+        compose.onNode(firstDay).assertExists()
+
+        compose.runOnIdle { state = SnapshotState(week, false) }
+        compose.onNode(firstDay).assertDoesNotExist()
+        compose.onNode(lastDay).assertExists()
+
+        compose.onNodeWithText("30 days").performScrollTo().performClick()
+        compose.runOnIdle { state = SnapshotState(month, false) }
+        compose.onNode(firstDay).assertDoesNotExist()
+        compose.onNode(lastDay).assertExists()
     }
 
     @Test fun refreshingKeepsTheLabeledSnapshotAndMethodPercentagesDoNotOverflowLong() {
@@ -102,7 +144,7 @@ class ServerSummaryScreenTest {
                 StatisticsScreen(SnapshotState(period, false, ApiFailureKind.TIMEOUT), 7, PaddingValues(), { retries++ }, {}, {})
             }
         } }
-        compose.onNodeWithText("30 Okt 2026 to 5 Nov 2026").assertExists()
+        compose.onNodeWithText("30 Oct 2026 to 5 Nov 2026").assertExists()
         compose.onNodeWithText("Try again").performScrollTo().performClick()
         compose.onNode(hasText("250 g") and hasAnyAncestor(hasTestTag("statistics-summary"))).assertExists()
         compose.onAllNodesWithText("100%").onLast().performScrollTo().assertIsDisplayed()

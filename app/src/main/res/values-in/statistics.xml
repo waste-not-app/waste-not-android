@@ -4,17 +4,21 @@
     <string name="statistics_empty_hint">Pilih periode lain atau mulai catat aktivitasmu.</string>
     <string name="daily_weight_title">Berat ditangani per hari</string>
     <string name="daily_count_title">Benda ditangani per hari</string>
-    <string name="daily_chart_description">%1$s dalam %2$s, %3$s hingga %4$s. Buka Lihat angka harian untuk rincian setiap tanggal.</string>
-    <string name="daily_scale">Nilai tertinggi: %1$s %2$s</string>
-    <string name="daily_axis_weight">Gram per hari. Hari tanpa aktivitas bernilai 0.</string>
-    <string name="daily_axis_count">Jumlah benda per hari. Hari tanpa aktivitas bernilai 0.</string>
-    <string name="daily_scroll_hint">Geser grafik untuk melihat tanggal lainnya.</string>
+    <string name="daily_chart_description">%1$s, %2$s. Gunakan Hari sebelumnya atau Hari berikutnya untuk memilih tanggal, atau buka Lihat angka harian untuk membaca semuanya.</string>
+    <string name="daily_scale">Tertinggi: %1$s</string>
+    <string name="daily_chart_hint">Ketuk satu hari untuk melihat totalnya. Sela menandakan nol.</string>
+    <string name="daily_previous">Hari sebelumnya</string>
+    <string name="daily_next">Hari berikutnya</string>
+    <string name="daily_grams">%1$s g</string>
+    <plurals name="daily_items">
+        <item quantity="other">%1$s benda</item>
+    </plurals>
     <string name="daily_show">Lihat angka harian</string>
     <string name="daily_hide">Tutup angka harian</string>
     <string name="daily_values">Angka harian</string>
     <string name="daily_expanded">Terbuka</string>
     <string name="daily_collapsed">Tertutup</string>
-    <string name="daily_row">%1$s · %2$s g · %3$s benda</string>
+    <string name="daily_row">%1$s · %2$s · %3$s</string>
     <string name="methods_title">Metode pengelolaan</string>
     <string name="method_fraction">%1$d dari %2$d aktivitas</string>
     <string name="methods_basis">Proporsi berdasarkan seluruh aktivitas, termasuk Reduce dan Trash.</string>

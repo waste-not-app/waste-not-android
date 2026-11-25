@@ -761,6 +761,7 @@ internal fun AccountPage(
                 }
             }
         }
+        Box(Modifier.fillMaxWidth().windowInsetsTopHeight(WindowInsets.statusBars).background(colors.background))
     }
 }
 
