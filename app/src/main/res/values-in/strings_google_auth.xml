@@ -1,0 +1,20 @@
+<resources>
+    <string name="google_auth_continue">Lanjutkan dengan Google</string>
+    <string name="google_auth_loading">Memeriksa login Google…</string>
+    <string name="google_auth_link_title">Tautkan akun WasteNot</string>
+    <string name="google_auth_link_description">Email itu sudah digunakan oleh akun WasteNot. Masukkan kata sandi WasteNot, lalu pilih lagi Akun Google yang sama untuk menautkannya.</string>
+    <string name="google_auth_link_password">Kata sandi WasteNot saat ini</string>
+    <string name="google_auth_link_wrong_account">Pilih Akun Google yang sama dengan yang Anda pilih sebelumnya.</string>
+    <string name="google_auth_link_failed">Akun belum bisa ditautkan. Periksa kata sandi WasteNot dan pilih lagi Akun Google yang sama.</string>
+    <string name="google_auth_identity_conflict">Akun Google ini tidak bisa ditautkan. Masuk dengan kata sandi WasteNot.</string>
+    <string name="google_auth_unavailable">Login dengan Google sedang tidak tersedia.</string>
+    <string name="google_auth_no_account">Tidak ada Akun Google yang tersedia. Tambahkan akun ke perangkat ini, lalu coba lagi.</string>
+    <string name="google_auth_expired">Login Google belum bisa diverifikasi. Pilih lagi Akun Google Anda.</string>
+    <string name="google_auth_network">WasteNot tidak dapat dihubungi. Periksa koneksi Anda, lalu coba lagi.</string>
+    <string name="google_auth_rate_limited">Terlalu banyak percobaan. Tunggu sebentar, lalu coba lagi.</string>
+    <string name="google_auth_failed">Login dengan Google belum berhasil. Coba lagi.</string>
+    <string name="google_auth_wrong_account">Akun ini belum bisa diverifikasi. Coba lagi dengan Akun Google yang Anda gunakan untuk WasteNot.</string>
+    <string name="delete_account_google_description">Konfirmasi dengan Akun Google yang Anda gunakan untuk WasteNot untuk menghapus akun.</string>
+    <string name="delete_account_google_confirm">Verifikasi dengan Google dan hapus</string>
+    <string name="delete_account_google_unavailable">Versi aplikasi ini tidak dapat memverifikasi Akun Google. Perbarui WasteNot untuk memverifikasi akun Anda.</string>
+</resources>

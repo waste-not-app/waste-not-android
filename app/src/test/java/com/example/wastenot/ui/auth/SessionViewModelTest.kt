@@ -202,6 +202,70 @@ class SessionViewModelTest {
         assertEquals(2, source.bootstrapCalls)
     }
 
+    @Test fun googleCancelAndLatePickerResultDoNotSubmitOrClearThePasswordForm() = runTest {
+        val source = FakeSession()
+        val vm = model(source)
+        vm.change(AccountField.EMAIL, "saved@example.invalid")
+        vm.change(AccountField.PASSWORD, "fixture-password")
+        val canceled = requireNotNull(vm.beginGoogle())
+        assertEquals(null, vm.beginGoogle())
+        vm.submit(register = false)
+        vm.completeGoogle(canceled, GoogleSelection.Canceled)
+        assertFalse(vm.auth.value.submitting)
+        assertEquals("saved@example.invalid", vm.auth.value.email)
+        assertEquals("fixture-password", vm.auth.value.password)
+        assertEquals(0, source.loginCalls)
+
+        val navigatedAway = requireNotNull(vm.beginGoogle())
+        vm.cancelSubmission()
+        val fresh = requireNotNull(vm.beginGoogle())
+        vm.completeGoogle(navigatedAway, GoogleSelection.Selected("discarded-token", "fixture-account"))
+        runCurrent()
+        assertTrue(source.googleTokens.isEmpty())
+        assertTrue(vm.auth.value.submitting)
+        vm.completeGoogle(fresh, GoogleSelection.Canceled)
+        assertFalse(vm.auth.value.submitting)
+    }
+
+    @Test fun googleLinkRequiresFreshSelectionOfTheSameAccountAndKeepsRecoverableInput() = runTest {
+        val source = FakeSession().apply { googleFailure = ApiFailure(ApiFailureKind.CONFLICT, 409, "GOOGLE_LINK_REQUIRED") }
+        val vm = model(source)
+        val firstToken = GoogleSelection.Selected("fixture-first", "fixture-account")
+        vm.completeGoogle(requireNotNull(vm.beginGoogle()), firstToken)
+        advanceUntilIdle()
+        assertTrue(vm.auth.value.googleLinkRequired)
+        assertEquals(null, vm.beginGoogle())
+        assertEquals(listOf("fixture-first"), source.googleTokens)
+        assertEquals(listOf(null), source.googlePasswords)
+
+        val rawPassword = "  fixture-link-password  "
+        vm.changeGoogleLinkPassword(rawPassword)
+        val wrongAccount = GoogleSelection.Selected("fixture-wrong", "other-account")
+        vm.completeGoogle(requireNotNull(vm.beginGoogle()), wrongAccount)
+        assertEquals(com.example.wastenot.R.string.google_auth_link_wrong_account, vm.auth.value.googleFailure)
+        assertEquals(listOf("fixture-first"), source.googleTokens)
+        source.googleFailure = ApiFailure(ApiFailureKind.UNAUTHENTICATED, 401, "UNAUTHENTICATED")
+        val retry = requireNotNull(vm.beginGoogle())
+        val secondToken = GoogleSelection.Selected("fixture-second", "fixture-account")
+        vm.completeGoogle(retry, secondToken)
+        vm.completeGoogle(retry, secondToken)
+        advanceUntilIdle()
+        assertEquals(com.example.wastenot.R.string.google_auth_link_failed, vm.auth.value.googleFailure)
+        assertEquals(rawPassword, vm.auth.value.googleLinkPassword)
+        assertFalse(vm.auth.value.toString().contains(rawPassword))
+        assertFalse(secondToken.toString().contains("fixture-second"))
+        assertFalse(secondToken.toString().contains("fixture-account"))
+
+        source.googleFailure = null
+        vm.completeGoogle(requireNotNull(vm.beginGoogle()), GoogleSelection.Selected("fixture-third", "fixture-account"))
+        advanceUntilIdle()
+        assertEquals(listOf("fixture-first", "fixture-second", "fixture-third"), source.googleTokens)
+        assertEquals(listOf(null, rawPassword, rawPassword), source.googlePasswords)
+        assertFalse(vm.auth.value.googleLinkRequired)
+        assertEquals("", vm.auth.value.googleLinkPassword)
+        assertTrue(vm.session.value.phase is SessionState.Authenticated)
+    }
+
     private class FakeSession : AccountSession {
         override val state = MutableStateFlow<SessionState>(SessionState.SignedOut())
 
@@ -210,6 +274,9 @@ class SessionViewModelTest {
         var loginCalls = 0
         var registerCalls = 0
         var receivedPassword: String? = null
+        val googleTokens = mutableListOf<String>()
+        val googlePasswords = mutableListOf<String?>()
+        var googleFailure: ApiFailure? = null
         var failure: ApiFailureKind? = null
         var failureFields: Map<String, String> = emptyMap()
         var loginGate: CompletableDeferred<Unit>? = null
@@ -226,6 +293,12 @@ class SessionViewModelTest {
         }
         override suspend fun register(name: String, email: String, password: String, timezone: ZoneId): ApiResult<User> {
             registerCalls++
+            return result()
+        }
+        override suspend fun googleLogin(idToken: String, timezone: ZoneId, currentPassword: String?): ApiResult<User> {
+            googleTokens += idToken
+            googlePasswords += currentPassword
+            googleFailure?.let { return ApiResult.Failure(it) }
             return result()
         }
         override suspend fun logout(): LogoutResult {

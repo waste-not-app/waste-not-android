@@ -45,12 +45,19 @@ fun apiBaseUrl(property: String, defaultValue: String = "", allowLocalHttp: Bool
 android {
     namespace = "com.example.wastenot"
     compileSdk = 37
+    val googleWebClientId = providers.gradleProperty("wastenot.googleWebClientId")
+        .orElse(providers.environmentVariable("WASTENOT_GOOGLE_WEB_CLIENT_ID"))
+        .orElse("").get().trim()
+    require(googleWebClientId.isEmpty() || Regex("[A-Za-z0-9._-]+\\.apps\\.googleusercontent\\.com").matches(googleWebClientId)) {
+        "wastenot.googleWebClientId must be a Google OAuth Web client ID."
+    }
     defaultConfig {
         applicationId = "com.example.wastenot"
         minSdk = 30
         targetSdk = 36
         versionCode = 6
         versionName = "1.0.7"
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
         testInstrumentationRunner = "com.example.wastenot.WasteNotTestRunner"
     }
 
@@ -188,6 +195,9 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.activity.compose)
+  implementation(libs.androidx.credentials.core)
+  implementation(libs.androidx.credentials.play.services.auth)
+  implementation(libs.googleid)
 
   // Arch Components
   implementation(libs.androidx.lifecycle.runtime.compose)

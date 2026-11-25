@@ -135,6 +135,14 @@ Proposed defaults: a 15-minute access token and a 7-day refresh session. The val
 
 Refresh takes a refresh_token, revokes the old token, and issues a new pair atomically. The app serializes refreshes so several 401s never trigger concurrent rotations. If a rotation's outcome is unknown, ask the user to sign in again; never retry the refresh without limit. An authenticated logout revokes the session_id in the JWT, returns 204, and is idempotent. If logout fails on the network, the client still deletes its local secrets and says the session was removed from the device; it can't claim the server session was revoked. The expiry limit still applies.
 
+### Google sign-in
+
+`POST /v1/auth/google/challenge` takes no body and returns `data.nonce`. Pass it to Android Credential Manager as the Google sign-in nonce. Use it once within five minutes. Send the resulting Google ID token to `POST /v1/auth/google` as `id_token`, with the device IANA `timezone`. The server verifies Google's signature, issuer, audience, expiry, verified email, and the one-time nonce. The response is the same 200 session payload as password sign-in.
+
+The server identifies returning users by Google's stable subject, not their email. New Google accounts are passwordless. If the email matches an unlinked password account, `409 GOOGLE_LINK_REQUIRED` asks for the current WasteNot password. Start a new challenge and send it as `current_password` with a fresh ID token; a successful link retains the same account, logs and XP. A different linked Google identity is never replaced (`409 GOOGLE_IDENTITY_CONFLICT`). Google sign-in requires the provider to be configured (`503 GOOGLE_AUTH_UNAVAILABLE` otherwise).
+
+The session user and `/me` include `has_password`. Email password reset does not add a password to a Google-only account. To delete an account, `DELETE /v1/me` accepts one proof: `password`, or `google_id_token` from a fresh challenge and the same linked Google account. The Google ID token is never saved on the device.
+
 ### GET /me
 
 ```json

@@ -1,0 +1,23 @@
+<resources>
+    <color name="google_sign_in_background">#FFFFFF</color>
+    <color name="google_sign_in_foreground">#1F1F1F</color>
+    <color name="google_sign_in_border">#747775</color>
+    <string name="google_auth_continue">Continue with Google</string>
+    <string name="google_auth_loading">Checking Google sign-in…</string>
+    <string name="google_auth_link_title">Link your WasteNot account</string>
+    <string name="google_auth_link_description">A WasteNot account already uses that email. Enter its password, then choose the same Google Account again to link them.</string>
+    <string name="google_auth_link_password">Current WasteNot password</string>
+    <string name="google_auth_link_wrong_account">Choose the same Google Account you selected before.</string>
+    <string name="google_auth_link_failed">Couldn’t verify the link. Check your WasteNot password and choose the same Google Account again.</string>
+    <string name="google_auth_identity_conflict">This Google Account can’t be linked. Sign in with your WasteNot password instead.</string>
+    <string name="google_auth_unavailable">Google sign-in isn’t available right now.</string>
+    <string name="google_auth_no_account">No Google Account was available. Add one to this device and try again.</string>
+    <string name="google_auth_expired">Couldn’t verify Google sign-in. Choose your Google Account again.</string>
+    <string name="google_auth_network">Couldn’t reach WasteNot. Check your connection and try again.</string>
+    <string name="google_auth_rate_limited">Too many attempts. Wait a moment and try again.</string>
+    <string name="google_auth_failed">Couldn’t complete Google sign-in. Try again.</string>
+    <string name="google_auth_wrong_account">Couldn’t verify this account. Try again with the Google Account you use for WasteNot.</string>
+    <string name="delete_account_google_description">Confirm with the Google Account you use for WasteNot to delete your account.</string>
+    <string name="delete_account_google_confirm">Verify with Google and delete</string>
+    <string name="delete_account_google_unavailable">Google verification isn’t available in this build. Update WasteNot to verify your account.</string>
+</resources>

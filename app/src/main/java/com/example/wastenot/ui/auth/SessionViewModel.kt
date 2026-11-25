@@ -2,6 +2,7 @@ package com.example.wastenot.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.wastenot.R
 import com.example.wastenot.data.network.ApiFailureKind
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.repository.AccountSession
@@ -40,6 +41,10 @@ data class AuthUiState(
     val serverFields: Set<AccountField> = emptySet(),
     val failure: ApiFailureKind? = null,
     val submitting: Boolean = false,
+    val googleSubmitting: Boolean = false,
+    val googleFailure: Int? = null,
+    val googleLinkRequired: Boolean = false,
+    val googleLinkPassword: String = "",
     val focusRequest: Int = 0,
 ) {
     override fun toString() = "AuthUiState(submitting=$submitting, errors=${errors.keys}, failure=$failure)"
@@ -57,6 +62,8 @@ class SessionViewModel(private val accounts: AccountSession) : ViewModel() {
     private var pending: Job? = null
     private var bootstrapStarted = false
     private var authRevision = 0L
+    private var googleSelectionAttempt: Long? = null
+    private var googleLinkAccountId: String? = null
 
     fun bootstrap(retry: Boolean = false) {
         if (pending?.isActive == true || (bootstrapStarted && !retry)) return
@@ -83,18 +90,84 @@ class SessionViewModel(private val accounts: AccountSession) : ViewModel() {
     }
 
     fun clearPasswords() {
-        mutableAuth.update { it.copy(password = "", confirmation = "", errors = emptyMap(), serverFields = emptySet(), failure = null) }
+        googleLinkAccountId = null
+        mutableAuth.update { it.copy(password = "", confirmation = "", errors = emptyMap(), serverFields = emptySet(),
+            failure = null, googleFailure = null, googleLinkRequired = false, googleLinkPassword = "") }
     }
 
     fun cancelSubmission() {
         authRevision++
+        googleSelectionAttempt = null
         pending?.cancel()
         clearPasswords()
-        mutableAuth.update { it.copy(submitting = false) }
+        mutableAuth.update { it.copy(submitting = false, googleSubmitting = false) }
+    }
+
+    internal fun changeGoogleLinkPassword(password: String) {
+        mutableAuth.update {
+            if (!it.googleLinkRequired || it.submitting) it else it.copy(googleLinkPassword = password, googleFailure = null)
+        }
+    }
+
+    internal fun dismissGoogleLink() {
+        if (mutableAuth.value.submitting) return
+        googleLinkAccountId = null
+        mutableAuth.update {
+            it.copy(googleLinkRequired = false, googleLinkPassword = "", googleFailure = null)
+        }
+    }
+
+    internal suspend fun googleChallenge() = accounts.googleChallenge()
+
+    internal fun beginGoogle(): Long? {
+        val input = mutableAuth.value
+        if (input.submitting || pending?.isActive == true || mutableLogout.value is LogoutUiState.Pending ||
+            accounts.state.value !is SessionState.SignedOut || (input.googleLinkRequired && input.googleLinkPassword.isEmpty())) {
+            return null
+        }
+        val attempt = ++authRevision
+        googleSelectionAttempt = attempt
+        mutableAuth.update { it.copy(submitting = true, googleSubmitting = true, failure = null, googleFailure = null) }
+        return attempt
+    }
+
+    internal fun completeGoogle(attempt: Long, selection: GoogleSelection) {
+        if (googleSelectionAttempt != attempt) return
+        googleSelectionAttempt = null
+        if (selection !is GoogleSelection.Selected) {
+            mutableAuth.update { it.copy(submitting = false, googleSubmitting = false,
+                googleFailure = (selection as? GoogleSelection.Failure)?.message) }
+            return
+        }
+        val input = mutableAuth.value
+        val password = input.googleLinkPassword.takeIf { input.googleLinkRequired }
+        if (input.googleLinkRequired && selection.accountId != googleLinkAccountId) {
+            mutableAuth.update { it.copy(submitting = false, googleSubmitting = false,
+                googleFailure = R.string.google_auth_link_wrong_account) }
+            return
+        }
+        mutableLogout.value = LogoutUiState.None
+        pending = viewModelScope.launch {
+            try {
+                val result = accounts.googleLogin(selection.idToken, input.timezone, password)
+                if (authRevision != attempt) return@launch
+                when (result) {
+                    is ApiResult.Success -> clearPasswords()
+                    is ApiResult.Failure -> if (result.error.code == "GOOGLE_LINK_REQUIRED") {
+                        googleLinkAccountId = selection.accountId
+                        mutableAuth.update { it.copy(googleLinkRequired = true, googleLinkPassword = "") }
+                    } else {
+                        mutableAuth.update { it.copy(googleFailure = result.error.googleMessage(linking = password != null)) }
+                    }
+                }
+            } finally {
+                if (authRevision == attempt) mutableAuth.update { it.copy(submitting = false, googleSubmitting = false) }
+            }
+        }
     }
 
     fun submit(register: Boolean) {
-        if (pending?.isActive == true || accounts.state.value !is SessionState.SignedOut) return
+        if (mutableAuth.value.submitting || pending?.isActive == true || accounts.state.value !is SessionState.SignedOut) return
         val input = mutableAuth.value
         val errors = if (register) validateRegistrationInput(input.name, input.email, input.password, input.confirmation)
             else validateLoginInput(input.email, input.password)
@@ -105,7 +178,8 @@ class SessionViewModel(private val accounts: AccountSession) : ViewModel() {
         val source = accounts
         val revision = ++authRevision
         mutableLogout.value = LogoutUiState.None
-        mutableAuth.update { it.copy(submitting = true, errors = emptyMap(), serverFields = emptySet(), failure = null) }
+        mutableAuth.update { it.copy(submitting = true, errors = emptyMap(), serverFields = emptySet(),
+            failure = null, googleFailure = null) }
         pending = viewModelScope.launch {
             try {
                 val result = if (register) source.register(input.name, input.email, input.password, input.timezone)
@@ -132,6 +206,8 @@ class SessionViewModel(private val accounts: AccountSession) : ViewModel() {
     fun logout() {
         if (mutableLogout.value is LogoutUiState.Pending) return
         authRevision++
+        googleSelectionAttempt = null
+        googleLinkAccountId = null
         pending?.cancel()
         mutableAuth.value = AuthUiState()
         val source = accounts

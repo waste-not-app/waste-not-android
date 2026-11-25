@@ -12,6 +12,8 @@ interface AccountManagement {
     suspend fun requestPasswordReset(email: String): ApiResult<Unit>
     suspend fun confirmPasswordReset(token: String, password: String): ApiResult<Unit>
     suspend fun deleteAccount(password: String): ApiResult<Unit>
+    suspend fun googleChallenge(): ApiResult<String> = googleNotConfigured()
+    suspend fun deleteGoogleAccount(idToken: String): ApiResult<Unit> = googleNotConfigured()
 }
 
 class RemoteAccountManagement(
@@ -34,6 +36,8 @@ class RemoteAccountManagement(
     }
 
     override suspend fun deleteAccount(password: String) = sessions.deleteAccount(password, clearDeletedAccount)
+    override suspend fun googleChallenge() = sessions.googleChallenge()
+    override suspend fun deleteGoogleAccount(idToken: String) = sessions.deleteGoogleAccount(idToken, clearDeletedAccount)
 
     private fun unavailable() = ApiResult.Failure(ApiFailure(ApiFailureKind.NOT_CONFIGURED))
 }

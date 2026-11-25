@@ -14,6 +14,7 @@ import com.example.wastenot.data.network.dto.RegisterDto
 import com.example.wastenot.data.network.dto.SessionTokens
 import com.example.wastenot.model.User
 import com.example.wastenot.data.network.dto.DeleteAccountDto
+import com.example.wastenot.data.network.dto.GoogleLoginDto
 import com.example.wastenot.model.normalizeAccountEmail
 import java.io.IOException
 import java.time.ZoneId
@@ -56,6 +57,22 @@ class SessionRepository(
         val connection = network ?: return@authenticate failure(ApiFailureKind.NOT_CONFIGURED)
         val input = RegisterDto(name.trim(), normalizeAccountEmail(email), password, timezone.id)
         connection.executor.execute({ it.toModel() }) { connection.api.register(input) }
+    }
+
+    suspend fun googleChallenge(): ApiResult<String> {
+        val connection = network ?: return failure(ApiFailureKind.NOT_CONFIGURED)
+        return connection.executor.execute({ it.nonce.also { nonce ->
+            require(nonce.isNotEmpty() && nonce.all { c ->
+                c in 'A'..'Z' || c in 'a'..'z' || c in '0'..'9' || c == '-' || c == '_'
+            })
+        } }) { connection.api.googleChallenge() }
+    }
+
+    suspend fun googleLogin(idToken: String, timezone: ZoneId, currentPassword: String?): ApiResult<User> = authenticate {
+        val connection = network ?: return@authenticate failure(ApiFailureKind.NOT_CONFIGURED)
+        connection.executor.execute({ it.toModel() }) {
+            connection.api.googleLogin(GoogleLoginDto(idToken, timezone.id, currentPassword))
+        }
     }
 
     suspend fun bootstrap(networkAvailable: Boolean = true): SessionState {
@@ -151,12 +168,18 @@ class SessionRepository(
         }
     }
 
-    suspend fun deleteAccount(password: String, clearDeletedAccount: suspend (String) -> Unit): ApiResult<Unit> {
+    suspend fun deleteAccount(password: String, clearDeletedAccount: suspend (String) -> Unit): ApiResult<Unit> =
+        deleteAccount(DeleteAccountDto(password = password), clearDeletedAccount)
+
+    suspend fun deleteGoogleAccount(idToken: String, clearDeletedAccount: suspend (String) -> Unit): ApiResult<Unit> =
+        deleteAccount(DeleteAccountDto(googleIdToken = idToken), clearDeletedAccount)
+
+    private suspend fun deleteAccount(input: DeleteAccountDto, clearDeletedAccount: suspend (String) -> Unit): ApiResult<Unit> {
         val account = state.value as? SessionState.Authenticated ?: return failure(ApiFailureKind.UNAUTHENTICATED)
         if (account.offline) return failure(ApiFailureKind.NETWORK)
         val connection = network ?: return failure(ApiFailureKind.NOT_CONFIGURED)
         val result = authenticated { credential ->
-            connection.executor.executeEmpty { connection.api.deleteAccount(DeleteAccountDto(password), credential) }
+            connection.executor.executeEmpty { connection.api.deleteAccount(input, credential) }
         }
         val cleanupPending = result is ApiResult.Failure && result.error.code == "ACCOUNT_DELETION_PENDING"
         if (result is ApiResult.Failure && !cleanupPending) return result

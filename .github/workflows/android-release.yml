@@ -66,6 +66,7 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           WASTENOT_RELEASE_API_BASE_URL: ${{ vars.WASTENOT_RELEASE_API_BASE_URL }}
+          WASTENOT_GOOGLE_WEB_CLIENT_ID: ${{ vars.WASTENOT_GOOGLE_WEB_CLIENT_ID }}
         run: |
           set -euo pipefail
           if [ -z "$WASTENOT_RELEASE_API_BASE_URL" ]; then

@@ -36,6 +36,7 @@ import com.example.wastenot.data.repository.AccountManagement
 import com.example.wastenot.data.repository.RemoteAccountManagement
 import com.example.wastenot.data.network.ApiResult
 import com.example.wastenot.data.local.LocalEditorDraftStore
+import com.example.wastenot.ui.auth.clearGoogleCredentials
 import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -65,7 +66,9 @@ open class AppContainer(context: Context) {
         },
     )
     open val accountSession: AccountSession =
-        RemoteAccountSession(sessions, ::networkAvailable)
+        RemoteAccountSession(sessions, ::networkAvailable) {
+            if (BuildConfig.GOOGLE_WEB_CLIENT_ID.isNotBlank()) clearGoogleCredentials(appContext)
+        }
     val core = CoreRepository(network, sessions)
     val ai = AiRepository(network, sessions)
     open val guides: GuideStore = RemoteGuideStore(core)
